@@ -2,9 +2,9 @@
 from plankapy import Planka
 from controllers import Project, Board, Card, List, Stopwatch, Label, Task, CommentAction, Attachment, User, CardMembership, BoardMembership, CardLabel, ProjectManager, Background
 
-API_URL = "http://planka.corp.finelines-engineering.com"
-API_USER = "hwelch"
-API_PASS = "Fiber4u!"
+API_URL = "http://localhost:3000"
+API_USER = "demo@demo.demo"
+API_PASS = "demo"
 
 planka = Planka(API_URL, API_USER, API_PASS)
 
