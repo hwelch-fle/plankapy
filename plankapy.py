@@ -1,6 +1,5 @@
 import requests
 import json
-import time
 
 API_URL = "http://localhost:3000"
 API_USER = "demo@demo.demo"
@@ -13,28 +12,28 @@ class Planka:
     @username: Username of Planka user
     @password: Password of Planka user
     """
-    def __init__(self, url:str, username:str, password:str, api_end="/api", routes="config/planka_routes.json", templates="config/planka_templates.json"):
+    def __init__(self, url:str, username:str, password:str, templates="config/templates.json"):
         self.url = url
         self.username = username
         self.password = password
-        self.api_end = api_end
         self.auth = None
-        with open(routes) as f:
-            self.routes = json.load(f)
         with open(templates) as f:
             self.templates = json.load(f)
         self.authenticate()
+    
+    def __repr__(self):
+        return f"<{type(self).__name__}:\n\tBase URL: {self.url}\n\tLogin User: {self.username}\n\tLogin Pass: {self.password}\n\tAPI Token: {self.auth}\n>"
 
     def deauthenticate(self) -> bool:
         """Deletes the auth token from the Planka API
         @return: True if successful, False if not
         """
         try:
-            self.request("DELETE", self.get_route("access-token", "DELETE", "active"))
+            self.request("DELETE", "/api/access-tokens/me")
             self.auth = None
             return True
         except:
-            return False
+            raise InvalidToken(f"No active access token assigned to this instance\n{self.__repr__()}")
 
     def validate(self) -> bool:
         """Validates the Planka API connection
@@ -44,20 +43,20 @@ class Planka:
             self.request("GET", "/*")
             return True
         except:
-            return False
+            raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
 
     def authenticate(self) -> bool:
         """Gets an auth token from the Planka API
         @return: True if successful, False if not
         """
         try:
-            request = requests.post(f"{self.url}{self.get_route('access-token', 'POST', 'active')}", data={'emailOrUsername': self.username, 'password': self.password})
+            request = requests.post(f"{self.url}/api/access-tokens", data={'emailOrUsername': self.username, 'password': self.password})
             self.auth = request.json()['item']
-            if self.auth == None:
-                raise Exception("Invalid API credentials")
+            if not self.auth:
+                raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
             return True
         except:
-            raise Exception("Invalid API credentials")
+            raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
 
     def request(self, method:str, endpoint:str, data:dict=None) -> dict:
         """Makes a request to the Planka API
@@ -66,7 +65,7 @@ class Planka:
         @data: Data to send with request (default: None)
         @return: JSON response from Planka API
         """
-        if self.auth == None:
+        if not self.auth:
             self.authenticate()
         headers = \
             { 
@@ -77,27 +76,15 @@ class Planka:
         response = requests.request(method, url, headers=headers, json=data)
 
         if response.status_code == 401:
-            raise Exception("Invalid API credentials")
+            raise InvalidToken("Invalid API credentials")
 
         if response.status_code not in [200, 201]:
-            raise Exception(f"Failed to {method} {url} with status code {response.status_code}")
+            raise InvalidToken(f"Failed to {method} {url} with status code {response.status_code}")
 
         try:
             return response.json()
         except:
-            raise Exception(f"Failed to parse response from {url}")
-    
-    def get_route(self, controller:str, method:str, action:str) -> str:
-        """Returns a route from the planka_routes.json file
-        @controller: Name of controller
-        @method: HTTP method
-        @action: Name of request action
-        @return: Route string
-        """
-        try:
-            return self.routes[controller][method][action]
-        except:
-            raise Exception(f"Route not found: {controller} {method} {action}")
+            raise InvalidToken(f"Failed to parse response from {url}")
     
     def get_template(self, template:str) -> dict:
         """Returns a template from the templates.json file
@@ -107,7 +94,7 @@ class Planka:
         try:
             return self.templates[template]
         except:
-            raise Exception(f"Template not found: {template}")
+            raise InvalidToken(f"Template not found: {template}")
         
 class Controller():
     def __init__(self, instance:Planka) -> None:
@@ -135,13 +122,10 @@ class Controller():
         """Builds the controller data
         @return: Controller data dictionary
         """
-        if kwargs == {}:
+        if not kwargs:
             return kwargs
-        data = {}
         valid_keys = self.template.keys()
-        for key, value in kwargs.items():
-            if key in valid_keys:
-                data[key] = value
+        data = {key: value for key, value in kwargs.items() if key in valid_keys}
         self.data = data
         return self.data
 
@@ -153,7 +137,7 @@ class Controller():
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before creating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
         self.response = self.instance.request("POST", route, data)
         return self.response
 
@@ -173,11 +157,11 @@ class Controller():
         if not data:
             data = self.data
         if not self.data:
-            raise Exception(f"Please Build a {type(self).__name__} before updating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before updating")
         self.response = self.instance.request("PATCH", route, data=data)
         return self.response
 
-    def delete(self, route:str) -> dict:
+    def delete(self, route:str) -> dict: 
         """Deletes a controller object (DELETE)
         @route: Route for controller object DELETE request
         @oid: ID of controller object
@@ -205,12 +189,12 @@ class Project(Controller):
         """
         if oid:
             return super().get(f"/api/projects/{oid}")
-        prjs = super().get(f"/api/projects")
+        prjs = super().get("/api/projects")
         if not name:
             return prjs
         prj_names = [prj["name"] for prj in prjs["items"]]
         if name not in prj_names:
-            raise Exception(f"Project {name} not found")
+            raise InvalidToken(f"Project {name} not found")
         prj_id = [prj for prj in prjs["items"] if prj["name"] == name][0]["id"]
         return super().get(f"/api/projects/{prj_id}")
 
@@ -225,9 +209,9 @@ class Project(Controller):
         @return: POST response dictionary
         """
         if not self.data:
-            raise Exception(f"Please Build a {type(self).__name__} before creating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
         if self.data["name"] in [prj["name"] for prj in self.get()['items']]:
-            raise Exception(f"Project {self.data['name']} already exists")
+            raise InvalidToken(f"Project {self.data['name']} already exists")
         return super().create("/api/projects")
     
     def update(self, name:str) -> dict:
@@ -262,7 +246,7 @@ class Board(Controller):
         if oid:
             return super().get(f"/api/boards/{oid}")
         if not (project_name):
-            raise Exception("Please provide a project name")
+            raise InvalidToken("Please provide a project name")
         prj_con = Project(self.instance)
         prj = prj_con.get(project_name)
         boards = prj["included"]["boards"]
@@ -270,7 +254,7 @@ class Board(Controller):
             return boards
         board_names = [board["name"] for board in boards]
         if board_name not in board_names:
-            raise Exception(f"Board `{board_name}` not found")
+            raise InvalidToken(f"Board `{board_name}` not found")
         board_id = [board for board in boards if board["name"] == board_name][0]["id"]
         return super().get(f"/api/boards/{board_id}")
     
@@ -279,8 +263,8 @@ class Board(Controller):
         @prj_name: Name of project to create board in
         @return: POST response dictionary
         """
-        if self.data == None:
-            raise Exception(f"Please Build a {type(self).__name__} before creating")
+        if not self.data:
+            raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
         prj_con = Project(self.instance)
         prj_id = prj_con.get(project_name)['item']['id']
         return super().create(f"/api/projects/{prj_id}/boards")
@@ -295,11 +279,11 @@ class Board(Controller):
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before updating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before updating")
         if oid:
             return super().update(f"/api/boards/{oid}", data=data)
         if not (project_name and board_name):
-            raise Exception("Please provide project and board names")
+            raise InvalidToken("Please provide project and board names")
         board_id = self.get(project_name, board_name)['item']['id']
         return super().update(f"/api/boards/{board_id}", data=self.data)
     
@@ -312,10 +296,10 @@ class Board(Controller):
         """
         if oid:
             return super().delete(f"/api/boards/{oid}")
-        if project_name == None:
-            raise Exception("Please provide a project name")
-        if board_name == None:
-            raise Exception("Please provide a board name")
+        if not project_name:
+            raise InvalidToken("Please provide a project name")
+        if not board_name:
+            raise InvalidToken("Please provide a board name")
         board_id = self.get(project_name, board_name)['item']['id']
         return super().delete(f"/api/boards/{board_id}")
 
@@ -334,15 +318,15 @@ class List(Controller):
         @return: GET response dictionary
         """
         if not (project_name and board_name):
-            raise Exception("Please provide project and board names")
+            raise InvalidToken("Please provide project and board names")
         board_con = Board(self.instance)
         board = board_con.get(project_name, board_name)
         lists = board["included"]["lists"]
         list_names = [lst["name"] for lst in lists]
-        if list_name == None:
+        if not list_name:
             return lists
         if list_name not in list_names:
-            raise Exception(f"List `{list_name}` not found")
+            raise InvalidToken(f"List `{list_name}` not found")
         return [lst for lst in lists if lst["name"] == list_name][0]
     
     def create(self, project_name:str=None, board_name:str=None, data:dict=None):
@@ -354,9 +338,9 @@ class List(Controller):
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before creating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
         if not (project_name and board_name):
-            raise Exception("Please provide project and board name")
+            raise InvalidToken("Please provide project and board name")
         board_con = Board(self.instance)
         board_id = board_con.get(project_name, board_name)['item']['id']
         return super().create(f"/api/boards/{board_id}/lists")
@@ -372,11 +356,11 @@ class List(Controller):
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before updating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before updating")
         if oid:
             return super().update(f"/api/lists/{oid}", data=data)
         if not (project_name and board_name and list_name):
-            raise Exception("Please provide project, board, and list names")
+            raise InvalidToken("Please provide project, board, and list names")
         lst = self.get(project_name, board_name, list_name)
         return super().update(f"/api/lists/{lst['id']}", data=data)
     
@@ -388,10 +372,10 @@ class List(Controller):
         @list_name: Name of list to delete
         @return: DELETE response dictionary
         """
-        if oid != None:
+        if oid:
             return super().delete(f"/api/lists/{oid}")
         if not (project_name and board_name and list_name):
-            raise Exception("Please provide a project, board, and list names")
+            raise InvalidToken("Please provide a project, board, and list names")
         lst = self.get(project_name, board_name, list_name)
         return super().delete(f"/api/lists/{lst['id']}")
 
@@ -413,16 +397,16 @@ class Card(Controller):
         if oid != None:
             return super().get(f"/api/cards/{oid}")
         if not (project_name and board_name and list_name):
-            raise Exception("Please provide project, board, and list names")
+            raise InvalidToken("Please provide project, board, and list names")
         board_con = Board(self.instance)
         board = board_con.get(project_name, board_name)
         lst_id = [ls for ls in board["included"]["lists"] if ls["name"] == list_name][0]["id"]
         cards = [card for card in board["included"]["cards"] if card["listId"] == lst_id]
         card_names = [card["name"] for card in cards]
-        if card_name == None:
+        if not card_name:
             return [self.get(oid=card["id"]) for card in cards]
         if card_name not in card_names:
-            raise Exception(f"Card `{card_name}` not found")
+            raise InvalidToken(f"Card `{card_name}` not found")
         card_id = [card for card in cards if card["name"] == card_name][0]['id']
         return super().get(f"/api/cards/{card_id}")
     
@@ -433,12 +417,12 @@ class Card(Controller):
         @list_name: Name of list to create card in
         @return: POST response dictionary
         """
-        if data == None:
+        if not data:
             data = self.data
-        if data == None:
-            raise Exception(f"Please Build a {type(self).__name__} before creating")
+        if not data:
+            raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
         if not (project_name and board_name and list_name):
-            raise Exception("Please provide a project, board and list names")
+            raise InvalidToken("Please provide a project, board and list names")
         board_con = Board(self.instance)
         board = board_con.get(project_name, board_name)
         lst_id = [ls for ls in board["included"]["lists"] if ls["name"] == list_name][0]["id"]
@@ -456,7 +440,7 @@ class Card(Controller):
         if oid != None:
             return super().delete(f"/api/cards/{oid}")
         if not (project_name and board_name and list_name and card_name):
-            raise Exception("Please provide a project, board, list, and card name")
+            raise InvalidToken("Please provide a project, board, list, and card name")
         card = self.get(project_name, board_name, list_name, card_name)
         return super().delete(f"/api/cards/{card['id']}")
     
@@ -472,11 +456,11 @@ class Card(Controller):
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before updating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before updating")
         if oid:
             return super().update(f"/api/cards/{oid}", data=data)
         if not (project_name and board_name and list_name and card_name):
-            raise Exception("Please provide a project, board, list, and card name")
+            raise InvalidToken("Please provide a project, board, list, and card name")
         card = self.get(project_name, board_name, list_name, card_name)
         return super().update(f"/api/cards/{card['id']}", data=data)
     
@@ -492,7 +476,7 @@ class Card(Controller):
         if oid:
             return self.get(oid=oid)['included']['cardLabels']
         if not (project_name and board_name and list_name and card_name):
-            raise Exception("Please provide project, board, list, and card names")
+            raise InvalidToken("Please provide project, board, list, and card names")
         card_id = self.get(project_name, board_name, list_name, card_name)['item']['id']
         return self.get(oid=card_id)['included']['cardLabels']
     
@@ -514,7 +498,7 @@ class Label(Controller):
         @return: GET response dictionary
         """
         if not (project_name and board_name):
-            raise Exception("Please provide project and board names")
+            raise InvalidToken("Please provide project and board names")
         board_con = Board(self.instance)
         board = board_con.get(project_name, board_name)
         labels = board["included"]["labels"]
@@ -522,7 +506,7 @@ class Label(Controller):
         if not label_name:
             return labels
         if label_name not in label_names:
-            raise Exception(f"Label `{label_name}` not found")
+            raise InvalidToken(f"Label `{label_name}` not found")
         return [label for label in labels if label["name"] == label_name][0]
     
     def create(self, project_name:str=None, board_name:str=None, data:dict=None):
@@ -534,9 +518,9 @@ class Label(Controller):
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before creating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
         if not (project_name and board_name):
-            raise Exception("Please provide project and board names")
+            raise InvalidToken("Please provide project and board names")
         board_con = Board(self.instance)
         board = board_con.get(project_name, board_name)['item']
         return super().create(f"/api/boards/{board['id']}/labels")
@@ -552,7 +536,7 @@ class Label(Controller):
         if oid:
             return super().delete(f"/api/labels/{oid}")
         if not (project_name and board_name and label_name):
-            raise Exception("Please provide project, board, and label names")
+            raise InvalidToken("Please provide project, board, and label names")
         label = self.get(project_name, board_name, label_name)
         return super().delete(f"/api/labels/{label['id']}")
     
@@ -568,12 +552,12 @@ class Label(Controller):
         if label_id and card_id:
             return super().create(f"/api/cards/{card_id}/labels", data={"labelId":label_id})
         if not (project_name and board_name and label_name):
-            raise Exception("Please provide a project, board, label name")
-        if card_id and label_name:
+            raise InvalidToken("Please provide a project, board, label name")
+        if card_id:
             label = self.get(project_name, board_name, label_name)
             return super().create(f"/api/cards/{card_id}/labels", data={"labelId":label['item']['id']})
         if not (card_name and list_name):
-            raise Exception("Please provide a card and list name")
+            raise InvalidToken("Please provide a card and list name")
         card_con = Card(self.instance)
         card = card_con.get(project_name, board_name, list_name, card_name)
         label = self.get(project_name, board_name, label_name)
@@ -591,12 +575,12 @@ class Label(Controller):
         if label_id and card_id:
             return super().delete(f"/api/cards/{card_id}/labels/{label_id}")
         if not (project_name and board_name and label_name):
-            raise Exception("Please provide a project, board, label name")
-        if card_id and label_name:
+            raise InvalidToken("Please provide a project, board, label name")
+        if card_id:
             label_id = [label['id'] for label in Card(self.instance).get_labels(oid=card_id) if label['name'] == label_name][0]
             return super().delete(f"/api/cards/{card_id}/labels/{label['item']['id']}")
         if not (card_name and list_name):
-            raise Exception("Please provide a card and list name")
+            raise InvalidToken("Please provide a card and list name")
         card_con = Card(self.instance)
         card = card_con.get(project_name, board_name, list_name, card_name)
         label = self.get(project_name, board_name, label_name)
@@ -619,7 +603,7 @@ class Task(Controller):
         @return: GET response dictionary
         """
         if not (project_name and board_name and list_name and card_name):
-            raise Exception("Please provide project, board, list, and card names")
+            raise InvalidToken("Please provide project, board, list, and card names")
         board_con = Board(self.instance)
         board = board_con.get(project_name, board_name)
         list_id = [ls for ls in board["included"]["lists"] if ls["name"] == list_name][0]["id"]
@@ -627,10 +611,10 @@ class Task(Controller):
         card_id = [card for card in cards if card["name"] == card_name][0]["id"]
         tasks = [task for task in board["included"]["tasks"] if task["cardId"] == card_id]
         task_names = [task["name"] for task in tasks]
-        if task_name == None:
+        if not task_name:
             return tasks
         if task_name not in task_names:
-            raise Exception(f"Task `{task_name}` not found")
+            raise InvalidToken(f"Task `{task_name}` not found")
         return [task for task in tasks if task["name"] == task_name][0]
     
     def create(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, data:dict=None, card_id:str=None):
@@ -645,11 +629,11 @@ class Task(Controller):
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before creating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
         if card_id:
             return super().create(f"/api/cards/{card_id}/tasks")
         if not (project_name and board_name and list_name and card_name):
-            raise Exception("Please provide project, board, list, and card names")
+            raise InvalidToken("Please provide project, board, list, and card names")
         board_con = Board(self.instance)
         board = board_con.get(project_name, board_name)
         list_id = [ls for ls in board["included"]["lists"] if ls["name"] == list_name][0]["id"]
@@ -670,11 +654,11 @@ class Task(Controller):
         if not data:
             data = self.data
         if not data:
-            raise Exception(f"Please Build a {type(self).__name__} before updating")
+            raise InvalidToken(f"Please Build a {type(self).__name__} before updating")
         if oid:
             return super().update(f"/api/tasks/{oid}")
         if not (project_name and board_name and list_name and card_name and task_name):
-            raise Exception("Please provide project, board, list, card, and task names")
+            raise InvalidToken("Please provide project, board, list, card, and task names")
         task = self.get(project_name, board_name, list_name, card_name, task_name)
         return super().update(f"/api/tasks/{task['id']}")
        
@@ -691,7 +675,7 @@ class Task(Controller):
         if oid:
             return super().delete(f"/api/tasks/{id}")
         if not (project_name and board_name and list_name and card_name and task_name):
-            raise Exception("Please provide project, board, list, card, and task names")
+            raise InvalidToken("Please provide project, board, list, card, and task names")
         task = self.get(project_name, board_name, list_name, card_name, task_name)
         return super().delete(f"/api/tasks/{task['id']}")
 
@@ -728,9 +712,9 @@ class Background(Controller):
         project = Project(self.instance)
         prj_id = project.get(prj_name)["item"]["id"]
         if "type" not in self.data.keys():
-            raise Exception("Please specify a background type: `gradient` | `image`")
+            raise InvalidToken("Please specify a background type: `gradient` | `image`")
         if self.data["type"] == "gradient" and self.data["name"] not in self.options:
-            raise Exception(f"Gradient {self.data['name']} not found: please choose from\n{self.options}")
+            raise InvalidToken(f"Gradient {self.data['name']} not found: please choose from\n{self.options}")
         return super().update(f"/api/projects/{prj_id}", data={"background": self.data})
     
     def clear(self, prj_name:str):
@@ -750,92 +734,72 @@ class Comment(Controller):
 
 class User(Controller):
     def __init__(self, instance:Planka, **kwargs) -> None:
+        """Creates a user
+        @username: Username of user to create
+        @name: Display name of user to create
+        @password: Password of user to create
+        @email: Email of user to create
+        @subscribe: Subscibe user to own cards (default: False)
+        @organization: Organization of user to create (default: None)
+        @admin: Admin state of user to create (default: False)
+        """
         self.instance = instance
         self.template = instance.get_template("user")
         self.data = self.build(**kwargs)
 
-def test_planka():
-    import random
-    planka = Planka(API_URL, API_USER, API_PASS)
-    project = Project(planka)
-    board = Board(planka)
-    lst = List(planka)
-    card = Card(planka)
-    label = Label(planka)
-    task = Task(planka)
-    attachment = Attachment(planka)
-    stopwatch = Stopwatch(planka)
-    background = Background(planka)
-    comment = Comment(planka)
-    user = User(planka)
-
-    if "Plankapy Test Project" in [prj["name"] for prj in project.get()["items"]]:
-        project.delete("Plankapy Test Project")
-        
-
-    project.build(name="Plankapy Test Project")
-    project.create()
-    print("Created Test Project")
+    def get(self, username:str=None):
+        """Gets a user
+        @username: Username of user to get (all if not provided)
+        @return: GET response dictionary
+        """
+        if not username:
+            return super().get("/api/users")["items"]
+        users = super().get("/api/users")["items"]
+        names = [user["username"] for user in users]
+        if username not in names:
+            raise InvalidToken(f"User {username} not found")
+        return users[names.index(username)]
     
-    board.build(name="Test Board", type="kanban", position=OFFSET)
-    board.create("Plankapy Test Project")
-    print("Created Test Board")
+    def create(self, data:dict=None):
+        """Creates a user
+        @data: Data dictionary to create user with (optional)
+        @return: POST response dictionary
+        """
+        if not data:
+            data = self.data
+        if not data:
+            raise InvalidToken("Please either build a user or provide a data dictionary")
+        if self.data["username"] in [user["username"] for user in self.get()]:
+            raise InvalidToken(f"User {self.data['username']} already exists")
+        return super().create("/api/users", data=self.data)
     
-    next_pos = OFFSET
-    new_labels = []
-    for color in label.colors():
-        label.build(name=f"{color} label", color=color, position=next_pos)
-        new_labels.append(label.create("Plankapy Test Project", "Test Board")["item"])
-        next_pos += OFFSET
-        print(f"Created {color} Label")
-    lst.build(name="Test List", position=0)
-    lst.create("Plankapy Test Project", "Test Board")
-    print("Created Test List")
+    def delete(self, username:str, oid:str=None):
+        """Deletes a user
+        @username: Username of user to delete
+        @oid: ID of user to delete (Use this if you already have the ID)
+        @return: DELETE response dictionary
+        """
+        if oid:
+            return super().delete(f"/api/users/{oid}")
+        if username not in [user["username"] for user in self.get()]:
+            raise InvalidToken(f"User {username} not found")
+        return super().delete(f"/api/users/{self.get(username)['id']}")
     
-    new_cards=[]
-    next_pos = OFFSET
-    for i in range(1, 11):
-        card.build(name=f"Test Card {i}", description=f"CHANGE ME {i}", position=next_pos)
-        next_pos += OFFSET
-        new_cards.append(card.create("Plankapy Test Project", "Test Board", "Test List")["item"])
-        print(f"Created Test Card {i}")
+    def update(self, username:str, oid:str=None, data:dict=None):
+        """Updates a user
+        @username: Username of user to update
+        @oid: ID of user to update (Use this if you already have the ID)
+        @data: Data dictionary to update user with (optional)
+        @return: PATCH response dictionary
+        """
+        user = self.get(username)
+        if not data:
+            data = self.data
+        if not data:
+            raise InvalidToken("Please either build a user or provide a data dictionary")
+        return super().update(f"/api/users/{user['id']}", data=data)
     
-    for cd in new_cards:
-        lb = random.choice(new_labels)
-        label.add(label_id=lb["id"], card_id=cd["id"])
-    print("added random labels to cards")
-        
-    for i in range(int(len(new_cards)/2)):
-        cd = random.choice(new_cards)
-        lbs = card.get_labels("Plankapy Test Project", "Test Board", oid=cd["id"])
-        for lb in lbs:
-            print(lb)
-            label.remove(label_id=lb["labelId"], card_id=lb["cardId"])
-            print(f"removed label from {cd['name']}")
-    print("removed random labels from half the cards")
-    
-    new_tasks=[]
-    for cd in new_cards:
-        next_pos=OFFSET
-        for i in range(1,5):
-            task.build(name=f"Test Task {i}", position=next_pos)
-            next_pos += OFFSET
-            print(cd)
-            new_tasks.append(task.create(card_id=cd["id"])["item"])
-        print(f"Created 4 tasks on {cd['name']}")
-    
-    for tsk in new_tasks:
-        print(tsk)
-        task.build(name=f"Updated Task: {tsk['name']}", isCompleted=True)
-        task.update(oid=tsk["id"])
-    print("Updated task all tasks")
-    
-    for grad in background.gradients():
-        grad = grad
-        background.build(name=grad, type="gradient")
-        background.apply("Plankapy Test Project")
-        print(f"Applied gradient {grad} to Test Project")
-        
-    background.clear("Plankapy Test Project")
-    print("Cleared gradient from Test Project")
-    print("Tests complete")
+class InvalidToken(Exception):
+    """General Error for invalid API inputs
+    """
+    pass
