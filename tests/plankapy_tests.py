@@ -2,6 +2,8 @@ from plankapy import *
 import random
 
 def test_planka():
+    ## In no way meant to be efficient code, just a way to test all components 
+    ## of the API
     planka = Planka(API_URL, API_USER, API_PASS)
     project = Project(planka)
     board = Board(planka)
