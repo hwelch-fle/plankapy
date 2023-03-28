@@ -229,6 +229,49 @@ class Project(Controller):
         """
         prj_id = self.get(name)['item']['id']
         return super().delete(f"/api/projects/{prj_id}")
+    
+    def assign_manager(self, project_name:str=None, user_name:str=None, oid:str=None, uid:str=None) -> dict:
+        """Assigns a manager to a project
+        @oid: ID of project to assign manager to (optional)
+        @uid: ID of user to assign as manager (optional)
+        @project_name: Name of project to assign manager to
+        @user_name: Name of user to assign as manager
+        @return: PATCH response dictionary
+        """
+        if oid:
+            prj_id = oid
+        else:
+            prj_id = self.get(project_name)['item']['id']
+        if uid:
+            usr_id = uid
+        else:
+            usr_con = User(self.instance)
+            usr_id = usr_con.get(user_name)['item']['id']
+        return super().update(f"/api/projects/{prj_id}/managers", data={"userId": usr_id})
+
+    def remove_manager(self, project_name:str=None, user_name:str=None, oid:str=None, uid:str=None) -> dict:
+        """Deletes a manager from a project
+        @oid: ID of project to delete manager from (optional)
+        @uid: ID of user to delete as manager (optional)
+        @project_name: Name of project to delete manager from
+        @user_name: Name of user to delete as manager
+        @return: PATCH response dictionary
+        """
+        if oid:
+            prj_id = oid
+        else:
+            prj_id = self.get(project_name)['item']['id']
+        if uid:
+            usr_id = uid
+        else:
+            usr_con = User(self.instance)
+            usr_id = usr_con.get(user_name)['item']['id']
+        prj_mans = Project(self.instance).get(oid=prj_id)['included']['projectManagers']
+        if usr_id in [oid['userId'] for oid in prj_mans]:
+            man_id = [oid['id'] for oid in prj_mans if oid['userId'] == usr_id][0]
+            return super().delete(f"/api/project-managers/{man_id}")
+        else:
+            raise InvalidToken(f"User {user_name} is not a manager of project {project_name}")
 
 class Board(Controller):
     def __init__(self, instance:Planka, **kwargs) -> None:
@@ -302,6 +345,51 @@ class Board(Controller):
             raise InvalidToken("Please provide a board name")
         board_id = self.get(project_name, board_name)['item']['id']
         return super().delete(f"/api/boards/{board_id}")
+
+    def assign_member(self, project_name:str=None, board_name:str=None, user_name:str=None, oid:str=None, uid:str=None, editor:bool=False) -> dict:
+        """Assigns a user to a board
+        @oid: ID of board to assign user to (optional)
+        @uid: ID of user to assign to board (optional)
+        @editor: Toggle user role to editor (default: viewer)
+        @project_name: Name of project to assign user to board in
+        @board_name: Name of board to assign user to
+        @user_name: Name of user to assign to board
+        @return: POST response dictionary
+        """
+        if oid:
+            board_id = oid
+        else:
+            board_id = self.get(project_name, board_name)['item']['id']
+        if uid:
+            usr_id = uid
+        else:
+            usr_con = User(self.instance)
+            usr_id = usr_con.get(user_name)['item']['id']
+        data={"userId": usr_id, "role":  ("editor" if editor else "viewer"), "canComment": True}
+        return super().create(f"/api/boards/{board_id}/memberships", data=data)
+
+    def update_member(self, project_name:str=None, board_name:str=None, user_name:str=None, oid:str=None, uid:str=None, editor:bool=False) -> dict:
+        """Updates a user's role on a board
+        @oid: ID of board to update user's role on (optional)
+        @uid: ID of user to update role on (optional)
+        @editor: Toggle user role to editor (default: viewer)
+        @project_name: Name of project to update user's role on board in
+        @board_name: Name of board to update user's role on
+        @user_name: Name of user to update role on board
+        @return: PATCH response dictionary
+        """
+        if oid:
+            board_id = oid
+        else:
+            board_id = self.get(project_name, board_name)['item']['id']
+        if uid:
+            usr_id = uid
+        else:
+            usr_con = User(self.instance)
+            usr_id = usr_con.get(user_name)['item']['id']
+        if not role:
+            role = "viewer"
+        return super().update(f"/api/board-memberships/{usr_id}", data={"role": role})
 
 class List(Controller):
     def __init__(self, instance:Planka, **kwargs) -> None:
