@@ -47,7 +47,9 @@
     "board-membership":
         {
             "boardId": "int",
-            "userId": "int"
+            "userId": "int",
+            "role": "str : editor | viewer",
+            "canComment": "bool  : viewer only"
         },
     "project-manager":
         {
@@ -82,7 +84,7 @@
     "background":
         {
             "name": "str",
-            "type": "str"
+            "type": "str : background | image"
         },
     "gradients":
             [
