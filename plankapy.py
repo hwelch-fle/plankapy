@@ -8,9 +8,9 @@ OFFSET = 65535
 
 class Planka:
     """API wrapper class for Planka
-    -url: URL of Planka instance
-    -username: Username of Planka user
-    -password: Password of Planka user
+    - url: URL of Planka instance
+    - username: Username of Planka user
+    - password: Password of Planka user
     """
     def __init__(self, url:str, username:str, password:str, templates="config/templates.json"):
         self.url = url
