@@ -2,15 +2,15 @@ import requests
 import json
 
 API_URL = "http://localhost:3000"
-API_USER = "demo@demo.demo"
+API_USER = "demo-demo.demo"
 API_PASS = "demo"
 OFFSET = 65535
 
 class Planka:
     """API wrapper class for Planka
-    @url: URL of Planka instance
-    @username: Username of Planka user
-    @password: Password of Planka user
+    -url: URL of Planka instance
+    -username: Username of Planka user
+    -password: Password of Planka user
     """
     def __init__(self, url:str, username:str, password:str, templates="config/templates.json"):
         self.url = url
@@ -26,7 +26,7 @@ class Planka:
 
     def deauthenticate(self) -> bool:
         """Deletes the auth token from the Planka API
-        @return: True if successful, False if not
+        -return: True if successful, False if not
         """
         try:
             self.request("DELETE", "/api/access-tokens/me")
@@ -37,7 +37,7 @@ class Planka:
 
     def validate(self) -> bool:
         """Validates the Planka API connection
-        @return: True if successful, False if not
+        -return: True if successful, False if not
         """
         try:
             self.request("GET", "/*")
@@ -47,7 +47,7 @@ class Planka:
 
     def authenticate(self) -> bool:
         """Gets an auth token from the Planka API
-        @return: True if successful, False if not
+        -return: True if successful, False if not
         """
         try:
             request = requests.post(f"{self.url}/api/access-tokens", data={'emailOrUsername': self.username, 'password': self.password})
@@ -60,10 +60,10 @@ class Planka:
 
     def request(self, method:str, endpoint:str, data:dict=None) -> dict:
         """Makes a request to the Planka API
-        @method: HTTP method
-        @endpoint: API endpoint
-        @data: Data to send with request (default: None)
-        @return: JSON response from Planka API
+        -method: HTTP method
+        -endpoint: API endpoint
+        -data: Data to send with request (default: None)
+        -return: JSON response from Planka API
         """
         if not self.auth:
             self.authenticate()
@@ -88,8 +88,8 @@ class Planka:
     
     def get_template(self, template:str) -> dict:
         """Returns a template from the templates.json file
-        @template: Name of template to return
-        @return: Template dictionary
+        -template: Name of template to return
+        -return: Template dictionary
         """
         try:
             return self.templates[template]
@@ -99,7 +99,7 @@ class Planka:
 class Controller():
     def __init__(self, instance:Planka) -> None:
         """Controller class for Planka API
-        @instance: Planka API instance
+        -instance: Planka API instance
         """
         self.instance = instance
         self.template:dict = None
@@ -108,19 +108,19 @@ class Controller():
 
     def __str__(self) -> str:
         """Returns a string representation of the controller object
-        @return: String representation of controller object
+        -return: String representation of controller object
         """
         return f"{type(self).__name__}:\n{json.dumps(self.data, sort_keys=True, indent=4)}"
 
     def __repr__(self) -> str:
         """Returns a string representation of the controller object
-        @return: String representation of controller object
+        -return: String representation of controller object
         """
         return f"<{type(self).__name__}({self.__class__.__bases__[0].__name__})>{self.__str__()}"
 
     def build(self, **kwargs) -> dict:
         """Builds the controller data
-        @return: Controller data dictionary
+        -return: Controller data dictionary
         """
         if not kwargs:
             return kwargs
@@ -131,8 +131,8 @@ class Controller():
 
     def create(self, route:str, data:dict=None) -> dict:
         """Creates a new controller object (POST)
-        @route: Route for controller object POST request
-        @return: POST response dictionary
+        -route: Route for controller object POST request
+        -return: POST response dictionary
         """
         if not data:
             data = self.data
@@ -143,16 +143,16 @@ class Controller():
 
     def get(self, route:str) -> dict:
         """Gets a controller object (GET)
-        @route: Route for controller object GET request
-        @return: GET response dictionary
+        -route: Route for controller object GET request
+        -return: GET response dictionary
         """
         return self.instance.request("GET", route)
 
     def update(self, route:str, data:dict=None) -> dict:
         """Updates a controller object (PATCH)
-        @route: Route for controller object PATCH request
-        @oid: ID of controller object
-        @return: PATCH response dictionary
+        -route: Route for controller object PATCH request
+        -oid: ID of controller object
+        -return: PATCH response dictionary
         """
         if not data:
             data = self.data
@@ -163,15 +163,15 @@ class Controller():
 
     def delete(self, route:str) -> dict: 
         """Deletes a controller object (DELETE)
-        @route: Route for controller object DELETE request
-        @oid: ID of controller object
-        @return: DELETE response dictionary
+        -route: Route for controller object DELETE request
+        -oid: ID of controller object
+        -return: DELETE response dictionary
         """
         return self.instance.request("DELETE", route)
     
     def last_response(self) -> dict:
         """Returns the last response from the controller object
-        @return: Last response dictionary
+        -return: Last response dictionary
         """
         return self.response
 
@@ -183,9 +183,9 @@ class Project(Controller):
 
     def get(self, name:str=None, oid:str=None) -> dict:
         """Gets a project by name
-        @oid: ID of project to get (optional)
-        @name: Name of project if None returns all projects
-        @return: GET response dictionary
+        -oid: ID of project to get (optional)
+        -name: Name of project if None returns all projects
+        -return: GET response dictionary
         """
         if oid:
             return super().get(f"/api/projects/{oid}")
@@ -200,13 +200,13 @@ class Project(Controller):
 
     def get_project_names(self) -> list:
         """Gets a list of project names
-        @return: List of project names
+        -return: List of project names
         """
         return [prj["name"] for prj in self.get()['items']]
     
     def create(self) -> dict:
         """Creates a new project
-        @return: POST response dictionary
+        -return: POST response dictionary
         """
         if not self.data:
             raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
@@ -216,16 +216,16 @@ class Project(Controller):
     
     def update(self, name:str) -> dict:
         """Updates a project
-        @name: Name of project to update
-        @return: PATCH response dictionary
+        -name: Name of project to update
+        -return: PATCH response dictionary
         """
         prj_id = prj_id = self.get(name)['item']['id']
         return super().update(f"/api/projects/{prj_id}")
 
     def delete(self, name:str) -> dict:
         """Deletes a project
-        @name: Name of project to delete
-        @return: DELETE response dictionary
+        -name: Name of project to delete
+        -return: DELETE response dictionary
         """
         prj_id = self.get(name)['item']['id']
         return super().delete(f"/api/projects/{prj_id}")
@@ -238,10 +238,10 @@ class Board(Controller):
     
     def get(self, project_name:str=None, board_name:str=None, oid:str=None) -> dict:
         """Gets a board by name
-        @oid: ID of board to get (optonal)
-        @name: Name of board if None returns all boards
-        @project_name: Name of project to get boards from
-        @return: GET response dictionary
+        -oid: ID of board to get (optonal)
+        -name: Name of board if None returns all boards
+        -project_name: Name of project to get boards from
+        -return: GET response dictionary
         """
         if oid:
             return super().get(f"/api/boards/{oid}")
@@ -260,8 +260,8 @@ class Board(Controller):
     
     def create(self, project_name:str) -> dict:
         """Creates a new board
-        @prj_name: Name of project to create board in
-        @return: POST response dictionary
+        -prj_name: Name of project to create board in
+        -return: POST response dictionary
         """
         if not self.data:
             raise InvalidToken(f"Please Build a {type(self).__name__} before creating")
@@ -271,10 +271,10 @@ class Board(Controller):
     
     def update(self, project_name:str=None, board_name:str=None, data:dict=None, oid:str=None) -> dict:
         """Updates a board
-        @oid: ID of board to update (optional)
-        @project_name: Name of project to update board in
-        @board_name: Name of board to update
-        @return: PATCH response dictionary
+        -oid: ID of board to update (optional)
+        -project_name: Name of project to update board in
+        -board_name: Name of board to update
+        -return: PATCH response dictionary
         """
         if not data:
             data = self.data
@@ -289,10 +289,10 @@ class Board(Controller):
     
     def delete(self, project_name:str=None, board_name:str=None, oid:str=None):
         """Deletes a board
-        @oid: ID of board to delete (optional)
-        @project_name: Name of project to delete board in
-        @board_name: Name of board to delete
-        @return: DELETE response dictionary
+        -oid: ID of board to delete (optional)
+        -project_name: Name of project to delete board in
+        -board_name: Name of board to delete
+        -return: DELETE response dictionary
         """
         if oid:
             return super().delete(f"/api/boards/{oid}")
@@ -312,10 +312,10 @@ class List(Controller):
     def get(self, project_name:str=None, board_name:str=None, list_name:str=None):
         """Gets a list by name
         NOTE: No GET route for list by ID
-        @project_name: Name of project to get list from
-        @board_name: Name of board to get list from
-        @list_name: Name of list to get
-        @return: GET response dictionary
+        -project_name: Name of project to get list from
+        -board_name: Name of board to get list from
+        -list_name: Name of list to get
+        -return: GET response dictionary
         """
         if not (project_name and board_name):
             raise InvalidToken("Please provide project and board names")
@@ -331,9 +331,9 @@ class List(Controller):
     
     def create(self, project_name:str=None, board_name:str=None, data:dict=None):
         """Creates a new list
-        @project_name: Name of project to create list in
-        @board_name: Name of board to create list in
-        @return: POST response dictionary
+        -project_name: Name of project to create list in
+        -board_name: Name of board to create list in
+        -return: POST response dictionary
         """
         if not data:
             data = self.data
@@ -347,11 +347,11 @@ class List(Controller):
     
     def update(self, project_name:str=None, board_name:str=None, list_name:str=None, data:dict=None, oid:str=None):
         """Updates a list
-        @oid: ID of list to update (optional)
-        @project_name: Name of project to update list in
-        @board_name: Name of board to update list in
-        @list_name: Name of list to update
-        @return: PATCH response dictionary
+        -oid: ID of list to update (optional)
+        -project_name: Name of project to update list in
+        -board_name: Name of board to update list in
+        -list_name: Name of list to update
+        -return: PATCH response dictionary
         """        
         if not data:
             data = self.data
@@ -366,11 +366,11 @@ class List(Controller):
     
     def delete(self, project_name:str=None, board_name:str=None, list_name:str=None, oid:str=None):
         """Deletes a list
-        @oid: ID of list to delete (optional)
-        @project_name: Name of project to delete list in
-        @board_name: Name of board to delete list in
-        @list_name: Name of list to delete
-        @return: DELETE response dictionary
+        -oid: ID of list to delete (optional)
+        -project_name: Name of project to delete list in
+        -board_name: Name of board to delete list in
+        -list_name: Name of list to delete
+        -return: DELETE response dictionary
         """
         if oid:
             return super().delete(f"/api/lists/{oid}")
@@ -387,12 +387,12 @@ class Card(Controller):
 
     def get(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, oid:str=None):
         """Gets a card by name
-        @oid: ID of card to get (optional)
-        @project_name: Name of project to get card from
-        @board_name: Name of board to get card from
-        @list_name: Name of list to get card from
-        @card_name: Name of card to get
-        @return: GET response dictionary
+        -oid: ID of card to get (optional)
+        -project_name: Name of project to get card from
+        -board_name: Name of board to get card from
+        -list_name: Name of list to get card from
+        -card_name: Name of card to get
+        -return: GET response dictionary
         """
         if oid != None:
             return super().get(f"/api/cards/{oid}")
@@ -412,10 +412,10 @@ class Card(Controller):
     
     def create(self, project_name:str=None, board_name:str=None, list_name:str=None, data:dict=None):
         """Creates a new card
-        @project_name: Name of project to create card in
-        @board_name: Name of board to create card in
-        @list_name: Name of list to create card in
-        @return: POST response dictionary
+        -project_name: Name of project to create card in
+        -board_name: Name of board to create card in
+        -list_name: Name of list to create card in
+        -return: POST response dictionary
         """
         if not data:
             data = self.data
@@ -430,12 +430,12 @@ class Card(Controller):
 
     def delete(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, oid:str=None):
         """Deletes a card
-        @oid: ID of card to delete (optional)
-        @project_name: Name of project to delete card in
-        @board_name: Name of board to delete card in
-        @list_name: Name of list to delete card in
-        @card_name: Name of card to delete
-        @return: DELETE response dictionary
+        -oid: ID of card to delete (optional)
+        -project_name: Name of project to delete card in
+        -board_name: Name of board to delete card in
+        -list_name: Name of list to delete card in
+        -card_name: Name of card to delete
+        -return: DELETE response dictionary
         """
         if oid != None:
             return super().delete(f"/api/cards/{oid}")
@@ -446,12 +446,12 @@ class Card(Controller):
     
     def update(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, data:dict=None, oid:str=None):
         """Updates a card
-        @oid: ID of card to update (optional)
-        @project_name: Name of project to update card in
-        @board_name: Name of board to update card in
-        @list_name: Name of list to update card in
-        @card_name: Name of card to update
-        @return: PATCH response dictionary
+        -oid: ID of card to update (optional)
+        -project_name: Name of project to update card in
+        -board_name: Name of board to update card in
+        -list_name: Name of list to update card in
+        -card_name: Name of card to update
+        -return: PATCH response dictionary
         """
         if not data:
             data = self.data
@@ -466,12 +466,12 @@ class Card(Controller):
     
     def get_labels(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, oid:str=None):
         """Gets labels for a card
-        @oid: ID of card to get labels from (optional)
-        @project_name: Name of project to get card from
-        @board_name: Name of board to get card from
-        @list_name: Name of list to get card from
-        @card_name: Name of card to get
-        @return: GET response dictionary
+        -oid: ID of card to get labels from (optional)
+        -project_name: Name of project to get card from
+        -board_name: Name of board to get card from
+        -list_name: Name of list to get card from
+        -card_name: Name of card to get
+        -return: GET response dictionary
         """
         if oid:
             return self.get(oid=oid)['included']['cardLabels']
@@ -492,10 +492,10 @@ class Label(Controller):
     
     def get(self, project_name:str=None, board_name:str=None, label_name:str=None) -> dict:
         """Gets a label by name
-        @project_name: Name of project to get label from
-        @board_name: Name of board to get label from
-        @label_name: Name of label to get
-        @return: GET response dictionary
+        -project_name: Name of project to get label from
+        -board_name: Name of board to get label from
+        -label_name: Name of label to get
+        -return: GET response dictionary
         """
         if not (project_name and board_name):
             raise InvalidToken("Please provide project and board names")
@@ -511,9 +511,9 @@ class Label(Controller):
     
     def create(self, project_name:str=None, board_name:str=None, data:dict=None):
         """Creates a new label
-        @project_name: Name of project to create label in
-        @board_name: Name of board to create label in
-        @return: POST response dictionary
+        -project_name: Name of project to create label in
+        -board_name: Name of board to create label in
+        -return: POST response dictionary
         """
         if not data:
             data = self.data
@@ -527,11 +527,11 @@ class Label(Controller):
     
     def delete(self, project_name:str=None, board_name:str=None, label_name:str=None, oid:str=None):
         """Deletes a label
-        @oid: ID of label to delete (optional)
-        @project_name: Name of project to delete label from
-        @board_name: Name of board to delete label from
-        @label_name: Name of label to delete
-        @return: DELETE response dictionary
+        -oid: ID of label to delete (optional)
+        -project_name: Name of project to delete label from
+        -board_name: Name of board to delete label from
+        -label_name: Name of label to delete
+        -return: DELETE response dictionary
         """
         if oid:
             return super().delete(f"/api/labels/{oid}")
@@ -542,12 +542,12 @@ class Label(Controller):
     
     def add(self, project_name:str=None, board_name:str=None, list_name:str=None ,card_name:str=None, label_name:str=None, card_id:str=None, label_id:str=None):
         """Adds a label to a card
-        @project_name: Name of project to add label to card in
-        @board_name: Name of board to add label to card in
-        @label_name: Name of label to add to card
-        @card_name: Name of card to add label to
-        @list_name: Name of list to add label to card in
-        @return: POST response dictionary
+        -project_name: Name of project to add label to card in
+        -board_name: Name of board to add label to card in
+        -label_name: Name of label to add to card
+        -card_name: Name of card to add label to
+        -list_name: Name of list to add label to card in
+        -return: POST response dictionary
         """
         if label_id and card_id:
             return super().create(f"/api/cards/{card_id}/labels", data={"labelId":label_id})
@@ -565,12 +565,12 @@ class Label(Controller):
 
     def remove(self, project_name:str=None, board_name:str=None, list_name:str=None ,card_name:str=None, label_name:str=None, card_id:str=None, label_id:str=None):
         """Removes a label from a card
-        @project_name: Name of project to remove label from card in
-        @board_name: Name of board to remove label from card in
-        @label_name: Name of label to remove from card
-        @card_name: Name of card to remove label from
-        @list_name: Name of list to remove label from card in
-        @return: DELETE response dictionary
+        -project_name: Name of project to remove label from card in
+        -board_name: Name of board to remove label from card in
+        -label_name: Name of label to remove from card
+        -card_name: Name of card to remove label from
+        -list_name: Name of list to remove label from card in
+        -return: DELETE response dictionary
         """
         if label_id and card_id:
             return super().delete(f"/api/cards/{card_id}/labels/{label_id}")
@@ -595,12 +595,12 @@ class Task(Controller):
     def get(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, task_name:str=None) -> dict:
         """Gets a task by name
         NOTE: No GET route for tasks by OID
-        @project_name: Name of project to get task from
-        @board_name: Name of board to get task from
-        @list_name: Name of list to get task from
-        @card_name: Name of card to get task from
-        @task_name: Name of task to get
-        @return: GET response dictionary
+        -project_name: Name of project to get task from
+        -board_name: Name of board to get task from
+        -list_name: Name of list to get task from
+        -card_name: Name of card to get task from
+        -task_name: Name of task to get
+        -return: GET response dictionary
         """
         if not (project_name and board_name and list_name and card_name):
             raise InvalidToken("Please provide project, board, list, and card names")
@@ -619,12 +619,12 @@ class Task(Controller):
     
     def create(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, data:dict=None, card_id:str=None):
         """Creates a new task
-        @card_id: ID of card to create task in (optional)
-        @project_name: Name of project to create task in
-        @board_name: Name of board to create task in
-        @list_name: Name of list to create task in
-        @card_name: Name of card to create task in
-        @return: POST response dictionary
+        -card_id: ID of card to create task in (optional)
+        -project_name: Name of project to create task in
+        -board_name: Name of board to create task in
+        -list_name: Name of list to create task in
+        -card_name: Name of card to create task in
+        -return: POST response dictionary
         """
         if not data:
             data = self.data
@@ -643,13 +643,13 @@ class Task(Controller):
     
     def update(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, task_name:str=None, data:dict=None, oid:str=None):
         """Updates a task
-        @oid: Object ID of task to update (optional)
-        @project_name: Name of project to update task in
-        @board_name: Name of board to update task in
-        @list_name: Name of list to update task in
-        @card_name: Name of card to update task in
-        @task_name: Name of task to update
-        @return: PATCH response dictionary
+        -oid: Object ID of task to update (optional)
+        -project_name: Name of project to update task in
+        -board_name: Name of board to update task in
+        -list_name: Name of list to update task in
+        -card_name: Name of card to update task in
+        -task_name: Name of task to update
+        -return: PATCH response dictionary
         """
         if not data:
             data = self.data
@@ -664,13 +664,13 @@ class Task(Controller):
        
     def delete(self, project_name:str=None, board_name:str=None, list_name:str=None, card_name:str=None, task_name:str=None, oid:str=None):
         """Deletes a task
-        @oid: ID of task to delete (Use this if you already have the ID)
-        @project_name: Name of project to delete task from
-        @board_name: Name of board to delete task from
-        @list_name: Name of list to delete task from
-        @card_name: Name of card to delete task from
-        @task_name: Name of task to delete
-        @return: DELETE response dictionary
+        -oid: ID of task to delete (Use this if you already have the ID)
+        -project_name: Name of project to delete task from
+        -board_name: Name of board to delete task from
+        -list_name: Name of list to delete task from
+        -card_name: Name of card to delete task from
+        -task_name: Name of task to delete
+        -return: DELETE response dictionary
         """
         if oid:
             return super().delete(f"/api/tasks/{id}")
@@ -700,14 +700,14 @@ class Background(Controller):
 
     def gradients(self) -> dict:
         """Gets all gradients
-        @return: GET response dictionary
+        -return: GET response dictionary
         """
         return self.options
 
     def apply(self, prj_name:str):
         """Applies a gradient to a project
-        @project: Name of project to apply gradient to
-        @return: PATCH response dictionary
+        -project: Name of project to apply gradient to
+        -return: PATCH response dictionary
         """
         project = Project(self.instance)
         prj_id = project.get(prj_name)["item"]["id"]
@@ -719,8 +719,8 @@ class Background(Controller):
     
     def clear(self, prj_name:str):
         """Clears a gradient from a project
-        @project: Name of project to clear gradient from
-        @return: PATCH response dictionary
+        -project: Name of project to clear gradient from
+        -return: PATCH response dictionary
         """
         project = Project(self.instance)
         prj_id = project.get(prj_name)["item"]["id"]
@@ -735,13 +735,13 @@ class Comment(Controller):
 class User(Controller):
     def __init__(self, instance:Planka, **kwargs) -> None:
         """Creates a user
-        @username: Username of user to create
-        @name: Display name of user to create
-        @password: Password of user to create
-        @email: Email of user to create
-        @subscribe: Subscibe user to own cards (default: False)
-        @organization: Organization of user to create (default: None)
-        @admin: Admin state of user to create (default: False)
+        -username: Username of user to create
+        -name: Display name of user to create
+        -password: Password of user to create
+        -email: Email of user to create
+        -subscribe: Subscibe user to own cards (default: False)
+        -organization: Organization of user to create (default: None)
+        -admin: Admin state of user to create (default: False)
         """
         self.instance = instance
         self.template = instance.get_template("user")
@@ -749,8 +749,8 @@ class User(Controller):
 
     def get(self, username:str=None):
         """Gets a user
-        @username: Username of user to get (all if not provided)
-        @return: GET response dictionary
+        -username: Username of user to get (all if not provided)
+        -return: GET response dictionary
         """
         if not username:
             return super().get("/api/users")["items"]
@@ -762,8 +762,8 @@ class User(Controller):
     
     def create(self, data:dict=None):
         """Creates a user
-        @data: Data dictionary to create user with (optional)
-        @return: POST response dictionary
+        -data: Data dictionary to create user with (optional)
+        -return: POST response dictionary
         """
         if not data:
             data = self.data
@@ -775,9 +775,9 @@ class User(Controller):
     
     def delete(self, username:str, oid:str=None):
         """Deletes a user
-        @username: Username of user to delete
-        @oid: ID of user to delete (Use this if you already have the ID)
-        @return: DELETE response dictionary
+        -username: Username of user to delete
+        -oid: ID of user to delete (Use this if you already have the ID)
+        -return: DELETE response dictionary
         """
         if oid:
             return super().delete(f"/api/users/{oid}")
@@ -787,10 +787,10 @@ class User(Controller):
     
     def update(self, username:str, oid:str=None, data:dict=None):
         """Updates a user
-        @username: Username of user to update
-        @oid: ID of user to update (Use this if you already have the ID)
-        @data: Data dictionary to update user with (optional)
-        @return: PATCH response dictionary
+        -username: Username of user to update
+        -oid: ID of user to update (Use this if you already have the ID)
+        -data: Data dictionary to update user with (optional)
+        -return: PATCH response dictionary
         """
         user = self.get(username)
         if not data:
