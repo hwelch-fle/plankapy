@@ -27,6 +27,8 @@ jobs:
       #- run: pip install -e .
       #- run: pip install --upgrade pip
       - run: pip install pdoc
+      - run: pip install requests
+      - run: pip install json
       # ADJUST THIS: build your documentation into docs/.
       # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
       - run: python3 -m pdoc -d markdown -o ../../docs ../../plankapy.py
