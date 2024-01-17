@@ -578,7 +578,7 @@ class Label(Controller):
             raise InvalidToken("Please provide a project, board, label name")
         if card_id:
             label_id = [label['id'] for label in Card(self.instance).get_labels(oid=card_id) if label['name'] == label_name][0]
-            return super().delete(f"/api/cards/{card_id}/labels/{label['item']['id']}")
+            return super().delete(f"/api/cards/{card_id}/labels/{label_id}")
         if not (card_name and list_name):
             raise InvalidToken("Please provide a card and list name")
         card_con = Card(self.instance)
