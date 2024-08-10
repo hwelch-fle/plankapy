@@ -79,7 +79,19 @@ class Planka:
             raise InvalidToken("Invalid API credentials")
 
         if response.status_code not in [200, 201]:
-            raise InvalidToken(f"Failed to {method} {url} with status code {response.status_code}")
+            try:
+                error_response = response.json()
+            
+                error_code = error_response.get("code")
+                error_message = error_response.get("message")
+                error_problems = '\n\t'.join(error_response.get("problems"))
+
+                full_message = f"[{error_code}] {error_message}\n{error_problems}"
+
+            except requests.exceptions.JSONDecodeError:
+                error_response = response.text
+
+            raise InvalidToken(f"Failed to {method} {url} with status code {response.status_code}, error message:\n{full_message}")
 
         try:
             return response.json()
