@@ -89,7 +89,7 @@ class Planka:
                 full_message = f"[{error_code}] {error_message}\n{error_problems}"
 
             except requests.exceptions.JSONDecodeError:
-                error_response = response.text
+                full_message = response.text
 
             raise InvalidToken(f"Failed to {method} {url} with status code {response.status_code}, error message:\n{full_message}")
 
