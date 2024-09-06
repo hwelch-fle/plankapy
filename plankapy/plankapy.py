@@ -1,5 +1,6 @@
 import requests
 import json
+import importlib.resources
 
 API_URL = "http://localhost:3000"
 API_USER = "demo- demo.demo"
@@ -12,13 +13,18 @@ class Planka:
     - username: Username of Planka user
     - password: Password of Planka user
     """
-    def __init__(self, url:str, username:str, password:str, templates="config/templates.json"):
+    def __init__(self, url:str, username:str, password:str, templates=None):
         self.url = url
         self.username = username
         self.password = password
         self.auth = None
-        with open(templates) as f:
-            self.templates = json.load(f)
+        if templates is None:
+            # Access the templates.json from within the package
+            with importlib.resources.open_text('plankapy.config', 'templates.json') as f:
+                self.templates = json.load(f)
+        else:
+            with open(templates) as f:
+                self.templates = json.load(f)
         self.authenticate()
     
     def __repr__(self):
