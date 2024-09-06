@@ -1,4 +1,3 @@
-#!/bin/python3
 from setuptools import setup, find_packages
 
 setup(
@@ -6,4 +5,8 @@ setup(
     version='1.0.0',
     description='Python library for Planka API',
     packages=find_packages(),
+    include_package_data=True,
+    package_data={
+        'plankapy': ['config/templates.json'],  # Include templates.json
+    },
 )
