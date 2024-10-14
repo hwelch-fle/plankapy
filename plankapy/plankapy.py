@@ -13,7 +13,7 @@ class Planka:
     - username: Username of Planka user
     - password: Password of Planka user
     """
-    def __init__(self, url:str, username:str, password:str, templates=None, access_token=None):
+    def __init__(self, url:str, username:str=None, password:str=None, templates=None, access_token=None):
         self.url = url
         self.username = username
         self.password = password
