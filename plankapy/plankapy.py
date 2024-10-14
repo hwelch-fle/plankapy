@@ -13,11 +13,11 @@ class Planka:
     - username: Username of Planka user
     - password: Password of Planka user
     """
-    def __init__(self, url:str, username:str, password:str, templates=None):
+    def __init__(self, url:str, username:str, password:str, templates=None, access_token=None):
         self.url = url
         self.username = username
         self.password = password
-        self.auth = None
+        self.auth = access_token
         if templates is None:
             # Access the templates.json from within the package
             with importlib.resources.open_text('plankapy.config', 'templates.json') as f:
@@ -55,6 +55,11 @@ class Planka:
         """Gets an auth token from the Planka API
         - **return:** True if successful, False if not
         """
+        # Allow SSO token bypass
+        if self.auth:
+            return True
+        
+        # Use login credentials to get an auth token
         try:
             request = requests.post(f"{self.url}/api/access-tokens", data={'emailOrUsername': self.username, 'password': self.password})
             self.auth = request.json()['item']
