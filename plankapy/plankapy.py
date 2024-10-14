@@ -38,7 +38,7 @@ class Planka:
             self.request("DELETE", "/api/access-tokens/me")
             self.auth = None
             return True
-        except:
+        except Exception as e:
             raise InvalidToken(f"No active access token assigned to this instance\n{self.__repr__()}")
 
     def validate(self) -> bool:
@@ -48,7 +48,7 @@ class Planka:
         try:
             self.request("GET", "/*")
             return True
-        except:
+        except Exception as e:
             raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
 
     def authenticate(self) -> bool:
@@ -58,11 +58,15 @@ class Planka:
         try:
             request = requests.post(f"{self.url}/api/access-tokens", data={'emailOrUsername': self.username, 'password': self.password})
             self.auth = request.json()['item']
-            if not self.auth:
-                raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
-            return True
-        except:
-            raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
+            if self.auth:
+                return True
+            
+        # Catch any exceptions raisef by requests.post()
+        except Exception as e:
+            raise e
+        
+        # Raise exception if no auth token is returned by the API
+        raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
 
     def request(self, method:str, endpoint:str, data:dict=None) -> dict:
         """Makes a request to the Planka API
@@ -101,7 +105,7 @@ class Planka:
 
         try:
             return response.json()
-        except:
+        except Exception as e:
             raise InvalidToken(f"Failed to parse response from {url}")
     
     def get_template(self, template:str) -> dict:
@@ -111,7 +115,7 @@ class Planka:
         """
         try:
             return self.templates[template]
-        except:
+        except Exception as e:
             raise InvalidToken(f"Template not found: {template}")
         
 class Controller():
