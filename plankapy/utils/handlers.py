@@ -175,10 +175,10 @@ class AttachmentHandler(JSONHandler):
     def __init__(self, session: Session) -> None:
         super().__init__(session.url, endpoint='api/attachments', headers=session.headers)
         
-class CommentActionHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/comment-actions', headers=session.headers)
-        
 class AccessHandler(JSONHandler):
     def __init__(self, session: Session) -> None:
         super().__init__(session.url, endpoint='api/access-tokens', headers=session.headers)
+        
+class LabelHandler(JSONHandler):
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/labels', headers=session.headers)
