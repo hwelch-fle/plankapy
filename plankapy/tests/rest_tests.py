@@ -5,7 +5,7 @@ from random import randint
 import sys
 sys.path.append('..')
 
-from models.apihandlers import BaseHandler
+from plankapy.utils.handlers import BaseHandler
 from tests.fake_planka import ROUTES
 
 def get_rest_endpoints(request_type: str) -> dict:

@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from urllib.request import Request, urlopen
 from urllib.parse import urljoin
 from http.client import HTTPResponse
-
-from typing import Optional, TypeAlias
+from typing import Optional, TypeAlias, Generator
 import json
+from contextlib import contextmanager
 
 JSONResponse: TypeAlias = dict[str, str]
 
@@ -90,6 +91,13 @@ class BaseHandler:
         with urlopen(req) as response:
             return response
         
+    @contextmanager
+    def endpoint_as(self, endpoint: Optional[str]=None) -> Generator['BaseHandler', None, None]:
+        _endpoint = self.endpoint
+        self.endpoint = endpoint
+        yield self
+        self.endpoint = _endpoint
+    
 class JSONHandler(BaseHandler):    
     def get(self) -> JSONResponse:
         return decode_data(super().get().read())
@@ -106,58 +114,71 @@ class JSONHandler(BaseHandler):
     def delete(self) -> JSONResponse:
         return decode_data(super().delete().read())
 
-    
+@dataclass
+class Session:
+    url: str
+    headers: Optional[dict[str, str]]=None
+
+@contextmanager
+def endpoint_as(handler: BaseHandler, endpoint: str):
+    _endpoint = handler.endpoint
+    handler.endpoint = endpoint
+    yield handler
+    handler.endpoint = _endpoint
+
+def create_session(url: str, username_or_email: str, password: str, token: Optional[str]=None) -> Session:
+    if token:
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+    else:
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Basic {username_or_email}:{password}'
+        }
+    return Session(url, headers)
+
 class ProjectHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/projects', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/projects', headers=session.headers)
         
 class BoardHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/boards', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/boards', headers=session.headers)
         
 class CardHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/cards', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/cards', headers=session.headers)
 
 class ListHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/lists', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/lists', headers=session.headers)
 
 class AttachmentHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/attachments', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/attachments', headers=session.headers)
 
 class TaskHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/tasks', headers=headers) 
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/tasks', headers=session.headers) 
 
 class NotificationHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/notifications', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/notifications', headers=session.headers)
 
 class UserHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/users', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/users', headers=session.headers)
 
 class AttachmentHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/attachments', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/attachments', headers=session.headers)
         
 class CommentActionHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/comment-actions', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/comment-actions', headers=session.headers)
         
 class AccessHandler(JSONHandler):
-    def __init__(self, base_url: str, *,
-                 headers: Optional[dict[str, str]]=None) -> None:
-        super().__init__(base_url, endpoint='api/access-tokens', headers=headers)
+    def __init__(self, session: Session) -> None:
+        super().__init__(session.url, endpoint='api/access-tokens', headers=session.headers)
