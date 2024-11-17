@@ -1,5 +1,20 @@
 from typing import Literal, TypeAlias
 
+# All positions in Planka are multples of this number
+OFFSET = 65535
+
+def get_position(value: int) -> int:
+    """Converts a Planka position to an indexed position
+    e.g. 65535 -> 1, 131070 -> 2, 196605 -> 3
+    """
+    return value / OFFSET
+
+def set_position(value: int) -> int:
+    """Converts an indexed position to a Planka position
+    e.g. 1 -> 65535, 2 -> 131070, 3 -> 196605
+    """
+    return value * OFFSET
+
 # From https://github.com/plankanban/planka/blob/master/server/api/models/Project.js
 Gradient: TypeAlias = Literal[
   'old-lime',
