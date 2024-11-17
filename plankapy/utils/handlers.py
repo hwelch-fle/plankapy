@@ -1,9 +1,9 @@
-from dataclasses import dataclass
 from urllib.request import Request, urlopen
 from urllib.parse import urljoin
-from http.client import HTTPResponse
+
 from typing import Optional, TypeAlias, Generator
 import json
+
 from contextlib import contextmanager
 
 JSONResponse: TypeAlias = dict[str, str]
@@ -24,7 +24,7 @@ class BaseHandler:
     
     @property
     def endpoint(self):
-        return urljoin(self.base_url, self._endpoint)
+        return urljoin(self._base_url, self._endpoint)
     
     @endpoint.setter
     def endpoint(self, value):
@@ -52,133 +52,83 @@ class BaseHandler:
     def __str__(self):
         return f'{self.endpoint}'
     
-    def get(self) -> HTTPResponse:
+    def get(self) -> bytes:
         req = Request(self.endpoint, 
                       headers=self.headers, 
                       method='GET')
         with urlopen(req) as response:
-            return response
+            return response.read()
     
-    def post(self, data: dict) -> HTTPResponse:
+    def post(self, data: dict) -> bytes:
         req = Request(self.endpoint, 
                       headers=self.headers, 
                       method='POST', 
                       data=encode_data(data))
         with urlopen(req) as response:
-            return response
+            return response.read()
     
-    def put(self, data: dict) -> HTTPResponse:
+    def put(self, data: dict) -> bytes:
         req = Request(
             self.endpoint, 
             headers=self.headers, 
             method='PUT', 
             data=encode_data(data))
         with urlopen(req) as response:
-            return response
+            return response.read()
     
-    def patch(self, data: dict) -> HTTPResponse:
+    def patch(self, data: dict) -> bytes:
         req = Request(self.endpoint, 
                       headers=self.headers, 
                       method='PATCH', 
                       data=encode_data(data))
         with urlopen(req) as response:
-            return response
+            return response.read()
     
-    def delete(self) -> HTTPResponse:
+    def delete(self) -> bytes:
         req = Request(self.endpoint, 
                       headers=self.headers, 
                       method='DELETE')
         with urlopen(req) as response:
-            return response
+            return response.read()
         
     @contextmanager
     def endpoint_as(self, endpoint: Optional[str]=None) -> Generator['BaseHandler', None, None]:
         _endpoint = self.endpoint
         self.endpoint = endpoint
-        yield self
-        self.endpoint = _endpoint
+        try:
+            yield self
+        finally:
+            self.endpoint = _endpoint
     
 class JSONHandler(BaseHandler):    
     def get(self) -> JSONResponse:
-        return decode_data(super().get().read())
+        return decode_data(super().get())
 
     def post(self, data: dict) -> JSONResponse:
-        return decode_data(super().post(data).read())
+        return decode_data(super().post(data))
     
     def put(self, data: dict) -> JSONResponse:
-        return decode_data(super().put(data).read())
+        return decode_data(super().put(data))
     
     def patch(self, data: dict) -> JSONResponse:
-        return decode_data(super().patch(data).read())
+        return decode_data(super().patch(data))
     
     def delete(self) -> JSONResponse:
-        return decode_data(super().delete().read())
+        return decode_data(super().delete())
 
-@dataclass
-class Session:
-    url: str
-    headers: Optional[dict[str, str]]=None
-
-@contextmanager
-def endpoint_as(handler: BaseHandler, endpoint: str):
-    _endpoint = handler.endpoint
-    handler.endpoint = endpoint
-    yield handler
-    handler.endpoint = _endpoint
-
-def create_session(url: str, username_or_email: str, password: str, token: Optional[str]=None) -> Session:
-    if token:
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {token}'
+def create_session(url: str, *,
+                   emailOrUsername: Optional[str]=None, 
+                   password: Optional[str], 
+                   token: Optional[str]=None) -> JSONHandler:
+    headers: dict[str, str] = {}
+    headers['Content-Type'] = 'application/json'
+    if not token:
+        data = {
+            'emailOrUsername': emailOrUsername,
+            'password': password
         }
-    else:
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Basic {username_or_email}:{password}'
-        }
-    return Session(url, headers)
-
-class ProjectHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/projects', headers=session.headers)
-        
-class BoardHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/boards', headers=session.headers)
-        
-class CardHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/cards', headers=session.headers)
-
-class ListHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/lists', headers=session.headers)
-
-class AttachmentHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/attachments', headers=session.headers)
-
-class TaskHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/tasks', headers=session.headers) 
-
-class NotificationHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/notifications', headers=session.headers)
-
-class UserHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/users', headers=session.headers)
-
-class AttachmentHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/attachments', headers=session.headers)
-        
-class AccessHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/access-tokens', headers=session.headers)
-        
-class LabelHandler(JSONHandler):
-    def __init__(self, session: Session) -> None:
-        super().__init__(session.url, endpoint='api/labels', headers=session.headers)
+        with JSONHandler(url, headers=headers).endpoint_as('api/access-tokens') as handler:
+            response = handler.post(data)
+            token = response['item']
+    headers['Authorization'] = f'Bearer {token}'
+    return JSONHandler(url, headers=headers)
