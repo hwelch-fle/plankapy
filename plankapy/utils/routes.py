@@ -17,7 +17,11 @@ class Route:
         self.method = method
         self.endpoint = endpoint
 
-    def __call__(self, **data):
+    @property
+    def url(self):
+        return self.handler.base_url + self.endpoint
+    
+    def __call__(self, **data) -> JSONResponse:
         match self.method:
             case 'GET':
                 with self.handler.endpoint_as(self.endpoint):
@@ -131,7 +135,7 @@ ROUTES = {
 
 class Routes:
     
-    def __init__(self, handler: JSONHandler):
+    def __init__(self, handler: JSONHandler) -> None:
         self.handler = handler
     
     def index(self) -> Route:
