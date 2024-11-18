@@ -2,7 +2,16 @@
 Dummy Planka API endpoints for testing purposes.
 """
 
-import flask
+import sys
+if 'flask' not in sys.modules:
+    import subprocess
+    subprocess.run(['pip', 'install', 'flask'])
+
+try:
+    import flask
+except ImportError as e:
+    print('Flask required to run test server')
+    raise e
 
 APP = flask.app.Flask(__name__)
 
