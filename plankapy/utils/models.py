@@ -60,15 +60,15 @@ class Action(Model):
     id: Optional[int]|_Unset=Unset
     type: Optional[ActionType]|_Unset=Required
     data: Optional[dict]|_Unset=Required
-    cardid: Optional[int]|_Unset=Required
-    userid: Optional[int]|_Unset=Required
+    cardId: Optional[int]|_Unset=Required
+    userId: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Archive(Model):
     fromModel: Optional[str]|_Unset=Required
-    originalRecordid: Optional[int]|_Unset=Required
+    originalRecordId: Optional[int]|_Unset=Required
     originalRecord: Optional[dict]|_Unset=Required
 
 @dataclass
@@ -89,7 +89,7 @@ class Board(Model):
     id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
-    projectid: Optional[int]|_Unset=Required
+    projectId: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
@@ -98,8 +98,8 @@ class BoardMembership(Model):
     id: Optional[int]|_Unset=Unset
     role: Optional[BoardRole]|_Unset=Required
     canComment: Optional[bool]|_Unset=Unset
-    boardid: Optional[int]|_Unset=Required
-    userid: Optional[int]|_Unset=Required
+    boardId: Optional[int]|_Unset=Required
+    userId: Optional[int]|_Unset=Required
 
 @dataclass
 class Card(Model):
@@ -110,10 +110,10 @@ class Card(Model):
     dueDate: Optional[datetime]|_Unset=Unset
     isDueDateCompleted: Optional[bool]|_Unset=Unset
     stopwatch: Optional['Stopwatch']|_Unset=Unset
-    boardid: Optional[int]|_Unset=Required
-    listid: Optional[int]|_Unset=Required
-    creatorUserid: Optional[int]|_Unset=Unset
-    coverAttachmentid: Optional[int]|_Unset=Unset
+    boardId: Optional[int]|_Unset=Required
+    listId: Optional[int]|_Unset=Required
+    creatorUserId: Optional[int]|_Unset=Unset
+    coverAttachmentId: Optional[int]|_Unset=Unset
     isSubscribed: Optional[bool]|_Unset=Unset
 
 @dataclass
@@ -124,31 +124,31 @@ class Stopwatch:
 @dataclass
 class CardLabel(Model):
     id: Optional[int]|_Unset=Unset
-    cardid: Optional[int]|_Unset=Required
-    labelid: Optional[int]|_Unset=Required
+    cardId: Optional[int]|_Unset=Required
+    labelId: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class CardMembership(Model):
     id: Optional[int]|_Unset=Unset
-    cardid: Optional[int]|_Unset=Required
-    userid: Optional[int]|_Unset=Required
+    cardId: Optional[int]|_Unset=Required
+    userId: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class CardSubscription(Model):
     id: Optional[int]|_Unset=Unset
-    cardid: Optional[int]|_Unset=Required
-    userid: Optional[int]|_Unset=Required
+    cardId: Optional[int]|_Unset=Required
+    userId: Optional[int]|_Unset=Required
     isPermanent: Optional[bool]|_Unset=Unset
 @dataclass
 class IdentityProviderUser(Model):
     id: Optional[int]|_Unset=Unset
     issuer: Optional[str]|_Unset=Unset
     sub: Optional[str]|_Unset=Unset
-    userid: Optional[int]|_Unset=Required
+    userId: Optional[int]|_Unset=Required
 
 @dataclass
 class Label(Model):
@@ -156,7 +156,7 @@ class Label(Model):
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
     color: Optional[str]|_Unset=Required
-    boardid: Optional[int]|_Unset=Required
+    boardId: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
@@ -165,7 +165,7 @@ class List(Model):
     id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
-    boardid: Optional[int]|_Unset=Required
+    boardId: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
@@ -173,9 +173,9 @@ class List(Model):
 class Notification(Model): 
     id: Optional[int]|_Unset=Unset
     isRead: bool|_Unset=Required
-    userid: Optional[int]|_Unset=Required
-    actionid: Optional[int]|_Unset=Required
-    cardid: Optional[int]|_Unset=Required
+    userId: Optional[int]|_Unset=Required
+    actionId: Optional[int]|_Unset=Required
+    cardId: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
@@ -192,8 +192,8 @@ class Project(Model):
 @dataclass
 class ProjectManager(Model):
     id: Optional[int]|_Unset=Unset
-    projectid: Optional[int]|_Unset=Required
-    userid: Optional[int]|_Unset=Required
+    projectId: Optional[int]|_Unset=Required
+    userId: Optional[int]|_Unset=Required
 
 @dataclass
 class Task(Model):
@@ -201,7 +201,7 @@ class Task(Model):
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
     isCompleted: bool|_Unset=Unset
-    cardid: Optional[int]|_Unset=Unset
+    cardId: Optional[int]|_Unset=Unset
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
