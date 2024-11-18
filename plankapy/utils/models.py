@@ -41,6 +41,19 @@ class Model:
     def __len__(self):
         """Return the number of set values"""
         return len([v for v in self.__dict__.values() if v is not Unset])
+    
+    def validate(self) -> bool:
+        """Check if all required fields are set
+        Raises:
+            ValueError: If a required field or fields notset
+        """
+        required = []
+        for key, value in self.__dict__.items():
+            if value is Required:
+                required.append(key)
+        if required:
+            raise ValueError(f"Required field(s) {required} not set")
+        return True
 
 @dataclass
 class Action(Model):
