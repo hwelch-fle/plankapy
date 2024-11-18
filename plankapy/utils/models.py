@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Self
 
+from .routes import Route
 from .constants import ActionType, BoardRole, Background, BackgroundImage
 
 # Sentinal value for unset values since None is a valid value for responses
@@ -54,6 +55,9 @@ class Model:
         if required:
             raise ValueError(f"Required field(s) {required} not set")
         return True
+    
+    def set_route(self, route: Route):
+        self.route = route
 
 @dataclass
 class Action(Model):
