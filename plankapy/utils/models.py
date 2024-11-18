@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Self
+from typing import Optional, Self
 
 from constants import ActionType, Background, BackgroundImage
 
@@ -10,7 +10,7 @@ class _Unset:
         return f"<Unset>"
     
 Unset = _Unset()
-
+Required = _Unset()
 
 # Base class for all models
 class Model:
@@ -37,31 +37,41 @@ class Model:
 
 @dataclass
 class Action(Model):
-    id: str|_Unset=Unset
-    createdAt: datetime|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
-    type: ActionType|_Unset=Unset
-    data: dict|_Unset=Unset
-    cardId: str|_Unset=Unset
-    userId: str|_Unset=Unset
+    id: Optional[str]|_Unset=Unset
+    type: Optional[ActionType]|_Unset=Required
+    data: Optional[dict]|_Unset=Required
+    cardId: Optional[str]|_Unset=Required
+    userId: Optional[str]|_Unset=Required
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Archive(Model):
-    fromModel: str|_Unset=Unset
-    originalRecordId: str|_Unset=Unset
-    originalRecord: dict|_Unset=Unset
+    fromModel: Optional[str]|_Unset=Required
+    originalRecordId: Optional[str]|_Unset=Required
+    originalRecord: Optional[dict]|_Unset=Required
 
 @dataclass
-class Attachment(Model): ...
+class Attachment(Model):
+    id: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
+    dirname: Optional[str]|_Unset=Required
+    filename: Optional[str]|_Unset=Required
+    image: Optional[dict]|_Unset=Unset
+    url: Optional[str]|_Unset=Unset
+    coverUrl: Optional[str]|_Unset=Unset
+    creatorUserId: Optional[str]|_Unset=Unset
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Board(Model):
-    createdAt: datetime|_Unset=Unset
-    id: str|_Unset=Unset
-    name: str|_Unset=Unset
-    position: int|_Unset=Unset
-    projectId: str|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
+    id: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
+    position: Optional[int]|_Unset=Required
+    projectId: Optional[str]|_Unset=Required
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class BoardMembership(Model): ...
@@ -83,72 +93,72 @@ class IdentityProviderUser(Model): ...
 
 @dataclass
 class Label(Model):
-    id: str|_Unset=Unset
-    createdAt: datetime|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
-    position: int|_Unset=Unset
-    name: str|_Unset=Unset
-    color: str|_Unset=Unset
-    boardId: str|_Unset=Unset
+    id: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Unset
+    position: Optional[int]|_Unset=Unset
+    color: Optional[str]|_Unset=Unset
+    boardId: Optional[str]|_Unset=Unset
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class List(Model):
-    id: str|_Unset=Unset
-    createdAt: datetime|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
-    position: int|_Unset=Unset
-    name: str|_Unset=Unset
-    boardId: str|_Unset=Unset
+    id: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Unset
+    position: Optional[int]|_Unset=Unset
+    boardId: Optional[str]|_Unset=Unset
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Notification(Model): 
-    id: str|_Unset=Unset
-    createdAt: datetime|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
+    id: Optional[str]|_Unset=Unset
     isRead: bool|_Unset=Unset
-    userID: str|_Unset=Unset
-    actionID: str|_Unset=Unset
-    cardID: str|_Unset=Unset
+    userID: Optional[str]|_Unset=Unset
+    actionID: Optional[str]|_Unset=Unset
+    cardID: Optional[str]|_Unset=Unset
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Project(Model):
+    id: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Unset
     # Background overrides backgroundImage
-    background: Background|_Unset=Unset
-    backgroundImage: BackgroundImage|_Unset=Unset
-    createdAt: datetime|_Unset=Unset
-    id: str|_Unset=Unset
-    name: str|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
-
+    background: Optional[Background]|_Unset=Unset
+    backgroundImage: Optional[BackgroundImage]|_Unset=Unset
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
+    
 @dataclass
 class ProjectManager(Model): ...
 
 @dataclass
 class Task(Model):
-    id: str|_Unset=Unset
-    createdAt: datetime|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
-    position: int|_Unset=Unset
-    name: str|_Unset=Unset
-    isCompleted: bool|_Unset=Unset
-    cardId: str|_Unset=Unset
+    id: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
+    position: Optional[int]|_Unset=Required
+    isCompleted: bool|_Unset=Required
+    cardId: Optional[str]|_Unset=Unset
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class User(Model):
-    avatarURL: str|_Unset=Unset
-    createdAt: datetime|_Unset=Unset
-    deletedAt: datetime|_Unset=Unset
-    email: str|_Unset=Unset
-    id: str|_Unset=Unset
+    id: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Unset
+    username: Optional[str]|_Unset=Unset
+    email: Optional[str]|_Unset=Unset
+    language: Optional[str]|_Unset=Unset
+    organization: Optional[str]|_Unset=Unset
+    phone: Optional[str]|_Unset=Unset
+    avatarURL: Optional[str]|_Unset=Unset
     isAdmin: bool|_Unset=Unset
     isDeletionLocked: bool|_Unset=Unset
     isLocked: bool|_Unset=Unset
     isRoleLocked: bool|_Unset=Unset
     isUsernameLocked: bool|_Unset=Unset
-    language: str|_Unset=Unset
-    name: str|_Unset=Unset
-    organization: str|_Unset=Unset
-    phone: str|_Unset=Unset
     subscribeToOwnCards: bool|_Unset=Unset
-    updatedAt: datetime|_Unset=Unset
-    username: str|_Unset=Unset
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
+    deletedAt: Optional[datetime]|_Unset=Unset
