@@ -1,4 +1,4 @@
-from handlers import JSONHandler, JSONResponse
+from .handlers import JSONHandler, JSONResponse
 from typing import Literal, TypeAlias
 
 RequestType: TypeAlias = Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
@@ -129,371 +129,376 @@ ROUTES = {
     'users_delete': ('DELETE', '/api/users/{id}'),
 }
 
-def index(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['index'], handler)
-    return route
-
-
-def boards_show(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['boards_show'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def actions_index(handler: JSONHandler, cardId: int) -> Route:
-    route = Route(*ROUTES['actions_index'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId)
-    return route
-
-def cards_show(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['cards_show'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def show_config(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['show_config'], handler)
-    return route
-
-def notifications_index(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['notifications_index'], handler)
-    return route
-
-def notifications_show(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['notifications_show'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def projects_index(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['projects_index'], handler)
-    return route
-
-def projects_show(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['projects_show'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def users_index(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['users_index'], handler)
-    return route
-
-def users_show(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_show'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def attachments_download(handler: JSONHandler, id: int, filename: str) -> Route:
-    route = Route(*ROUTES['attachments_download'], handler)
-    route.endpoint = route.endpoint.format(id=id, filename=filename)
-    return route
-
-def attachments_download_thumbnail(handler: JSONHandler, id: int, extension: str) -> Route:
-    route = Route(*ROUTES['attachments_download_thumbnail'], handler)
-    route.endpoint = route.endpoint.format(id=id, extension=extension)
-    return route
-
-def project_background_images(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['project_background_images'], handler)
-    return route
-
-def user_avatars(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['user_avatars'], handler)
-    return route
-
-def access_tokens_create(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['access_tokens_create'], handler)
-    return route
-
-def exchange_using_oidc(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['exchange_using_oidc'], handler)
-    return route
-
-def labels_create(handler: JSONHandler, boardId: int) -> Route:
-    route = Route(*ROUTES['labels_create'], handler)
-    route.endpoint = route.endpoint.format(boardId=boardId)
-    return route
-
-def lists_create(handler: JSONHandler, boardId: int) -> Route:
-    route = Route(*ROUTES['lists_create'], handler)
-    route.endpoint = route.endpoint.format(boardId=boardId)
-    return route
-
-def board_memberships_create(handler: JSONHandler, boardId: int) -> Route:
-    route = Route(*ROUTES['board_memberships_create'], handler)
-    route.endpoint = route.endpoint.format(boardId=boardId)
-    return route
-
-def attachments_create(handler: JSONHandler, cardId: int) -> Route:
-    route = Route(*ROUTES['attachments_create'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId)
-    return route
-
-def comment_actions_create(handler: JSONHandler, cardId: int) -> Route:
-    route = Route(*ROUTES['comment_actions_create'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId)
-    return route
-
-def card_labels_create(handler: JSONHandler, cardId: int) -> Route:
-    route = Route(*ROUTES['card_labels_create'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId)
-    return route
-
-def card_memberships_create(handler: JSONHandler, cardId: int) -> Route:
-    route = Route(*ROUTES['card_memberships_create'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId)
-    return route
-
-def tasks_create(handler: JSONHandler, cardId: int) -> Route:
-    route = Route(*ROUTES['tasks_create'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId)
-    return route
-
-def cards_duplicate(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['cards_duplicate'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def lists_sort(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['lists_sort'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def cards_create(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['cards_create'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def projects_create(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['projects_create'], handler)
-    return route
-
-def projects_update_background_image(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['projects_update_background_image'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def boards_create(handler: JSONHandler, projectId: int) -> Route:
-    route = Route(*ROUTES['boards_create'], handler)
-    route.endpoint = route.endpoint.format(projectId=projectId)
-    return route
-
-def project_managers_create(handler: JSONHandler, projectId: int) -> Route:
-    route = Route(*ROUTES['project_managers_create'], handler)
-    route.endpoint = route.endpoint.format(projectId=projectId)
-    return route
-
-def users_create(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['users_create'], handler)
-    return route
-
-def users_update_avatar(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update_avatar'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def attachments_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['attachments_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def board_memberships_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['board_memberships_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def boards_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['boards_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def cards_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['cards_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def comment_actions_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['comment_actions_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def labels_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['labels_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def lists_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['lists_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def notifications_update(handler: JSONHandler, ids: int) -> Route:
-    route = Route(*ROUTES['notifications_update'], handler)
-    route.endpoint = route.endpoint.format(ids=ids)
-    return route
-
-def projects_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['projects_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def tasks_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['tasks_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def users_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def users_update_email(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update_email'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def users_update_password(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update_password'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
-
-def users_update_username(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update_username'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+class Routes:
     
-def attachments_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['attachments_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def __init__(self, handler: JSONHandler):
+        self.handler = handler
+    
+    def index(self) -> Route:
+        route = Route(*ROUTES['index'], self.handler)
+        return route
 
-def board_memberships_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['board_memberships_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
 
-def boards_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['boards_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def boards_show(self, id: int) -> Route:
+        route = Route(*ROUTES['boards_show'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
 
-def cards_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['cards_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def actions_index(self, cardId: int) -> Route:
+        route = Route(*ROUTES['actions_index'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId)
+        return route
 
-def comment_actions_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['comment_actions_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def cards_show(self, id: int) -> Route:
+        route = Route(*ROUTES['cards_show'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
 
-def labels_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['labels_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def show_config(self) -> Route:
+        route = Route(*ROUTES['show_config'], self.handler)
+        return route
 
-def lists_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['lists_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def notifications_index(self) -> Route:
+        route = Route(*ROUTES['notifications_index'], self.handler)
+        return route
 
-def notifications_update(handler: JSONHandler, ids: int) -> Route:
-    route = Route(*ROUTES['notifications_update'], handler)
-    route.endpoint = route.endpoint.format(ids=ids)
-    return route
+    def notifications_show(self, id: int) -> Route:
+        route = Route(*ROUTES['notifications_show'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
 
-def projects_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['projects_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def projects_index(self) -> Route:
+        route = Route(*ROUTES['projects_index'], self.handler)
+        return route
 
-def tasks_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['tasks_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def projects_show(self, id: int) -> Route:
+        route = Route(*ROUTES['projects_show'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
 
-def users_update(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def users_index(self) -> Route:
+        route = Route(*ROUTES['users_index'], self.handler)
+        return route
 
-def users_update_email(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update_email'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def users_show(self, id: int) -> Route:
+        route = Route(*ROUTES['users_show'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
 
-def users_update_password(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update_password'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def attachments_download(self, id: int, filename: str) -> Route:
+        route = Route(*ROUTES['attachments_download'], self.handler)
+        route.endpoint = route.endpoint.format(id=id, filename=filename)
+        return route
 
-def users_update_username(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_update_username'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def attachments_download_thumbnail(self, id: int, extension: str) -> Route:
+        route = Route(*ROUTES['attachments_download_thumbnail'], self.handler)
+        route.endpoint = route.endpoint.format(id=id, extension=extension)
+        return route
 
-def access_tokens_delete(handler: JSONHandler) -> Route:
-    route = Route(*ROUTES['access_tokens_delete'], handler)
-    return route
+    def project_background_images(self) -> Route:
+        route = Route(*ROUTES['project_background_images'], self.handler)
+        return route
 
-def attachments_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['attachments_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def user_avatars(self) -> Route:
+        route = Route(*ROUTES['user_avatars'], self.handler)
+        return route
 
-def board_memberships_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['board_memberships_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def access_tokens_create(self) -> Route:
+        route = Route(*ROUTES['access_tokens_create'], self.handler)
+        return route
 
-def boards_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['boards_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def exchange_using_oidc(self) -> Route:
+        route = Route(*ROUTES['exchange_using_oidc'], self.handler)
+        return route
 
-def card_labels_delete(handler: JSONHandler, cardId: int, labelId: int) -> Route:
-    route = Route(*ROUTES['card_labels_delete'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId, labelId=labelId)
-    return route
+    def labels_create(self, boardId: int) -> Route:
+        route = Route(*ROUTES['labels_create'], self.handler)
+        route.endpoint = route.endpoint.format(boardId=boardId)
+        return route
 
-def card_memberships_delete(handler: JSONHandler, cardId: int) -> Route:
-    route = Route(*ROUTES['card_memberships_delete'], handler)
-    route.endpoint = route.endpoint.format(cardId=cardId)
-    return route
+    def lists_create(self, boardId: int) -> Route:
+        route = Route(*ROUTES['lists_create'], self.handler)
+        route.endpoint = route.endpoint.format(boardId=boardId)
+        return route
 
-def cards_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['cards_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def board_memberships_create(self, boardId: int) -> Route:
+        route = Route(*ROUTES['board_memberships_create'], self.handler)
+        route.endpoint = route.endpoint.format(boardId=boardId)
+        return route
 
-def comment_actions_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['comment_actions_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def attachments_create(self, cardId: int) -> Route:
+        route = Route(*ROUTES['attachments_create'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId)
+        return route
 
-def labels_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['labels_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def comment_actions_create(self, cardId: int) -> Route:
+        route = Route(*ROUTES['comment_actions_create'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId)
+        return route
 
-def lists_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['lists_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def card_labels_create(self, cardId: int) -> Route:
+        route = Route(*ROUTES['card_labels_create'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId)
+        return route
 
-def project_managers_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['project_managers_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def card_memberships_create(self, cardId: int) -> Route:
+        route = Route(*ROUTES['card_memberships_create'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId)
+        return route
 
-def projects_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['projects_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def tasks_create(self, cardId: int) -> Route:
+        route = Route(*ROUTES['tasks_create'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId)
+        return route
 
-def tasks_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['tasks_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def cards_duplicate(self, id: int) -> Route:
+        route = Route(*ROUTES['cards_duplicate'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
 
-def users_delete(handler: JSONHandler, id: int) -> Route:
-    route = Route(*ROUTES['users_delete'], handler)
-    route.endpoint = route.endpoint.format(id=id)
-    return route
+    def lists_sort(self, id: int) -> Route:
+        route = Route(*ROUTES['lists_sort'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def cards_create(self, id: int) -> Route:
+        route = Route(*ROUTES['cards_create'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def projects_create(self) -> Route:
+        route = Route(*ROUTES['projects_create'], self.handler)
+        return route
+
+    def projects_update_background_image(self, id: int) -> Route:
+        route = Route(*ROUTES['projects_update_background_image'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def boards_create(self, projectId: int) -> Route:
+        route = Route(*ROUTES['boards_create'], self.handler)
+        route.endpoint = route.endpoint.format(projectId=projectId)
+        return route
+
+    def project_managers_create(self, projectId: int) -> Route:
+        route = Route(*ROUTES['project_managers_create'], self.handler)
+        route.endpoint = route.endpoint.format(projectId=projectId)
+        return route
+
+    def users_create(self) -> Route:
+        route = Route(*ROUTES['users_create'], self.handler)
+        return route
+
+    def users_update_avatar(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update_avatar'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def attachments_update(self, id: int) -> Route:
+        route = Route(*ROUTES['attachments_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def board_memberships_update(self, id: int) -> Route:
+        route = Route(*ROUTES['board_memberships_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def boards_update(self, id: int) -> Route:
+        route = Route(*ROUTES['boards_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def cards_update(self, id: int) -> Route:
+        route = Route(*ROUTES['cards_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def comment_actions_update(self, id: int) -> Route:
+        route = Route(*ROUTES['comment_actions_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def labels_update(self, id: int) -> Route:
+        route = Route(*ROUTES['labels_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def lists_update(self, id: int) -> Route:
+        route = Route(*ROUTES['lists_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def notifications_update(self, ids: int) -> Route:
+        route = Route(*ROUTES['notifications_update'], self.handler)
+        route.endpoint = route.endpoint.format(ids=ids)
+        return route
+
+    def projects_update(self, id: int) -> Route:
+        route = Route(*ROUTES['projects_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def tasks_update(self, id: int) -> Route:
+        route = Route(*ROUTES['tasks_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update_email(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update_email'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update_password(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update_password'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update_username(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update_username'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def attachments_update(self, id: int) -> Route:
+        route = Route(*ROUTES['attachments_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def board_memberships_update(self, id: int) -> Route:
+        route = Route(*ROUTES['board_memberships_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def boards_update(self, id: int) -> Route:
+        route = Route(*ROUTES['boards_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def cards_update(self, id: int) -> Route:
+        route = Route(*ROUTES['cards_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def comment_actions_update(self, id: int) -> Route:
+        route = Route(*ROUTES['comment_actions_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def labels_update(self, id: int) -> Route:
+        route = Route(*ROUTES['labels_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def lists_update(self, id: int) -> Route:
+        route = Route(*ROUTES['lists_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def notifications_update(self, ids: int) -> Route:
+        route = Route(*ROUTES['notifications_update'], self.handler)
+        route.endpoint = route.endpoint.format(ids=ids)
+        return route
+
+    def projects_update(self, id: int) -> Route:
+        route = Route(*ROUTES['projects_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def tasks_update(self, id: int) -> Route:
+        route = Route(*ROUTES['tasks_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update_email(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update_email'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update_password(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update_password'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_update_username(self, id: int) -> Route:
+        route = Route(*ROUTES['users_update_username'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def access_tokens_delete(self) -> Route:
+        route = Route(*ROUTES['access_tokens_delete'], self.handler)
+        return route
+
+    def attachments_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['attachments_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def board_memberships_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['board_memberships_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def boards_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['boards_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def card_labels_delete(self, cardId: int, labelId: int) -> Route:
+        route = Route(*ROUTES['card_labels_delete'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId, labelId=labelId)
+        return route
+
+    def card_memberships_delete(self, cardId: int) -> Route:
+        route = Route(*ROUTES['card_memberships_delete'], self.handler)
+        route.endpoint = route.endpoint.format(cardId=cardId)
+        return route
+
+    def cards_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['cards_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def comment_actions_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['comment_actions_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def labels_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['labels_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def lists_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['lists_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def project_managers_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['project_managers_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def projects_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['projects_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def tasks_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['tasks_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
+
+    def users_delete(self, id: int) -> Route:
+        route = Route(*ROUTES['users_delete'], self.handler)
+        route.endpoint = route.endpoint.format(id=id)
+        return route
