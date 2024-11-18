@@ -22,6 +22,13 @@ class Model:
             raise ValueError(f"Invalid attributes for {cls.__name__}: {list(data.keys() - cls.__annotations__.keys())}")
         return cls(**data)
     
+    def __str__(self) -> str:
+        if hasattr(self, 'name'):
+            return self.name
+        elif hasattr(self, 'id'):
+            return self.id
+        return f"<{self.__class__.__name__}>"
+    
     def __iter__(self):
         return iter(self.__dict__.items())
     
