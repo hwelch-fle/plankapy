@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Self
+from typing import Self
 
 from constants import ActionType, Background, BackgroundImage
 
-# Sentinal value for unset values since None is a valid value
-# For responses
+# Sentinal value for unset values since None is a valid value for responses
 class _Unset: 
     def __repr__(self) -> str:
         return f"<Unset>"
