@@ -34,6 +34,7 @@ ActionType: TypeAlias = Literal[
     'commentCard',
 ]
 
+# From https://github.com/plankanban/planka/blob/master/server/api/models/BoardMembership.js
 BoardRole: TypeAlias = Literal[
     'editor',
     'viewer',
