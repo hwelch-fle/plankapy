@@ -94,36 +94,36 @@ class IdentityProviderUser(Model): ...
 @dataclass
 class Label(Model):
     id: Optional[str]|_Unset=Unset
-    name: Optional[str]|_Unset=Unset
-    position: Optional[int]|_Unset=Unset
-    color: Optional[str]|_Unset=Unset
-    boardId: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
+    position: Optional[int]|_Unset=Required
+    color: Optional[str]|_Unset=Required
+    boardId: Optional[str]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class List(Model):
     id: Optional[str]|_Unset=Unset
-    name: Optional[str]|_Unset=Unset
-    position: Optional[int]|_Unset=Unset
-    boardId: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
+    position: Optional[int]|_Unset=Required
+    boardId: Optional[str]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Notification(Model): 
     id: Optional[str]|_Unset=Unset
-    isRead: bool|_Unset=Unset
-    userID: Optional[str]|_Unset=Unset
-    actionID: Optional[str]|_Unset=Unset
-    cardID: Optional[str]|_Unset=Unset
+    isRead: bool|_Unset=Required
+    userID: Optional[str]|_Unset=Required
+    actionID: Optional[str]|_Unset=Required
+    cardID: Optional[str]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Project(Model):
     id: Optional[str]|_Unset=Unset
-    name: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
     # Background overrides backgroundImage
     background: Optional[Background]|_Unset=Unset
     backgroundImage: Optional[BackgroundImage]|_Unset=Unset
@@ -138,7 +138,7 @@ class Task(Model):
     id: Optional[str]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
-    isCompleted: bool|_Unset=Required
+    isCompleted: bool|_Unset=Unset
     cardId: Optional[str]|_Unset=Unset
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
@@ -146,9 +146,9 @@ class Task(Model):
 @dataclass
 class User(Model):
     id: Optional[str]|_Unset=Unset
-    name: Optional[str]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
     username: Optional[str]|_Unset=Unset
-    email: Optional[str]|_Unset=Unset
+    email: Optional[str]|_Unset=Required
     language: Optional[str]|_Unset=Unset
     organization: Optional[str]|_Unset=Unset
     phone: Optional[str]|_Unset=Unset
