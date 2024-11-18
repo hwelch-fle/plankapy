@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Self
 
-from constants import ActionType, Background, BackgroundImage
+from .constants import ActionType, BoardRole, Background, BackgroundImage
 
 # Sentinal value for unset values since None is a valid value for responses
 class _Unset: 
@@ -57,92 +57,131 @@ class Model:
 
 @dataclass
 class Action(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     type: Optional[ActionType]|_Unset=Required
     data: Optional[dict]|_Unset=Required
-    cardId: Optional[str]|_Unset=Required
-    userId: Optional[str]|_Unset=Required
+    cardid: Optional[int]|_Unset=Required
+    userid: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Archive(Model):
     fromModel: Optional[str]|_Unset=Required
-    originalRecordId: Optional[str]|_Unset=Required
+    originalRecordid: Optional[int]|_Unset=Required
     originalRecord: Optional[dict]|_Unset=Required
 
 @dataclass
 class Attachment(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     dirname: Optional[str]|_Unset=Required
     filename: Optional[str]|_Unset=Required
     image: Optional[dict]|_Unset=Unset
     url: Optional[str]|_Unset=Unset
     coverUrl: Optional[str]|_Unset=Unset
-    creatorUserId: Optional[str]|_Unset=Unset
+    creatorUserid: Optional[int]|_Unset=Unset
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Board(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
-    projectId: Optional[str]|_Unset=Required
+    projectid: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
-class BoardMembership(Model): ...
+class BoardMembership(Model):
+    id: Optional[int]|_Unset=Unset
+    role: Optional[BoardRole]|_Unset=Required
+    canComment: Optional[bool]|_Unset=Unset
+    boardid: Optional[int]|_Unset=Required
+    userid: Optional[int]|_Unset=Required
 
 @dataclass
-class Card(Model): ...
+class Card(Model):
+    id: Optional[int]|_Unset=Unset
+    name: Optional[str]|_Unset=Required
+    position: Optional[int]|_Unset=Required
+    description: Optional[str]|_Unset=Unset
+    dueDate: Optional[datetime]|_Unset=Unset
+    isDueDateCompleted: Optional[bool]|_Unset=Unset
+    stopwatch: Optional['Stopwatch']|_Unset=Unset
+    boardid: Optional[int]|_Unset=Required
+    listid: Optional[int]|_Unset=Required
+    creatorUserid: Optional[int]|_Unset=Unset
+    coverAttachmentid: Optional[int]|_Unset=Unset
+    isSubscribed: Optional[bool]|_Unset=Unset
 
 @dataclass
-class CardLabel(Model): ...
+class Stopwatch:
+    startedAt: Optional[datetime]|_Unset=Unset
+    total: Optional[int]|_Unset=Unset
 
 @dataclass
-class CardMembership(Model): ...
+class CardLabel(Model):
+    id: Optional[int]|_Unset=Unset
+    cardid: Optional[int]|_Unset=Required
+    labelid: Optional[int]|_Unset=Required
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
-class CardSubscription(Model): ...
+class CardMembership(Model):
+    id: Optional[int]|_Unset=Unset
+    cardid: Optional[int]|_Unset=Required
+    userid: Optional[int]|_Unset=Required
+    createdAt: Optional[datetime]|_Unset=Unset
+    updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
-class IdentityProviderUser(Model): ...
+class CardSubscription(Model):
+    id: Optional[int]|_Unset=Unset
+    cardid: Optional[int]|_Unset=Required
+    userid: Optional[int]|_Unset=Required
+    isPermanent: Optional[bool]|_Unset=Unset
+@dataclass
+class IdentityProviderUser(Model):
+    id: Optional[int]|_Unset=Unset
+    issuer: Optional[str]|_Unset=Unset
+    sub: Optional[str]|_Unset=Unset
+    userid: Optional[int]|_Unset=Required
 
 @dataclass
 class Label(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
     color: Optional[str]|_Unset=Required
-    boardId: Optional[str]|_Unset=Required
+    boardid: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class List(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
-    boardId: Optional[str]|_Unset=Required
+    boardid: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Notification(Model): 
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     isRead: bool|_Unset=Required
-    userID: Optional[str]|_Unset=Required
-    actionID: Optional[str]|_Unset=Required
-    cardID: Optional[str]|_Unset=Required
+    userid: Optional[int]|_Unset=Required
+    actionid: Optional[int]|_Unset=Required
+    cardid: Optional[int]|_Unset=Required
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class Project(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     # Background overrides backgroundImage
     background: Optional[Background]|_Unset=Unset
@@ -151,21 +190,24 @@ class Project(Model):
     updatedAt: Optional[datetime]|_Unset=Unset
     
 @dataclass
-class ProjectManager(Model): ...
+class ProjectManager(Model):
+    id: Optional[int]|_Unset=Unset
+    projectid: Optional[int]|_Unset=Required
+    userid: Optional[int]|_Unset=Required
 
 @dataclass
 class Task(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     position: Optional[int]|_Unset=Required
     isCompleted: bool|_Unset=Unset
-    cardId: Optional[str]|_Unset=Unset
+    cardid: Optional[int]|_Unset=Unset
     createdAt: Optional[datetime]|_Unset=Unset
     updatedAt: Optional[datetime]|_Unset=Unset
 
 @dataclass
 class User(Model):
-    id: Optional[str]|_Unset=Unset
+    id: Optional[int]|_Unset=Unset
     name: Optional[str]|_Unset=Required
     username: Optional[str]|_Unset=Unset
     email: Optional[str]|_Unset=Required
