@@ -27,10 +27,16 @@ def set_position(value: int, zero_index: bool=False) -> int:
     """
     return int(value * OFFSET) - zero_index
 
+# From https://github.com/plankanban/planka/blob/master/server/api/models/Action.js
 ActionType: TypeAlias = Literal[
     'createCard',
     'moveCard',
     'commentCard',
+]
+
+BoardRole: TypeAlias = Literal[
+    'editor',
+    'viewer',
 ]
 
 # From https://github.com/plankanban/planka/blob/master/server/api/models/Project.js
