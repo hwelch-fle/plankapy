@@ -12,7 +12,10 @@ def encode_data(data: dict, encoding: str='utf-8') -> bytes:
     return json.dumps(data).encode(encoding)
 
 def decode_data(data: bytes, encoding: str='utf-8') -> dict:
-    return json.loads(data.decode(encoding))
+    try:
+        return json.loads(data.decode(encoding))
+    except json.JSONDecodeError:
+        return {'body': data.decode(encoding)}
 
 class BaseHandler:
     def __init__(self, base_url: str, *,
@@ -22,6 +25,9 @@ class BaseHandler:
         self._endpoint = endpoint
         self._headers = headers if headers else {}
     
+    def __repr__(self):
+        return f'<{self.__class__.__name__} {self.endpoint} >'
+
     @property
     def endpoint(self):
         return urljoin(self._base_url, self._endpoint)
