@@ -1,9 +1,34 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Self
+try:
+    from typing import Optional, Self
+except ImportError:
+    from typing import Optional
+    Self = object
 
 from .routes import Route
 from .constants import ActionType, BoardRole, Background, BackgroundImage
+
+__all__ = [
+    'Action',
+    'Archive',
+    'Attachment',
+    'Board',
+    'BoardMembership',
+    'Card',
+    'Stopwatch',
+    'CardLabel',
+    'CardMembership',
+    'CardSubscription',
+    'IdentityProviderUser',
+    'Label',
+    'List',
+    'Notification',
+    'Project',
+    'ProjectManager',
+    'Task',
+    'User',
+]
 
 # Sentinal value for unset values since None is a valid value for responses
 class _Unset: 
@@ -151,6 +176,7 @@ class CardSubscription(Model):
     cardId: Optional[int]|_Unset=Required
     userId: Optional[int]|_Unset=Required
     isPermanent: Optional[bool]|_Unset=Unset
+
 @dataclass
 class IdentityProviderUser(Model):
     id: Optional[int]|_Unset=Unset
