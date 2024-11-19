@@ -72,7 +72,7 @@ Gradient: TypeAlias = Literal[
 @dataclass
 class Background:
     name: Gradient
-    type: Literal['gradient']
+    type: str = 'gradient'
 
 @dataclass
 class BackgroundImage:
