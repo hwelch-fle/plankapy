@@ -1,4 +1,4 @@
-from .handlers import JSONHandler, JSONResponse
+from utils.handlers import JSONHandler, JSONResponse
 from typing import Literal, TypeAlias
 
 RequestType: TypeAlias = Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
@@ -43,6 +43,11 @@ class Route:
 
     def __repr__(self):
         return f'<Route {self.method} {self.endpoint} for {self.handler}>'
+    
+    def __iter__(self):
+        if not self.method == 'GET':
+            raise ValueError('Only GET routes can be iterated')
+        return iter(self()['items'])
 
 ROUTES = {
 
@@ -134,7 +139,19 @@ ROUTES = {
 }
 
 class Routes:
+    """Container for all routes in the Planka API.
+    Each method returns a Route object that can be called to make a request.
     
+    Usage:
+    >>> routes = Routes(handler)
+    >>> route = routes.index()
+    >>> route()
+    <JSONResponse>
+
+    >>> update_card = routes.cards_update(1)
+    >>> update_card(name='Updated name')
+    <JSONResponse>
+    """
     def __init__(self, handler: JSONHandler) -> None:
         self.handler = handler
     
