@@ -56,7 +56,11 @@ class Model:
             raise ValueError(f"Required field(s) {required} not set")
         return True
     
-    def set_route(self, route: Route):
+    def bind_route(self, route: Route):
+        """Bind a route to the model
+        Args:
+            route (Route): The route to bind to the model instance
+        """
         self.route = route
 
 @dataclass
