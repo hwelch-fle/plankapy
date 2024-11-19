@@ -39,6 +39,7 @@ Unset = _Unset()
 Required = _Unset()
 
 # Base class for all models
+# TODO: Set up as a Mapping so models can be ** unpacked into POST, PUT, and PATCH routes
 class Model:
     """Implements common magic methods for all Models"""
     @classmethod
@@ -47,26 +48,6 @@ class Model:
         if not set(data.keys()).issubset(cls.__annotations__):
             raise ValueError(f"Invalid attributes for {cls.__name__}: {list(data.keys() - cls.__annotations__.keys())}")
         return cls(**data)
-    
-    def __str__(self) -> str:
-        if hasattr(self, 'name'):
-            return self.name
-        elif hasattr(self, 'id'):
-            return self.id
-        return f"<{self.__class__.__name__}>"
-    
-    def __iter__(self):
-        return iter(self.__dict__.items())
-    
-    def __getitem__(self, key):
-        return self.__dict__[key]
-    
-    def __setitem__(self, key, value):
-        self.__dict__[key] = value
-        
-    def __len__(self):
-        """Return the number of set values"""
-        return len([v for v in self.__dict__.values() if v is not Unset])
     
     def validate(self) -> bool:
         """Check if all required fields are set
@@ -90,171 +71,171 @@ class Model:
 
 @dataclass
 class Action(Model):
-    id: Optional[int]|_Unset=Unset
-    type: Optional[ActionType]|_Unset=Required
-    data: Optional[dict]|_Unset=Required
-    cardId: Optional[int]|_Unset=Required
-    userId: Optional[int]|_Unset=Required
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    type: Optional[ActionType]=Required
+    data: Optional[dict]=Required
+    cardId: Optional[int]=Required
+    userId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class Archive(Model):
-    fromModel: Optional[str]|_Unset=Required
-    originalRecordId: Optional[int]|_Unset=Required
-    originalRecord: Optional[dict]|_Unset=Required
+    fromModel: Optional[str]=Required
+    originalRecordId: Optional[int]=Required
+    originalRecord: Optional[dict]=Required
 
 @dataclass
 class Attachment(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
-    dirname: Optional[str]|_Unset=Required
-    filename: Optional[str]|_Unset=Required
-    image: Optional[dict]|_Unset=Unset
-    url: Optional[str]|_Unset=Unset
-    coverUrl: Optional[str]|_Unset=Unset
-    creatorUserid: Optional[int]|_Unset=Unset
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
+    dirname: Optional[str]=Required
+    filename: Optional[str]=Required
+    image: Optional[dict]=Unset
+    url: Optional[str]=Unset
+    coverUrl: Optional[str]=Unset
+    creatorUserid: Optional[int]=Unset
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class Board(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
-    position: Optional[int]|_Unset=Required
-    projectId: Optional[int]|_Unset=Required
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
+    position: Optional[int]=Required
+    projectId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class BoardMembership(Model):
-    id: Optional[int]|_Unset=Unset
-    role: Optional[BoardRole]|_Unset=Required
-    canComment: Optional[bool]|_Unset=Unset
-    boardId: Optional[int]|_Unset=Required
-    userId: Optional[int]|_Unset=Required
+    id: Optional[int]=Unset
+    role: Optional[BoardRole]=Required
+    canComment: Optional[bool]=Unset
+    boardId: Optional[int]=Required
+    userId: Optional[int]=Required
 
 @dataclass
 class Card(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
-    position: Optional[int]|_Unset=Required
-    description: Optional[str]|_Unset=Unset
-    dueDate: Optional[datetime]|_Unset=Unset
-    isDueDateCompleted: Optional[bool]|_Unset=Unset
-    stopwatch: Optional['Stopwatch']|_Unset=Unset
-    boardId: Optional[int]|_Unset=Required
-    listId: Optional[int]|_Unset=Required
-    creatorUserId: Optional[int]|_Unset=Unset
-    coverAttachmentId: Optional[int]|_Unset=Unset
-    isSubscribed: Optional[bool]|_Unset=Unset
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
+    position: Optional[int]=Required
+    description: Optional[str]=Unset
+    dueDate: Optional[datetime]=Unset
+    isDueDateCompleted: Optional[bool]=Unset
+    stopwatch: Optional['Stopwatch']=Unset
+    boardId: Optional[int]=Required
+    listId: Optional[int]=Required
+    creatorUserId: Optional[int]=Unset
+    coverAttachmentId: Optional[int]=Unset
+    isSubscribed: Optional[bool]=Unset
 
 @dataclass
 class Stopwatch:
-    startedAt: Optional[datetime]|_Unset=Unset
-    total: Optional[int]|_Unset=Unset
+    startedAt: Optional[datetime]=Unset
+    total: Optional[int]=Unset
 
 @dataclass
 class CardLabel(Model):
-    id: Optional[int]|_Unset=Unset
-    cardId: Optional[int]|_Unset=Required
-    labelId: Optional[int]|_Unset=Required
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    cardId: Optional[int]=Required
+    labelId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class CardMembership(Model):
-    id: Optional[int]|_Unset=Unset
-    cardId: Optional[int]|_Unset=Required
-    userId: Optional[int]|_Unset=Required
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    cardId: Optional[int]=Required
+    userId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class CardSubscription(Model):
-    id: Optional[int]|_Unset=Unset
-    cardId: Optional[int]|_Unset=Required
-    userId: Optional[int]|_Unset=Required
-    isPermanent: Optional[bool]|_Unset=Unset
+    id: Optional[int]=Unset
+    cardId: Optional[int]=Required
+    userId: Optional[int]=Required
+    isPermanent: Optional[bool]=Unset
 
 @dataclass
 class IdentityProviderUser(Model):
-    id: Optional[int]|_Unset=Unset
-    issuer: Optional[str]|_Unset=Unset
-    sub: Optional[str]|_Unset=Unset
-    userId: Optional[int]|_Unset=Required
+    id: Optional[int]=Unset
+    issuer: Optional[str]=Unset
+    sub: Optional[str]=Unset
+    userId: Optional[int]=Required
 
 @dataclass
 class Label(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
-    position: Optional[int]|_Unset=Required
-    color: Optional[str]|_Unset=Required
-    boardId: Optional[int]|_Unset=Required
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
+    position: Optional[int]=Required
+    color: Optional[str]=Required
+    boardId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class List(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
-    position: Optional[int]|_Unset=Required
-    boardId: Optional[int]|_Unset=Required
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
+    position: Optional[int]=Required
+    boardId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class Notification(Model): 
-    id: Optional[int]|_Unset=Unset
-    isRead: bool|_Unset=Required
-    userId: Optional[int]|_Unset=Required
-    actionId: Optional[int]|_Unset=Required
-    cardId: Optional[int]|_Unset=Required
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    isRead: bool=Required
+    userId: Optional[int]=Required
+    actionId: Optional[int]=Required
+    cardId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class Project(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
     # Background overrides backgroundImage
-    background: Optional[Background]|_Unset=Unset
-    backgroundImage: Optional[BackgroundImage]|_Unset=Unset
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    background: Optional[Background]=Unset
+    backgroundImage: Optional[BackgroundImage]=Unset
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
     
 @dataclass
 class ProjectManager(Model):
-    id: Optional[int]|_Unset=Unset
-    projectId: Optional[int]|_Unset=Required
-    userId: Optional[int]|_Unset=Required
+    id: Optional[int]=Unset
+    projectId: Optional[int]=Required
+    userId: Optional[int]=Required
 
 @dataclass
 class Task(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
-    position: Optional[int]|_Unset=Required
-    isCompleted: bool|_Unset=Unset
-    cardId: Optional[int]|_Unset=Unset
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
+    position: Optional[int]=Required
+    isCompleted: bool=Unset
+    cardId: Optional[int]=Unset
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class User(Model):
-    id: Optional[int]|_Unset=Unset
-    name: Optional[str]|_Unset=Required
-    username: Optional[str]|_Unset=Unset
-    email: Optional[str]|_Unset=Required
-    language: Optional[str]|_Unset=Unset
-    organization: Optional[str]|_Unset=Unset
-    phone: Optional[str]|_Unset=Unset
-    avatarURL: Optional[str]|_Unset=Unset
-    isAdmin: bool|_Unset=Unset
-    isDeletionLocked: bool|_Unset=Unset
-    isLocked: bool|_Unset=Unset
-    isRoleLocked: bool|_Unset=Unset
-    isUsernameLocked: bool|_Unset=Unset
-    subscribeToOwnCards: bool|_Unset=Unset
-    createdAt: Optional[datetime]|_Unset=Unset
-    updatedAt: Optional[datetime]|_Unset=Unset
-    deletedAt: Optional[datetime]|_Unset=Unset
+    id: Optional[int]=Unset
+    name: Optional[str]=Required
+    username: Optional[str]=Unset
+    email: Optional[str]=Required
+    language: Optional[str]=Unset
+    organization: Optional[str]=Unset
+    phone: Optional[str]=Unset
+    avatarURL: Optional[str]=Unset
+    isAdmin: bool=Unset
+    isDeletionLocked: bool=Unset
+    isLocked: bool=Unset
+    isRoleLocked: bool=Unset
+    isUsernameLocked: bool=Unset
+    subscribeToOwnCards: bool=Unset
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
+    deletedAt: Optional[datetime]=Unset
