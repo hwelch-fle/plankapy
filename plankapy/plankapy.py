@@ -46,7 +46,7 @@ class Planka:
         - **return:** True if successful, False if not
         """
         try:
-            self.request("GET", "/*")
+            self.request("GET", "/api/users/me")
             return True
         except Exception as e:
             raise InvalidToken(f"Invalid API credentials\n{self.__repr__()}")
