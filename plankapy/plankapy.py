@@ -13,11 +13,11 @@ class Planka:
     - username: Username of Planka user
     - password: Password of Planka user
     """
-    def __init__(self, url:str, username:str=None, password:str=None, templates=None, access_token=None):
+    def __init__(self, url:str, username:str=None, password:str=None, templates=None, access_token=None, http_only_token=None):
         self.url = url
         self.username = username
         self.password = password
-        self.auth = access_token
+        self.auth = (access_token, http_only_token)
         if templates is None:
             # Access the templates.json from within the package
             with importlib.resources.open_text('plankapy.config', 'templates.json') as f:
@@ -28,7 +28,7 @@ class Planka:
         self.authenticate()
     
     def __repr__(self):
-        return f"<{type(self).__name__}:\n\tBase URL: {self.url}\n\tLogin User: {self.username}\n\tLogin Pass: {self.password}\n\tAPI Token: {self.auth}\n>"
+        return f"<{type(self).__name__}:\n\tBase URL: {self.url}\n\tLogin User: {self.username}\n\tLogin Pass: {self.password}\n\tAPI Tokens: {self.auth}\n>"
 
     def deauthenticate(self) -> bool:
         """Deletes the auth token from the Planka API
@@ -36,7 +36,7 @@ class Planka:
         """
         try:
             self.request("DELETE", "/api/access-tokens/me")
-            self.auth = None
+            self.auth = (None, None)
             return True
         except Exception as e:
             raise InvalidToken(f"No active access token assigned to this instance\n{self.__repr__()}")
@@ -56,14 +56,15 @@ class Planka:
         - **return:** True if successful, False if not
         """
         # Allow SSO token bypass
-        if self.auth:
+        if self.auth[0]:
             return True
         
         # Use login credentials to get an auth token
         try:
-            request = requests.post(f"{self.url}/api/access-tokens", data={'emailOrUsername': self.username, 'password': self.password})
-            self.auth = request.json()['item']
-            if self.auth:
+            import ipdb; ipdb.set_trace()  # noqa:E402,E702
+            request = requests.post(f"{self.url}/api/access-tokens?withHttpOnlyToken=true", data={'emailOrUsername': self.username, 'password': self.password})
+            self.auth = (request.json()['item'], request.cookies.get('httpOnlyToken'))
+            if self.auth[0]:
                 return True
             
         # Catch any exceptions raisef by requests.post()
@@ -80,15 +81,18 @@ class Planka:
         - data: Data to send with request (default: None)
         - **return:** JSON response from Planka API
         """
-        if not self.auth:
+        if not self.auth[0]:
             self.authenticate()
         headers = \
             { 
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.auth}"
+            "Authorization": f"Bearer {self.auth[0]}"
             }
+        cookies = {}
+        if self.auth[1]:
+            cookies['httpOnlyToken'] = self.auth[1]
         url = f"{self.url}{endpoint}"
-        response = requests.request(method, url, headers=headers, json=data)
+        response = requests.request(method, url, headers=headers, cookies=cookies, json=data)
 
         if response.status_code == 401:
             raise InvalidToken("Invalid API credentials")
