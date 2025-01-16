@@ -16,6 +16,10 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+dependencies = [
+    "requests",
+]
+
 [project.urls]
 Homepage = "https://github.com/hwelch-fle/plankapy"
 Documentation = "https://hwelch-fle.github.io/plankapy/plankapy.html"
