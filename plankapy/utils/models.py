@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 try:
-    from typing import Optional, Self
+    from typing import Optional, Self, Any, Mapping
 except ImportError:
     from typing import Optional
     Self = object
@@ -40,12 +40,12 @@ Required = _Unset()
 
 # Base class for all models
 # TODO: Set up as a Mapping so models can be ** unpacked into POST, PUT, and PATCH routes
-class Model:
+class Model(Mapping):
     """Implements common magic methods for all Models"""
     @classmethod
     def from_dict(cls, data: dict) -> Self:
         """Create a new instance of the class from a dictionary"""
-        if not set(data.keys()).issubset(cls.__annotations__):
+        if not set(data.keys()).issubset(cls.__annotations__.keys()):
             raise ValueError(f"Invalid attributes for {cls.__name__}: {list(data.keys() - cls.__annotations__.keys())}")
         return cls(**data)
     
@@ -68,6 +68,16 @@ class Model:
             route (Route): The route to bind to the model instance
         """
         self.route = route
+
+    def __getitem__(self, key) -> Any:
+        val = self.__dict__[key]
+        return val if val is not Unset else None
+    
+    def __iter__(self):
+        return iter(k for k, v in self.__dict__.items() if v is not Unset)
+    
+    def __len__(self) -> int:
+        return len(i for i in self)
 
 @dataclass
 class Action(Model):
