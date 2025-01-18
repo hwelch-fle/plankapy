@@ -61,7 +61,6 @@ class Planka:
         
         # Use login credentials to get an auth token
         try:
-            import ipdb; ipdb.set_trace()  # noqa:E402,E702
             request = requests.post(f"{self.url}/api/access-tokens?withHttpOnlyToken=true", data={'emailOrUsername': self.username, 'password': self.password})
             self.auth = (request.json()['item'], request.cookies.get('httpOnlyToken'))
             if self.auth[0]:
