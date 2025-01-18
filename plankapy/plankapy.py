@@ -586,7 +586,7 @@ class Label(Controller):
             raise InvalidToken("Please provide a project, board, label name")
         if card_id:
             label = self.get(project_name, board_name, label_name)
-            return super().create(f"/api/cards/{card_id}/labels", data={"labelId":label['item']['id']})
+            return super().create(f"/api/cards/{card_id}/labels", data={"labelId":label['id']})
         if not (card_name and list_name):
             raise InvalidToken("Please provide a card and list name")
         card_con = Card(self.instance)
