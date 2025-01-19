@@ -6,8 +6,6 @@ import json
 
 from contextlib import contextmanager
 
-JSONResponse: TypeAlias = dict[str, str]
-
 class BaseHandler:
     def __init__(self, base_url: str, *,
                  endpoint: Optional[str]=None, 
@@ -15,7 +13,7 @@ class BaseHandler:
         self.base_url = base_url
         self._endpoint = endpoint
         self.headers = headers if headers else {'Content-Type': 'application/json'}
-
+    
     @property
     def endpoint(self) -> str:
         return urljoin(self.base_url, self._endpoint)
@@ -100,6 +98,7 @@ class BaseHandler:
             self.endpoint = _endpoint
     
 class JSONHandler(BaseHandler):
+    JSONResponse: TypeAlias = dict[str, str]
 
     def decode_data(self, data: bytes, encoding: str='utf-8') -> dict:
         try:
@@ -121,7 +120,6 @@ class JSONHandler(BaseHandler):
     
     def delete(self) -> JSONResponse:
         return self.decode_data(super().delete())
-
 
 class BaseAuth:
     endpoint = None
