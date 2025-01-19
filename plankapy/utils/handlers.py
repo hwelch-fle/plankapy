@@ -1,7 +1,7 @@
-from urllib.request import Request, urlopen
+from urllib.request import Request, urlopen, HTTPError
 from urllib.parse import urljoin
 
-from typing import Optional, TypeAlias, Generator
+from typing import Optional, TypeAlias, Generator, Self
 import json
 
 from contextlib import contextmanager
