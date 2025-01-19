@@ -20,6 +20,13 @@ Required = _Unset()
 # TODO: Set up as a Mapping so models can be ** unpacked into POST, PUT, and PATCH routes
 class Model(Mapping):
     """Implements common magic methods for all Models"""
+    @property
+    def routes(self) -> Routes:
+        return self._routes
+    
+    @routes.setter
+    def routes(self, routes: Routes):
+        self._routes = routes
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
