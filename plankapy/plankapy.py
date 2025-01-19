@@ -22,31 +22,9 @@ class Planka:
         return handler
 
 if __name__ == '__main__':
-    import time
-    import random
-    planka = Planka('http://localhost:3000', username_or_email='demo', password='demo')
+    from pprint import pprint
+    auth = PasswordAuth(username_or_email='demo', password='demo')
+    planka = Planka('http://localhost:3000', auth=auth)
 
-    while True:
-        loop_start = time.time()
-        prjs = 0
-        for project in planka.routes.projects_index():
-            prjs += 1
-            project = Project(**project)
-            gradient = random.choice(Gradient.__args__)
-    
-            project.background = Background(gradient).__dict__
-            project.name = gradient
-            changed_background = planka.routes.projects_update(project.id)(**project)
-            changed_background = Project(**changed_background['item'])
-            print(f'{changed_background.name} changed to {changed_background.background}')
-        loop_end = time.time()
-        print(f"{(loop_end-loop_start)/prjs:.2f} seconds per update")
-
-    #for grad in Gradient.__args__:
-    #    create_project = planka.routes.projects_create()
-    #
-    #    project = Project(name=grad, background=Background(grad).__dict__)
-    #    project.validate()
-    #    print(dict(**project))
-    #    resp = create_project(**project)
-    #    print(f"Created {grad}: {resp}")
+    get_index = planka.routes.get_project_index()
+    pprint(get_index())
