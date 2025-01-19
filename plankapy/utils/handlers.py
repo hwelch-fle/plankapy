@@ -120,23 +120,23 @@ class JSONHandler(BaseHandler):
 class BaseAuth:
     endpoint = None
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name___}: "
+        return f"<{self.__class__.__name__}: {self.endpoint}"
+    
     def authenticate(self) -> str:
-        raise NotImplementedError(f"Authentication not implemeted by {self.__class__.__name__}")
+        raise NotImplementedError
 
 class PasswordAuth(BaseAuth):
     endpoint = 'api/access-tokens'
 
     def __init__(self, username_or_email: str, password: str) -> None:
         self.token = None
-        self.data = {
+        self.credentials = {
             'emailOrUsername': username_or_email,
             'password': password
         }
 
     def authenticate(self, url: str) -> str:
-        with JSONHandler(url, headers={'Content-Type': 'application/json'}).endpoint_as(self.endpoint) as handler:
-            self.token = handler.post(self.data)['item']
+        self.token = JSONHandler(url, endpoint=self.endpoint).post(self.credentials)['item']
         return f"Bearer {self.token}"
 
 class TokenAuth(BaseAuth):
@@ -145,10 +145,11 @@ class TokenAuth(BaseAuth):
     def __init__(self, token: str) -> None:
         self.token = token
 
-    def authenticate(self, url: str) -> str:
+    def authenticate(self, url: str=None) -> str:
+        """URL not required for getting auth string with pre-supplied token"""
         return f"Bearer {self.token}"
 
-# TODO: Implement SSO auth for httpOnlyToken auth
+# TODO: Implement SSO auth with httpOnlyToken
 # https://github.com/hwelch-fle/plankapy/pull/11/commits/72b8d06208dc961537ef2bcd8d65c11879b8d6b9#
 class HTTPOnlyAuth(BaseAuth): ...
 
