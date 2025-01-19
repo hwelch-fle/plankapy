@@ -8,53 +8,26 @@ from contextlib import contextmanager
 
 JSONResponse: TypeAlias = dict[str, str]
 
-def encode_data(data: dict, encoding: str='utf-8') -> bytes:
-    return json.dumps(data).encode(encoding)
-
-def decode_data(data: bytes, encoding: str='utf-8') -> dict:
-    try:
-        return json.loads(data.decode(encoding))
-    except json.JSONDecodeError:
-        return {'body': data.decode(encoding)}
-
 class BaseHandler:
     def __init__(self, base_url: str, *,
                  endpoint: Optional[str]=None, 
                  headers: Optional[dict[str, str]]=None) -> None:
-        self._base_url = base_url
-        self._endpoint = endpoint
-        self._headers = headers if headers else {}
-
-    @property
-    def endpoint(self):
-        return urljoin(self._base_url, self._endpoint)
-    
-    @endpoint.setter
-    def endpoint(self, value):
-        self._endpoint = value
-        
-    @property
-    def headers(self):
-        return self._headers
-    
-    @headers.setter
-    def headers(self, value):
-        self._headers = value
-        
-    @property
-    def base_url(self):
-        return self._base_url
-    
-    @base_url.setter
-    def base_url(self, value):
-        self._base_url = value
+        self.base_url = base_url
+        self.endpoint = urljoin(base_url, endpoint)
+        self.headers = headers if headers else {}
 
     def __repr__(self):
         return f'<{self.__class__.__name__} {self.endpoint} >'
     
     def __str__(self):
-        return f'{self.endpoint}'
+        return self.endpoint
     
+    def encode_data(self, data: dict, encoding: str='utf-8') -> bytes:
+        return json.dumps(data).encode(encoding)
+
+    def decode_data(self):
+        raise NotImplementedError("Decoding must be implemeted by subclass")
+
     def _open(self, request: Request) -> bytes:
         try:
             with urlopen(request) as response:
@@ -79,7 +52,7 @@ class BaseHandler:
                 self.endpoint, 
                 headers=self.headers, 
                 method='POST', 
-                data=encode_data(data)
+                data=self.encode_data(data)
             )
         )
     
@@ -88,7 +61,7 @@ class BaseHandler:
                 self.endpoint, 
                 headers=self.headers, 
                 method='PUT', 
-                data=encode_data(data)
+                data=self.encode_data(data)
             )
         )
     
@@ -97,7 +70,7 @@ class BaseHandler:
                 self.endpoint, 
                 headers=self.headers, 
                 method='PATCH', 
-                data=encode_data(data)
+                data=self.encode_data(data)
             )
         )
     
@@ -122,20 +95,26 @@ class JSONHandler(BaseHandler):
     def __post_init__(self):
         self.headers['Content-Type'] = 'application/json'
 
+    def decode_data(self, data: bytes, encoding: str='utf-8') -> dict:
+        try:
+            return json.loads(data.decode(encoding))
+        except json.JSONDecodeError:
+            return {'body': data.decode(encoding)}
+
     def get(self) -> JSONResponse:
-        return decode_data(super().get())
+        return self.decode_data(super().get())
 
     def post(self, data: dict) -> JSONResponse:
-        return decode_data(super().post(data))
+        return self.decode_data(super().post(data))
     
     def put(self, data: dict) -> JSONResponse:
-        return decode_data(super().put(data))
+        return self.decode_data(super().put(data))
     
     def patch(self, data: dict) -> JSONResponse:
-        return decode_data(super().patch(data))
+        return self.decode_data(super().patch(data))
     
     def delete(self) -> JSONResponse:
-        return decode_data(super().delete())
+        return self.decode_data(super().delete())
 
 
 class BaseAuth:
