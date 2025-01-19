@@ -1,5 +1,5 @@
 from utils.handlers import JSONHandler, JSONResponse
-from typing import Literal, TypeAlias, Callable
+from typing import Literal, TypeAlias
 from functools import wraps
 
 RequestType: TypeAlias = Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
@@ -23,24 +23,23 @@ class Route:
         return self.handler.base_url + self.endpoint
     
     def __call__(self, **data) -> JSONResponse:
-        match self.method:
-            case 'GET':
-                with self.handler.endpoint_as(self.endpoint):
-                    return self.handler.get()
-            case 'POST':
-                with self.handler.endpoint_as(self.endpoint):
-                    return self.handler.post(data)
-            case 'PATCH':
-                with self.handler.endpoint_as(self.endpoint):
-                    return self.handler.patch(data)
-            case 'PUT':
-                with self.handler.endpoint_as(self.endpoint):
-                    return self.handler.put(data)
-            case 'DELETE':
-                with self.handler.endpoint_as(self.endpoint):
-                    return self.handler.delete()
-            case _:
-                raise ValueError(f'Invalid method: {self.method}, must be one of GET, POST, PATCH, PUT, DELETE')
+        with self.handler.endpoint_as(self.endpoint):
+            if self.method == 'GET':
+                return self.handler.get()
+            
+            elif self.method == 'POST':
+                return self.handler.post(data)
+            
+            elif self.method == 'PATCH':
+                return self.handler.patch(data)
+            
+            elif self.method == 'PUT':
+                return self.handler.put(data)
+            
+            elif self.method == 'DELETE':
+                return self.handler.delete()
+                
+        return None
 
     def __repr__(self):
         return f'<Route {self.method} {self.endpoint} for {self.handler}>'
