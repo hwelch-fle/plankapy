@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from .routes import Route
 from .constants import ActionType, BoardRole, Background, BackgroundImage
 
-# Sentinal value for unset values since None is a valid value for responses
+# Sentinel value for unset values since None is a valid value for responses
 class _Unset: 
     def __repr__(self) -> str:
         return "<Unset>"
