@@ -17,6 +17,11 @@ class Planka:
             raise ValueError('Either a token or username/email and password must be provided')
         self.routes = Routes(self.handler)
 
+    def _create_session(self, auth: BaseAuth) -> JSONHandler:
+        handler = JSONHandler(self.url)
+        handler.headers['Authorization'] = auth.authenticate(self.url)
+        return handler
+
 if __name__ == '__main__':
     import time
     import random
