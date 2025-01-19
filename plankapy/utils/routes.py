@@ -70,8 +70,7 @@ class Routes:
         def _wrapper(route):
             @wraps(route)
             def _wrapped(self, *args, **kwargs):
-                endpoint.format(*args, **kwargs)
-                return Route(method, endpoint, self.handler)
+                return Route(method, endpoint.format(*args, **kwargs), self.handler)
             return _wrapped
         return _wrapper
 
