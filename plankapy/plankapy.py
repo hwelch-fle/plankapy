@@ -3,10 +3,9 @@ sys.path.append('..')
 
 from utils.routes import Routes, Route
 from utils.models import *
-from utils.handlers import create_session
+from utils.handlers import TokenAuth, PasswordAuth, BaseAuth, JSONHandler
 from utils.constants import *
 
-# This implementation is current;y prettly slow, about 2s for reading all boards and lists in an instance
 class Planka:
     def __init__(self, url: str, auth: BaseAuth=None):
         if not auth:
