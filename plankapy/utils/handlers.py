@@ -106,7 +106,10 @@ class BaseHandler:
         finally:
             self.endpoint = _endpoint
     
-class JSONHandler(BaseHandler):    
+class JSONHandler(BaseHandler):
+    def __post_init__(self):
+        self.headers['Content-Type'] = 'application/json'
+
     def get(self) -> JSONResponse:
         return decode_data(super().get())
 
