@@ -8,13 +8,12 @@ from utils.constants import *
 
 # This implementation is current;y prettly slow, about 2s for reading all boards and lists in an instance
 class Planka:
-    def __init__(self, url: str, *, username_or_email: str=None, password: str=None, token: str=None):        
-        if token:
-            self.handler = create_session(url, token=token)
-        elif username_or_email and password:
-            self.handler = create_session(url, emailOrUsername=username_or_email, password=password)
-        else:
-            raise ValueError('Either a token or username/email and password must be provided')
+    def __init__(self, url: str, auth: BaseAuth=None):
+        if not auth:
+            raise ValueError('No authentication method provided')
+        self.url = url
+        self.auth = auth
+        self.handler = self._create_session(auth)
         self.routes = Routes(self.handler)
 
     def _create_session(self, auth: BaseAuth) -> JSONHandler:
