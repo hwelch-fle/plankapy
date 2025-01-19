@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Self, Any, Mapping
+from contextlib import contextmanager
 
 from .routes import Route
 from .constants import ActionType, BoardRole, Background, BackgroundImage
@@ -55,7 +56,25 @@ class Model(Mapping):
         return iter(k for k, v in self.__dict__.items() if v is not Unset)
     
     def __len__(self) -> int:
-        return len(i for i in self)
+        return len([i for i in self])
+    
+    def update(self): ...
+
+    @contextmanager
+    def editor(self):
+        """Context manager for editing the model
+
+        Example:
+        ```python
+        with model.editor() as m:
+            m.name = "New Name"
+            m.position = 1
+        ```
+        """
+        try:
+            yield
+        finally:
+            self.update()
 
 @dataclass
 class Action(Model):
