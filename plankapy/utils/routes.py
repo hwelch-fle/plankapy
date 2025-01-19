@@ -1,5 +1,6 @@
 from utils.handlers import JSONHandler, JSONResponse
-from typing import Literal, TypeAlias
+from typing import Literal, TypeAlias, Callable
+from functools import wraps
 
 RequestType: TypeAlias = Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
 
@@ -49,95 +50,6 @@ class Route:
             raise ValueError('Only GET routes can be iterated')
         return iter(self()['items'])
 
-ROUTES = {
-
-    # GET
-    'index': ('GET', '/*'),
-    'boards_show': ('GET', '/api/boards/{id}'),
-    'actions_index': ('GET', '/api/cards/{cardId}/actions'),
-    'cards_show': ('GET', '/api/cards/{id}'),
-    'show_config': ('GET', '/api/config'),
-    'notifications_index': ('GET', '/api/notifications'),
-    'notifications_show': ('GET', '/api/notifications/{id}'),
-    'projects_index': ('GET', '/api/projects'),
-    'projects_show': ('GET', '/api/projects/{id}'),
-    'users_index': ('GET', '/api/users'),
-    'users_show': ('GET', '/api/users/{id}'),
-    'attachments_download': ('GET', '/attachments/{id}/download/{filename}'),
-    'attachments_download_thumbnail': ('GET', '/attachments/{id}/download/thumbnails/cover-256.{extension}'),
-    'project_background_images': ('GET', '/project-background-images/*'),
-    'user_avatars': ('GET', '/user-avatars/*'),
-
-    # POST
-    'access_tokens_create': ('POST', '/api/access-tokens'),
-    'exchange_using_oidc': ('POST', '/api/access-tokens/exchange-using-oidc'),
-    'labels_create': ('POST', '/api/boards/{boardId}/labels'),
-    'lists_create': ('POST', '/api/boards/{boardId}/lists'),
-    'board_memberships_create': ('POST', '/api/boards/{boardId}/memberships'),
-    'attachments_create': ('POST', '/api/cards/{cardId}/attachments'),
-    'comment_actions_create': ('POST', '/api/cards/{cardId}/comment-actions'),
-    'card_labels_create': ('POST', '/api/cards/{cardId}/labels'),
-    'card_memberships_create': ('POST', '/api/cards/{cardId}/memberships'),
-    'tasks_create': ('POST', '/api/cards/{cardId}/tasks'),
-    'cards_duplicate': ('POST', '/api/cards/{id}/duplicate'),
-    'lists_sort': ('POST', '/api/lists/{id}/sort'),
-    'cards_create': ('POST', '/api/lists/{id}/cards'),
-    'projects_create': ('POST', '/api/projects'),
-    'projects_update_background_image': ('POST', '/api/projects/{id}/background-image'),
-    'boards_create': ('POST', '/api/projects/{projectId}/boards'),
-    'project_managers_create': ('POST', '/api/projects/{projectId}/managers'),
-    'users_create': ('POST', '/api/users'),
-    'users_update_avatar': ('POST', '/api/users/{id}/avatar'),
-
-    # PUT
-    'attachments_update': ('PUT', '/api/attachments/{id}'),
-    'board_memberships_update': ('PUT', '/api/board-memberships/{id}'),
-    'boards_update': ('PUT', '/api/boards/{id}'),
-    'cards_update': ('PUT', '/api/cards/{id}'),
-    'comment_actions_update': ('PUT', '/api/comment-actions/{id}'),
-    'labels_update': ('PUT', '/api/labels/{id}'),
-    'lists_update': ('PUT', '/api/lists/{id}'),
-    'notifications_update': ('PUT', '/api/notifications/{ids}'),
-    'projects_update': ('PUT', '/api/projects/{id}'),
-    'tasks_update': ('PUT', '/api/tasks/{id}'),
-    'users_update': ('PUT', '/api/users/{id}'),
-    'users_update_email': ('PUT', '/api/users/{id}/email'),
-    'users_update_password': ('PUT', '/api/users/{id}/password'),
-    'users_update_username': ('PUT', '/api/users/{id}/username'),
-
-    # PATCH
-    'attachments_update': ('PATCH', '/api/attachments/{id}'),
-    'board_memberships_update': ('PATCH', '/api/board-memberships/{id}'),
-    'boards_update': ('PATCH', '/api/boards/{id}'),
-    'cards_update': ('PATCH', '/api/cards/{id}'),
-    'comment_actions_update': ('PATCH', '/api/comment-actions/{id}'),
-    'labels_update': ('PATCH', '/api/labels/{id}'),
-    'lists_update': ('PATCH', '/api/lists/{id}'),
-    'notifications_update': ('PATCH', '/api/notifications/{ids}'),
-    'projects_update': ('PATCH', '/api/projects/{id}'),
-    'tasks_update': ('PATCH', '/api/tasks/{id}'),
-    'users_update': ('PATCH', '/api/users/{id}'),
-    'users_update_email': ('PATCH', '/api/users/{id}/email'),
-    'users_update_password': ('PATCH', '/api/users/{id}/password'),
-    'users_update_username': ('PATCH', '/api/users/{id}/username'),
-
-    # DELETE
-    'access_tokens_delete': ('DELETE', '/api/access-tokens/me'),
-    'attachments_delete': ('DELETE', '/api/attachments/{id}'),
-    'board_memberships_delete': ('DELETE', '/api/board-memberships/{id}'),
-    'boards_delete': ('DELETE', '/api/boards/{id}'),
-    'card_labels_delete': ('DELETE', '/api/cards/{cardId}/labels/{labelId}'),
-    'card_memberships_delete': ('DELETE', '/api/cards/{cardId}/memberships'),
-    'cards_delete': ('DELETE', '/api/cards/{id}'),
-    'comment_actions_delete': ('DELETE', '/api/comment-actions/{id}'),
-    'labels_delete': ('DELETE', '/api/labels/{id}'),
-    'lists_delete': ('DELETE', '/api/lists/{id}'),
-    'project_managers_delete': ('DELETE', '/api/project-managers/{id}'),
-    'projects_delete': ('DELETE', '/api/projects/{id}'),
-    'tasks_delete': ('DELETE', '/api/tasks/{id}'),
-    'users_delete': ('DELETE', '/api/users/{id}'),
-}
-
 class Routes:
     """Container for all routes in the Planka API.
     Each method returns a Route object that can be called to make a request.
@@ -155,371 +67,242 @@ class Routes:
     def __init__(self, handler: JSONHandler) -> None:
         self.handler = handler
     
-    def index(self) -> Route:
-        route = Route(*ROUTES['index'], self.handler)
-        return route
-
-
-    def boards_show(self, id: int) -> Route:
-        route = Route(*ROUTES['boards_show'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def actions_index(self, cardId: int) -> Route:
-        route = Route(*ROUTES['actions_index'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId)
-        return route
-
-    def cards_show(self, id: int) -> Route:
-        route = Route(*ROUTES['cards_show'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def show_config(self) -> Route:
-        route = Route(*ROUTES['show_config'], self.handler)
-        return route
-
-    def notifications_index(self) -> Route:
-        route = Route(*ROUTES['notifications_index'], self.handler)
-        return route
-
-    def notifications_show(self, id: int) -> Route:
-        route = Route(*ROUTES['notifications_show'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def projects_index(self) -> Route:
-        route = Route(*ROUTES['projects_index'], self.handler)
-        return route
-
-    def projects_show(self, id: int) -> Route:
-        route = Route(*ROUTES['projects_show'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_index(self) -> Route:
-        route = Route(*ROUTES['users_index'], self.handler)
-        return route
-
-    def users_show(self, id: int) -> Route:
-        route = Route(*ROUTES['users_show'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def attachments_download(self, id: int, filename: str) -> Route:
-        route = Route(*ROUTES['attachments_download'], self.handler)
-        route.endpoint = route.endpoint.format(id=id, filename=filename)
-        return route
-
-    def attachments_download_thumbnail(self, id: int, extension: str) -> Route:
-        route = Route(*ROUTES['attachments_download_thumbnail'], self.handler)
-        route.endpoint = route.endpoint.format(id=id, extension=extension)
-        return route
-
-    def project_background_images(self) -> Route:
-        route = Route(*ROUTES['project_background_images'], self.handler)
-        return route
-
-    def user_avatars(self) -> Route:
-        route = Route(*ROUTES['user_avatars'], self.handler)
-        return route
-
-    def access_tokens_create(self) -> Route:
-        route = Route(*ROUTES['access_tokens_create'], self.handler)
-        return route
-
-    def exchange_using_oidc(self) -> Route:
-        route = Route(*ROUTES['exchange_using_oidc'], self.handler)
-        return route
-
-    def labels_create(self, boardId: int) -> Route:
-        route = Route(*ROUTES['labels_create'], self.handler)
-        route.endpoint = route.endpoint.format(boardId=boardId)
-        return route
-
-    def lists_create(self, boardId: int) -> Route:
-        route = Route(*ROUTES['lists_create'], self.handler)
-        route.endpoint = route.endpoint.format(boardId=boardId)
-        return route
-
-    def board_memberships_create(self, boardId: int) -> Route:
-        route = Route(*ROUTES['board_memberships_create'], self.handler)
-        route.endpoint = route.endpoint.format(boardId=boardId)
-        return route
-
-    def attachments_create(self, cardId: int) -> Route:
-        route = Route(*ROUTES['attachments_create'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId)
-        return route
-
-    def comment_actions_create(self, cardId: int) -> Route:
-        route = Route(*ROUTES['comment_actions_create'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId)
-        return route
-
-    def card_labels_create(self, cardId: int) -> Route:
-        route = Route(*ROUTES['card_labels_create'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId)
-        return route
-
-    def card_memberships_create(self, cardId: int) -> Route:
-        route = Route(*ROUTES['card_memberships_create'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId)
-        return route
-
-    def tasks_create(self, cardId: int) -> Route:
-        route = Route(*ROUTES['tasks_create'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId)
-        return route
-
-    def cards_duplicate(self, id: int) -> Route:
-        route = Route(*ROUTES['cards_duplicate'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def lists_sort(self, id: int) -> Route:
-        route = Route(*ROUTES['lists_sort'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def cards_create(self, id: int) -> Route:
-        route = Route(*ROUTES['cards_create'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def projects_create(self) -> Route:
-        route = Route(*ROUTES['projects_create'], self.handler)
-        return route
-
-    def projects_update_background_image(self, id: int) -> Route:
-        route = Route(*ROUTES['projects_update_background_image'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def boards_create(self, projectId: int) -> Route:
-        route = Route(*ROUTES['boards_create'], self.handler)
-        route.endpoint = route.endpoint.format(projectId=projectId)
-        return route
-
-    def project_managers_create(self, projectId: int) -> Route:
-        route = Route(*ROUTES['project_managers_create'], self.handler)
-        route.endpoint = route.endpoint.format(projectId=projectId)
-        return route
-
-    def users_create(self) -> Route:
-        route = Route(*ROUTES['users_create'], self.handler)
-        return route
-
-    def users_update_avatar(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update_avatar'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def attachments_update(self, id: int) -> Route:
-        route = Route(*ROUTES['attachments_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def board_memberships_update(self, id: int) -> Route:
-        route = Route(*ROUTES['board_memberships_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def boards_update(self, id: int) -> Route:
-        route = Route(*ROUTES['boards_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def cards_update(self, id: int) -> Route:
-        route = Route(*ROUTES['cards_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def comment_actions_update(self, id: int) -> Route:
-        route = Route(*ROUTES['comment_actions_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def labels_update(self, id: int) -> Route:
-        route = Route(*ROUTES['labels_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def lists_update(self, id: int) -> Route:
-        route = Route(*ROUTES['lists_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def notifications_update(self, ids: int) -> Route:
-        route = Route(*ROUTES['notifications_update'], self.handler)
-        route.endpoint = route.endpoint.format(ids=ids)
-        return route
-
-    def projects_update(self, id: int) -> Route:
-        route = Route(*ROUTES['projects_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def tasks_update(self, id: int) -> Route:
-        route = Route(*ROUTES['tasks_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update_email(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update_email'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update_password(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update_password'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update_username(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update_username'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def attachments_update(self, id: int) -> Route:
-        route = Route(*ROUTES['attachments_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def board_memberships_update(self, id: int) -> Route:
-        route = Route(*ROUTES['board_memberships_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def boards_update(self, id: int) -> Route:
-        route = Route(*ROUTES['boards_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def cards_update(self, id: int) -> Route:
-        route = Route(*ROUTES['cards_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def comment_actions_update(self, id: int) -> Route:
-        route = Route(*ROUTES['comment_actions_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def labels_update(self, id: int) -> Route:
-        route = Route(*ROUTES['labels_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def lists_update(self, id: int) -> Route:
-        route = Route(*ROUTES['lists_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def notifications_update(self, ids: int) -> Route:
-        route = Route(*ROUTES['notifications_update'], self.handler)
-        route.endpoint = route.endpoint.format(ids=ids)
-        return route
-
-    def projects_update(self, id: int) -> Route:
-        route = Route(*ROUTES['projects_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def tasks_update(self, id: int) -> Route:
-        route = Route(*ROUTES['tasks_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update_email(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update_email'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update_password(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update_password'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_update_username(self, id: int) -> Route:
-        route = Route(*ROUTES['users_update_username'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def access_tokens_delete(self) -> Route:
-        route = Route(*ROUTES['access_tokens_delete'], self.handler)
-        return route
-
-    def attachments_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['attachments_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def board_memberships_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['board_memberships_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def boards_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['boards_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def card_labels_delete(self, cardId: int, labelId: int) -> Route:
-        route = Route(*ROUTES['card_labels_delete'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId, labelId=labelId)
-        return route
-
-    def card_memberships_delete(self, cardId: int) -> Route:
-        route = Route(*ROUTES['card_memberships_delete'], self.handler)
-        route.endpoint = route.endpoint.format(cardId=cardId)
-        return route
-
-    def cards_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['cards_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def comment_actions_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['comment_actions_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def labels_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['labels_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def lists_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['lists_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def project_managers_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['project_managers_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def projects_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['projects_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def tasks_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['tasks_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
-
-    def users_delete(self, id: int) -> Route:
-        route = Route(*ROUTES['users_delete'], self.handler)
-        route.endpoint = route.endpoint.format(id=id)
-        return route
+    def register_route(method: RequestType, endpoint: str):
+        def _wrapper(route):
+            @wraps(route)
+            def _wrapped(self, *args, **kwargs):
+                endpoint.format(*args, **kwargs)
+                return Route(method, endpoint, self.handler)
+            return _wrapped
+        return _wrapper
+
+    @register_route('GET', '/*')
+    def get_index(self) -> Route: ...
+
+    @register_route('GET', '/api/users/me')
+    def get_me(self) -> Route: ...
+
+    @register_route('GET', '/api/config')
+    def get_config(self) -> Route: ...
+
+    @register_route('GET', '/api/boards/{id}')
+    def get_board(self, id: int) -> Route: ...
+
+    @register_route('GET', '/api/cards/{cardId}/actions')
+    def get_action_index(self, cardId: int) -> Route: ...
+
+    @register_route('GET', '/api/cards/{id}')
+    def get_card(self, id: int) -> Route: ...
+
+    @register_route('GET', '/api/notifications')
+    def get_notification_index(self) -> Route: ...
+
+    @register_route('GET', '/api/notifications/{id}')
+    def get_notification(self, id: int) -> Route: ...
+
+    @register_route('GET', '/api/projects')
+    def get_project_index(self) -> Route: ...
+
+    @register_route('GET', '/api/projects/{id}')
+    def get_project(self, id: int) -> Route: ...
+
+    @register_route('GET', '/api/users')
+    def get_user_index(self) -> Route: ...
+
+    @register_route('GET', '/api/users/{id}')
+    def get_user(self, id: int) -> Route: ...
+
+    @register_route('GET', '/attachments/{id}/download/{filename}')
+    def get_attachment_download(self, id: int, filename: str) -> Route: ...
+
+    @register_route('GET', '/attachments/{id}/download/thumbnails/cover-256.{extension}')
+    def get_attachment_download_thumbnail(self, id: int, extension: str) -> Route: ...
+
+    @register_route('GET', '/project-background-images/*')
+    def get_project_background_images(self) -> Route: ...
+
+    @register_route('GET', '/user-avatars/*')
+    def get_user_avatars(self) -> Route: ...
+
+    @register_route('POST', '/api/access-tokens')
+    def post_access_tokens(self) -> Route: ...
+
+    @register_route('POST', '/api/access-tokens/exchange-using-oidc')
+    def post_exchange_using_oidc(self) -> Route: ...
+
+    @register_route('POST', '/api/boards/{boardId}/labels')
+    def post_label(self, boardId: int) -> Route: ...
+
+    @register_route('POST', '/api/boards/{boardId}/lists')
+    def post_list(self, boardId: int) -> Route: ...
+
+    @register_route('POST', '/api/boards/{boardId}/memberships')
+    def post_board_membership(self, boardId: int) -> Route: ...
+
+    @register_route('POST', '/api/cards/{cardId}/attachments')
+    def post_attachment(self, cardId: int) -> Route: ...
+
+    @register_route('POST', '/api/cards/{cardId}/comment-actions')
+    def post_comment_action(self, cardId: int) -> Route: ...
+
+    @register_route('POST', '/api/cards/{cardId}/labels')
+    def post_card_label(self, cardId: int) -> Route: ...
+
+    @register_route('POST', '/api/cards/{cardId}/memberships')
+    def post_card_membership(self, cardId: int) -> Route: ...
+
+    @register_route('POST', '/api/cards/{cardId}/tasks')
+    def post_task(self, cardId: int) -> Route: ...
+
+    @register_route('POST', '/api/cards/{id}/duplicate')
+    def post_duplicate_card(self, id: int) -> Route: ...
+
+    @register_route('POST', '/api/lists/{id}/sort')
+    def post_sort_list(self, id: int) -> Route: ...
+
+    @register_route('POST', '/api/lists/{id}/cards')
+    def post_card(self, id: int) -> Route: ...
+
+    @register_route('POST', '/api/projects')
+    def post_project(self) -> Route: ...
+
+    @register_route('POST', '/api/projects/{id}/background-image')
+    def post_project_background_image(self, id: int) -> Route: ...
+
+    @register_route('POST', '/api/projects/{projectId}/boards')
+    def post_board(self, projectId: int) -> Route: ...
+
+    @register_route('POST', '/api/projects/{projectId}/managers')
+    def post_project_manager(self, projectId: int) -> Route: ...
+
+    @register_route('POST', '/api/users')
+    def post_users(self) -> Route: ...
+
+    @register_route('POST', '/api/users/{id}/avatar')
+    def post_user_avatar(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/attachments/{id}')
+    def put_attachment(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/board-memberships/{id}')
+    def put_board_membership(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/boards/{id}')
+    def put_board(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/cards/{id}')
+    def put_card(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/comment-actions/{id}')
+    def put_comment_action(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/labels/{id}')
+    def put_label(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/lists/{id}')
+    def put_list(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/notifications/{ids}')
+    def put_notification(self, ids: str) -> Route: ...
+
+    @register_route('PUT', '/api/projects/{id}')
+    def put_project(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/tasks/{id}')
+    def put_task(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/users/{id}')
+    def put_user(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/users/{id}/email')
+    def put_user_email(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/users/{id}/password')
+    def put_user_password(self, id: int) -> Route: ...
+
+    @register_route('PUT', '/api/users/{id}/username')
+    def put_user_username(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/attachments/{id}')
+    def patch_attachment(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/board-memberships/{id}')
+    def patch_board_membership(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/boards/{id}')
+    def patch_board(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/cards/{id}')
+    def patch_card(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/comment-actions/{id}')
+    def patch_comment_action(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/labels/{id}')
+    def patch_label(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/lists/{id}')
+    def patch_list(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/notifications/{ids}')
+    def patch_notification(self, ids: str) -> Route: ...
+
+    @register_route('PATCH', '/api/projects/{id}')
+    def patch_project(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/tasks/{id}')
+    def patch_task(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/users/{id}')
+    def patch_user(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/users/{id}/email')
+    def patch_user_email(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/users/{id}/password')
+    def patch_user_password(self, id: int) -> Route: ...
+
+    @register_route('PATCH', '/api/users/{id}/username')
+    def patch_user_username(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/access-tokens/me')
+    def delete_access_tokens(self) -> Route: ...
+
+    @register_route('DELETE', '/api/attachments/{id}')
+    def delete_attachment(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/board-memberships/{id}')
+    def delete_board_membership(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/boards/{id}')
+    def delete_board(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/cards/{cardId}/labels/{labelId}')
+    def delete_card_label(self, cardId: int, labelId: int) -> Route: ...
+
+    @register_route('DELETE', '/api/cards/{cardId}/memberships')
+    def delete_card_membership(self, cardId: int) -> Route: ...
+
+    @register_route('DELETE', '/api/cards/{id}')
+    def delete_card(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/comment-actions/{id}')
+    def delete_comment_action(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/labels/{id}')
+    def delete_label(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/lists/{id}')
+    def delete_list(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/project-managers/{id}')
+    def delete_project_manager(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/projects/{id}')
+    def delete_project(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/tasks/{id}')
+    def delete_task(self, id: int) -> Route: ...
+
+    @register_route('DELETE', '/api/users/{id}')
+    def delete_user(self, id: int) -> Route: ...
