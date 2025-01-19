@@ -58,44 +58,59 @@ class BaseHandler:
     def __str__(self):
         return f'{self.endpoint}'
     
+    def _open(self, request: Request) -> bytes:
+        try:
+            with urlopen(request) as response:
+                return response.read()
+        except HTTPError as error:
+            error.add_note(f"endpoint: {request.full_url}\n"
+                           f"headers: {request.headers}\n"
+                           f"data: {request.data}")
+            raise error
+                
+
     def get(self) -> bytes:
-        req = Request(self.endpoint, 
-                      headers=self.headers, 
-                      method='GET')
-        with urlopen(req) as response:
-            return response.read()
+        return self._open(Request(
+                self.endpoint,         
+                headers=self.headers, 
+                method='GET'
+            )
+        )
     
     def post(self, data: dict) -> bytes:
-        req = Request(self.endpoint, 
-                      headers=self.headers, 
-                      method='POST', 
-                      data=encode_data(data))
-        with urlopen(req) as response:
-            return response.read()
+        return self._open(Request(
+                self.endpoint, 
+                headers=self.headers, 
+                method='POST', 
+                data=encode_data(data)
+            )
+        )
     
     def put(self, data: dict) -> bytes:
-        req = Request(
-            self.endpoint, 
-            headers=self.headers, 
-            method='PUT', 
-            data=encode_data(data))
-        with urlopen(req) as response:
-            return response.read()
+        return self._open(Request(
+                self.endpoint, 
+                headers=self.headers, 
+                method='PUT', 
+                data=encode_data(data)
+            )
+        )
     
     def patch(self, data: dict) -> bytes:
-        req = Request(self.endpoint, 
-                      headers=self.headers, 
-                      method='PATCH', 
-                      data=encode_data(data))
-        with urlopen(req) as response:
-            return response.read()
+        return self._open(Request(
+                self.endpoint, 
+                headers=self.headers, 
+                method='PATCH', 
+                data=encode_data(data)
+            )
+        )
     
     def delete(self) -> bytes:
-        req = Request(self.endpoint, 
-                      headers=self.headers, 
-                      method='DELETE')
-        with urlopen(req) as response:
-            return response.read()
+        return self._open(Request(
+                self.endpoint, 
+                headers=self.headers, 
+                method='DELETE'
+            )
+        )
         
     @contextmanager
     def endpoint_as(self, endpoint: Optional[str]=None) -> Generator[Self, None, None]:
