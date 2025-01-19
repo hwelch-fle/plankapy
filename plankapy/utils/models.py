@@ -83,7 +83,7 @@ class Model(Mapping):
             self.update()
 
 @dataclass
-class Action(Model):
+class _Action(Model):
     id: Optional[int]=Unset
     type: Optional[ActionType]=Required
     data: Optional[dict]=Required
@@ -93,13 +93,13 @@ class Action(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class Archive(Model):
+class _Archive(Model):
     fromModel: Optional[str]=Required
     originalRecordId: Optional[int]=Required
     originalRecord: Optional[dict]=Required
 
 @dataclass
-class Attachment(Model):
+class _Attachment(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     dirname: Optional[str]=Required
@@ -112,7 +112,7 @@ class Attachment(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class Board(Model):
+class _Board(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -121,7 +121,7 @@ class Board(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class BoardMembership(Model):
+class _BoardMembership(Model):
     id: Optional[int]=Unset
     role: Optional[BoardRole]=Required
     canComment: Optional[bool]=Unset
@@ -129,7 +129,7 @@ class BoardMembership(Model):
     userId: Optional[int]=Required
 
 @dataclass
-class Card(Model):
+class _Card(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -144,12 +144,12 @@ class Card(Model):
     isSubscribed: Optional[bool]=Unset
 
 @dataclass
-class Stopwatch:
+class _Stopwatch:
     startedAt: Optional[datetime]=Unset
     total: Optional[int]=Unset
 
 @dataclass
-class CardLabel(Model):
+class _CardLabel(Model):
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
     labelId: Optional[int]=Required
@@ -157,7 +157,7 @@ class CardLabel(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class CardMembership(Model):
+class _CardMembership(Model):
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
@@ -165,21 +165,21 @@ class CardMembership(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class CardSubscription(Model):
+class _CardSubscription(Model):
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
     isPermanent: Optional[bool]=Unset
 
 @dataclass
-class IdentityProviderUser(Model):
+class _IdentityProviderUser(Model):
     id: Optional[int]=Unset
     issuer: Optional[str]=Unset
     sub: Optional[str]=Unset
     userId: Optional[int]=Required
 
 @dataclass
-class Label(Model):
+class _Label(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -189,7 +189,7 @@ class Label(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class List(Model):
+class _List(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -198,7 +198,7 @@ class List(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class Notification(Model): 
+class _Notification(Model): 
     id: Optional[int]=Unset
     isRead: bool=Required
     userId: Optional[int]=Required
@@ -208,7 +208,7 @@ class Notification(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class Project(Model):
+class _Project(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     # Background overrides backgroundImage
@@ -218,13 +218,13 @@ class Project(Model):
     updatedAt: Optional[datetime]=Unset
     
 @dataclass
-class ProjectManager(Model):
+class _ProjectManager(Model):
     id: Optional[int]=Unset
     projectId: Optional[int]=Required
     userId: Optional[int]=Required
 
 @dataclass
-class Task(Model):
+class _Task(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -234,7 +234,7 @@ class Task(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass
-class User(Model):
+class _User(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     username: Optional[str]=Unset
