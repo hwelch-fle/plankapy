@@ -15,6 +15,9 @@ classifiers = [
     "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "urllib3>=2.2.3",
+]
 
 [project.urls]
 Homepage = "https://github.com/hwelch-fle/plankapy"
