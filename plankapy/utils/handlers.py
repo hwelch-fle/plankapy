@@ -24,9 +24,6 @@ class BaseHandler:
         self._base_url = base_url
         self._endpoint = endpoint
         self._headers = headers if headers else {}
-    
-    def __repr__(self):
-        return f'<{self.__class__.__name__} {self.endpoint} >'
 
     @property
     def endpoint(self):
