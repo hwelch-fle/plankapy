@@ -98,7 +98,7 @@ class BaseHandler:
             return response.read()
         
     @contextmanager
-    def endpoint_as(self, endpoint: Optional[str]=None) -> Generator['BaseHandler', None, None]:
+    def endpoint_as(self, endpoint: Optional[str]=None) -> Generator[Self, None, None]:
         _endpoint = self.endpoint
         self.endpoint = endpoint
         try:
