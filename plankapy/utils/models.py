@@ -53,7 +53,11 @@ class Model(Mapping):
         return val if val is not Unset else None
     
     def __iter__(self):
-        return iter(k for k, v in self.__dict__.items() if v is not Unset)
+        return iter(
+            k for k, v in self.__dict__.items() 
+            if v is not Unset 
+            and not k.startswith("_") # 
+        )
     
     def __len__(self) -> int:
         return len([i for i in self])
