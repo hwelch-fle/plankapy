@@ -1,4 +1,4 @@
-from utils.handlers import JSONHandler, JSONResponse
+from utils.handlers import JSONHandler
 from typing import Literal, TypeAlias
 from functools import wraps
 
@@ -22,7 +22,7 @@ class Route:
     def url(self):
         return self.handler.base_url + self.endpoint
     
-    def __call__(self, **data) -> JSONResponse:
+    def __call__(self, **data) -> JSONHandler.JSONResponse:
         with self.handler.endpoint_as(self.endpoint):
             if self.method == 'GET':
                 return self.handler.get()
@@ -57,11 +57,11 @@ class Routes:
     >>> routes = Routes(handler)
     >>> route = routes.index()
     >>> route()
-    <JSONResponse>
+    <JSONHandler.JSONResponse>
 
     >>> update_card = routes.cards_update(1)
     >>> update_card(name='Updated name')
-    <JSONResponse>
+    <JSONHandler.JSONResponse>
     """
     def __init__(self, handler: JSONHandler) -> None:
         self.handler = handler
