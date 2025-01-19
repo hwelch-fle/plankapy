@@ -1,10 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-try:
-    from typing import Optional, Self, Any, Mapping
-except ImportError:
-    from typing import Optional
-    Self = object
+from typing import Optional, Self, Any, Mapping
 
 from .routes import Route
 from .constants import ActionType, BoardRole, Background, BackgroundImage
@@ -33,7 +29,7 @@ __all__ = [
 # Sentinal value for unset values since None is a valid value for responses
 class _Unset: 
     def __repr__(self) -> str:
-        return f"<Unset>"
+        return "<Unset>"
     
 Unset = _Unset()
 Required = _Unset()
@@ -42,6 +38,7 @@ Required = _Unset()
 # TODO: Set up as a Mapping so models can be ** unpacked into POST, PUT, and PATCH routes
 class Model(Mapping):
     """Implements common magic methods for all Models"""
+
     @classmethod
     def from_dict(cls, data: dict) -> Self:
         """Create a new instance of the class from a dictionary"""
