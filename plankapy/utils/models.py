@@ -136,12 +136,14 @@ class _Card(Model):
     description: Optional[str]=Unset
     dueDate: Optional[datetime]=Unset
     isDueDateCompleted: Optional[bool]=Unset
-    stopwatch: Optional['Stopwatch']=Unset
+    stopwatch: Optional[_Stopwatch]=Unset
     boardId: Optional[int]=Required
     listId: Optional[int]=Required
     creatorUserId: Optional[int]=Unset
     coverAttachmentId: Optional[int]=Unset
     isSubscribed: Optional[bool]=Unset
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class _Stopwatch:
@@ -242,7 +244,7 @@ class _User(Model):
     language: Optional[str]=Unset
     organization: Optional[str]=Unset
     phone: Optional[str]=Unset
-    avatarURL: Optional[str]=Unset
+    avatarUrl: Optional[str]=Unset
     isAdmin: bool=Unset
     isDeletionLocked: bool=Unset
     isLocked: bool=Unset
