@@ -13,8 +13,16 @@ class BaseHandler:
                  endpoint: Optional[str]=None, 
                  headers: Optional[dict[str, str]]=None) -> None:
         self.base_url = base_url
-        self.endpoint = urljoin(base_url, endpoint)
-        self.headers = headers if headers else {}
+        self._endpoint = endpoint
+        self.headers = headers if headers else {'Content-Type': 'application/json'}
+
+    @property
+    def endpoint(self) -> str:
+        return urljoin(self.base_url, self._endpoint)
+    
+    @endpoint.setter
+    def endpoint(self, value: str):
+        self._endpoint = value
 
     def __repr__(self):
         return f'<{self.__class__.__name__} {self.endpoint} >'
@@ -92,8 +100,6 @@ class BaseHandler:
             self.endpoint = _endpoint
     
 class JSONHandler(BaseHandler):
-    def __post_init__(self):
-        self.headers['Content-Type'] = 'application/json'
 
     def decode_data(self, data: bytes, encoding: str='utf-8') -> dict:
         try:
