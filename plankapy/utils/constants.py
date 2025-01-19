@@ -107,3 +107,17 @@ LabelColor = Literal[
   'coral-green',
   'light-cocoa',
 ]
+
+ListSorts = {
+    'Name': 'name_asc',
+    'Due date': 'dueDate_asc',
+    'Oldest First': 'createdAt_asc',
+    'Newest First': 'createdAt_desc',
+}
+
+SortOption = Literal[
+    'Name',
+    'Due date',
+    'Oldest First',
+    'Newest First',
+]
