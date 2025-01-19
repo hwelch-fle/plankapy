@@ -28,25 +28,16 @@ class Model(Mapping):
             raise ValueError(f"Invalid attributes for {cls.__name__}: {list(data.keys() - cls.__annotations__.keys())}")
         return cls(**data)
     
-    def validate(self) -> bool:
-        """Check if all required fields are set
-        Raises:
-            ValueError: If a required field or fields notset
-        """
-        required = []
-        for key, value in self.__dict__.items():
-            if value is Required:
-                required.append(key)
-        if required:
-            raise ValueError(f"Required field(s) {required} not set")
-        return True
-    
-    def bind_route(self, route: Route):
-        """Bind a route to the model
+    def bind(self, routes: Routes) -> Self:
+        """Bind routes to the model
         Args:
-            route (Route): The route to bind to the model instance
+            routes (Routes): The routes to bind to the model instance
+        
+        Returns:
+            Self for chain operations
         """
-        self.route = route
+        self.routes = routes
+        return self
 
     def __getitem__(self, key) -> Any:
         val = self.__dict__[key]
