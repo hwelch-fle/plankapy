@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional, Self, Any, Mapping
 from contextlib import contextmanager
 
-from .routes import Route
+from .routes import Routes
 from .constants import ActionType, BoardRole, Background, BackgroundImage
 
 # Sentinel value for unset values since None is a valid value for responses
