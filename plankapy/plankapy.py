@@ -185,7 +185,6 @@ class Planka:
         route = self.routes.get_config()
         return route()['item']
 
-
 class Project(_Project):
     
     @property
