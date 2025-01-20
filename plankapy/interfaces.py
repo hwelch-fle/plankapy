@@ -862,6 +862,16 @@ class Card(_Card):
         route = self.routes.post_duplicate_card(id=self.id)
         return Card(**route(**self)['item']).bind(self.routes)
     
+    def add_member(self, user: User) -> CardMembership:
+        route = self.routes.post_card_membership(cardId=self.id)
+        cardMembership = CardMembership(userId=user.id, cardId=self.id)
+        return CardMembership(**route(**cardMembership)['item']).bind(self.routes)
+    
+    def add_label(self, label: Label) -> CardLabel:
+        route = self.routes.post_card_label(cardId=self.id)
+        cardLabel = CardLabel(labelId=label.id, cardId=self.id)
+        return CardLabel(**route(**cardLabel)['item']).bind(self.routes)
+    
     @overload
     def update(self) -> Card: ...
     
