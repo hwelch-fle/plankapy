@@ -1,4 +1,4 @@
-from utils.handlers import JSONHandler
+from handlers import JSONHandler
 from typing import Literal, TypeAlias
 from functools import wraps
 
