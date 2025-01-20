@@ -718,6 +718,47 @@ class Label(_Label):
                 self.__init__(**label)
                 return
         raise ValueError(f'Label: {self.name} with id({self.id}) not found, it was likely deleted')
+
+class Action(_Action): 
+    
+    @property
+    def card(self) -> Card:
+        card_route = self.routes.get_card(id=self.cardId)
+        return Card(**card_route()['item']).bind(self.routes)
+    
+    @property
+    def user(self) -> User:
+        user_route = self.routes.get_user(id=self.userId)
+        return User(**user_route()['item']).bind(self.routes)
+    
+    @overload
+    def update(self): ...
+    
+    @overload
+    def update(self, action: Action): ...
+    
+    @overload
+    def update(self, data: dict=None, type: ActionType=None): ...
+    
+    def update(self, *args, **kwargs) -> Action:
+        overload = parse_overload(
+            args, kwargs, 
+            model='action', 
+            options=('data', 'type'),
+            noarg=self)
+        
+        route = self.routes.patch_action(id=self.id)
+        self.__init__(**route(**overload)['item'])
+        return self
+    
+    def refresh(self) -> None:
+        """Refreshes the action data"""
+        for action in self.card.actions:
+            if action.id == self.id:
+                self.__init__(**action)
+                return
+        raise ValueError(f'Action with id({self.id}) not found, it was likely deleted')
+
 class Archive(_Archive): ...
 
 class Attachment(_Attachment): ...
