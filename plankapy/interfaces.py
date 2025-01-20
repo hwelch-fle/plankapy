@@ -840,7 +840,17 @@ class Card(_Card):
             Action(**action).bind(self.routes)
             for action in route()['items']
         ]
-        
+    
+    def add_comment(self, comment: str) -> Action:
+        route = self.routes.post_comment_action(cardId=self.id)
+        action = Action(type='commentCard', data={'text': comment}, cardId=self.id)
+        return Action(**route(**action)['item']).bind(self.routes)
+    
+    def move_card(self, list: List) -> Card:
+        listId = list.id
+        self.listId = listId
+        self.update()
+    
     @overload
     def update(self) -> Card: ...
     
