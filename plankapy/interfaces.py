@@ -209,6 +209,7 @@ class Planka:
                                   required=('name',))
 
         overload['position'] = set_position(overload.get('position', 0))
+        
         if 'background' in overload:
             overload['background'] = {'name': overload['background'], 'type': 'gradient'}
 
@@ -262,12 +263,14 @@ class Project(_Project):
             model='board', 
             options=('name', 'position'), 
             required=('name', 'position'))
-        name = overload.get('name')
-        position = overload.get('position')
-
+        
+        if 'position' in overload:
+            overload['position'] = set_position(overload['position'])
+        
+        overload['projectId'] = self.id
+        
         route = self.routes.post_board(projectId=self.id)
-        board = Board(name=name, position=set_position(position), projectId=self.id)
-        return Board(**route(**board)['item']).bind(self.routes)
+        return Board(**route(**overload)['item']).bind(self.routes)
 
     @overload
     def create_project_manager(self, user: User) -> ProjectManager: ...
@@ -537,14 +540,10 @@ class User(_User):
     def notifications(self) -> list[Notification]:
         """Returns a list of all notifications for the user"""
         route = self.routes.get_notification_index()
-        notifications = [
+        return [
             Notification(**notification).bind(self.routes)
             for notification in route()['items']
-        ]
-        return [
-            notification
-            for notification in notifications
-            if notification.userId == self.id
+            if notification['userId'] == self.id
         ]
     
     @overload
@@ -691,21 +690,12 @@ class Label(_Label):
         return Board(**board_route()['item']).bind(self.routes)
     
     @property
-    def labeledCards(self) -> list[Card]:
+    def cards(self) -> list[Card]:
         return [
             cardLabel.card
             for cardLabel in self.board.cardLabels
             if cardLabel.labelId == self.id
         ]
-    
-    @property
-    def integer_position(self) -> int:
-        return get_position(self.position)
-    
-    @integer_position.setter
-    def integer_position(self, value: int):
-        self.position = set_position(value)
-        self.update()
     
     @overload
     def update(self) -> Label: ...
@@ -762,13 +752,13 @@ class Action(_Action):
     def update(self, action: Action): ...
     
     @overload
-    def update(self, data: dict=None, type: ActionType=None): ...
+    def update(self, text: str=None): ...
     
     def update(self, *args, **kwargs) -> Action:
         overload = parse_overload(
             args, kwargs, 
             model='action', 
-            options=('data', 'type'),
+            options=('text',),
             noarg=self)
         
         route = self.routes.patch_comment_action(id=self.id)
@@ -1008,10 +998,22 @@ class List(_List):
         route = self.routes.post_card(id=self.id)
         return Card(**route(**overload)['item']).bind(self.routes)
 
-    def sort(self, sort: SortOption) -> None:
+    def _sort(self, sort: SortOption) -> None:
         route = self.routes.post_sort_list(id=self.id)
         route(**{'type': ListSorts[sort]})
 
+    def sort_by_name(self) -> None:
+        self._sort('Name')
+    
+    def sort_by_due_date(self) -> None:
+        self._sort('Due date')
+        
+    def sort_by_newest(self) -> None:
+        self._sort('Newest First')
+    
+    def sort_by_oldest(self) -> None:
+        self._sort('Oldest First')
+    
     def delete(self) -> None:
         """Deletes the list CANNOT BE UNDONE"""
         route = self.routes.delete_list(id=self.id)
