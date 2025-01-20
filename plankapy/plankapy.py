@@ -951,10 +951,30 @@ class List(_List):
                 return
         raise ValueError(f'List: {self.name} with id({self.id}) not found, it was likely deleted')
 
-class ProjectManager(_ProjectManager): ...
-
-class Task(_Task): ...
-
+class ProjectManager(_ProjectManager):
+    
+    @property
+    def user(self) -> User:
+        user_route = self.routes.get_user(id=self.userId)
+        return User(**user_route()['item']).bind(self.routes)
+    
+    @property
+    def project(self) -> Project:
+        project_route = self.routes.get_project(id=self.projectId)
+        return Project(**project_route()['item']).bind(self.routes)
+    
+    def delete(self) -> None:
+        """Deletes the project manager CANNOT BE UNDONE"""
+        route = self.routes.delete_project_manager(id=self.id)
+        route()
+     
+    def refresh(self) -> None:
+        """Refreshes the project manager data"""
+        for manager in self.project.projectManagers:
+            if manager.id == self.id:
+                self.__init__(**manager)
+                return
+        raise ValueError(f'Project Manager with id({self.id}) not found, it was likely deleted')
 if __name__ == '__main__':
     auth = PasswordAuth(username_or_email='demo', password='demo')
     planka = Planka('http://localhost:3000', auth=auth)
