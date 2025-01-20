@@ -841,6 +841,51 @@ class Card(_Card):
             attachment_route = self.routes.get_attachment(id=self.coverAttachmentId)
             return Attachment(**attachment_route()['item']).bind(self.routes)
         return None
+    
+    @overload
+    def update(self) -> Card: ...
+    
+    @overload
+    def update(self, card: Card) -> Card: ...
+    
+    @overload
+    def update(self, name: str, position: int, 
+                    description: str=None, dueDate: datetime=None,
+                    isDueDateCompleted: bool=None,
+                    stopwatch: _Stopwatch=None, boardId: int=None,
+                    listId: int=None, creatorUserId: int=None,
+                    coverAttachmentId: int=None, isSubscribed: bool=None) -> Card: ...
+    
+    def update(self, *args, **kwargs) -> Card:
+        overload = parse_overload(
+            args, kwargs, 
+            model='card', 
+            options=('name', 'position', 'description', 'dueDate', 
+                    'isDueDateCompleted', 'stopwatch', 
+                    'creatorUserId', 'coverAttachmentId', 
+                    'isSubscribed'), 
+            noarg=self)
+        
+        if 'position' in overload:
+            overload['position'] = set_position(overload['position'])
+        
+        route = self.routes.patch_card(id=self.id)
+        self.__init__(**route(**overload)['item'])
+        return self
+    
+    def delete(self) -> None:
+        """Deletes the card CANNOT BE UNDONE"""
+        route = self.routes.delete_card(id=self.id)
+        route()
+    
+    def refresh(self):
+        route = self.routes.get_card(id=self.id)
+        try:
+            self.__init__(**route()['item'])
+        except HTTPError:
+            raise ValueError(f'Card: {self.name} with id({self.id}) not found, it was likely deleted')
+    
+    
         
 class CardLabel(_CardLabel):
     
