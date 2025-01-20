@@ -614,6 +614,50 @@ class Notification(_Notification):
         except HTTPError:
             raise ValueError(f'Notification with id({self.id}) not found, it was likely deleted')
 
+class BoardMembership(_BoardMembership):
+    
+    @property
+    def user(self) -> User:
+        user_route = self.routes.get_user(id=self.userId)
+        return User(**user_route()['item']).bind(self.routes)
+    
+    @property
+    def board(self) -> Board:
+        board_route = self.routes.get_board(id=self.boardId)
+        return Board(**board_route()['item']).bind(self.routes)
+    
+    @overload
+    def update(self): ...
+    
+    @overload
+    def update(self, boardMembership: BoardMembership): ...
+    
+    @overload
+    def update(self, role: BoardRole=None, canComment: bool=None): ...
+    
+    def delete(self) -> None:
+        """Deletes the board membership CANNOT BE UNDONE"""
+        route = self.routes.delete_board_membership(id=self.id)
+        route()
+    
+    def update(self, *args, **kwargs) -> BoardMembership:
+        overload = parse_overload(
+            args, kwargs, 
+            model='boardMembership', 
+            options=('role', 'canComment'),
+            noarg=self)
+        
+        route = self.routes.patch_board_membership(id=self.id)
+        self.__init__(**route(**overload)['item'])
+        return self
+    
+    def refresh(self) -> None:
+        """Refreshes the board membership data"""
+        for membership in self.board.boardMemberships:
+            if membership.id == self.id:
+                self.__init__(**membership)
+                return
+        raise ValueError(f'Board Membership with id({self.id}) not found, it was likely deleted')
 class Archive(_Archive): ...
 
 class Attachment(_Attachment): ...
