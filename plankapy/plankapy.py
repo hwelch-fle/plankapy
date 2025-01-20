@@ -267,7 +267,8 @@ class Project(_Project):
                                   noarg=self)
 
         route = self.routes.patch_project(id=self.id)
-        route(**overload)
+        self.__init__(**route(**overload)['item'])
+        return self
 
     def set_background_gradient(self, gradient: Gradient) -> None:
         self.update(background={'name': gradient, 'type': 'gradient'})
@@ -397,14 +398,15 @@ class Board(_Board):
     def update(self, name: str=None, position: int=None) -> Board: ...
 
     def update(self, *args, **kwargs) -> Board:
-        overload = parse_overload(args, kwargs, model='board', 
-                                  options=('name', 'position'),
-                                  noarg=self)
+        overload = parse_overload(
+            args, kwargs, 
+            model='board', 
+            options=('name', 'position'),
+            noarg=self)
         
         route = self.routes.patch_board(id=self.id)
-        route(**overload)
-
-class User(_User): ...
+        self.__init__(**route(**overload)['item'])
+        return self
 
 class Notification(_Notification): ...
 
@@ -495,15 +497,18 @@ class List(_List):
     def update(self, name: str=None, position: int=None) -> List: ...
 
     def update(self, *args, **kwargs) -> List:
-        overload = parse_overload(args, kwargs, model='list', 
-                                  options=('name', 'position'),
-                                  noarg=self)
+        overload = parse_overload(
+            args, kwargs, 
+            model='list', 
+            options=('name', 'position'),
+            noarg=self)
         
-        name = overload.get('name')
-        position = set_position(overload.get('position'))
+        if 'position' in overload:
+            overload['position'] = set_position(overload['position'])
         
         route = self.routes.patch_list(id=self.id)
-        route(name=name, position=position)
+        self.__init__(**route(**overload)['item'])
+        return self
 
 class ProjectManager(_ProjectManager): ...
 
