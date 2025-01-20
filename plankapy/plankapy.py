@@ -136,6 +136,7 @@ class Planka:
 
     @auth.setter
     def auth(self, auth: BaseAuth):
+        """Changes the authentication method and creates a new session"""
         self._auth = auth
         self._create_session()
 
@@ -145,11 +146,13 @@ class Planka:
     
     @url.setter
     def url(self, url: str):
+        """Changes the base url and creates a new session"""
         self._url = url
         self._create_session(self.auth)
 
     @property
     def projects(self) -> list[Project]:
+        """Returns a list of all projects"""
         route = self.routes.get_project_index()
         return [
             Project(**project).bind(self.routes)
@@ -158,6 +161,7 @@ class Planka:
     
     @property
     def users(self) -> list[User]:
+        """Returns a list of all users"""
         route = self.routes.get_user_index()
         return [
             User(**user).bind(self.routes)
@@ -166,6 +170,7 @@ class Planka:
     
     @property
     def notifications(self) -> list[Notification]:
+        """Returns a list of all notifications for the current user"""
         route = self.routes.get_notification_index()
         return [
             Notification(**notification).bind(self.routes)
@@ -174,19 +179,23 @@ class Planka:
     
     @property
     def project_background_images(self, NOT_IMPLEMENTED) -> list[BackgroundImage]:
+        """Requires client side rendering, not currently supported"""
         raise NotImplementedError('Getting project backgrounds is not currently supported by plankapy')
 
     @property
     def user_avatars(self, NOT_IMPLEMENTED) -> list[str]:
+        """Requires client side rendering, not currently supported"""
         raise NotImplementedError('Getting user avatars is not currently supported by plankapy')
 
     @property
     def me(self) -> User:
+        """Returns the current user"""
         route = self.routes.get_me()
         return User(**route()['item']).bind(self.routes)
-
+    
     @property
     def config(self) -> JSONHandler.JSONResponse:
+        """Returns the planka configuration"""
         route = self.routes.get_config()
         return route()['item']
     
