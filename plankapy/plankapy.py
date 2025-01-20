@@ -246,7 +246,11 @@ class Project(_Project):
     def create_board(self, name: str, position: int) -> Board: ...
 
     def create_board(self, *args, **kwargs) -> Board:
-        overload = parse_overload(args, kwargs, model='board', options=('name', 'position'), required=('name', 'position'))
+        overload = parse_overload(
+            args, kwargs, 
+            model='board', 
+            options=('name', 'position'), 
+            required=('name', 'position'))
         name = overload.get('name')
         position = overload.get('position')
 
@@ -261,7 +265,11 @@ class Project(_Project):
     def create_project_manager(self, userId: int) -> ProjectManager: ...
 
     def create_project_manager(self, *args, **kwargs) -> ProjectManager:
-        overload = parse_overload(args, kwargs, model='user', options=('UserId'), required=('userId'))
+        overload = parse_overload(
+            args, kwargs, 
+            model='user', 
+            options=('UserId',), 
+            required=('userId',))
         userId = overload.get('userId')
 
         route = self.routes.post_project_manager(projectId=self.id)
