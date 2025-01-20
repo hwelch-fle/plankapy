@@ -95,15 +95,15 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
     # Unpack provided model
     if args and isinstance(args[0], Model) or model in kwargs:
         return {**args[0]} if args else {**kwargs[model]}
-    
-    # Use self if no arguments are provided
-    elif noarg:
-        return {**noarg}
 
     # Convert positional to keyword arguments
-    elif args:
+    elif args and not kwargs:
         coded_args = dict(zip(options, args))
         kwargs.update(coded_args)
+
+    # Use self if no arguments are provided
+    elif noarg and not kwargs:
+        return {**noarg}
 
     # Check for required arguments
     if not all([arg in kwargs for arg in required]):
