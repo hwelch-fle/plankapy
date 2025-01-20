@@ -975,6 +975,48 @@ class ProjectManager(_ProjectManager):
                 self.__init__(**manager)
                 return
         raise ValueError(f'Project Manager with id({self.id}) not found, it was likely deleted')
+
+class Task(_Task):
+    
+    @property
+    def card(self) -> Card:
+        card_route = self.routes.get_card(id=self.cardId)
+        return Card(**card_route()['item']).bind(self.routes)
+     
+    @overload
+    def update(self): ...
+    
+    @overload
+    def update(self, task: Task): ...
+    
+    @overload
+    def update(self, name: str=None, isCompleted: bool=None) -> Task: ...
+
+    def update(self, *args, **kwargs) -> Task:
+        overload = parse_overload(
+            args, kwargs, 
+            model='task', 
+            options=('name', 'isCompleted'),
+            noarg=self)
+        
+        route = self.routes.patch_task(id=self.id)
+        self.__init__(**route(**overload)['item'])
+        return self
+    
+    def delete(self) -> None:
+        """Deletes the task CANNOT BE UNDONE"""
+        route = self.routes.delete_task(id=self.id)
+        route()
+    
+    def refresh(self) -> None:
+        """Refreshes the task data"""
+        tasks = self.card.board.tasks
+        for task in tasks:
+            if task.id == self.id:
+                self.__init__(**task)
+                return
+        raise ValueError(f'Task with id({self.id}) not found, it was likely deleted')
+    
 if __name__ == '__main__':
     auth = PasswordAuth(username_or_email='demo', password='demo')
     planka = Planka('http://localhost:3000', auth=auth)
