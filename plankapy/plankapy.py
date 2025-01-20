@@ -331,6 +331,24 @@ class Board(_Board):
         ]
     
     @property
+    def editors(self) -> list[User]:
+        return [
+            user
+            for user in self.users
+            for boardMembership in self.boardMemberships
+            if boardMembership.userId == user.id and boardMembership.canComment
+        ]
+    
+    @property
+    def viewers(self) -> list[User]:
+        return [
+            user
+            for user in self.users
+            for boardMembership in self.boardMemberships
+            if boardMembership.userId == user.id and not boardMembership.canComment
+        ]
+    
+    @property
     def boardMemberships(self) -> list[BoardMembership]:
         return [
             BoardMembership(**boardMembership).bind(self.routes)
