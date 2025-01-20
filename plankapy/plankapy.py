@@ -770,6 +770,53 @@ class Attachment(_Attachment):
     
     
 
+class Card(_Card):
+    
+    @property
+    def list(self) -> List:
+        list_route = self.routes.get_list(id=self.listId)
+        return List(**list_route()['item']).bind(self.routes)
+    
+    @property
+    def creator(self) -> User:
+        user_route = self.routes.get_user(id=self.creatorUserId)
+        return User(**user_route()['item']).bind(self.routes)
+    
+    @property
+    def board(self) -> Board:
+        board_route = self.routes.get_board(id=self.boardId)
+        return Board(**board_route()['item']).bind(self.routes)
+    
+    @property
+    def labels(self) -> list[Label]:
+        return [
+            cardLabel.label
+            for cardLabel in self.board.cardLabels
+            if cardLabel.cardId == self.id
+        ]
+        
+    @property
+    def members(self) -> list[User]:
+        return [
+            cardMembership.user
+            for cardMembership in self.board.cardMemberships
+            if cardMembership.cardId == self.id
+        ]
+    
+    @ property
+    def subcribers(self) -> list[User]:
+        return [
+            subscription
+            for subscription in self.board.cardMemberships
+            if subscription.cardId == self.id
+        ]
+    
+    @property
+    def coverAttachment(self) -> Attachment:
+        if self.coverAttachmentId:
+            attachment_route = self.routes.get_attachment(id=self.coverAttachmentId)
+            return Attachment(**attachment_route()['item']).bind(self.routes)
+        return None
 class List(_List):
     
     @property
