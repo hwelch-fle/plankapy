@@ -800,11 +800,6 @@ class Attachment(_Attachment):
 class Card(_Card):
     
     @property
-    def list(self) -> List:
-        list_route = self.routes.get_list(id=self.listId)
-        return List(**list_route()['item']).bind(self.routes)
-    
-    @property
     def creator(self) -> User:
         user_route = self.routes.get_user(id=self.creatorUserId)
         return User(**user_route()['item']).bind(self.routes)
@@ -813,6 +808,13 @@ class Card(_Card):
     def board(self) -> Board:
         board_route = self.routes.get_board(id=self.boardId)
         return Board(**board_route()['item']).bind(self.routes)
+    
+    @property
+    def list(self) -> List:
+        for list in self.board.lists:
+            if list.id == self.listId:
+                return list
+        raise ValueError(f'List with id({self.listId}) not found, it was likely deleted')
     
     @property
     def labels(self) -> list[Label]:
