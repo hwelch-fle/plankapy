@@ -130,6 +130,8 @@ class _BoardMembership(Model):
     canComment: Optional[bool]=Unset
     boardId: Optional[int]=Required
     userId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class _Card(Model):
@@ -175,6 +177,8 @@ class _CardSubscription(Model):
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
     isPermanent: Optional[bool]=Unset
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class _IdentityProviderUser(Model):
@@ -182,6 +186,8 @@ class _IdentityProviderUser(Model):
     issuer: Optional[str]=Unset
     sub: Optional[str]=Unset
     userId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class _Label(Model):
@@ -227,6 +233,8 @@ class _ProjectManager(Model):
     id: Optional[int]=Unset
     projectId: Optional[int]=Required
     userId: Optional[int]=Required
+    createdAt: Optional[datetime]=Unset
+    updatedAt: Optional[datetime]=Unset
 
 @dataclass
 class _Task(Model):
