@@ -841,7 +841,30 @@ class User(Controller):
         if not data:
             raise InvalidToken("Please either build a user or provide a data dictionary")
         return super().update(f"/api/users/{user['id']}", data=data)
-    
+
+    def add(self, project_name:str=None, board_name:str=None, list_name:str=None ,card_name:str=None, user_name:str=None, card_id:str=None, user_id:str=None):
+        """Adds a user/member to a card
+        - project_name: Name of project to add member to card in
+        - board_name: Name of board to add member to card in
+        - user_name: Name of member to add to card
+        - card_name: Name of card to add member to
+        - list_name: Name of list to add member to card in
+        - **return:** POST response dictionary
+        """
+        if user_id and card_id:
+            return super().create(f"/api/cards/{card_id}/memberships", data={"userId":user_id})
+        if not (project_name and board_name and user_name):
+            raise InvalidToken("Please provide a project, board, user name")
+        if card_id:
+            user = self.get(username=user_name)
+            return super().create(f"/api/cards/{card_id}/memberships", data={"userId":user['id']})
+        if not (card_name and list_name):
+            raise InvalidToken("Please provide a card and list name")
+        card_con = Card(self.instance)
+        card = card_con.get(project_name, board_name, list_name, card_name)
+        user = self.get(username=user_name)
+        return super().create(f"/api/cards/{card['item']['id']}/memberships", {"userId":user['item']['id']})
+
 class InvalidToken(Exception):
     """General Error for invalid API inputs
     """
