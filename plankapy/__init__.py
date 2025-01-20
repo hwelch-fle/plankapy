@@ -17,3 +17,9 @@ from interfaces import (
     ProjectManager,
     Task,
 )
+
+from handlers import (
+    BaseAuth,
+    PasswordAuth,
+    TokenAuth,
+)
