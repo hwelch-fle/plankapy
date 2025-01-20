@@ -817,6 +817,25 @@ class Card(_Card):
             attachment_route = self.routes.get_attachment(id=self.coverAttachmentId)
             return Attachment(**attachment_route()['item']).bind(self.routes)
         return None
+        
+class CardLabel(_CardLabel):
+    
+    @property
+    def card(self) -> Card:
+        card_route = self.routes.get_card(id=self.cardId)
+        return Card(**card_route()['item']).bind(self.routes)
+    
+    @property
+    def board(self) -> Board:
+        board_route = self.routes.get_board(id=self.card.boardId)
+        return Board(**board_route()['item']).bind(self.routes)
+    
+    @property
+    def label(self) -> Label:
+        for label in self.board.labels:
+            if label.id == self.labelId:
+                return label
+        raise ValueError(f'Label with id({self.labelId}) not found, it was likely deleted')
 class List(_List):
     
     @property
