@@ -850,8 +850,14 @@ class Card(_Card):
     
     def add_comment(self, comment: str) -> Action:
         route = self.routes.post_comment_action(cardId=self.id)
-        action = Action(type='commentCard', data={'text': comment}, cardId=self.id)
-        return Action(**route(**action)['item']).bind(self.routes)
+        me = User(**self.routes.get_me()()['item'])
+        
+        data = {'type': 'commentCard',
+                'data': {'text': comment},
+                'cardId': self.id,
+                'userId': me.id,
+                }
+        return Action(**route(**data)['item']).bind(self.routes)
     
     def move_card(self, list: List) -> Card:
         listId = list.id
