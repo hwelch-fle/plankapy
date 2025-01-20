@@ -1,4 +1,4 @@
-from interfaces import (
+from .interfaces import (
     Planka,
     Project,
     User,
@@ -18,7 +18,7 @@ from interfaces import (
     Task,
 )
 
-from handlers import (
+from .handlers import (
     BaseAuth,
     PasswordAuth,
     TokenAuth,

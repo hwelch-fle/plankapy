@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 import plankapy as pk
 
 if __name__ == '__main__':

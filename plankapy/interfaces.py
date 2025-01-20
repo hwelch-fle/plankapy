@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import sys
-sys.path.append('..')
-
 from typing import overload
 from datetime import datetime
 from urllib.error import HTTPError
 
-from routes import Routes
-from models import (
+from .routes import Routes
+from .models import (
     Model,
     _Action,
     _Archive,
@@ -29,14 +26,14 @@ from models import (
     _Task,
     _User,
 )
-from handlers import (
+from .handlers import (
     TokenAuth, 
     PasswordAuth, 
     BaseAuth, 
     JSONHandler,
 )
 
-from constants import (
+from .constants import (
     Gradient,
     LabelColor,
     ActionType,

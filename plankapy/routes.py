@@ -1,8 +1,9 @@
-from handlers import JSONHandler
 from typing import Literal, TypeAlias
 from functools import wraps
 
-RequestType: TypeAlias = Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+from .handlers import JSONHandler
+
+
 
 class Route:
     """Wraps a JSONHandler method with a specific HTTP method and endpoint.
@@ -13,6 +14,9 @@ class Route:
     >>> route()
     <JSONResponse>
     """
+    
+    RequestType: TypeAlias = Literal['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+    
     def __init__(self, method: RequestType, endpoint: str, handler: JSONHandler):
         self.handler = handler
         self.method = method
@@ -66,7 +70,7 @@ class Routes:
     def __init__(self, handler: JSONHandler) -> None:
         self.handler = handler
     
-    def register_route(method: RequestType, endpoint: str):
+    def register_route(method: Route.RequestType, endpoint: str):
         def _wrapper(route):
             @wraps(route)
             def _wrapped(self, *args, **kwargs):
