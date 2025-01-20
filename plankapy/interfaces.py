@@ -771,7 +771,7 @@ class Action(_Action):
             options=('data', 'type'),
             noarg=self)
         
-        route = self.routes.patch_action(id=self.id)
+        route = self.routes.patch_comment_action(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
     
