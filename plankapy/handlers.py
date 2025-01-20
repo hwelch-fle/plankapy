@@ -7,34 +7,24 @@ import json
 from contextlib import contextmanager
 
 class _BaseHandler(Protocol):
-    """Base class for all handlers"""
+    """Protocol for implementing HTTP/s request handlers"""
     
     def __init__(self, base_url: str, *,
                  endpoint: Optional[str]=None, 
                  headers: Optional[dict[str, str]]=None) -> None: ...
-    
     @property
     def endpoint(self) -> str: ...
-    
     @endpoint.setter
     def endpoint(self, value: str): ...
-    
     def encode_data(self, data: dict, encoding: str='utf-8') -> bytes: ...
-
     def decode_data(self) -> Any: ...
-                
     def get(self) -> Any: ...
-    
     def post(self, data: dict) -> Any: ...
-    
     def put(self, data: dict) -> Any: ...
-    
     def patch(self, data: dict) -> Any: ...
-    
     def delete(self) -> Any: ...
-        
     @contextmanager
-    def endpoint_as(self, endpoint: Optional[str]=None) -> Generator[Self, None, None]: ...
+    def endpoint_as(self, endpoint: Optional[str]=None) -> Generator[Self, None, None]: ... 
 
 class urllibHandler(_BaseHandler):
     """Base class for handling HTTP requests using urllib"""
@@ -127,7 +117,7 @@ class urllibHandler(_BaseHandler):
             yield self
         finally:
             self.endpoint = _endpoint
-   
+
 class JSONHandler(urllibHandler):
     """Handler for JSON data (Uses urllib)"""
     JSONResponse: TypeAlias = dict[str, str]
