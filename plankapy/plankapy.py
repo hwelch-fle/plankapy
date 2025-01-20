@@ -658,6 +658,66 @@ class BoardMembership(_BoardMembership):
                 self.__init__(**membership)
                 return
         raise ValueError(f'Board Membership with id({self.id}) not found, it was likely deleted')
+    
+class Label(_Label):
+    
+    @property
+    def board(self) -> Board:
+        board_route = self.routes.get_board(id=self.boardId)
+        return Board(**board_route()['item']).bind(self.routes)
+    
+    @property
+    def labeledCards(self) -> list[Card]:
+        return [
+            cardLabel.card
+            for cardLabel in self.board.cardLabels
+            if cardLabel.labelId == self.id
+        ]
+    
+    @property
+    def integer_position(self) -> int:
+        return get_position(self.position)
+    
+    @integer_position.setter
+    def integer_position(self, value: int):
+        self.position = set_position(value)
+        self.update()
+    
+    @overload
+    def update(self) -> Label: ...
+    
+    @overload
+    def update(self, label: Label) -> Label: ...
+    
+    @overload
+    def update(self, name: str=None, color: LabelColor=None, position: int=None) -> Label: ...
+    
+    def update(self, *args, **kwargs) -> Label:
+        overload = parse_overload(
+            args, kwargs, 
+            model='label', 
+            options=('name', 'color', 'position'),
+            noarg=self)
+        
+        if 'position' in overload:
+            overload['position'] = set_position(overload['position'])
+        
+        route = self.routes.patch_label(id=self.id)
+        self.__init__(**route(**overload)['item'])
+        return self
+    
+    def delete(self) -> None:
+        """Deletes the label CANNOT BE UNDONE"""
+        route = self.routes.delete_label(id=self.id)
+        route()
+        
+    def refresh(self) -> None:
+        """Refreshes the label data"""
+        for label in self.board.labels:
+            if label.id == self.id:
+                self.__init__(**label)
+                return
+        raise ValueError(f'Label: {self.name} with id({self.id}) not found, it was likely deleted')
 class Archive(_Archive): ...
 
 class Attachment(_Attachment): ...
