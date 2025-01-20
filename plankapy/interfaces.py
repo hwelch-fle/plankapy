@@ -1039,7 +1039,7 @@ class ProjectManager(_ProjectManager):
      
     def refresh(self) -> None:
         """Refreshes the project manager data"""
-        for manager in self.project.projectManagers:
+        for manager in self.project.managers:
             if manager.id == self.id:
                 self.__init__(**manager)
                 return
