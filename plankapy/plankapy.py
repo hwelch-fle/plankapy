@@ -224,7 +224,7 @@ class Project(_Project):
         ]
     
     @property
-    def projectManagers(self) -> list[ProjectManager]:
+    def managers(self) -> list[ProjectManager]:
         return [
             ProjectManager(**projectManager).bind(self.routes)
             for projectManager in self.included['projectManagers']
