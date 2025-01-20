@@ -455,6 +455,11 @@ class Board(_Board):
         label = Label(name=name, position=position, color=color, boardId=self.id)
         return Label(**route(**label)['item']).bind(self.routes)
 
+    def add_user(self, user: User, canComment: bool=False) -> BoardMembership:
+        route = self.routes.post_board_membership(boardId=self.id)
+        boardMembership = BoardMembership(userId=user.id, boardId=self.id, canComment=canComment)
+        return BoardMembership(**route(**boardMembership)['item']).bind(self.routes)
+    
     def delete(self) -> None:
         """Deletes the board CANNOT BE UNDONE"""
         route = self.routes.delete_board(id=self.id)
@@ -821,15 +826,7 @@ class Card(_Card):
             for cardMembership in self.board.cardMemberships
             if cardMembership.cardId == self.id
         ]
-    
-    @ property
-    def subcribers(self) -> list[User]:
-        return [
-            subscription
-            for subscription in self.board.cardMemberships
-            if subscription.cardId == self.id
-        ]
-        
+      
     @property
     def comments(self) -> list[Action]:
         route = self.routes.get_action_index(cardId=self.id)
@@ -861,6 +858,17 @@ class Card(_Card):
         route = self.routes.post_card_label(cardId=self.id)
         cardLabel = CardLabel(labelId=label.id, cardId=self.id)
         return CardLabel(**route(**cardLabel)['item']).bind(self.routes)
+    
+    def remove_label(self, label: Label) -> None:
+        """Removes a label from the card, does not delete the label"""
+        for card_label in self.board.cardLabels:
+            if card_label.cardId == self.id and card_label.labelId == label.id:
+                card_label.delete()
+
+    def remove_member(self, user: User) -> None:
+        for card_membership in self.board.cardMemberships:
+            if card_membership.cardId == self.id and card_membership.userId == user.id:
+                card_membership.delete()
     
     @overload
     def update(self) -> Card: ...
@@ -924,6 +932,11 @@ class CardLabel(_CardLabel):
                 return label
         raise ValueError(f'Label with id({self.labelId}) not found, it was likely deleted')
 
+    def delete(self) -> None:
+        """Deletes the card label CANNOT BE UNDONE"""
+        route = self.routes.delete_card_label(id=self.id)
+        route()
+    
 class CardMembership(_CardMembership):
     
     @property
@@ -936,6 +949,11 @@ class CardMembership(_CardMembership):
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
 
+    def delete(self) -> None:
+        """Deletes the card membership CANNOT BE UNDONE"""
+        route = self.routes.delete_card_membership(id=self.id)
+        route()
+    
 class CardSubscription(_CardSubscription): 
     
     @property
