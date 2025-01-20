@@ -860,6 +860,14 @@ class CardSubscription(_CardSubscription):
     def card(self) -> Card:
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
+
+class IdentityUserProvider(_IdentityProviderUser):
+    
+    @property
+    def user(self) -> User:
+        user_route = self.routes.get_user(id=self.userId)
+        return User(**user_route()['item']).bind(self.routes)
+
 class List(_List):
     
     @property
