@@ -184,6 +184,25 @@ class Planka:
     def config(self) -> JSONHandler.JSONResponse:
         route = self.routes.get_config()
         return route()['item']
+    
+    @overload
+    def create_project(self, project: Project) -> Project: ...
+
+    @overload
+    def create_project(self, name: str, position: int=None, 
+                       background: Gradient=None) -> Project: ...
+
+    def create_project(self, *args, **kwargs) -> Project:
+        overload = parse_overload(args, kwargs, model='project', 
+                                  options=('name', 'position', 'background', 'backgroundImage'), 
+                                  required=('name',))
+
+        overload['position'] = set_position(overload.get('position', 0))
+        if 'background' in overload:
+            overload['background'] = {'name': overload['background'], 'type': 'gradient'}
+
+        route = self.routes.post_project()
+        return Project(**route(**overload)['item']).bind(self.routes)
 
 class Project(_Project):
     
