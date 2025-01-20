@@ -544,6 +544,11 @@ class List(_List):
         route = self.routes.post_sort_list(id=self.id)
         route(**{'type': ListSorts[sort]})
 
+    def delete(self) -> None:
+        """Deletes the list CANNOT BE UNDONE"""
+        route = self.routes.delete_list(id=self.id)
+        route()
+
     @overload
     def update(self) -> List: ...
 
