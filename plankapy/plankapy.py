@@ -396,6 +396,11 @@ class Board(_Board):
         label = Label(name=name, position=position, color=color, boardId=self.id)
         return Label(**route(**label)['item']).bind(self.routes)
 
+    def delete(self) -> None:
+        """Deletes the board CANNOT BE UNDONE"""
+        route = self.routes.delete_board(id=self.id)
+        route()
+
     @overload
     def update(self) -> Board: ...
 
