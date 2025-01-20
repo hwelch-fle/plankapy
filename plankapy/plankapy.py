@@ -462,19 +462,66 @@ class Board(_Board):
             raise ValueError(f'Board {self.name} with id({self.id}) not found, it was likely deleted')
 
 class User(_User):
-
-    def delete(self) -> None:
-        """Deletes the user CANNOT BE UNDONE"""
-        route = self.routes.delete_user(id=self.id)
-        route()
-
-    def refresh(self) -> None:
-        """Refreshes the user data"""
-        route = self.routes.get_user(id=self.id)
-        try:
-            self.__init__(**route()['item'])
-        except HTTPError:
-            raise ValueError(f'User {self.name} with id({self.id}) not found, it was likely deleted')
+    """User properties traverse the whole instance and are thereby very slow
+    To get membership information, it is recommended to get the data from individual projects, boards, and cards"""
+    @property
+    def projects(self) -> list[Project]:
+        """Returns a list of all projects the user is a member of"""
+        projects_route = self.routes.get_project_index()
+        projects = [
+            Project(**project).bind(self.routes)
+            for project in projects_route()['items']
+        ]
+        return [
+            project
+            for project in projects
+            for user in project.users
+            if user.id == self.id
+        ]
+    
+    @property
+    def boards(self) -> list[Board]:
+        """Returns a list of all boards the user is a member of"""
+        return [
+            boardMembership.board
+            for project in self.projects
+            for boardMembership in project.boardMemberships
+            if boardMembership.userId == self.id
+        ]
+    
+    @property
+    def cards(self) -> list[Card]:
+        """Returns a list of all cards assigned to the user in all projects"""
+        return [
+            cardMembership.card
+            for board in self.boards
+            for cardMembership in board.cardMemberships
+            if cardMembership.userId == self.id
+        ]
+    
+    @property
+    def manager_of(self) -> list[Project]:
+        """Returns a list of all projects the user is a manager of"""
+        return [
+            project
+            for project in self.projects
+            for manager in project.managers
+            if manager.userId == self.id
+        ]
+    
+    @property
+    def notifications(self) -> list[Notification]:
+        """Returns a list of all notifications for the user"""
+        route = self.routes.get_notification_index()
+        notifications = [
+            Notification(**notification).bind(self.routes)
+            for notification in route()['items']
+        ]
+        return [
+            notification
+            for notification in notifications
+            if notification.userId == self.id
+        ]
     
     @overload
     def update(self) -> User: ...
@@ -504,14 +551,19 @@ class User(_User):
         route = self.routes.patch_user(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
-
-class Notification(_Notification): ...
-
-class BoardMembership(_BoardMembership): ...
-
-class Label(_Label): ...
-
-class Action(_Action): ...
+    
+    def delete(self) -> None:
+        """Deletes the user CANNOT BE UNDONE"""
+        route = self.routes.delete_user(id=self.id)
+        route()
+    
+    def refresh(self) -> None:
+        """Refreshes the user data"""
+        route = self.routes.get_user(id=self.id)
+        try:
+            self.__init__(**route()['item'])
+        except HTTPError:
+            raise ValueError(f'User {self.name} with id({self.id}) not found, it was likely deleted')
 
 class Archive(_Archive): ...
 
