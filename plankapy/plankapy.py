@@ -429,6 +429,50 @@ class Board(_Board):
         except HTTPError:
             raise ValueError(f'Board {self.name} with id({self.id}) not found, it was likely deleted')
 
+class User(_User):
+
+    def delete(self) -> None:
+        """Deletes the user CANNOT BE UNDONE"""
+        route = self.routes.delete_user(id=self.id)
+        route()
+
+    def refresh(self) -> None:
+        """Refreshes the user data"""
+        route = self.routes.get_user(id=self.id)
+        try:
+            self.__init__(**route()['item'])
+        except HTTPError:
+            raise ValueError(f'User {self.name} with id({self.id}) not found, it was likely deleted')
+    
+    @overload
+    def update(self) -> User: ...
+
+    @overload
+    def update(self, user: User) -> User: ...
+
+    @overload
+    def update(self, name: str=None, 
+               username: str=None, email: str=None, 
+               language: str=None, organization: str=None,
+               phone: str=None, avatarUrl: str=None,
+               isAdmin: bool=None, isDeletionLocked: bool=None,
+               isLocked: bool=None, isRoleLocked: bool=None,
+               isUsernameLocked: bool=None, subscribeToOwnCards:bool=None) -> User: ...
+
+    def update(self, *args, **kwargs) -> User:
+        overload = parse_overload(
+            args, kwargs, 
+            model='user', 
+            options=('name', 'username', 'email', 'language', 
+                     'organization', 'phone', 'avatarUrl', 
+                     'isAdmin', 'isDeletionLocked', 'isLocked', 
+                     'isRoleLocked', 'isUsernameLocked', 
+                     'subscribeToOwnCards'),
+            noarg=self)
+        route = self.routes.patch_user(id=self.id)
+        self.__init__(**route(**overload)['item'])
+        return self
+
 class Notification(_Notification): ...
 
 class BoardMembership(_BoardMembership): ...
