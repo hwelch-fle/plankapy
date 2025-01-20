@@ -110,7 +110,7 @@ class _Attachment(Model):
     image: Optional[dict]=Unset
     url: Optional[str]=Unset
     coverUrl: Optional[str]=Unset
-    creatorUserid: Optional[int]=Unset
+    creatorUserId: Optional[int]=Unset
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
