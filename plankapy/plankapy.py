@@ -3,9 +3,9 @@ from __future__ import annotations
 import sys
 sys.path.append('..')
 
-from typing import overload, Self
+from typing import overload
 from datetime import datetime
-from contextlib import contextmanager
+from urllib.error import HTTPError
 
 from utils.routes import Routes
 from utils.models import (
