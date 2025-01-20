@@ -864,6 +864,10 @@ class Card(_Card):
         self.listId = listId
         self.update()
     
+    def duplicate(self) -> Card:
+        route = self.routes.post_duplicate_card(id=self.id)
+        return Card(**route(**self)['item']).bind(self.routes)
+    
     @overload
     def update(self) -> Card: ...
     
