@@ -74,7 +74,10 @@ class Routes:
         def _wrapper(route):
             @wraps(route)
             def _wrapped(self, *args, **kwargs):
-                return Route(method, endpoint.format(*args, **kwargs), self.handler)
+                if args:
+                    arg_map = dict(zip(route.__annotations__.keys(), args))
+                    kwargs.update(arg_map)
+                return Route(method, endpoint.format(**kwargs), self.handler)
             return _wrapped
         return _wrapper
 
