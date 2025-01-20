@@ -835,13 +835,6 @@ class Card(_Card):
             if subscription.cardId == self.id
         ]
     
-    @property
-    def coverAttachment(self) -> Attachment:
-        if self.coverAttachmentId:
-            attachment_route = self.routes.get_attachment(id=self.coverAttachmentId)
-            return Attachment(**attachment_route()['item']).bind(self.routes)
-        return None
-    
     @overload
     def update(self) -> Card: ...
     
