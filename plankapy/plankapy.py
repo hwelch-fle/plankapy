@@ -249,7 +249,7 @@ class Project(_Project):
         projectManager = ProjectManager(userId=userId, projectId=self.id)
         return ProjectManager(**route(**projectManager)['item']).bind(self.routes)
 
-    def delete_project(self) -> None:
+    def delete(self) -> None:
         """Deletes the project CANNOT BE UNDONE"""
         route = self.routes.delete_project(id=self.id)
         route()
@@ -258,7 +258,8 @@ class Project(_Project):
     def update(self, project: Project) -> Project: ...
 
     @overload
-    def update(self, name: str=None, background: Background=None, backgroundImage: BackgroundImage=None) -> Project: ...
+    def update(self, name: str=None, background: Background=None, 
+               backgroundImage: BackgroundImage=None) -> Project: ...
 
     def update(self, *args, **kwargs) -> Project:
         overload = parse_overload(args, kwargs, model='project', 
