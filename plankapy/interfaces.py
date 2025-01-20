@@ -892,9 +892,7 @@ class Card(_Card):
         try:
             self.__init__(**route()['item'])
         except HTTPError:
-            raise ValueError(f'Card: {self.name} with id({self.id}) not found, it was likely deleted')
-    
-    
+            raise ValueError(f'Card: {self.name} with id({self.id}) not found, it was likely deleted') 
         
 class CardLabel(_CardLabel):
     
