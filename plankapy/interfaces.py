@@ -792,8 +792,6 @@ class Attachment(_Attachment):
         user_route = self.routes.get_user(id=self.creatorUserId)
         return User(**user_route()['item']).bind(self.routes)
     
-    
-
 class Card(_Card):
     
     @property
@@ -834,7 +832,15 @@ class Card(_Card):
             for subscription in self.board.cardMemberships
             if subscription.cardId == self.id
         ]
-    
+        
+    @property
+    def actions(self) -> list[Action]:
+        route = self.routes.get_action_index(cardId=self.id)
+        return [
+            Action(**action).bind(self.routes)
+            for action in route()['items']
+        ]
+        
     @overload
     def update(self) -> Card: ...
     
