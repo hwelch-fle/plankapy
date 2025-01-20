@@ -564,7 +564,7 @@ class List(_List):
         overload['boardId'] = self.boardId
         overload['listId'] = self.id
 
-        route = self.routes.post_card(listId=self.id)
+        route = self.routes.post_card(id=self.id)
         return Card(**route(**overload)['item']).bind(self.routes)
 
     def sort(self, sort: SortOption) -> None:
