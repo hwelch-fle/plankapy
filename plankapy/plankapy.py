@@ -524,29 +524,21 @@ class List(_List):
                     coverAttachmentId: int=None, isSubscribed: bool=None) -> Card: ...
     
     def create_card(self, *args, **kwargs) -> Card:
-        overload = parse_overload(self, args, kwargs, model='card', 
-                                  options=('name', 'position', 'description', 'dueDate', 
-                                           'isDueDateCompleted', 'stopwatch', 
-                                           'creatorUserId', 'coverAttachmentId', 
-                                           'isSubscribed'), 
-                                  required=('name', 'position'))
-        name = overload.get('name')
-        position = set_position(overload.get('position'))
-        description = overload.get('description', None)
-        dueDate = overload.get('dueDate', None)
-        isDueDateCompleted = overload.get('isDueDateCompleted', None)
-        stopwatch = overload.get('stopwatch', None)
-        creatorUserId = overload.get('creatorUserId', None)
-        coverAttachmentId = overload.get('coverAttachmentId', None)
-        isSubscribed = overload.get('isSubscribed', None)
+        overload = parse_overload(
+            args, kwargs, 
+            model='card', 
+            options=('name', 'position', 'description', 'dueDate', 
+                    'isDueDateCompleted', 'stopwatch', 
+                    'creatorUserId', 'coverAttachmentId', 
+                    'isSubscribed'), 
+            required=('name', 'position'),
+            noarg=self)
+        
+        overload['boardId'] = self.boardId
+        overload['listId'] = self.id
 
         route = self.routes.post_card(listId=self.id)
-        card = Card(name=name, position=position, description=description, 
-                    dueDate=dueDate, isDueDateCompleted=isDueDateCompleted, 
-                    stopwatch=stopwatch, boardId=self.boardId, listId=self.id, 
-                    creatorUserId=creatorUserId, coverAttachmentId=coverAttachmentId, 
-                    isSubscribed=isSubscribed)
-        return Card(**route(**card)['item']).bind(self.routes)
+        return Card(**route(**overload)['item']).bind(self.routes)
 
     def sort(self, sort: SortOption) -> None:
         route = self.routes.post_sort_list(id=self.id)
