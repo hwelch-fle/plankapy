@@ -1091,7 +1091,3 @@ class Task(_Task):
                 self.__init__(**task)
                 return
         raise ValueError(f'Task with id({self.id}) not found, it was likely deleted')
-    
-if __name__ == '__main__':
-    auth = PasswordAuth(username_or_email='demo', password='demo')
-    planka = Planka('http://localhost:3000', auth=auth)
