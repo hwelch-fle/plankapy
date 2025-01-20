@@ -789,7 +789,7 @@ class Attachment(_Attachment):
     
     @property
     def creator(self) -> User:
-        user_route = self.routes.get_user(id=self.creatorUserid)
+        user_route = self.routes.get_user(id=self.creatorUserId)
         return User(**user_route()['item']).bind(self.routes)
     
     
