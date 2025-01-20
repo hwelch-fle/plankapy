@@ -91,7 +91,12 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
         {'name': 'My New Board', 'position': 0}
 
     """
-    
+    # Convert options and required to tuples if they have a single value
+    if isinstance(options, str):
+        options = (options,)
+    if isinstance(required, str):
+        required = (required,)
+
     # Unpack provided model
     if args and isinstance(args[0], Model) or model in kwargs:
         return {**args[0]} if args else {**kwargs[model]}
@@ -107,7 +112,7 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
 
     # Check for required arguments
     if not all([arg in kwargs for arg in required]):
-        raise ValueError(f'{required} are required')
+        raise ValueError(f'Required: {required}')
     
     return kwargs
 
