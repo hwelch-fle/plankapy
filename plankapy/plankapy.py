@@ -890,7 +890,7 @@ class List(_List):
     def create_card(self, name: str, position: int, 
                     description: str=None, dueDate: datetime=None,
                     isDueDateCompleted: bool=None,
-                    stopwatch: Stopwatch=None, boardId: int=None,
+                    stopwatch: _Stopwatch=None, boardId: int=None,
                     listId: int=None, creatorUserId: int=None,
                     coverAttachmentId: int=None, isSubscribed: bool=None) -> Card: ...
     
