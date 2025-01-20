@@ -777,7 +777,7 @@ class Action(_Action):
     
     def refresh(self) -> None:
         """Refreshes the action data"""
-        for action in self.card.actions:
+        for action in self.card.comments:
             if action.id == self.id:
                 self.__init__(**action)
                 return
@@ -834,7 +834,7 @@ class Card(_Card):
         ]
         
     @property
-    def actions(self) -> list[Action]:
+    def comments(self) -> list[Action]:
         route = self.routes.get_action_index(cardId=self.id)
         return [
             Action(**action).bind(self.routes)
