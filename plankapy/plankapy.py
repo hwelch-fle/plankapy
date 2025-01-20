@@ -276,6 +276,14 @@ class Project(_Project):
     def set_background_image(self, image: BackgroundImage) -> None:
         raise NotImplementedError('setting project background images is not currently supported by plankapy')
 
+    def refresh(self) -> Project:
+        """Refreshes the project data"""
+        route = self.routes.get_project(id=self.id)
+        try:
+            self.__init__(**route()['item'])
+        except HTTPError:
+            raise ValueError(f'Project {self.name} with id({self.id}) not found, it was likely deleted')
+
 class Board(_Board):
 
     @property
@@ -509,6 +517,14 @@ class List(_List):
         route = self.routes.patch_list(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
+
+    def refresh(self) -> None:
+        """Refreshes the list data"""
+        for _list in self.board.lists:
+            if _list.id == self.id:
+                self.__init__(**_list)
+                return
+        raise ValueError(f'List: {self.name} with id({self.id}) not found, it was likely deleted')
 
 class ProjectManager(_ProjectManager): ...
 
