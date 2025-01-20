@@ -777,19 +777,32 @@ class User(Controller):
         self.template = instance.get_template("user")
         self.data = self.build(**kwargs)
 
-    def get(self, username:str=None):
+    def get(self, username:str=None, name:str=None):
         """Gets a user
         - username: Username of user to get (all if not provided)
+        - name: Name of user to get (all if not provided)
         - **return:** GET response dictionary
         """
-        if not username:
-            return super().get("/api/users")["items"]
         users = super().get("/api/users")["items"]
-        names = [user["username"] for user in users]
-        if username not in names:
-            raise InvalidToken(f"User {username} not found")
-        return users[names.index(username)]
-    
+        if not username and not name:
+            return users
+
+        def userfilter(cur, username, name):
+            return (username and cur["username"] == username) or (
+                name and cur["name"] == name
+            )
+
+        try:
+            return [u for u in users if userfilter(u, username, name)][0]
+
+        except IndexError:
+            msg = "User not found:"
+            if username:
+                msg += f' {username=}'
+            if name:
+                msg += f' {name=}'
+            raise InvalidToken(msg)
+
     def create(self, data:dict=None):
         """Creates a user
         - data: Data dictionary to create user with (optional)
