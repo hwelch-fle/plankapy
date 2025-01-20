@@ -46,54 +46,6 @@ from .constants import (
     ListSorts,
 )
 
-INTERFACES = [
-    'Planka',
-    'Project',
-    'User',
-    'Notification',
-    'Board',
-    'Label',
-    'Action',
-    'Archive',
-    'Attachment',
-    'Card',
-    'CardLabel',
-    'CardMembership',
-    'CardSubscription',
-    'IdentityUserProvider',
-    'List',
-    'ProjectManager',
-    'Task',
-]
-
-CONSTANTS = [
-    'Gradient',
-    'LabelColor',
-    'ActionType',
-    'BoardRole',
-    'Background',
-    'BackgroundImage',
-    'get_position',
-    'set_position',
-    'SortOption',
-    'ListSorts',
-]
-
-AUTH = [
-    'TokenAuth',
-    'PasswordAuth',
-    'BaseAuth',
-]
-
-HANDLERS = [
-    'TokenAuth',
-    'PasswordAuth',
-    'BaseAuth',
-    'JSONHandler',
-]
-
-__all__ = INTERFACES + CONSTANTS + AUTH + HANDLERS
-
 def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], required: tuple[str]=(), noarg:Model=None) -> dict:
     """Helper function that allows overloading with required values or a model instance
 
