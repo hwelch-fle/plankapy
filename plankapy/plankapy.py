@@ -761,19 +761,14 @@ class Action(_Action):
 
 class Archive(_Archive): ...
 
-class Attachment(_Attachment): ...
-
-class Card(_Card): ...
-
-class Stopwatch(_Stopwatch): ...
-
-class CardLabel(_CardLabel): ...
-
-class CardMembership(_CardMembership): ...
-
-class CardSubscription(_CardSubscription): ...
-
-class IdentityUserProvider(_IdentityProviderUser): ...
+class Attachment(_Attachment):
+    
+    @property
+    def creator(self) -> User:
+        user_route = self.routes.get_user(id=self.creatorUserid)
+        return User(**user_route()['item']).bind(self.routes)
+    
+    
 
 class List(_List):
     
