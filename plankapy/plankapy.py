@@ -421,6 +421,14 @@ class Board(_Board):
         self.__init__(**route(**overload)['item'])
         return self
 
+    def refresh(self) -> None:
+        """Refreshes the board data"""
+        route = self.routes.get_board(id=self.id)
+        try:
+            self.__init__(**route()['item'])
+        except HTTPError:
+            raise ValueError(f'Board {self.name} with id({self.id}) not found, it was likely deleted')
+
 class Notification(_Notification): ...
 
 class BoardMembership(_BoardMembership): ...
