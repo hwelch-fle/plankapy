@@ -565,6 +565,55 @@ class User(_User):
         except HTTPError:
             raise ValueError(f'User {self.name} with id({self.id}) not found, it was likely deleted')
 
+class Notification(_Notification):
+    
+    @property
+    def user(self) -> User:
+        user_route = self.routes.get_user(id=self.userId)
+        return User(**user_route()['item']).bind(self.routes)
+    
+    @property
+    def action(self) -> Action:
+        action_route = self.routes.get_action(id=self.actionId)
+        return Action(**action_route()['item']).bind(self.routes)
+    
+    @property
+    def card(self) -> Card:
+        card_route = self.routes.get_card(id=self.cardId)
+        return Card(**card_route()['item']).bind(self.routes)
+    
+    @overload
+    def update(self): ...
+    
+    @overload
+    def update(self, notification: Notification): ...
+    
+    @overload
+    def update(self, isRead: bool=None): ...
+    
+    def update(self, *args, **kwargs) -> Notification:
+        overload = parse_overload(
+            args, kwargs, 
+            model='notification', 
+            options=('isRead',),
+            noarg=self)
+        
+        route = self.routes.patch_notification(id=self.id)
+        self.__init__(**route(**overload)['item'])
+        return self
+    
+    def delete(self) -> None:
+        """Notifications can't be deleted, but they can be marked as read"""
+        self.update(isRead=True)
+    
+    def refresh(self) -> None:
+        """Refreshes the notification data"""
+        route = self.routes.get_notification(id=self.id)
+        try:
+            self.__init__(**route()['item'])
+        except HTTPError:
+            raise ValueError(f'Notification with id({self.id}) not found, it was likely deleted')
+
 class Archive(_Archive): ...
 
 class Attachment(_Attachment): ...
