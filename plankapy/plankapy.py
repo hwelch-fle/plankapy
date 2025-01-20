@@ -7,8 +7,8 @@ from typing import overload
 from datetime import datetime
 from urllib.error import HTTPError
 
-from utils.routes import Routes
-from utils.models import (
+from routes import Routes
+from models import (
     Model,
     _Action,
     _Archive,
@@ -29,14 +29,14 @@ from utils.models import (
     _Task,
     _User,
 )
-from utils.handlers import (
+from handlers import (
     TokenAuth, 
     PasswordAuth, 
     BaseAuth, 
     JSONHandler,
 )
 
-from utils.constants import (
+from constants import (
     Gradient,
     LabelColor,
     ActionType,
