@@ -775,6 +775,11 @@ class Action(_Action):
         self.__init__(**route(**overload)['item'])
         return self
     
+    def delete(self) -> None:
+        """Deletes the comment action CANNOT BE UNDONE"""
+        route = self.routes.delete_comment_action(id=self.id)
+        route()
+    
     def refresh(self) -> None:
         """Refreshes the action data"""
         for action in self.card.comments:
