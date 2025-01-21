@@ -835,10 +835,13 @@ class Card(_Card):
             for action in route()['items']
         ]
     
-    def add_comment(self, comment: str) -> Action:
-        route = self.routes.post_comment_action(cardId=self.id)        
-        data = {'text': comment, 'cardId': self.id}
-        return Action(**route(**data)['item']).bind(self.routes)
+    @property
+    def tasks(self) -> list[Task]:
+        return [
+            task
+            for task in self.board.tasks
+            if task.cardId == self.id
+        ]
     
     def move_card(self, list: List) -> Card:
         listId = list.id
@@ -849,16 +852,37 @@ class Card(_Card):
         route = self.routes.post_duplicate_card(id=self.id)
         return Card(**route(**self)['item']).bind(self.routes)
     
+    def add_label(self, label: Label) -> CardLabel:
+        route = self.routes.post_card_label(cardId=self.id)
+        cardLabel = CardLabel(labelId=label.id, cardId=self.id)
+        return CardLabel(**route(**cardLabel)['item']).bind(self.routes)
+
     def add_member(self, user: User) -> CardMembership:
         route = self.routes.post_card_membership(cardId=self.id)
         cardMembership = CardMembership(userId=user.id, cardId=self.id)
         return CardMembership(**route(**cardMembership)['item']).bind(self.routes)
     
-    def add_label(self, label: Label) -> CardLabel:
-        route = self.routes.post_card_label(cardId=self.id)
-        cardLabel = CardLabel(labelId=label.id, cardId=self.id)
-        return CardLabel(**route(**cardLabel)['item']).bind(self.routes)
-    
+    def add_comment(self, comment: str) -> Action:
+        route = self.routes.post_comment_action(cardId=self.id)        
+        data = {'text': comment, 'cardId': self.id}
+        return Action(**route(**data)['item']).bind(self.routes)
+
+    @overload
+    def add_task(self, task: Task) -> Task: ...
+
+    @overload
+    def add_task(self, name: str, position: int=0, 
+                 isCompleted: bool=False, isDeleted: bool=False) -> Task: ...
+        
+    def add_task(self, *args, **kwargs) -> Task:
+        overload = parse_overload(
+            args, kwargs, 
+            model='task', 
+            options=('name', 'position', 'isCompleted', 'isDeleted'), 
+            required=('name',))
+        route = self.routes.post_task(cardId=self.id)
+        return Task(**route(**overload)['item']).bind(self.routes)
+
     def remove_label(self, label: Label) -> None:
         """Removes a label from the card, does not delete the label"""
         for card_label in self.board.cardLabels:
@@ -870,6 +894,12 @@ class Card(_Card):
             if card_membership.cardId == self.id and card_membership.userId == user.id:
                 card_membership.delete()
     
+    def remove_comment(self, comment_action: Action) -> None:
+        """Pass a comment from self.comments to remove it"""
+        for comment in self.comments:
+            if comment.id == comment_action.id:
+                comment.delete()
+
     @overload
     def update(self) -> Card: ...
     
