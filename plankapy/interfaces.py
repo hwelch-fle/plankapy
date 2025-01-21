@@ -208,9 +208,9 @@ class Planka:
                                   options=('name', 'position', 'background', 'backgroundImage'), 
                                   required=('name',))
 
-        overload['position'] = set_position(overload.get('position', 0))
+        overload['position'] = overload.get('position', 0)
         
-        if 'background' in overload:
+        if 'background' in overload: # Convert gradient to expected format
             overload['background'] = {'name': overload['background'], 'type': 'gradient'}
 
         route = self.routes.post_project()
@@ -262,11 +262,8 @@ class Project(_Project):
             args, kwargs, 
             model='board', 
             options=('name', 'position'), 
-            required=('name', 'position'))
-        
-        if 'position' in overload:
-            overload['position'] = set_position(overload['position'])
-        
+            required=('name',))
+
         overload['projectId'] = self.id
         
         route = self.routes.post_board(projectId=self.id)
@@ -282,13 +279,13 @@ class Project(_Project):
         overload = parse_overload(
             args, kwargs, 
             model='user', 
-            options=('UserId',), 
+            options=('userId',), 
             required=('userId',))
-        userId = overload.get('userId')
+
+        overload['projectId'] = self.id
 
         route = self.routes.post_project_manager(projectId=self.id)
-        projectManager = ProjectManager(userId=userId, projectId=self.id)
-        return ProjectManager(**route(**projectManager)['item']).bind(self.routes)
+        return ProjectManager(**route(**overload)['item']).bind(self.routes)
 
     def delete(self) -> None:
         """Deletes the project CANNOT BE UNDONE"""
@@ -429,36 +426,36 @@ class Board(_Board):
     def create_list(self, *args, **kwargs) -> List:
         overload = parse_overload(args, kwargs, model='list', 
                                   options=('name', 'position'), 
-                                  required=('name', 'position'))
-        name = overload.get('name')
-        position = overload.get('position')
+                                  required=('name',))
+        
+        overload['position'] = overload.get('position', 0)
+        overload['boardId'] = self.id
 
         route = self.routes.post_list(boardId=self.id)
-        _list = List(name=name, position=set_position(position), boardId=self.id)
-        return List(**route(**_list)['item']).bind(self.routes)
+        return List(**route(**overload)['item']).bind(self.routes)
     
     @overload
     def create_label(self, label: Label) -> Label: ...
 
     @overload
-    def create_label(self, name: str, position: int, color: LabelColor) -> Label: ...
+    def create_label(self, name: str, position: int=0, color: LabelColor=None) -> Label: ...
 
     def create_label(self, *args, **kwargs) -> Label:
         overload = parse_overload(args, kwargs, model='label', 
                                   options=('name', 'position', 'color'), 
-                                  required=('name', 'position', 'color'))
-        name = overload.get('name')
-        color = overload.get('color')
-        position = set_position(overload.get('position'))
+                                  required=('name',)) # Only name requires user provided value
+        
+        # Required arguments with defaults must be manually assigned
+        overload['position'] = overload.get('position', 0)
+        overload['color'] = overload.get('color', LabelColor.__args__[0])
+        overload['boardId'] = self.id
 
         route = self.routes.post_label(boardId=self.id)
-        label = Label(name=name, position=position, color=color, boardId=self.id)
-        return Label(**route(**label)['item']).bind(self.routes)
+        return Label(**route(**overload)['item']).bind(self.routes)
 
     def add_user(self, user: User, canComment: bool=False) -> BoardMembership:
         route = self.routes.post_board_membership(boardId=self.id)
-        boardMembership = BoardMembership(userId=user.id, boardId=self.id, canComment=canComment)
-        return BoardMembership(**route(**boardMembership)['item']).bind(self.routes)
+        return BoardMembership(**route(userId=user.id, boardId=self.id, canComment=canComment)['item']).bind(self.routes)
     
     def delete(self) -> None:
         """Deletes the board CANNOT BE UNDONE"""
@@ -717,10 +714,7 @@ class Label(_Label):
             model='label', 
             options=('name', 'color', 'position'),
             noarg=self)
-        
-        if 'position' in overload:
-            overload['position'] = set_position(overload['position'])
-        
+              
         route = self.routes.patch_label(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
@@ -854,18 +848,15 @@ class Card(_Card):
     
     def add_label(self, label: Label) -> CardLabel:
         route = self.routes.post_card_label(cardId=self.id)
-        cardLabel = CardLabel(labelId=label.id, cardId=self.id)
-        return CardLabel(**route(**cardLabel)['item']).bind(self.routes)
+        return CardLabel(**route(labelId=label.id, cardId=self.id)['item']).bind(self.routes)
 
     def add_member(self, user: User) -> CardMembership:
         route = self.routes.post_card_membership(cardId=self.id)
-        cardMembership = CardMembership(userId=user.id, cardId=self.id)
-        return CardMembership(**route(**cardMembership)['item']).bind(self.routes)
+        return CardMembership(**route(userId=user.id, cardId=self.id)['item']).bind(self.routes)
     
     def add_comment(self, comment: str) -> Action:
         route = self.routes.post_comment_action(cardId=self.id)        
-        data = {'text': comment, 'cardId': self.id}
-        return Action(**route(**data)['item']).bind(self.routes)
+        return Action(**route(text=comment, cardId=self.id)['item']).bind(self.routes)
 
     @overload
     def add_task(self, task: Task) -> Task: ...
@@ -879,8 +870,15 @@ class Card(_Card):
             args, kwargs, 
             model='task', 
             options=('name', 'position', 'isCompleted', 'isDeleted'), 
-            required=('name',))
+            required=('name',)) # Only name requires user provided value
+        
         route = self.routes.post_task(cardId=self.id)
+        
+        # Required arguments with defaults must be manually assigned
+        overload['position'] = overload.get('position', 0)
+        overload['isCompleted'] = overload.get('isCompleted', False)
+        overload['isDeleted'] = overload.get('isDeleted', False)
+
         return Task(**route(**overload)['item']).bind(self.routes)
 
     def remove_label(self, label: Label) -> None:
@@ -907,7 +905,7 @@ class Card(_Card):
     def update(self, card: Card) -> Card: ...
     
     @overload
-    def update(self, name: str, position: int, 
+    def update(self, name: str, position: int=0, 
                     description: str=None, dueDate: datetime=None,
                     isDueDateCompleted: bool=None,
                     stopwatch: _Stopwatch=None, boardId: int=None,
@@ -923,10 +921,7 @@ class Card(_Card):
                     'creatorUserId', 'coverAttachmentId', 
                     'isSubscribed'), 
             noarg=self)
-        
-        if 'position' in overload:
-            overload['position'] = set_position(overload['position'])
-        
+                
         route = self.routes.patch_card(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
@@ -1022,7 +1017,7 @@ class List(_List):
     def create_card(self, card: Card) -> Card: ...
 
     @overload
-    def create_card(self, name: str, position: int, 
+    def create_card(self, name: str, position: int=0, 
                     description: str=None, dueDate: datetime=None,
                     isDueDateCompleted: bool=None,
                     stopwatch: _Stopwatch=None, boardId: int=None,
@@ -1082,9 +1077,6 @@ class List(_List):
             model='list', 
             options=('name', 'position'),
             noarg=self)
-        
-        if 'position' in overload:
-            overload['position'] = set_position(overload['position'])
         
         route = self.routes.patch_list(id=self.id)
         self.__init__(**route(**overload)['item'])
