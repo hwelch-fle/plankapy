@@ -1,7 +1,24 @@
 import sys
 sys.path.append('..')
 
+import asyncio
+import time
 import plankapy as pk
+
+async def async_range(count):
+    for i in range(count):
+        yield(i)
+        await asyncio.sleep(0.0)
+
+async def async_create_card(i, _list: pk.List):
+    _list.create_card(name=f"Card {i}", position=i+1)
+
+async def async_create_cards(n: int, _list: pk.List):
+    start = time.time()
+    async for i in async_range(n):
+        await async_create_card(i, _list)
+    end = time.time()
+    print(f"Done in {end - start:.2f} seconds (asynchronously)")
 
 if __name__ == '__main__':
     auth = pk.PasswordAuth(username_or_email='demo', password='demo')
@@ -14,8 +31,9 @@ if __name__ == '__main__':
     board = project.create_board(name='Test Board', position=1)
     
     # Create a new list
-    _list = board.create_list(name='Test List 1', position=3)
-    
+    _list = board.create_list(name='Test List 1', position=0)
+    _list2 = board.create_list(name='Test List 2', position=1)
+
     # Label Options
     labels_options: list[tuple[str, pk.LabelColor]] = [
         ('Label 1', 'antique-blue'), 
@@ -53,3 +71,22 @@ if __name__ == '__main__':
     # Add Checklist to card
     for task in ['Task 1', 'Task 2', 'Task 3']:
         card.add_task(name=task)
+
+    # Duplicate Card
+    card2 = card.duplicate()
+
+    # Move Card
+    card2.move(_list2)
+
+    # Stress test with async
+    print("Creating 100 cards asynchronously")
+    t = asyncio.create_task(async_create_cards(100, _list2))
+
+    # Create 100 cards synchronously
+    print("Creating 100 cards synchronously")
+    start = time.time()
+    for i in range(100):
+        _list.create_card(name=f"Card {i}", position=i+1)
+    end = time.time()
+    print(f"Done in {end - start:.2f} seconds (syncronously)")
+    
