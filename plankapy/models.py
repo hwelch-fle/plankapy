@@ -106,7 +106,7 @@ class Model(Mapping):
 
     def refresh(self): ...
 
-@dataclass
+@dataclass(eq=False)
 class _Action(Model):
     id: Optional[int]=Unset
     type: Optional[ActionType]=Required
@@ -116,13 +116,13 @@ class _Action(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Archive(Model):
     fromModel: Optional[str]=Required
     originalRecordId: Optional[int]=Required
     originalRecord: Optional[dict]=Required
 
-@dataclass
+@dataclass(eq=False)
 class _Attachment(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -135,7 +135,7 @@ class _Attachment(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Board(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -144,7 +144,7 @@ class _Board(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _BoardMembership(Model):
     id: Optional[int]=Unset
     role: Optional[BoardRole]=Required
@@ -154,7 +154,7 @@ class _BoardMembership(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Card(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -171,12 +171,12 @@ class _Card(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Stopwatch:
     startedAt: Optional[datetime]=Unset
     total: Optional[int]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _CardLabel(Model):
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
@@ -184,7 +184,7 @@ class _CardLabel(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _CardMembership(Model):
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
@@ -192,7 +192,7 @@ class _CardMembership(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _CardSubscription(Model):
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
@@ -201,7 +201,7 @@ class _CardSubscription(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _IdentityProviderUser(Model):
     id: Optional[int]=Unset
     issuer: Optional[str]=Unset
@@ -210,7 +210,7 @@ class _IdentityProviderUser(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Label(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -220,7 +220,7 @@ class _Label(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _List(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -229,7 +229,7 @@ class _List(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Notification(Model): 
     id: Optional[int]=Unset
     isRead: bool=Required
@@ -239,7 +239,7 @@ class _Notification(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Project(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -249,7 +249,7 @@ class _Project(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
     
-@dataclass
+@dataclass(eq=False)
 class _ProjectManager(Model):
     id: Optional[int]=Unset
     projectId: Optional[int]=Required
@@ -257,7 +257,7 @@ class _ProjectManager(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _Task(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -267,7 +267,7 @@ class _Task(Model):
     createdAt: Optional[datetime]=Unset
     updatedAt: Optional[datetime]=Unset
 
-@dataclass
+@dataclass(eq=False)
 class _User(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
