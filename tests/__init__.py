@@ -49,3 +49,7 @@ if __name__ == '__main__':
     with card.editor():
         import this
         card.description = this.s
+
+    # Add Checklist to card
+    for task in ['Task 1', 'Task 2', 'Task 3']:
+        card.add_task(name=task)
