@@ -39,6 +39,9 @@ class Model(Mapping):
         """
         if hasattr(self, 'id') and hasattr(self, 'name'):
             return f"{self.name}_{chr(123)}{self.id[-5:]}{chr(125)}"
+        
+        # Default unique name if no id or name (model name and last 5 characters of hash)
+        return f"{self.__class__.__name__}_{str(hash(self))[-5:]}"
     
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -75,6 +78,13 @@ class Model(Mapping):
     
     def __len__(self) -> int:
         return len([i for i in self])
+    
+    def __hash__(self) -> int:
+        if hasattr(self, 'id'):
+            return int(self.id)
+        
+        # Default hash if no id (string of name and attributes)
+        return hash(f"{self.__class__.__name__}{self.__dict__}")
     
     def update(self): ...
 
