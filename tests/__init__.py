@@ -22,7 +22,7 @@ async def async_create_cards(n: int, _list: pk.List):
 
 if __name__ == '__main__':
     auth = pk.PasswordAuth(username_or_email='demo', password='demo')
-    planka = pk.Planka('http://localhost:3001', auth=auth)
+    planka = pk.Planka('http://localhost:3000', auth=auth)
     
     # Create a new project
     project = planka.create_project(name='Test Project')
