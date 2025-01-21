@@ -16,8 +16,6 @@ class _Unset:
 Unset = _Unset()
 Required = _Unset()
 
-# Base class for all models
-# TODO: Set up as a Mapping so models can be ** unpacked into POST, PUT, and PATCH routes
 class Model(Mapping):
     """Implements common magic methods for all Models"""
 

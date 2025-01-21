@@ -22,7 +22,7 @@ async def async_create_cards(n: int, _list: pk.List):
 
 if __name__ == '__main__':
     auth = pk.PasswordAuth(username_or_email='demo', password='demo')
-    planka = pk.Planka('http://localhost:3000', auth=auth)
+    planka = pk.Planka('http://localhost:3001', auth=auth)
     
     # Create a new project
     project = planka.create_project(name='Test Project')
@@ -90,3 +90,13 @@ if __name__ == '__main__':
     end = time.time()
     print(f"Done in {end - start:.2f} seconds (syncronously)")
     
+    
+    project = \
+    {
+        board : 
+            {
+                _list: _list.cards
+                for _list in board.lists
+            }
+        for board in project.boards
+    }
