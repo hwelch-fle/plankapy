@@ -835,7 +835,7 @@ class Card(_Card):
             if task.cardId == self.id
         ]
     
-    def move_card(self, list: List) -> Card:
+    def move(self, list: List) -> Card:
         listId = list.id
         self.listId = listId
         self.update()
