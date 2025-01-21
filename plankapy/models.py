@@ -29,6 +29,17 @@ class Model(Mapping):
     def routes(self, routes: Routes):
         self._routes = routes
 
+    @property
+    def unique_name(self) -> str:
+        """Generate a unique name for the model instance using the last 5 characters of the id
+        and the name attribute
+        
+        Returns:
+            str: The unique name for the model instance in the format {name}_{id[:-3]}
+        """
+        if hasattr(self, 'id') and hasattr(self, 'name'):
+            return f"{self.name}_{chr(123)}{self.id[-5:]}{chr(125)}"
+    
     @classmethod
     def from_dict(cls, data: dict) -> Self:
         """Create a new instance of the class from a dictionary"""
