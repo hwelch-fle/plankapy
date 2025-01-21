@@ -330,6 +330,11 @@ class Board(_Board):
         return route()['included']
     
     @property
+    def project(self) -> Project:
+        project_route = self.routes.get_project(id=self.projectId)
+        return Project(**project_route()['item']).bind(self.routes)
+
+    @property
     def users(self) -> list[User]:
         return [
             User(**user).bind(self.routes)
@@ -408,13 +413,6 @@ class Board(_Board):
         return [
             Attachment(**attachment).bind(self.routes)
             for attachment in self.included['attachments']
-        ]
-    
-    @property
-    def projects(self) -> list[Project]:
-        return [
-            Project(**project).bind(self.routes)
-            for project in self.included['projects']
         ]
 
     @overload
