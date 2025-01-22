@@ -1375,6 +1375,15 @@ class Card(_Card):
 
         return Task(**route(**overload)['item']).bind(self.routes)
 
+    def add_stopwatch(self) -> None:
+        """Adds a stopwatch to the card"""
+        self.refresh()
+        if self.stopwatch:
+            return
+        
+        with self.editor():
+            self.stopwatch = dict(Stopwatch(startedAt=None, total=0).stop())
+
     def remove_label(self, label: Label) -> None:
         """Removes a label from the card, does not delete the label"""
         for card_label in self.board.cardLabels:
@@ -1391,6 +1400,24 @@ class Card(_Card):
         for comment in self.comments:
             if comment.id == comment_action.id:
                 comment.delete()
+
+    def remove_stopwatch(self) -> None:
+        """Removes the stopwatch from the card"""
+        self.refresh()
+        with self.editor():
+            self.stopwatch = None
+
+    # Stopwatch handling is a bit weird, this is a hacky override to always show the user a Stopwatch instance
+    def __getattribute__(self, name):
+        if name == 'stopwatch':
+            return Stopwatch(_card=self, **super().__getattribute__(name))
+        return super().__getattribute__(name)
+
+    def __setattr__(self, name, value):
+        if name == 'stopwatch' and isinstance(value, Stopwatch):
+            super().__setattr__(name, dict(value))
+        else:
+            super().__setattr__(name, value)
 
     @overload
     def update(self) -> Card: ...
