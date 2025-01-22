@@ -590,7 +590,7 @@ class Project(_Project):
         
         Note:
             All objects accessed by properties are always up to date, but the root object that contains those
-            properties keeps a cache of it's own data. This method refreshes the root object data.
+            properties keeps a cache of its own data. This method refreshes the root object data.
 
             FUTURE: This method might be removed or disabled in the future if I can get a __getattr__ implementation
             to work without causing infinite recursion updating the root object when properties are accessed
@@ -907,9 +907,9 @@ class Board(_Board):
         Args: Alternate
             board (Board): Board instance to update (required)
         
-        Args: No Arguments
+        Note:
             If no arguments are provided, the board will update itself with the current values
-            stored in it's attributes
+            stored in its attributes
         
         Returns:
             Board: Updated board instance
@@ -1047,7 +1047,7 @@ class User(_User):
         Args: Alternate
             user (User): User instance to update (required)
         
-        Args: No Arguments
+        Note:
             If no arguments are provided, the user will update itself with the current values stored in its attributes
 
         Returns:
