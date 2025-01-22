@@ -118,7 +118,14 @@ extra:
 
 nav:
   - Home: index.md
-  - API Reference: api_docs/
+  - API Reference: 
+    - interfaces: api_docs/interfaces.md
+    - helpers: api_docs/helpers.md
+    - models: api_docs/models.md
+    - handlers: api_docs/handlers.md
+    - routes: api_docs/routes.md
+    - constants: api_docs/constants.md
+
   - Usage: usage.md
   - CLI: cli.md
   - Change Log: changelog.md
