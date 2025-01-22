@@ -1,2 +1,2 @@
 # Stopwatch
-::: plankapy.interfaces.Stopwatch
+::: plankapy.models.Stopwatch
