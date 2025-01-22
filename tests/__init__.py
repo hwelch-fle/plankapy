@@ -3,17 +3,17 @@ sys.path.append('..')
 
 import asyncio
 import time
-import plankapy as pk
+import plankapy as ppy
 
 async def async_range(count):
     for i in range(count):
         yield(i)
         await asyncio.sleep(0.0)
 
-async def async_create_card(i, _list: pk.List):
+async def async_create_card(i, _list: ppy.List):
     _list.create_card(name=f"Card {i}", position=i+1)
 
-async def async_create_cards(n: int, _list: pk.List):
+async def async_create_cards(n: int, _list: ppy.List):
     start = time.time()
     async for i in async_range(n):
         await async_create_card(i, _list)
@@ -21,8 +21,8 @@ async def async_create_cards(n: int, _list: pk.List):
     print(f"Done in {end - start:.2f} seconds (asynchronously)")
 
 if __name__ == '__main__':
-    auth = pk.PasswordAuth(username_or_email='demo', password='demo')
-    planka = pk.Planka('http://localhost:3000', auth=auth)
+    auth = ppy.PasswordAuth(username_or_email='demo', password='demo')
+    planka = ppy.Planka('http://localhost:3000', auth=auth)
     
     # Create a new project
     project = planka.create_project(name='Test Project')
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     _list2 = board.create_list(name='Test List 2', position=1)
 
     # Label Options
-    labels_options: list[tuple[str, pk.LabelColor]] = [
+    labels_options: list[tuple[str, ppy.LabelColor]] = [
         ('Label 1', 'antique-blue'), 
         ('Label 2', 'coral-green'), 
         ('Label 3', 'berry-red')
