@@ -119,10 +119,10 @@ extra:
 nav:
   - Home: index.md
   - API: 
+    - Planka: interfaces/Planka.md
     - Authentication Interfaces:
       - PasswordAuth: auth/PasswordAuth.md
       - TokenAuth: auth/TokenAuth.md
-    - Planka: interfaces/Planka.md
     - User Interfaces:
       - User: interfaces/User.md
       - Notification: interfaces/Notification.md
@@ -145,6 +145,7 @@ nav:
       - Stopwatch: interfaces/Stopwatch.md
     - Constants: constants/constants.md
     - Helpers: helpers/helpers.md
+    - Models: models/models.md
 
     - Unused:
       - IdentityProviderUser: interfaces/IdentityProviderUser.md

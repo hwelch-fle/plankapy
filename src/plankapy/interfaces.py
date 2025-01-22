@@ -160,7 +160,18 @@ class Planka:
                 card().add_comment('My Comment')
                 len(comments())
                 >>> 3
+    
+    Tip:
+        All objects inherit the `editor` context manager from the `Model` class except `Planka`.
+        This means if you want to make changes to something, you can do it directly to attributes
+        in an editor context instead of calling the model's `update` method
 
+        Example:
+            ```python
+            with card.editor():
+                card.name = 'My New Card'
+                card.description = 'My New Description'
+            ```
     """
     def __init__(self, url: str, auth: BaseAuth=None):
         if not auth:
@@ -591,19 +602,48 @@ class Project(_Project):
             raise ValueError(f'Project {self.name} with id({self.id}) not found, it was likely deleted')
 
 class Board(_Board):
-
+    """Interface for interacting with planka Boards and their included sub-objects
+    
+    Note:
+        All implemented public properties return API responses with accessed. This means that the values are not cached 
+        and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
+        property access will always provide the most up to date information. 
+    """
     @property
     def included(self) -> JSONHandler.JSONResponse:
+        """Returns the included data for the board
+        
+        Warning:
+            This property is meant to be used internally for building objects in the other proeprties
+            It can be directly accessed, but it will only return JSON data and not objects
+
+        Returns:
+            Included data for the board
+        """
         route = self.routes.get_board(id=self.id)
         return route()['included']
     
     @property
     def project(self) -> Project:
+        """Returns the project the board belongs to
+        
+        Note:
+            All objects include a reference to their parent object and parent objects include a reference to their children
+            This means that you can traverse the entire API structure from any object
+
+        Returns:
+            Project: Project instance
+        """
         project_route = self.routes.get_project(id=self.projectId)
         return Project(**project_route()['item']).bind(self.routes)
 
     @property
     def users(self) -> list[User]:
+        """A list of all users in the board
+
+        Returns:
+            List of all users
+        """
         return [
             User(**user).bind(self.routes)
             for user in self.included['users']
@@ -611,6 +651,11 @@ class Board(_Board):
     
     @property
     def editors(self) -> list[User]:
+        """A list of all users that can edit the board
+
+        Returns:
+            List of all editors
+        """
         return [
             user
             for user in self.users
@@ -620,6 +665,11 @@ class Board(_Board):
     
     @property
     def viewers(self) -> list[User]:
+        """A list of all users that can view the board
+        
+        Returns:
+            List of all viewers
+        """
         return [
             user
             for user in self.users
@@ -629,6 +679,15 @@ class Board(_Board):
     
     @property
     def boardMemberships(self) -> list[BoardMembership]:
+        """A list of all board memberships
+        
+        Note:
+            This property is primarily here for internal use, '.editor' and '.viewer' properties 
+            are derived from the board memberships
+
+        Returns:
+            List of all membership types (editor, viewer)
+        """
         return [
             BoardMembership(**boardMembership).bind(self.routes)
             for boardMembership in self.included['boardMemberships']
@@ -636,6 +695,11 @@ class Board(_Board):
     
     @property
     def labels(self) -> list[Label]:
+        """A list of all labels in the board
+        
+        Returns:
+            List of all labels in the board
+        """
         return [
             Label(**label).bind(self.routes)
             for label in self.included['labels']
@@ -643,6 +707,11 @@ class Board(_Board):
     
     @property
     def lists(self) -> list[List]:
+        """A list of all lists in the board
+        
+        Returns:
+            List of all lists in the board
+        """
         return [
             List(**_list).bind(self.routes)
             for _list in self.included['lists']
@@ -650,6 +719,11 @@ class Board(_Board):
     
     @property
     def cards(self) -> list[Card]:
+        """A list of all cards in the board
+        
+        Returns:
+            A list of all cards in the board
+        """
         return [
             Card(**card).bind(self.routes)
             for card in self.included['cards']
@@ -657,6 +731,14 @@ class Board(_Board):
     
     @property
     def cardMemberships(self) -> list[CardMembership]:
+        """A list of all card -> user relationships in the board
+        
+        Note:
+            This property is used by the `Card` class to determine its users
+
+        Returns:
+            A list of all card memberships in the board
+        """
         return [
             CardMembership(**cardMembership).bind(self.routes)
             for cardMembership in self.included['cardMemberships']
@@ -664,6 +746,14 @@ class Board(_Board):
     
     @property
     def cardLabels(self) -> list[CardLabel]:
+        """A list of all card -> label relationships in the board
+        
+        Note:
+            This property is used by the `Card` class to determine its labels
+
+        Returns:
+            A list of all card labels in the board
+        """
         return [
             CardLabel(**cardLabel).bind(self.routes)
             for cardLabel in self.included['cardLabels']
@@ -671,6 +761,14 @@ class Board(_Board):
     
     @property
     def tasks(self) -> list[Task]:
+        """A list of all tasks in the board
+        
+        Note:
+            This property is used by the `Card` class to determine its tasks
+
+        Returns:
+            A list of all card tasks in the board
+        """
         return [
             Task(**task).bind(self.routes)
             for task in self.included['tasks']
@@ -678,6 +776,14 @@ class Board(_Board):
     
     @property
     def attachments(self) -> list[Attachment]:
+        """A list of all attachments in the board
+        
+        Note:
+            This property is used by the `Card` class to determine its attachments
+            
+        Returns:
+            A list of all card attachments in the board
+        """
         return [
             Attachment(**attachment).bind(self.routes)
             for attachment in self.included['attachments']
@@ -690,6 +796,26 @@ class Board(_Board):
     def create_list(self, name: str, position: int) -> List: ...
 
     def create_list(self, *args, **kwargs) -> List:
+        """Creates a new list in the board
+        
+        Args:
+            name (str): Name of the list (required)
+            position (int): Position of the list (default: 0)
+            
+        Args: Alternate
+            list (List): List instance to create
+            
+        Returns:
+            List: New list instance
+            
+        Example:
+            ```python
+            new_list = board.create_list('My List')
+
+            l = List(name='My List', position=0)
+            new_list2 = board.create_list(l)
+            ```
+        """
         overload = parse_overload(args, kwargs, model='list', 
                                   options=('name', 'position'), 
                                   required=('name',))
@@ -707,6 +833,26 @@ class Board(_Board):
     def create_label(self, name: str, position: int=0, color: LabelColor=None) -> Label: ...
 
     def create_label(self, *args, **kwargs) -> Label:
+        """Creates a new label in the board
+        
+        Args:
+            name (str): Name of the label (required)
+            position (int): Position of the label (default: 0)
+            color (LabelColor): Color of the label (default: "berry-red
+            
+        Args: Alternate
+            label (Label): Label instance to create
+        
+        Returns:
+            Label: New label instance
+            
+        Example:
+            ```python
+            new_label = board.create_label('My Label')
+            label = Label(name='My Label', position=0, color='wet-moss')
+            new_label2 = board.create_label(label)
+            ```
+        """
         overload = parse_overload(args, kwargs, model='label', 
                                   options=('name', 'position', 'color'), 
                                   required=('name',)) # Only name requires user provided value
@@ -720,11 +866,24 @@ class Board(_Board):
         return Label(**route(**overload)['item']).bind(self.routes)
 
     def add_user(self, user: User, canComment: bool=False) -> BoardMembership:
+        """Adds a user to the board
+        
+        Args:
+            user (User): User instance to add
+            canComment (bool): Whether the user can comment on the board (default: False)
+        
+        Returns:
+            BoardMembership: New board membership
+        """
         route = self.routes.post_board_membership(boardId=self.id)
         return BoardMembership(**route(userId=user.id, boardId=self.id, canComment=canComment)['item']).bind(self.routes)
     
     def delete(self) -> None:
-        """Deletes the board CANNOT BE UNDONE"""
+        """Deletes the board
+
+        Caution:
+            This action is irreversible and cannot be undone
+        """
         route = self.routes.delete_board(id=self.id)
         route()
 
@@ -738,6 +897,22 @@ class Board(_Board):
     def update(self, name: str=None, position: int=None) -> Board: ...
 
     def update(self, *args, **kwargs) -> Board:
+        """Updates the board with new values
+        
+        Args:
+            name (str): Name of the board (optional)
+            position (int): Position of the board (optional)
+        
+        Args: Alternate
+            board (Board): Board instance to update (required)
+        
+        Args: No Arguments
+            If no arguments are provided, the board will update itself with the current values
+            stored in it's attributes
+        
+        Returns:
+            Board: Updated board instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='board', 

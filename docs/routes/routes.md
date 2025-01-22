@@ -1,0 +1,2 @@
+# Routes
+::: plankapy.routes
