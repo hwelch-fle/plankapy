@@ -130,11 +130,10 @@ class Planka:
         
         Example:
             ```python
-            cards = project.cards
-            len(cards)
+            len(project.cards)
             >>> 5
             project.create_card('My Card')
-            len(cards)
+            len(project.cards)
             >>> 6
             ```
 
@@ -148,6 +147,20 @@ class Planka:
         planka.me
         >>> User(id=...9234, name='username', ...)
         ```
+    
+    Tip:
+        If you want to store a property chain to update later, but dont want to call it by full name, you can use a lambda
+
+            Example:
+                ```python
+                card = lambda: planka.project[0].boards[0].lists[0].cards[0]
+                comments = lambda: card().comments
+                len(comments())
+                >>> 2
+                card().add_comment('My Comment')
+                len(comments())
+                >>> 3
+
     """
     def __init__(self, url: str, auth: BaseAuth=None):
         if not auth:
@@ -193,7 +206,7 @@ class Planka:
 
     @property
     def url(self) -> str:
-        """Returns the current planka url
+        """The current planka url
 
         Returns:
             Planka url
@@ -221,7 +234,11 @@ class Planka:
 
     @property
     def projects(self) -> list[Project]:
-        """Returns a list of all projects, updated on every access"""
+        """List of all projects on the Planka instance
+        
+        Returns:
+            List of all projects
+        """
         route = self.routes.get_project_index()
         return [
             Project(**project).bind(self.routes)
@@ -230,7 +247,11 @@ class Planka:
     
     @property
     def users(self) -> list[User]:
-        """Returns a list of all users, updated on every access"""
+        """List of all users on the Planka instance
+        
+        Returns:
+            List of all users
+        """
         route = self.routes.get_user_index()
         return [
             User(**user).bind(self.routes)
@@ -239,7 +260,11 @@ class Planka:
     
     @property
     def notifications(self) -> list[Notification]:
-        """Returns a list of all notifications for the current logged in user"""
+        """List of all notifications for the current user
+        
+        Returns:
+            List of all notifications
+        """
         route = self.routes.get_notification_index()
         return [
             Notification(**notification).bind(self.routes)
@@ -248,23 +273,45 @@ class Planka:
     
     @property
     def project_background_images(self, NOT_IMPLEMENTED) -> list[BackgroundImage]:
-        """Requires client side rendering, not currently supported"""
+        """Get Project Background Images
+        
+        Attention:
+            Requires client side rendering, not currently supported
+        
+        Raises:
+            NotImplementedError
+        """
         raise NotImplementedError('Getting project backgrounds is not currently supported by plankapy')
 
     @property
     def user_avatars(self, NOT_IMPLEMENTED) -> list[str]:
-        """Requires client side rendering, not currently supported"""
+        """Get User Avatars
+
+        Attention:
+            Requires client side rendering, not currently supported
+        
+        Raises:
+            NotImplementedError
+        """
         raise NotImplementedError('Getting user avatars is not currently supported by plankapy')
 
     @property
     def me(self) -> User:
-        """Returns the current user, updated on every access"""
+        """Current Logged in User
+        
+        Returns:
+            Current user
+        """
         route = self.routes.get_me()
         return User(**route()['item']).bind(self.routes)
     
     @property
     def config(self) -> JSONHandler.JSONResponse:
-        """Returns the planka configuration, updated on every access"""
+        """Planka Configuration
+        
+        Returns:
+            Configuration data
+        """
         route = self.routes.get_config()
         return route()['item']
     
@@ -283,14 +330,11 @@ class Planka:
             You can pass a `Project` instance or provide a required `name` argument
 
         Args:
-            Required Args:
-            name (str): Name of the project
-
-            Optional Args:
-            position (int): Position of the project, defaults to 0
-            background (Gradient): Background gradient of the project, defaults to None
+            name (str): Name of the project (required)
+            position (int): Position of the project (default: 0)
+            background (Gradient): Background gradient of the project (default: None)
             
-            Alterate Args:
+        Args: Alternate
             project (Project): Project instance to create
         
         Returns:
@@ -299,6 +343,8 @@ class Planka:
         Example:
             ```python
             new_project = planka.create_project('My Project')
+            new_project.set_background_gradient('blue-xchange') # Set background gradient
+            new_project.add_project_manager(planka.me) # Add current user as project manager
             ```
         """
         overload = parse_overload(args, kwargs, model='project', 
@@ -412,12 +458,12 @@ class Project(_Project):
         return Board(**route(**overload)['item']).bind(self.routes)
 
     @overload
-    def create_project_manager(self, user: User) -> ProjectManager: ...
+    def add_project_manager(self, user: User) -> ProjectManager: ...
 
     @overload
-    def create_project_manager(self, userId: int) -> ProjectManager: ...
+    def add_project_manager(self, userId: int) -> ProjectManager: ...
 
-    def create_project_manager(self, *args, **kwargs) -> ProjectManager:
+    def add_project_manager(self, *args, **kwargs) -> ProjectManager:
         """Creates a new project manager in the project
 
         Note:
@@ -425,11 +471,10 @@ class Project(_Project):
             You can pass a `User` instance or provide a required `userId` argument
 
         Args:
-            Required Args:
-            userId (int): Id of the user
+            userId (int): id of the user to make project manager (required)
 
-            Alternate Args:
-            user (User): User instance to create
+        Args: Alternate    
+            user (User): User instance to create (required)
 
         Returns:
             ProjectManager: New project manager instance
@@ -437,6 +482,7 @@ class Project(_Project):
         Example:
             ```python
             new_manager = project.create_project_manager(planka.me)
+            other_manager = project.create_project_manager(userId='...1234')
             ```
         
         """
@@ -454,7 +500,7 @@ class Project(_Project):
     def delete(self) -> None:
         """Deletes the project
         
-        Note:
+        Caution:
             This action is irreversible and cannot be undone
         """
         route = self.routes.delete_project(id=self.id)
@@ -469,21 +515,15 @@ class Project(_Project):
 
     def update(self, *args, **kwargs) -> Project:
         """Updates the project with new values
-        
-        Note:
-            This method has overloaded arguments,
-            You can pass a `Project` instance or provide optional arguments
-
-            **`backgroundImage` is not currently supported by plankapy**
             
         Args:
-            Optional Args:
-            name (str): Name of the project
-            background (Gradient): Background gradient of the project
-            backgroundImage (BackgroundImage): Background image of the project
+            name (str): Name of the project (required)
+            background (Gradient): Background gradient of the project (default: None)
+            backgroundImage (BackgroundImage): Background image of the project (default: None)
         
-            Alterate Args:
-            project (Project): Project instance to update
+
+        Args: Alternate
+            project (Project): Project instance to update (required)
         
         Returns:
             Project: Updated project instance
