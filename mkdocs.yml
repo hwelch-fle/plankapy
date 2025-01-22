@@ -4,7 +4,7 @@ repo_url: https://github.com/hwelch-fle/plankapy
 
 theme:
   name: material
-  custom_dir: docs/overrides
+  #custom_dir: docs/overrides
   palette:
   - media: "(prefers-color-scheme)"
     toggle:
