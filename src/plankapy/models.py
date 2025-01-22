@@ -97,20 +97,72 @@ class Model(Mapping):
     def __getitem__(self, key) -> Any:
         """Get the value of an attribute
         
+        Warning:
+            This is an implementation detail that allows for the unpacking operations
+            in the rest of the codebase, all model attributes are still directly accessible
+            through `__getattribute___`
+
         Note:
             Returns None if the attribute is `Unset` or starts with an underscore
+
+        Example:
+            ```python
+            print(model['name'])
+            >>> "Model Name"
+
+            model.name = Unset
+            print(model['name'])
+            >>> None
+            ```
         """
         val = self.__dict__[key]
         return val if val is not Unset else None
     
     def __iter__(self):
-        """Iterate over the model attributes
-        
+        """Iterate over public, assigned model attribute names
+
+        Warning:
+            This is used in conjunction with `__getitem__` to unpack assigned values. 
+            This allows model state to be passed as keyword arguments to functions
+
+            Example:
+                ```python
+                model = Model(name="Model Name", position=1, other=Unset)
+
+                def func(name=None, position=None):
+                    return {"name": name, "position": position}
+                
+                print(func(**model))
+                >>> {'name': 'Model Name', 'position': 1}
+                ```
+            Notice how only the assigned values are returned after unpacking and any Unset or 
+            private attributes are skipped, This allows `None` values to be assigned during
+            a `PATCH` request to delete data 
+
         Note:
             Skips attributes that are `Unset` or start with an underscore
 
         Returns:
             Iterator: The iterator of the model attributes
+        
+        Example:
+            ```python
+
+            # Skip Private attributes
+            print(list(model.__dict__))
+            >>> ['_privateattribute', 'name', 'position', 'id']
+
+            print(list(model))
+            >>> ['name', 'position', 'id'] # Skips _privateattribute
+
+            # Skip Unset attributes
+            print(model.___dict___)
+            >>> {'_privateattribute': 'Private', 'name': 'Model Name', 'position': Unset, 'id': 1}
+            
+            items = dict(model.items())
+            print(items)
+            >>> {'name': 'Model Name', 'id': 1} # Skips position because it's Unset
+            ```
         """
         return iter(
             k for k, v in self.__dict__.items() 
