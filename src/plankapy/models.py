@@ -40,17 +40,6 @@ class Model(Mapping):
         
         # Default unique name if no id or name (model name and last 5 characters of hash)
         return f"{self.__class__.__name__}_{str(hash(self))[-5:]}"
-    
-    @classmethod
-    def from_dict(cls, data: dict) -> Self:
-        """Create a new instance of the class from a dictionary"""
-        if not set(data.keys()).issubset(cls.__annotations__.keys()):
-            raise ValueError(f"Invalid attributes for {cls.__name__}: {list(data.keys() - cls.__annotations__.keys())}")
-        return cls(**data)
-    
-    def to_dict(self) -> dict:
-        """Convert the model instance to a dictionary"""
-        return {k: v for k, v in self.__dict__.items() if v is not Unset}
 
     def bind(self, routes: Routes) -> Self:
         """Bind routes to the model
