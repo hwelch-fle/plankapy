@@ -1,0 +1,2 @@
+# Notification
+::: plankapy.interfaces.Notification

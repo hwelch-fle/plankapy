@@ -1,0 +1,2 @@
+# Board
+::: plankapy.interfaces.Board

@@ -1,2 +1,0 @@
-# Route Model
-::: plankapy.routes

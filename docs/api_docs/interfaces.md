@@ -1,2 +1,0 @@
-# API Interfaces
-::: plankapy.interfaces

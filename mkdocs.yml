@@ -4,7 +4,7 @@ repo_url: https://github.com/hwelch-fle/plankapy
 
 theme:
   name: material
-  #custom_dir: docs/overrides
+  #custom_dir: overrides
   palette:
   - media: "(prefers-color-scheme)"
     toggle:
@@ -118,16 +118,36 @@ extra:
 
 nav:
   - Home: index.md
-  - API Reference: 
-    - interfaces: api_docs/interfaces.md
-    - helpers: api_docs/helpers.md
-    - models: api_docs/models.md
-    - handlers: api_docs/handlers.md
-    - routes: api_docs/routes.md
-    - constants: api_docs/constants.md
+  - API: 
+    - Authentication:
+      - PasswordAuth: auth/PasswordAuth.md
+      - TokenAuth: auth/TokenAuth.md
+    - Planka: interfaces/Planka.md
+      - User: interfaces/User.md
+        - Notification: interfaces/Notification.md
+    - Project: interfaces/Project.md
+      - ProjectManager: interfaces/ProjectManager.md
+    - Board: interfaces/Board.md
+      - BoardMembership: interfaces/BoardMembership.md
+      - Label: interfaces/Label.md
+    - List: interfaces/List.md
+    - Card: interfaces/Card.md
+      - CardLabel: interfaces/CardLabel.md
+      - CardMembership: interfaces/CardMembership.md
+      - CardSubscription: interfaces/CardSubscription.md
+      - Attachment: interfaces/Attachment.md
+      - Action: interfaces/Action.md
+      - Task: interfaces/Task.md
+      - Stopwatch: interfaces/Stopwatch.md
+    - Constants: constants/constants.md
+    - Helpers: helpers/helpers.md
+
+    - Unused:
+      - IdentityProviderUser: interfaces/IdentityProviderUser.md
+      - Archive: interfaces/Archive.md
 
   - Usage: usage.md
-  - CLI: cli.md
+  - CLI: cli/cli.md
   - Change Log: changelog.md
   - Recipes: recipes.md
   - Overview: overview.md

@@ -1,0 +1,2 @@
+# ProjectManager
+::: plankapy.interfaces.ProjectManager

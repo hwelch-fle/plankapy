@@ -1,0 +1,2 @@
+# Stopwatch
+::: plankapy.interfaces.Stopwatch

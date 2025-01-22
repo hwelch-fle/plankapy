@@ -1,0 +1,2 @@
+# PasswordAuth
+::: plankapy.handlers.PasswordAuth

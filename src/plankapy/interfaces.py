@@ -117,50 +117,36 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
 
 class Planka:
     """Root object for interacting with the Planka API
-    
-    See Also:
-        ['Routes'][plankapy.routes]: For routing implementations
-        ['Handlers'][plankapy.handlers]: For handler implementations
 
     Attributes:
-        Required:
         auth (BaseAuth): Authentication method
         url (str): Base url for the Planka instance
-
-        Internal:
         handler (JSONHandler): JSONHandler instance for making requests
 
     Note:
         All implemented public properties return API responses with accessed. This means that the values are not cached 
         and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
         property access will always provide the most up to date information.
-
-    Properties:
-        Internal:
-        auth (BaseAuth): Authentication method
-        url (str): Base url for the Planka instance
-
-        Public:
-        projects (list[Project]): List of all projects
-        users (list[User]): List of all users
-        notifications (list[Notification]): List of all notifications for the current user
-        project_background_images (NOT_IMPLEMENTED): List of all project background images
-        user_avatars (NOT_IMPLEMENTED): List of all user avatars
-        me (User): Current user
-        config (JSONHandler.JSONResponse): Planka configuration
+        
+        Example:
+            ```python
+            cards = project.cards
+            len(cards)
+            >>> 5
+            project.create_card('My Card')
+            len(cards)
+            >>> 6
+            ```
 
     Example:
         ```python
         from plankapy import Planka, TokenAuth
 
-        auth = TokenAuth('your_token')
+        auth = PasswordAuth('username', 'password')
         planka = Planka('https://planka.example.com', auth)
 
-        # Get all projects
-        projects = planka.projects
-
-        # Create a new project
-        new_project = planka.create_project('My Project')
+        planka.me
+        >>> User(id=...9234, name='username', ...)
         ```
     """
     def __init__(self, url: str, auth: BaseAuth=None):
@@ -182,7 +168,7 @@ class Planka:
         """Returns the current authentication method
 
         Returns:
-            BaseAuth: Authentication method
+            Authentication method
         """
         return self._auth
 
@@ -193,14 +179,14 @@ class Planka:
         Args:
             auth (BaseAuth): New authentication method
             
-        Note:
+        Warning:
             Changing the authentication method will create a new session with the current url, 
             If you need to change both the url and the authentication method, create a new Planka instance
             
         Example:
-        ```python
-        planka.auth = TokenAuth('<new_token>')
-        ```
+            ```python
+            planka.auth = TokenAuth('<new_token>')
+            ```
         """
         self._auth = auth
         self._create_session(auth)
@@ -210,7 +196,7 @@ class Planka:
         """Returns the current planka url
 
         Returns:
-            str: Planka url
+            Planka url
         """
         return self._url
     
@@ -219,9 +205,9 @@ class Planka:
         """Changes the base url and creates a new session
         
         Args:
-            url (str): New base url
+            url: New base url
         
-        Note:
+        Warning:
             Changing the url will create a new session with the current authentication method, 
             If you need to change both the url and the authentication method, create a new Planka instance
             
@@ -253,7 +239,7 @@ class Planka:
     
     @property
     def notifications(self) -> list[Notification]:
-        """Returns a list of all notifications for the current logged in user, updated on every access"""
+        """Returns a list of all notifications for the current logged in user"""
         route = self.routes.get_notification_index()
         return [
             Notification(**notification).bind(self.routes)
@@ -1354,6 +1340,8 @@ class ProjectManager(_ProjectManager):
                 self.__init__(**manager)
                 return
         raise ValueError(f'Project Manager with id({self.id}) not found, it was likely deleted')
+
+class Stopwatch(_Stopwatch): ...
 
 class Task(_Task):
     

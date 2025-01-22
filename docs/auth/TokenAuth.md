@@ -1,0 +1,2 @@
+# TokenAuth
+::: plankapy.handlers.TokenAuth

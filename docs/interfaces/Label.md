@@ -1,0 +1,2 @@
+# Label
+::: plankapy.interfaces.Label

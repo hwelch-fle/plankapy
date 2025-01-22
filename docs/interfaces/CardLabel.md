@@ -1,0 +1,2 @@
+# CardLabel
+::: plankapy.interfaces.CardLabel
