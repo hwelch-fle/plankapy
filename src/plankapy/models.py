@@ -58,6 +58,26 @@ class Model(Mapping):
         # Default unique name if no id or name (model name and last 5 characters of hash)
         return f"{self.__class__.__name__}_{str(hash(self))[-5:]}"
 
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """Get the creation date of the model instance
+        
+        Returns:
+            Optional[datetime]: The creation date of the model instance
+        """
+        if hasattr(self, 'createdAt'):
+            return datetime.fromisoformat(self.createdAt)
+    
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """Get the last update date of the model instance
+        
+        Returns:
+            Optional[datetime]: The last update date of the model instance
+        """
+        if hasattr(self, 'updatedAt'):
+            return datetime.fromisoformat(self.updatedAt)
+
     def bind(self, routes: Routes) -> Self:
         """Bind routes to the model
         Args:
