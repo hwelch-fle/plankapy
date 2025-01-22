@@ -1,3 +1,7 @@
+"""Pythonic API wrapper for Plankanban"""
+
+__version__ = "2.0.0"
+
 from .interfaces import (
     Planka,
     Project,
