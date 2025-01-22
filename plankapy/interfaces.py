@@ -64,7 +64,8 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
     Raises:
         ValueError: if required arguments are not provided
 
-    Examples:
+    Example:
+        ```python
         # Positional required arguments
         >>> parse_overload(('My board', 0), {}, 'board', ('name', 'position'))
         {'name': 'My board', 'position': 0}
@@ -86,6 +87,7 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
         board.name = 'My New Board'
         >>> parse_overload((), {}, 'board', ('name', 'position'), noarg=self)
         {'name': 'My New Board', 'position': 0}
+        ```
 
     """
     # Convert options and required to tuples if they have a single value
@@ -114,6 +116,53 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
     return kwargs
 
 class Planka:
+    """Root object for interacting with the Planka API
+    
+    See Also:
+        ['Routes'][plankapy.routes]: For routing implementations
+        ['Handlers'][plankapy.handlers]: For handler implementations
+
+    Attributes:
+        Required:
+        auth (BaseAuth): Authentication method
+        url (str): Base url for the Planka instance
+
+        Internal:
+        handler (JSONHandler): JSONHandler instance for making requests
+
+    Note:
+        All implemented public properties return API responses with accessed. This means that the values are not cached 
+        and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
+        property access will always provide the most up to date information.
+
+    Properties:
+        Internal:
+        auth (BaseAuth): Authentication method
+        url (str): Base url for the Planka instance
+
+        Public:
+        projects (list[Project]): List of all projects
+        users (list[User]): List of all users
+        notifications (list[Notification]): List of all notifications for the current user
+        project_background_images (NOT_IMPLEMENTED): List of all project background images
+        user_avatars (NOT_IMPLEMENTED): List of all user avatars
+        me (User): Current user
+        config (JSONHandler.JSONResponse): Planka configuration
+
+    Example:
+        ```python
+        from plankapy import Planka, TokenAuth
+
+        auth = TokenAuth('your_token')
+        planka = Planka('https://planka.example.com', auth)
+
+        # Get all projects
+        projects = planka.projects
+
+        # Create a new project
+        new_project = planka.create_project('My Project')
+        ```
+    """
     def __init__(self, url: str, auth: BaseAuth=None):
         if not auth:
             raise ValueError('No authentication method provided')
@@ -123,33 +172,70 @@ class Planka:
         self._create_session()
 
     def _create_session(self) -> None:
+        """INTERNAL: Creates a new session with the current authentication method and url"""
         self.handler = JSONHandler(self.url)
         self.handler.headers['Authorization'] = self.auth.authenticate(self.url)
         self.routes = Routes(self.handler)
     
     @property
     def auth(self) -> BaseAuth:
+        """Returns the current authentication method
+
+        Returns:
+            BaseAuth: Authentication method
+        """
         return self._auth
 
     @auth.setter
     def auth(self, auth: BaseAuth):
-        """Changes the authentication method and creates a new session"""
+        """Changes the authentication method and creates a new session
+        
+        Args:
+            auth (BaseAuth): New authentication method
+            
+        Note:
+            Changing the authentication method will create a new session with the current url, 
+            If you need to change both the url and the authentication method, create a new Planka instance
+            
+        Example:
+        ```python
+        planka.auth = TokenAuth('<new_token>')
+        ```
+        """
         self._auth = auth
-        self._create_session()
+        self._create_session(auth)
 
     @property
     def url(self) -> str:
+        """Returns the current planka url
+
+        Returns:
+            str: Planka url
+        """
         return self._url
     
     @url.setter
     def url(self, url: str):
-        """Changes the base url and creates a new session"""
+        """Changes the base url and creates a new session
+        
+        Args:
+            url (str): New base url
+        
+        Note:
+            Changing the url will create a new session with the current authentication method, 
+            If you need to change both the url and the authentication method, create a new Planka instance
+            
+        Example:
+            ```python
+            planka.url = 'https://planka.example.com'
+            ```
+        """
         self._url = url
         self._create_session(self.auth)
 
     @property
     def projects(self) -> list[Project]:
-        """Returns a list of all projects"""
+        """Returns a list of all projects, updated on every access"""
         route = self.routes.get_project_index()
         return [
             Project(**project).bind(self.routes)
@@ -158,7 +244,7 @@ class Planka:
     
     @property
     def users(self) -> list[User]:
-        """Returns a list of all users"""
+        """Returns a list of all users, updated on every access"""
         route = self.routes.get_user_index()
         return [
             User(**user).bind(self.routes)
@@ -167,7 +253,7 @@ class Planka:
     
     @property
     def notifications(self) -> list[Notification]:
-        """Returns a list of all notifications for the current user"""
+        """Returns a list of all notifications for the current logged in user, updated on every access"""
         route = self.routes.get_notification_index()
         return [
             Notification(**notification).bind(self.routes)
@@ -186,13 +272,13 @@ class Planka:
 
     @property
     def me(self) -> User:
-        """Returns the current user"""
+        """Returns the current user, updated on every access"""
         route = self.routes.get_me()
         return User(**route()['item']).bind(self.routes)
     
     @property
     def config(self) -> JSONHandler.JSONResponse:
-        """Returns the planka configuration"""
+        """Returns the planka configuration, updated on every access"""
         route = self.routes.get_config()
         return route()['item']
     
@@ -204,6 +290,31 @@ class Planka:
                        background: Gradient=None) -> Project: ...
 
     def create_project(self, *args, **kwargs) -> Project:
+        """Creates a new project
+        
+        Note:
+            This method has overloaded arguments, 
+            You can pass a `Project` instance or provide a required `name` argument
+
+        Args:
+            Required Args:
+            name (str): Name of the project
+
+            Optional Args:
+            position (int): Position of the project, defaults to 0
+            background (Gradient): Background gradient of the project, defaults to None
+            
+            Alterate Args:
+            project (Project): Project instance to create
+        
+        Returns:
+            Project: New project instance
+
+        Example:
+            ```python
+            new_project = planka.create_project('My Project')
+            ```
+        """
         overload = parse_overload(args, kwargs, model='project', 
                                   options=('name', 'position', 'background', 'backgroundImage'), 
                                   required=('name',))
@@ -217,14 +328,32 @@ class Planka:
         return Project(**route(**overload)['item']).bind(self.routes)
 
 class Project(_Project):
+    """Interface for interacting with planka Projects and their included sub-objects
     
+    Note:
+        All implemented public properties return API responses with accessed. This means that the values are not cached 
+        and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
+        property access will always provide the most up to date information.
+
+    Properties:
+        Internal:
+        included (JSONHandler.JSONResponse): Included data for the project
+
+        Public:
+        users (list[User]): List of all users in the project
+        managers (list[ProjectManager]): List of all project managers
+        boardMemberships (list[BoardMembership]): List of all board memberships
+        boards (list[Board]): List of all boards in the project
+    """
     @property
     def included(self) -> JSONHandler.JSONResponse:
+        """INTERNAL: Returns the included data for the project"""
         route = self.routes.get_project(id=self.id)
         return route()['included']
     
     @property
     def users(self) -> list[User]:
+        """Returns a list of all users in the project, updated on every access"""
         return [
             User(**user).bind(self.routes)
             for user in self.included['users']
@@ -232,6 +361,7 @@ class Project(_Project):
     
     @property
     def managers(self) -> list[ProjectManager]:
+        """Returns a list of all project managers, updated on every access"""
         return [
             ProjectManager(**projectManager).bind(self.routes)
             for projectManager in self.included['projectManagers']
@@ -239,6 +369,7 @@ class Project(_Project):
     
     @property
     def boardMemberships(self) -> list[BoardMembership]:
+        """Returns a list of all board memberships, updated on every access"""
         return [
             BoardMembership(**boardMembership).bind(self.routes)
             for boardMembership in self.included['boardMemberships']
@@ -246,6 +377,7 @@ class Project(_Project):
 
     @property
     def boards(self) -> list[Board]:
+        """Returns a list of all boards in the project, updated on every access"""
         return [
             Board(**board).bind(self.routes)
             for board in self.included['boards']
@@ -258,6 +390,30 @@ class Project(_Project):
     def create_board(self, name: str, position: int) -> Board: ...
 
     def create_board(self, *args, **kwargs) -> Board:
+        """Creates a new board in the project
+        
+        Note:
+            This method has overloaded arguments,
+            You can pass a `Board` instance or provide a required `name` argument
+        
+        Args:
+            Required Args:
+            name (str): Name of the board
+
+            Optional Args:
+            position (int): Position of the board, defaults to 0
+            
+            Alterate Args:
+            board (Board): Board instance to create
+
+        Returns:
+            Board: New board instance
+
+        Example:
+            ```python
+            new_board = project.create_board('My Board')
+            ```
+        """
         overload = parse_overload(
             args, kwargs, 
             model='board', 
@@ -276,6 +432,28 @@ class Project(_Project):
     def create_project_manager(self, userId: int) -> ProjectManager: ...
 
     def create_project_manager(self, *args, **kwargs) -> ProjectManager:
+        """Creates a new project manager in the project
+
+        Note:
+            This method has overloaded arguments,
+            You can pass a `User` instance or provide a required `userId` argument
+
+        Args:
+            Required Args:
+            userId (int): Id of the user
+
+            Alternate Args:
+            user (User): User instance to create
+
+        Returns:
+            ProjectManager: New project manager instance
+        
+        Example:
+            ```python
+            new_manager = project.create_project_manager(planka.me)
+            ```
+        
+        """
         overload = parse_overload(
             args, kwargs, 
             model='user', 
@@ -288,7 +466,11 @@ class Project(_Project):
         return ProjectManager(**route(**overload)['item']).bind(self.routes)
 
     def delete(self) -> None:
-        """Deletes the project CANNOT BE UNDONE"""
+        """Deletes the project
+        
+        Note:
+            This action is irreversible and cannot be undone
+        """
         route = self.routes.delete_project(id=self.id)
         route()
 
@@ -296,26 +478,86 @@ class Project(_Project):
     def update(self, project: Project) -> Project: ...
 
     @overload
-    def update(self, name: str=None, background: Background=None, 
+    def update(self, name: str=None, background: Gradient=None, 
                backgroundImage: BackgroundImage=None) -> Project: ...
 
     def update(self, *args, **kwargs) -> Project:
+        """Updates the project with new values
+        
+        Note:
+            This method has overloaded arguments,
+            You can pass a `Project` instance or provide optional arguments
+
+            **`backgroundImage` is not currently supported by plankapy**
+            
+        Args:
+            Optional Args:
+            name (str): Name of the project
+            background (Gradient): Background gradient of the project
+            backgroundImage (BackgroundImage): Background image of the project
+        
+            Alterate Args:
+            project (Project): Project instance to update
+        
+        Returns:
+            Project: Updated project instance
+
+        Example:
+            ```python
+            project.update(name='My New Project', background='blue-xchange'))
+            ```
+        """
         overload = parse_overload(args, kwargs, model='project', 
                                   options=('name', 'background', 'backgroundImage'),
                                   noarg=self)
+        
+        if 'background' in overload:
+            overload['background'] = {'name': overload['background'], 'type': 'gradient'}
 
         route = self.routes.patch_project(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
 
     def set_background_gradient(self, gradient: Gradient) -> None:
+        """Set a background gradient for the project
+        See Also:
+            [Gradient][plankapy.constants.Gradient]: For available gradients
+        
+        Args:
+            gradient (Gradient): Background gradient to set
+        
+        Example:
+            ```python
+            project.set_background_gradient('blue-xchange')
+            ```
+        """
         self.update(background={'name': gradient, 'type': 'gradient'})
 
     def set_background_image(self, image: BackgroundImage) -> None:
+        """Set a background image for the project
+        
+        Note:
+            This method is not currently supported by plankapy
+
+        Args:
+            image (BackgroundImage): Background image to set
+        
+        Raises:
+            NotImplementedError: Setting background images is not currently supported by plankapy
+        """
         raise NotImplementedError('setting project background images is not currently supported by plankapy')
 
-    def refresh(self) -> Project:
-        """Refreshes the project data"""
+    def refresh(self) -> None:
+        """Refreshes the project data
+        
+        Note:
+            All objects accessed by properties are always up to date, but the root object that contains those
+            properties keeps a cache of it's own data. This method refreshes the root object data.
+
+            FUTURE: This method might be removed or disabled in the future if I can get a __getattr__ implementation
+            to work without causing infinite recursion updating the root object when properties are accessed
+
+        """
         route = self.routes.get_project(id=self.id)
         try:
             self.__init__(**route()['item'])
