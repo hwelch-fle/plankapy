@@ -139,7 +139,7 @@ class Planka:
 
     Example:
         ```python
-        from plankapy import Planka, TokenAuth
+        from plankapy import Planka, PasswordAuth
 
         auth = PasswordAuth('username', 'password')
         planka = Planka('https://planka.example.com', auth)
@@ -151,15 +151,16 @@ class Planka:
     Tip:
         If you want to store a property chain to update later, but dont want to call it by full name, you can use a lambda
 
-            Example:
-                ```python
-                card = lambda: planka.project[0].boards[0].lists[0].cards[0]
-                comments = lambda: card().comments
-                len(comments())
-                >>> 2
-                card().add_comment('My Comment')
-                len(comments())
-                >>> 3
+        Example:
+            ```python
+            card = lambda: planka.project[0].boards[0].lists[0].cards[0]
+            comments = lambda: card().comments
+            len(comments())
+            >>> 2
+            card().add_comment('My Comment')
+            len(comments())
+            >>> 3
+            ```
     
     Tip:
         All objects inherit the `editor` context manager from the `Model` class except `Planka`.
@@ -511,7 +512,7 @@ class Project(_Project):
     def delete(self) -> None:
         """Deletes the project
         
-        Caution:
+        Danger:
             This action is irreversible and cannot be undone
         """
         route = self.routes.delete_project(id=self.id)
@@ -881,7 +882,7 @@ class Board(_Board):
     def delete(self) -> None:
         """Deletes the board
 
-        Caution:
+        Danger:
             This action is irreversible and cannot be undone
         """
         route = self.routes.delete_board(id=self.id)
@@ -932,11 +933,16 @@ class Board(_Board):
             raise ValueError(f'Board {self.name} with id({self.id}) not found, it was likely deleted')
 
 class User(_User):
-    """User properties traverse the whole instance and are thereby very slow
-    To get membership information, it is recommended to get the data from individual projects, boards, and cards"""
+    """Interface for interacting with planka Users and their included sub-objects
+
+    """
     @property
     def projects(self) -> list[Project]:
-        """Returns a list of all projects the user is a member of"""
+        """A list of all projects the user is a member of
+        
+        Returns:
+            List of all projects the user is a member of
+        """
         projects_route = self.routes.get_project_index()
         projects = [
             Project(**project).bind(self.routes)
@@ -951,7 +957,11 @@ class User(_User):
     
     @property
     def boards(self) -> list[Board]:
-        """Returns a list of all boards the user is a member of"""
+        """A list of all boards the user is a member of
+        
+        Returns:
+            List of all boards the user is a member of
+        """
         return [
             boardMembership.board
             for project in self.projects
@@ -961,7 +971,11 @@ class User(_User):
     
     @property
     def cards(self) -> list[Card]:
-        """Returns a list of all cards assigned to the user in all projects"""
+        """A list of all cards assigned to the user in all projects
+        
+        Returns:
+            List of all cards assigned to the user
+        """
         return [
             cardMembership.card
             for board in self.boards
@@ -971,7 +985,11 @@ class User(_User):
     
     @property
     def manager_of(self) -> list[Project]:
-        """Returns a list of all projects the user is a manager of"""
+        """A list of all projects the user is a manager of
+        
+        Returns:
+            List of all projects the user is a manager of
+        """
         return [
             project
             for project in self.projects
@@ -981,7 +999,11 @@ class User(_User):
     
     @property
     def notifications(self) -> list[Notification]:
-        """Returns a list of all notifications for the user"""
+        """A list of all notifications for the user
+        
+        Returns:
+            List of all notifications for the user
+        """
         route = self.routes.get_notification_index()
         return [
             Notification(**notification).bind(self.routes)
@@ -1005,6 +1027,32 @@ class User(_User):
                isUsernameLocked: bool=None, subscribeToOwnCards:bool=None) -> User: ...
 
     def update(self, *args, **kwargs) -> User:
+        """Updates the user with new values
+        
+        Args:
+            name (str): Name of the user (optional)
+            username (str): Username of the user (optional)
+            email (str): Email of the user (optional)
+            language (str): Language of the user (optional)
+            organization (str): Organization of the user (optional)
+            phone (str): Phone number of the user (optional)
+            avatarUrl (str): Avatar url of the user (optional)
+            isAdmin (bool): Whether the user is an admin (optional)
+            isDeletionLocked (bool): Whether the user is deletion locked (optional)
+            isLocked (bool): Whether the user is locked (optional)
+            isRoleLocked (bool): Whether the user is role locked (optional)
+            isUsernameLocked (bool): Whether the user is username locked (optional)
+            subscribeToOwnCards (bool): Whether the user is subscribed to their own cards (optional)
+            
+        Args: Alternate
+            user (User): User instance to update (required)
+        
+        Args: No Arguments
+            If no arguments are provided, the user will update itself with the current values stored in its attributes
+
+        Returns:
+            User: Updated user instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='user', 
@@ -1019,12 +1067,17 @@ class User(_User):
         return self
     
     def delete(self) -> None:
-        """Deletes the user CANNOT BE UNDONE"""
+        """Deletes the user
+        
+        Danger:
+            This action is irreversible and cannot be undone
+        """
         route = self.routes.delete_user(id=self.id)
         route()
     
     def refresh(self) -> None:
-        """Refreshes the user data"""
+        """Refreshes the user data
+        """
         route = self.routes.get_user(id=self.id)
         try:
             self.__init__(**route()['item'])
