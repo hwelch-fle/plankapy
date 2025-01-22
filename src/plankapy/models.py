@@ -274,9 +274,47 @@ class _Card(Model):
     updatedAt: Optional[datetime]=Unset
 
 @dataclass(eq=False)
-class _Stopwatch:
-    startedAt: Optional[datetime]=Unset
+class Stopwatch(Model):
+    """Stopwatch Model
+
+    Attributes:
+        startedAt (datetime): The start date of the stopwatch
+        total (int): The total time of the stopwatch
+    """
+    _card: Optional[_Card]=Unset
+    startedAt: Optional[str]=Unset
     total: Optional[int]=Unset
+
+    def start_datetime(self) -> datetime:
+        """Returns the datetime the stopwatch was started"""
+        return datetime.fromisoformat(self.startedAt)
+
+    def start(self) -> Stopwatch:
+        """Starts the stopwatch"""
+        self.startedAt = datetime.now().isoformat()
+        self._card.stopwatch = self
+        self._card.update()
+    
+    def stop(self) -> Stopwatch:
+        """Stops the stopwatch"""
+        now = datetime.now()
+        started = datetime.fromisoformat(self.startedAt)
+        self.total += int(now.timestamp() - started.timestamp())
+        self.startedAt = None
+        self._card.stopwatch = self
+        self._card.update()
+    
+    def set(self, hours: int=0, minutes: int=0, seconds: int=0) -> Stopwatch:
+        """Set an amount of time for the stopwatch
+        
+        Args:
+            hours (int): Hours to set
+            minutes (int): Minutes to set
+            seconds (int): Seconds to set
+        """
+        self.total = (hours * 3600) + (minutes * 60) + seconds
+        self._card.stopwatch = self
+        self._card.update()
 
 @dataclass(eq=False)
 class _CardLabel(Model):
