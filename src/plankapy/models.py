@@ -210,22 +210,61 @@ class Model(Mapping):
 
 @dataclass(eq=False)
 class _Action(Model):
+    """Action Model
+    
+    Attributes:
+        id (int): The ID of the action
+        type (ActionType): The type of the action
+        data (dict): The data of the action
+        cardId (int): The ID of the card the action is associated with
+        userId (int): The ID of the user who created the action
+        createdAt (datetime): The creation date of the action
+        updatedAt (datetime): The last update date of the action
+    """
+
     id: Optional[int]=Unset
     type: Optional[ActionType]=Required
     data: Optional[dict]=Required
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _Archive(Model):
+    """Archive Model
+    
+    Warning:
+        This model is currently unavailable in the Planka API
+
+    Attributes:
+        fromModel (str): The model the archive is from
+        originalRecordId (int): The ID of the original record
+        originalRecord (dict): The original record
+    """
+
     fromModel: Optional[str]=Required
     originalRecordId: Optional[int]=Required
     originalRecord: Optional[dict]=Required
 
 @dataclass(eq=False)
 class _Attachment(Model):
+    """Attachment Model
+    
+    Attributes:
+        id (int): The ID of the attachment
+        name (str): The name of the attachment
+        url (str): The URL of the attachment
+        cardId (int): The ID of the card the attachment is associated with
+        dirname (str): The directory name of the attachment
+        filename (str): The filename of the attachment
+        image (dict): The image of the attachment
+        url (str): The URL of the attachment
+        coverUrl (str): The cover URL of the attachment
+        creatorUserId (int): The ID of the user who created the attachment
+        createdAt (datetime): The creation date of the attachment
+        updatedAt (datetime): The last update date of the attachment
+        """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     dirname: Optional[str]=Required
@@ -234,44 +273,84 @@ class _Attachment(Model):
     url: Optional[str]=Unset
     coverUrl: Optional[str]=Unset
     creatorUserId: Optional[int]=Unset
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _Board(Model):
+    """Board Model
+
+    Attributes:
+        id (int): The ID of the board
+        name (str): The name of the board
+        description (str): The description of the board
+        isClosed (bool): The closed status of the board
+        isStarred (bool): The starred status of the board
+        createdAt (datetime): The creation date of the board
+        updatedAt (datetime): The last update date of the board
+    """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
     projectId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _BoardMembership(Model):
+    """Board Membership Model
+
+    Attributes:
+        id (int): The ID of the board membership
+        role (BoardRole): The role of the board membership
+        canComment (bool): The comment permission of the board membership
+        boardId (int): The ID of the board the membership is associated with
+        userId (int): The ID of the user the membership is associated with
+        createdAt (datetime): The creation date of the board membership
+        updatedAt (datetime): The last update date of the board membership
+    """
     id: Optional[int]=Unset
     role: Optional[BoardRole]=Required
     canComment: Optional[bool]=Unset
     boardId: Optional[int]=Required
     userId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _Card(Model):
+    """Card Model
+    
+    Attributes:
+        id (int): The ID of the card
+        name (str): The name of the card
+        position (int): The position of the card
+        description (str): The description of the card
+        dueDate (datetime): The due date of the card
+        isDueDateCompleted (bool): The due date completion status of the card
+        stopwatch (_Stopwatch): The stopwatch associated with the card
+        boardId (int): The ID of the board the card is associated with
+        listId (int): The ID of the list the card is associated with
+        creatorUserId (int): The ID of the user who created the card
+        coverAttachmentId (int): The ID of the cover attachment of the card
+        isSubscribed (bool): The current user's subscription status with the card
+        createdAt (datetime): The creation date of the card
+        updatedAt (datetime): The last update date of the card
+    """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
     description: Optional[str]=Unset
-    dueDate: Optional[datetime]=Unset
+    dueDate: Optional[str]=Unset
     isDueDateCompleted: Optional[bool]=Unset
-    stopwatch: Optional[_Stopwatch]=Unset
+    stopwatch: Optional[Stopwatch]=Unset
     boardId: Optional[int]=Required
     listId: Optional[int]=Required
     creatorUserId: Optional[int]=Unset
     coverAttachmentId: Optional[int]=Unset
     isSubscribed: Optional[bool]=Unset
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class Stopwatch(Model):
@@ -318,19 +397,37 @@ class Stopwatch(Model):
 
 @dataclass(eq=False)
 class _CardLabel(Model):
+    """Card Label Model
+    
+    Attributes:
+        id (int): The ID of the card label
+        cardId (int): The ID of the card the label is associated with
+        labelId (int): The ID of the label the card is associated with
+        createdAt (datetime): The creation date of the card label
+        updatedAt (datetime): The last update date of the card label
+    """
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
     labelId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _CardMembership(Model):
+    """Card Membership Model
+
+    Attributes:
+        id (int): The ID of the card membership
+        cardId (int): The ID of the card the membership is associated with
+        userId (int): The ID of the user the membership is associated with
+        createdAt (datetime): The creation date of the card membership
+        updatedAt (datetime): The last update date of the card membership
+    """
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _CardSubscription(Model):
@@ -338,8 +435,8 @@ class _CardSubscription(Model):
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
     isPermanent: Optional[bool]=Unset
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _IdentityProviderUser(Model):
@@ -347,8 +444,8 @@ class _IdentityProviderUser(Model):
     issuer: Optional[str]=Unset
     sub: Optional[str]=Unset
     userId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _Label(Model):
@@ -357,8 +454,8 @@ class _Label(Model):
     position: Optional[int]=Required
     color: Optional[str]=Required
     boardId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _List(Model):
@@ -366,8 +463,8 @@ class _List(Model):
     name: Optional[str]=Required
     position: Optional[int]=Required
     boardId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _Notification(Model): 
@@ -376,8 +473,8 @@ class _Notification(Model):
     userId: Optional[int]=Required
     actionId: Optional[int]=Required
     cardId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _Project(Model):
@@ -386,16 +483,16 @@ class _Project(Model):
     # Background overrides backgroundImage
     background: Optional[Background]=Unset
     backgroundImage: Optional[BackgroundImage]=Unset
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
     
 @dataclass(eq=False)
 class _ProjectManager(Model):
     id: Optional[int]=Unset
     projectId: Optional[int]=Required
     userId: Optional[int]=Required
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _Task(Model):
@@ -404,8 +501,8 @@ class _Task(Model):
     position: Optional[int]=Required
     isCompleted: bool=Unset
     cardId: Optional[int]=Unset
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
 class _User(Model):
@@ -423,6 +520,6 @@ class _User(Model):
     isRoleLocked: bool=Unset
     isUsernameLocked: bool=Unset
     subscribeToOwnCards: bool=Unset
-    createdAt: Optional[datetime]=Unset
-    updatedAt: Optional[datetime]=Unset
-    deletedAt: Optional[datetime]=Unset
+    createdAt: Optional[str]=Unset
+    updatedAt: Optional[str]=Unset
+    deletedAt: Optional[str]=Unset
