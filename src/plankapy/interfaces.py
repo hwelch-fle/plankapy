@@ -7,24 +7,24 @@ from datetime import datetime
 from .routes import Routes
 from .models import (
     Model,
-    _Action,
-    _Archive,
-    _Attachment,
-    _Board,
-    _BoardMembership,
-    _Card,
+    Action_,
+    Archive_,
+    Attachment_,
+    Board_,
+    BoardMembership_,
+    Card_,
     Stopwatch,
-    _CardLabel,
-    _CardMembership,
-    _CardSubscription,
-    _IdentityProviderUser,
-    _Label,
-    _List,
-    _Notification,
-    _Project,
-    _ProjectManager,
-    _Task,
-    _User,
+    CardLabel_,
+    CardMembership_,
+    CardSubscription_,
+    IdentityProviderUser_,
+    Label_,
+    List_,
+    Notification_,
+    Project_,
+    ProjectManager_,
+    Task_,
+    User_,
 )
 from .handlers import (
     TokenAuth, 
@@ -371,7 +371,7 @@ class Planka:
         route = self.routes.post_project()
         return Project(**route(**overload)['item']).bind(self.routes)
 
-class Project(_Project):
+class Project(Project_):
     """Interface for interacting with planka Projects and their included sub-objects
     
     Note:
@@ -597,7 +597,7 @@ class Project(_Project):
         route = self.routes.get_project(id=self.id)
         self.__init__(**route()['item'])
 
-class Board(_Board):
+class Board(Board_):
     """Interface for interacting with planka Boards and their included sub-objects
     
     Note:
@@ -924,7 +924,7 @@ class Board(_Board):
         route = self.routes.get_board(id=self.id)
         self.__init__(**route()['item'])
 
-class User(_User):
+class User(User_):
     """Interface for interacting with planka Users and their included sub-objects
 
     """
@@ -1073,7 +1073,7 @@ class User(_User):
         route = self.routes.get_user(id=self.id)
         self.__init__(**route()['item'])
 
-class Notification(_Notification):
+class Notification(Notification_):
     
     @property
     def user(self) -> User:
@@ -1119,7 +1119,7 @@ class Notification(_Notification):
         route = self.routes.get_notification(id=self.id)
         self.__init__(**route()['item'])
 
-class BoardMembership(_BoardMembership):
+class BoardMembership(BoardMembership_):
     
     @property
     def user(self) -> User:
@@ -1162,7 +1162,7 @@ class BoardMembership(_BoardMembership):
             if membership.id == self.id:
                 self.__init__(**membership)
     
-class Label(_Label):
+class Label(Label_):
     
     @property
     def board(self) -> Board:
@@ -1208,7 +1208,7 @@ class Label(_Label):
             if label.id == self.id:
                 self.__init__(**label)
 
-class Action(_Action): 
+class Action(Action_): 
     
     @property
     def card(self) -> Card:
@@ -1251,7 +1251,7 @@ class Action(_Action):
             if action.id == self.id:
                 self.__init__(**action)
 
-class Archive(_Archive): 
+class Archive(Archive_): 
     """Interface for interacting with planka Archives and their included sub-objects
 
     Warning:
@@ -1260,14 +1260,14 @@ class Archive(_Archive):
     """
     ...
 
-class Attachment(_Attachment):
+class Attachment(Attachment_):
     
     @property
     def creator(self) -> User:
         user_route = self.routes.get_user(id=self.creatorUserId)
         return User(**user_route()['item']).bind(self.routes)
     
-class Card(_Card):
+class Card(Card_):
     
     @property
     def creator(self) -> User:
@@ -1442,7 +1442,7 @@ class Card(_Card):
         route = self.routes.get_card(id=self.id)
         self.__init__(**route()['item'])
         
-class CardLabel(_CardLabel):
+class CardLabel(CardLabel_):
     
     @property
     def card(self) -> Card:
@@ -1465,7 +1465,7 @@ class CardLabel(_CardLabel):
         route = self.routes.delete_card_label(id=self.id)
         route()
     
-class CardMembership(_CardMembership):
+class CardMembership(CardMembership_):
     
     @property
     def user(self) -> User:
@@ -1482,7 +1482,7 @@ class CardMembership(_CardMembership):
         route = self.routes.delete_card_membership(id=self.id)
         route()
     
-class CardSubscription(_CardSubscription): 
+class CardSubscription(CardSubscription_): 
     
     @property
     def user(self) -> User:
@@ -1494,14 +1494,14 @@ class CardSubscription(_CardSubscription):
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
 
-class IdentityUserProvider(_IdentityProviderUser):
+class IdentityUserProvider(IdentityProviderUser_):
     
     @property
     def user(self) -> User:
         user_route = self.routes.get_user(id=self.userId)
         return User(**user_route()['item']).bind(self.routes)
 
-class List(_List):
+class List(List_):
     
     @property
     def board(self) -> Board:
@@ -1591,7 +1591,7 @@ class List(_List):
             if _list.id == self.id:
                 self.__init__(**_list)
 
-class ProjectManager(_ProjectManager):
+class ProjectManager(ProjectManager_):
     
     @property
     def user(self) -> User:
@@ -1614,7 +1614,7 @@ class ProjectManager(_ProjectManager):
             if manager.id == self.id:
                 self.__init__(**manager)
 
-class Task(_Task):
+class Task(Task_):
     
     @property
     def card(self) -> Card:

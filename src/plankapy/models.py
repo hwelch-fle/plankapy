@@ -261,7 +261,7 @@ class Model(Mapping):
 
 
 @dataclass(eq=False)
-class _Action(Model):
+class Action_(Model):
     """Action Model
     
     Attributes:
@@ -283,7 +283,7 @@ class _Action(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _Archive(Model):
+class Archive_(Model):
     """Archive Model
     
     Warning:
@@ -300,7 +300,7 @@ class _Archive(Model):
     originalRecord: Optional[dict]=Required
 
 @dataclass(eq=False)
-class _Attachment(Model):
+class Attachment_(Model):
     """Attachment Model
     
     Attributes:
@@ -329,7 +329,7 @@ class _Attachment(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _Board(Model):
+class Board_(Model):
     """Board Model
 
     Attributes:
@@ -349,7 +349,7 @@ class _Board(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _BoardMembership(Model):
+class BoardMembership_(Model):
     """Board Membership Model
 
     Attributes:
@@ -370,7 +370,7 @@ class _BoardMembership(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _Card(Model):
+class Card_(Model):
     """Card Model
     
     Attributes:
@@ -412,7 +412,7 @@ class Stopwatch(Model):
         startedAt (datetime): The start date of the stopwatch
         total (int): The total time of the stopwatch
     """
-    _card: Optional[_Card]=Unset
+    _card: Optional[Card_]=Unset
     startedAt: Optional[str]=Unset
     total: Optional[int]=Unset
 
@@ -448,7 +448,7 @@ class Stopwatch(Model):
         self._card.update()
 
 @dataclass(eq=False)
-class _CardLabel(Model):
+class CardLabel_(Model):
     """Card Label Model
     
     Attributes:
@@ -465,7 +465,7 @@ class _CardLabel(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _CardMembership(Model):
+class CardMembership_(Model):
     """Card Membership Model
 
     Attributes:
@@ -482,7 +482,7 @@ class _CardMembership(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _CardSubscription(Model):
+class CardSubscription_(Model):
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
@@ -491,7 +491,7 @@ class _CardSubscription(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _IdentityProviderUser(Model):
+class IdentityProviderUser_(Model):
     id: Optional[int]=Unset
     issuer: Optional[str]=Unset
     sub: Optional[str]=Unset
@@ -500,7 +500,7 @@ class _IdentityProviderUser(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _Label(Model):
+class Label_(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -510,7 +510,7 @@ class _Label(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _List(Model):
+class List_(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -519,7 +519,7 @@ class _List(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _Notification(Model): 
+class Notification_(Model): 
     id: Optional[int]=Unset
     isRead: bool=Required
     userId: Optional[int]=Required
@@ -529,7 +529,7 @@ class _Notification(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _Project(Model):
+class Project_(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     # Background overrides backgroundImage
@@ -539,7 +539,7 @@ class _Project(Model):
     updatedAt: Optional[str]=Unset
     
 @dataclass(eq=False)
-class _ProjectManager(Model):
+class ProjectManager_(Model):
     id: Optional[int]=Unset
     projectId: Optional[int]=Required
     userId: Optional[int]=Required
@@ -547,7 +547,7 @@ class _ProjectManager(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _Task(Model):
+class Task_(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -557,7 +557,7 @@ class _Task(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class _User(Model):
+class User_(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     username: Optional[str]=Unset
