@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import overload
 from datetime import datetime
-from urllib.error import HTTPError
+
 
 from .routes import Routes
 from .models import (
@@ -13,7 +13,7 @@ from .models import (
     _Board,
     _BoardMembership,
     _Card,
-    _Stopwatch,
+    Stopwatch,
     _CardLabel,
     _CardMembership,
     _CardSubscription,
@@ -378,20 +378,18 @@ class Project(_Project):
         All implemented public properties return API responses with accessed. This means that the values are not cached 
         and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
         property access will always provide the most up to date information.
-
-    Properties:
-        Internal:
-        included (JSONHandler.JSONResponse): Included data for the project
-
-        Public:
-        users (list[User]): List of all users in the project
-        managers (list[ProjectManager]): List of all project managers
-        boardMemberships (list[BoardMembership]): List of all board memberships
-        boards (list[Board]): List of all boards in the project
     """
     @property
     def included(self) -> JSONHandler.JSONResponse:
-        """INTERNAL: Returns the included data for the project"""
+        """Included data for the project
+        
+        Warning:
+            This property is meant to be used internally for building objects in the other proeprties
+            It can be directly accessed, but it will only return JSON data and not objects
+        
+        Returns:
+            Included data for the project
+        """
         route = self.routes.get_project(id=self.id)
         return route()['included']
     
@@ -597,10 +595,7 @@ class Project(_Project):
 
         """
         route = self.routes.get_project(id=self.id)
-        try:
-            self.__init__(**route()['item'])
-        except HTTPError:
-            raise ValueError(f'Project {self.name} with id({self.id}) not found, it was likely deleted')
+        self.__init__(**route()['item'])
 
 class Board(_Board):
     """Interface for interacting with planka Boards and their included sub-objects
@@ -612,7 +607,7 @@ class Board(_Board):
     """
     @property
     def included(self) -> JSONHandler.JSONResponse:
-        """Returns the included data for the board
+        """Included data for the board
         
         Warning:
             This property is meant to be used internally for building objects in the other proeprties
@@ -626,7 +621,7 @@ class Board(_Board):
     
     @property
     def project(self) -> Project:
-        """Returns the project the board belongs to
+        """Project the board belongs to
         
         Note:
             All objects include a reference to their parent object and parent objects include a reference to their children
@@ -640,7 +635,7 @@ class Board(_Board):
 
     @property
     def users(self) -> list[User]:
-        """A list of all users in the board
+        """All users in the board
 
         Returns:
             List of all users
@@ -652,7 +647,7 @@ class Board(_Board):
     
     @property
     def editors(self) -> list[User]:
-        """A list of all users that can edit the board
+        """All users that can edit the board
 
         Returns:
             List of all editors
@@ -666,7 +661,7 @@ class Board(_Board):
     
     @property
     def viewers(self) -> list[User]:
-        """A list of all users that can view the board
+        """All users that can view the board
         
         Returns:
             List of all viewers
@@ -680,7 +675,7 @@ class Board(_Board):
     
     @property
     def boardMemberships(self) -> list[BoardMembership]:
-        """A list of all board memberships
+        """All board memberships
         
         Note:
             This property is primarily here for internal use, '.editor' and '.viewer' properties 
@@ -696,7 +691,7 @@ class Board(_Board):
     
     @property
     def labels(self) -> list[Label]:
-        """A list of all labels in the board
+        """All labels in the board
         
         Returns:
             List of all labels in the board
@@ -708,7 +703,7 @@ class Board(_Board):
     
     @property
     def lists(self) -> list[List]:
-        """A list of all lists in the board
+        """All lists in the board
         
         Returns:
             List of all lists in the board
@@ -720,7 +715,7 @@ class Board(_Board):
     
     @property
     def cards(self) -> list[Card]:
-        """A list of all cards in the board
+        """All cards in the board
         
         Returns:
             A list of all cards in the board
@@ -732,7 +727,7 @@ class Board(_Board):
     
     @property
     def cardMemberships(self) -> list[CardMembership]:
-        """A list of all card -> user relationships in the board
+        """All card -> user relationships in the board
         
         Note:
             This property is used by the `Card` class to determine its users
@@ -747,7 +742,7 @@ class Board(_Board):
     
     @property
     def cardLabels(self) -> list[CardLabel]:
-        """A list of all card -> label relationships in the board
+        """All card -> label relationships in the board
         
         Note:
             This property is used by the `Card` class to determine its labels
@@ -762,7 +757,7 @@ class Board(_Board):
     
     @property
     def tasks(self) -> list[Task]:
-        """A list of all tasks in the board
+        """All tasks in the board
         
         Note:
             This property is used by the `Card` class to determine its tasks
@@ -777,7 +772,7 @@ class Board(_Board):
     
     @property
     def attachments(self) -> list[Attachment]:
-        """A list of all attachments in the board
+        """All attachments in the board
         
         Note:
             This property is used by the `Card` class to determine its attachments
@@ -927,10 +922,7 @@ class Board(_Board):
     def refresh(self) -> None:
         """Refreshes the board data"""
         route = self.routes.get_board(id=self.id)
-        try:
-            self.__init__(**route()['item'])
-        except HTTPError:
-            raise ValueError(f'Board {self.name} with id({self.id}) not found, it was likely deleted')
+        self.__init__(**route()['item'])
 
 class User(_User):
     """Interface for interacting with planka Users and their included sub-objects
@@ -938,7 +930,7 @@ class User(_User):
     """
     @property
     def projects(self) -> list[Project]:
-        """A list of all projects the user is a member of
+        """All projects the user is a member of
         
         Returns:
             List of all projects the user is a member of
@@ -957,7 +949,7 @@ class User(_User):
     
     @property
     def boards(self) -> list[Board]:
-        """A list of all boards the user is a member of
+        """All boards the user is a member of
         
         Returns:
             List of all boards the user is a member of
@@ -971,7 +963,7 @@ class User(_User):
     
     @property
     def cards(self) -> list[Card]:
-        """A list of all cards assigned to the user in all projects
+        """All cards assigned to the user in all projects
         
         Returns:
             List of all cards assigned to the user
@@ -985,7 +977,7 @@ class User(_User):
     
     @property
     def manager_of(self) -> list[Project]:
-        """A list of all projects the user is a manager of
+        """All projects the user is a manager of
         
         Returns:
             List of all projects the user is a manager of
@@ -999,7 +991,7 @@ class User(_User):
     
     @property
     def notifications(self) -> list[Notification]:
-        """A list of all notifications for the user
+        """All notifications for the user
         
         Returns:
             List of all notifications for the user
@@ -1079,10 +1071,7 @@ class User(_User):
         """Refreshes the user data
         """
         route = self.routes.get_user(id=self.id)
-        try:
-            self.__init__(**route()['item'])
-        except HTTPError:
-            raise ValueError(f'User {self.name} with id({self.id}) not found, it was likely deleted')
+        self.__init__(**route()['item'])
 
 class Notification(_Notification):
     
@@ -1128,10 +1117,7 @@ class Notification(_Notification):
     def refresh(self) -> None:
         """Refreshes the notification data"""
         route = self.routes.get_notification(id=self.id)
-        try:
-            self.__init__(**route()['item'])
-        except HTTPError:
-            raise ValueError(f'Notification with id({self.id}) not found, it was likely deleted')
+        self.__init__(**route()['item'])
 
 class BoardMembership(_BoardMembership):
     
@@ -1175,8 +1161,6 @@ class BoardMembership(_BoardMembership):
         for membership in self.board.boardMemberships:
             if membership.id == self.id:
                 self.__init__(**membership)
-                return
-        raise ValueError(f'Board Membership with id({self.id}) not found, it was likely deleted')
     
 class Label(_Label):
     
@@ -1223,8 +1207,6 @@ class Label(_Label):
         for label in self.board.labels:
             if label.id == self.id:
                 self.__init__(**label)
-                return
-        raise ValueError(f'Label: {self.name} with id({self.id}) not found, it was likely deleted')
 
 class Action(_Action): 
     
@@ -1268,10 +1250,15 @@ class Action(_Action):
         for action in self.card.comments:
             if action.id == self.id:
                 self.__init__(**action)
-                return
-        raise ValueError(f'Action with id({self.id}) not found, it was likely deleted')
 
-class Archive(_Archive): ...
+class Archive(_Archive): 
+    """Interface for interacting with planka Archives and their included sub-objects
+
+    Warning:
+        This class is not yet implemented and is a placeholder for future development
+        There are no current Planka endpoints for interacting with `Archive` objects
+    """
+    ...
 
 class Attachment(_Attachment):
     
@@ -1297,7 +1284,6 @@ class Card(_Card):
         for list in self.board.lists:
             if list.id == self.listId:
                 return list
-        raise ValueError(f'List with id({self.listId}) not found, it was likely deleted')
     
     @property
     def labels(self) -> list[Label]:
@@ -1429,7 +1415,7 @@ class Card(_Card):
     def update(self, name: str, position: int=0, 
                     description: str=None, dueDate: datetime=None,
                     isDueDateCompleted: bool=None,
-                    stopwatch: _Stopwatch=None, boardId: int=None,
+                    stopwatch: Stopwatch=None, boardId: int=None,
                     listId: int=None, creatorUserId: int=None,
                     coverAttachmentId: int=None, isSubscribed: bool=None) -> Card: ...
     
@@ -1454,10 +1440,7 @@ class Card(_Card):
     
     def refresh(self):
         route = self.routes.get_card(id=self.id)
-        try:
-            self.__init__(**route()['item'])
-        except HTTPError:
-            raise ValueError(f'Card: {self.name} with id({self.id}) not found, it was likely deleted') 
+        self.__init__(**route()['item'])
         
 class CardLabel(_CardLabel):
     
@@ -1476,7 +1459,6 @@ class CardLabel(_CardLabel):
         for label in self.board.labels:
             if label.id == self.labelId:
                 return label
-        raise ValueError(f'Label with id({self.labelId}) not found, it was likely deleted')
 
     def delete(self) -> None:
         """Deletes the card label CANNOT BE UNDONE"""
@@ -1541,7 +1523,7 @@ class List(_List):
     def create_card(self, name: str, position: int=0, 
                     description: str=None, dueDate: datetime=None,
                     isDueDateCompleted: bool=None,
-                    stopwatch: _Stopwatch=None, boardId: int=None,
+                    stopwatch: Stopwatch=None, boardId: int=None,
                     listId: int=None, creatorUserId: int=None,
                     coverAttachmentId: int=None, isSubscribed: bool=None) -> Card: ...
     
@@ -1608,8 +1590,6 @@ class List(_List):
         for _list in self.board.lists:
             if _list.id == self.id:
                 self.__init__(**_list)
-                return
-        raise ValueError(f'List: {self.name} with id({self.id}) not found, it was likely deleted')
 
 class ProjectManager(_ProjectManager):
     
@@ -1633,10 +1613,6 @@ class ProjectManager(_ProjectManager):
         for manager in self.project.managers:
             if manager.id == self.id:
                 self.__init__(**manager)
-                return
-        raise ValueError(f'Project Manager with id({self.id}) not found, it was likely deleted')
-
-class Stopwatch(_Stopwatch): ...
 
 class Task(_Task):
     
@@ -1676,5 +1652,3 @@ class Task(_Task):
         for task in tasks:
             if task.id == self.id:
                 self.__init__(**task)
-                return
-        raise ValueError(f'Task with id({self.id}) not found, it was likely deleted')
