@@ -127,15 +127,15 @@ nav:
       - User: interfaces/User.md
       - Notification: interfaces/Notification.md
     - Project Interfaces: 
-      - Project:interfaces/Project.md
+      - Project: interfaces/Project.md
       - ProjectManager: interfaces/ProjectManager.md
     - Board Interfaces: 
       - Board: interfaces/Board.md
       - BoardMembership: interfaces/BoardMembership.md
       - Label: interfaces/Label.md
-    - List: interfaces/List.md
+      - List: interfaces/List.md
     - Card Interfaces:
-      -Card: interfaces/Card.md
+      - Card: interfaces/Card.md
       - CardLabel: interfaces/CardLabel.md
       - CardMembership: interfaces/CardMembership.md
       - CardSubscription: interfaces/CardSubscription.md
