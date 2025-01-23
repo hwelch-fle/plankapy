@@ -394,7 +394,7 @@ class Project(Project_):
         property access will always provide the most up to date information.
     """
     @property
-    def included(self) -> JSONHandler.JSONResponse:
+    def _included(self) -> JSONHandler.JSONResponse:
         """Included data for the project
         
         Warning:
@@ -412,7 +412,7 @@ class Project(Project_):
         """Returns a list of all users in the project, updated on every access"""
         return [
             User(**user).bind(self.routes)
-            for user in self.included['users']
+            for user in self._included['users']
         ]
     
     @property
@@ -420,7 +420,7 @@ class Project(Project_):
         """Returns a list of all project managers, updated on every access"""
         return [
             ProjectManager(**projectManager).bind(self.routes)
-            for projectManager in self.included['projectManagers']
+            for projectManager in self._included['projectManagers']
         ]
     
     @property
@@ -428,7 +428,7 @@ class Project(Project_):
         """Returns a list of all board memberships, updated on every access"""
         return [
             BoardMembership(**boardMembership).bind(self.routes)
-            for boardMembership in self.included['boardMemberships']
+            for boardMembership in self._included['boardMemberships']
         ]
 
     @property
@@ -436,7 +436,7 @@ class Project(Project_):
         """Returns a list of all boards in the project, updated on every access"""
         return [
             Board(**board).bind(self.routes)
-            for board in self.included['boards']
+            for board in self._included['boards']
         ]
     
     @overload
@@ -648,7 +648,7 @@ class Board(Board_):
         property access will always provide the most up to date information. 
     """
     @property
-    def included(self) -> JSONHandler.JSONResponse:
+    def _included(self) -> JSONHandler.JSONResponse:
         """Included data for the board
         
         Warning:
@@ -684,7 +684,7 @@ class Board(Board_):
         """
         return [
             User(**user).bind(self.routes)
-            for user in self.included['users']
+            for user in self._included['users']
         ]
     
     @property
@@ -728,7 +728,7 @@ class Board(Board_):
         """
         return [
             BoardMembership(**boardMembership).bind(self.routes)
-            for boardMembership in self.included['boardMemberships']
+            for boardMembership in self._included['boardMemberships']
         ]
     
     @property
@@ -740,7 +740,7 @@ class Board(Board_):
         """
         return [
             Label(**label).bind(self.routes)
-            for label in self.included['labels']
+            for label in self._included['labels']
         ]
     
     @property
@@ -752,7 +752,7 @@ class Board(Board_):
         """
         return [
             List(**_list).bind(self.routes)
-            for _list in self.included['lists']
+            for _list in self._included['lists']
         ]
     
     @property
@@ -764,7 +764,7 @@ class Board(Board_):
         """
         return [
             Card(**card).bind(self.routes)
-            for card in self.included['cards']
+            for card in self._included['cards']
         ]
     
     @property
@@ -779,7 +779,7 @@ class Board(Board_):
         """
         return [
             CardMembership(**cardMembership).bind(self.routes)
-            for cardMembership in self.included['cardMemberships']
+            for cardMembership in self._included['cardMemberships']
         ]
     
     @property
@@ -794,7 +794,7 @@ class Board(Board_):
         """
         return [
             CardLabel(**cardLabel).bind(self.routes)
-            for cardLabel in self.included['cardLabels']
+            for cardLabel in self._included['cardLabels']
         ]
     
     @property
@@ -809,7 +809,7 @@ class Board(Board_):
         """
         return [
             Task(**task).bind(self.routes)
-            for task in self.included['tasks']
+            for task in self._included['tasks']
         ]
     
     @property
@@ -824,7 +824,7 @@ class Board(Board_):
         """
         return [
             Attachment(**attachment).bind(self.routes)
-            for attachment in self.included['attachments']
+            for attachment in self._included['attachments']
         ]
 
     @overload
