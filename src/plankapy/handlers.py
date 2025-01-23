@@ -152,9 +152,32 @@ class BaseAuth(Protocol):
         raise NotImplementedError
 
 class PasswordAuth(BaseAuth):
+    """Authentication using a username or email and password
+    
+    Attributes:
+        endpoint (str): The token to use for authentication (default: 'api/access-tokens')
+    """
+    
     endpoint = 'api/access-tokens'
 
     def __init__(self, username_or_email: str, password: str) -> None:
+        """Initialize a PasswordAuth instance with a username or email and password
+        
+        Args:
+            username_or_email (str): The username or email to use for authentication
+            password (str): The password to use for authentication
+            
+        Example:
+            ```python
+            auth = PasswordAuth('username', 'password')
+            auth.authenticate('http://planka.instance')
+            >>> 'Bearer <token>'
+            
+            planka = Planka('http://planka.instance', auth)
+            planka.auth.token
+            >>> '<token>'
+            ```    
+        """
         self.token = None
         self.credentials = {
             'emailOrUsername': username_or_email,
@@ -162,17 +185,63 @@ class PasswordAuth(BaseAuth):
         }
 
     def authenticate(self, url: str) -> str:
+        """Implementation of the authenticate method
+        
+        Note:
+            The token is stored in the `self.token` attribute
+        
+        Args:
+            url (str): The base url of the Planka instance
+            
+        Returns:
+            Token from the `api/access-tokens` endpoint with a `Bearer ` prefix
+        
+        Raises:
+            HTTPError: Failed to authenticate
+        """
         self.token = JSONHandler(url, endpoint=self.endpoint).post(self.credentials)['item']
         return f"Bearer {self.token}"
 
 class TokenAuth(BaseAuth):
+    """Authentication using a pre-supplied token
+    
+    Note:
+        Token Authentication for now requires a token to be supplied
+        the `authenticate` method will return the token with a `Bearer ` prefix
+    
+    Attributes:
+        endpoint (str): The token to use for authentication (default: 'api/access-tokens')
+        
+    Example:
+        ```python
+        auth = TokenAuth('<token>')
+        auth.authenticate()
+        >>> 'Bearer <token>'
+        
+        planka = Planka('http://planka.instance', auth)
+        planka.auth.token
+        >>> '<token>'
+        ```
+    """
     endpoint = 'api/access-tokens'
 
     def __init__(self, token: str) -> None:
+        """Initialize a TokenAuth instance with a token
+        
+        Args:
+            token (str): The token to use for authentication
+        """
         self.token = token
 
     def authenticate(self, url: str=None) -> str:
-        """URL not required for getting auth string with pre-supplied token"""
+        """Implementation of the authenticate method
+        
+        Args:
+            url (str): Not used, but required by the protocol
+        
+        Returns:
+           Supplied token with `Bearer ` prefix
+        """
         return f"Bearer {self.token}"
 
 # TODO: Implement SSO auth with httpOnlyToken
