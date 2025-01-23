@@ -549,14 +549,19 @@ class Project(Project_):
             if manager.userId == overload['userId']:
                 manager.delete()
 
-    def delete(self) -> None:
+    def delete(self) -> Project:
         """Deletes the project
         
         Danger:
             This action is irreversible and cannot be undone
+        
+        Returns:
+            Project: Deleted project instance
         """
+        self.refresh()
         route = self.routes.delete_project(id=self.id)
         route()
+        return self
 
     @overload
     def update(self, project: Project) -> Project: ...
@@ -938,14 +943,19 @@ class Board(Board_):
             if member.userId == overload['userId']:
                 member.delete()
 
-    def delete(self) -> None:
+    def delete(self) -> Board:
         """Deletes the board
 
         Danger:
             This action is irreversible and cannot be undone
+            
+        Returns:
+            Board: Deleted board instance
         """
+        self.refresh()
         route = self.routes.delete_board(id=self.id)
         route()
+        return self
 
     @overload
     def update(self) -> Board: ...
@@ -1122,14 +1132,19 @@ class User(User_):
         self.__init__(**route(**overload)['item'])
         return self
     
-    def delete(self) -> None:
+    def delete(self) -> User:
         """Deletes the user
         
         Danger:
             This action is irreversible and cannot be undone
+        
+        Returns:
+            User: Deleted user instance
         """
+        self.refresh()
         route = self.routes.delete_user(id=self.id)
         route()
+        return self
     
     def refresh(self) -> None:
         """Refreshes the user data
@@ -1204,10 +1219,19 @@ class BoardMembership(BoardMembership_):
     @overload
     def update(self, role: BoardRole=None, canComment: bool=None): ...
     
-    def delete(self) -> None:
-        """Deletes the board membership CANNOT BE UNDONE"""
+    def delete(self) -> tuple[User, Board]:
+        """Deletes the board membership relation
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            User: The user that was removed from the board
+        """
+        self.refresh()
         route = self.routes.delete_board_membership(id=self.id)
         route()
+        return (self.user, self.board)
     
     def update(self, *args, **kwargs) -> BoardMembership:
         overload = parse_overload(
@@ -1261,10 +1285,19 @@ class Label(Label_):
         self.__init__(**route(**overload)['item'])
         return self
     
-    def delete(self) -> None:
-        """Deletes the label CANNOT BE UNDONE"""
+    def delete(self) -> Label:
+        """Deletes the label
+        
+        Danger:
+            This action is irreversible and cannot be undone
+        
+        Returns:
+            Label: Deleted label instance
+        """
+        self.refresh()
         route = self.routes.delete_label(id=self.id)
         route()
+        return self
         
     def refresh(self) -> None:
         """Refreshes the label data"""
@@ -1304,10 +1337,19 @@ class Action(Action_):
         self.__init__(**route(**overload)['item'])
         return self
     
-    def delete(self) -> None:
-        """Deletes the comment action CANNOT BE UNDONE"""
+    def delete(self) -> Action:
+        """Deletes the comment action
+        
+        Danger:
+            This action is irreversible and cannot be undone
+        
+        Returns:
+            Action: Deleted comment action instance
+        """
+        self.refresh()
         route = self.routes.delete_comment_action(id=self.id)
         route()
+        return self
     
     def refresh(self) -> None:
         """Refreshes the action data"""
@@ -1501,10 +1543,19 @@ class Card(Card_):
         self.__init__(**route(**overload)['item'])
         return self
     
-    def delete(self) -> None:
-        """Deletes the card CANNOT BE UNDONE"""
+    def delete(self) -> Card:
+        """Deletes the card
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            Card: The deleted card instance
+        """
+        self.refresh()
         route = self.routes.delete_card(id=self.id)
         route()
+        return self
     
     def refresh(self):
         route = self.routes.get_card(id=self.id)
@@ -1528,10 +1579,19 @@ class CardLabel(CardLabel_):
             if label.id == self.labelId:
                 return label
 
-    def delete(self) -> None:
-        """Deletes the card label CANNOT BE UNDONE"""
+    def delete(self) -> tuple[Card, Label]:
+        """Deletes the card label relationship
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            tuple[Card, Label]: The card and label that were removed from each other
+        """
+        self.refresh()
         route = self.routes.delete_card_label(cardId=self.card.id, labelId=self.labelId)
         route()
+        return (self.card, self.label)
     
 class CardMembership(CardMembership_):
     
@@ -1545,10 +1605,19 @@ class CardMembership(CardMembership_):
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
 
-    def delete(self) -> None:
-        """Deletes the card membership CANNOT BE UNDONE"""
+    def delete(self) -> tuple[User, Card]:
+        """Deletes the card membership
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            tuple[User, Card]: The user and card that were removed from each other
+        """
+        self.refresh()
         route = self.routes.delete_card_membership(id=self.id)
         route()
+        return (self.user, self.card)
     
 class CardSubscription(CardSubscription_): 
     
@@ -1629,10 +1698,19 @@ class List(List_):
     def sort_by_oldest(self) -> None:
         self._sort('Oldest First')
     
-    def delete(self) -> None:
-        """Deletes the list CANNOT BE UNDONE"""
+    def delete(self) -> List:
+        """Deletes the list
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            List: Deleted list instance
+        """
+        self.refresh()
         route = self.routes.delete_list(id=self.id)
         route()
+        return self
 
     @overload
     def update(self) -> List: ...
@@ -1672,10 +1750,19 @@ class ProjectManager(ProjectManager_):
         project_route = self.routes.get_project(id=self.projectId)
         return Project(**project_route()['item']).bind(self.routes)
     
-    def delete(self) -> None:
-        """Deletes the project manager CANNOT BE UNDONE"""
+    def delete(self) -> tuple[User, Project]:
+        """Deletes the project manager relationship
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            tuple[User, Project]: The user and project that the user was manager of
+        """
+        self.refresh()
         route = self.routes.delete_project_manager(id=self.id)
         route()
+        return (self.user, self.project)
      
     def refresh(self) -> None:
         """Refreshes the project manager data"""
@@ -1710,10 +1797,19 @@ class Task(Task_):
         self.__init__(**route(**overload)['item'])
         return self
     
-    def delete(self) -> None:
-        """Deletes the task CANNOT BE UNDONE"""
+    def delete(self) -> Task:
+        """Deletes the task
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            Task: Deleted task instance
+        """
+        self.refresh()
         route = self.routes.delete_task(id=self.id)
         route()
+        return self
     
     def refresh(self) -> None:
         """Refreshes the task data"""
