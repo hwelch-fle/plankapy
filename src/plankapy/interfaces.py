@@ -1189,8 +1189,9 @@ class Notification(Notification_):
         self.__init__(**route(**overload)['item'])
         return self
     
-    def delete(self) -> None:
-        """Notifications can't be deleted, but they can be marked as read"""
+    def mark_as_read(self) -> None:
+        """Marks the notification as read
+        """
         self.update(isRead=True)
     
     def refresh(self) -> None:
