@@ -370,6 +370,20 @@ class Planka:
 
         route = self.routes.post_project()
         return Project(**route(**overload)['item']).bind(self.routes)
+        
+    def create_user(self, username: str, email: str, password: str) -> User:
+        """Create a new user
+
+        Danger:
+            Supplied password must be moderately secure
+
+        Args:
+            username: Will assign username to `name` and `username`
+            email: 
+            password: Must be moderately secure or will raise a 400 error!
+        """
+        route = self.routes.post_user()
+        return User(**route(username=username, name=username, password=password, email=email)['item']).bind(self.routes)
 
 class Project(Project_):
     """Interface for interacting with planka Projects and their included sub-objects
@@ -429,7 +443,7 @@ class Project(Project_):
     def create_board(self, board: Board) -> Board: ...
 
     @overload
-    def create_board(self, name: str, position: int) -> Board: ...
+    def create_board(self, name: str, position: int=0) -> Board: ...
 
     def create_board(self, *args, **kwargs) -> Board:
         """Creates a new board in the project
@@ -462,6 +476,7 @@ class Project(Project_):
             options=('name', 'position'), 
             required=('name',))
 
+        overload['position'] = overload.get('position', 0)
         overload['projectId'] = self.id
         
         route = self.routes.post_board(projectId=self.id)
@@ -502,10 +517,37 @@ class Project(Project_):
             options=('userId',), 
             required=('userId',))
 
-        overload['projectId'] = self.id
+        userId = overload.get('userId', None)
+        
+        if not userId: # Get id from passed User
+            userId = overload.get('id')
+        
+        # Don't assign a manager twice (raises HTTP 409 - Conflict)
+        if userId in [manager.id for manager in self.managers]:
+            return
 
         route = self.routes.post_project_manager(projectId=self.id)
-        return ProjectManager(**route(**overload)['item']).bind(self.routes)
+        return ProjectManager(**route(userId=userId, projectId=self.id)['item']).bind(self.routes)
+
+    @overload
+    def remove_project_manager(project_manager: User) -> User: ...
+
+    @overload
+    def remove_project_manager(userId: int) -> User: ...
+
+    def remove_project_manager(self, *args, **kwargs) -> User:
+        overload = parse_overload(args, kwargs,
+                                  model='user',
+                                  options=('userId',),
+                                  required=('userId',)
+        )
+        
+        if 'userId' not in overload: # Case for User object
+            overload['userId'] = overload['id']
+        
+        for manager in self.managers:
+            if manager.userId == overload['userId']:
+                manager.delete()
 
     def delete(self) -> None:
         """Deletes the project
@@ -567,7 +609,7 @@ class Project(Project_):
             project.set_background_gradient('blue-xchange')
             ```
         """
-        self.update(background={'name': gradient, 'type': 'gradient'})
+        self.update(background=gradient)
 
     def set_background_image(self, image: BackgroundImage) -> None:
         """Set a background image for the project
@@ -834,7 +876,7 @@ class Board(Board_):
         Args:
             name (str): Name of the label (required)
             position (int): Position of the label (default: 0)
-            color (LabelColor): Color of the label (default: "berry-red
+            color (LabelColor): Color of the label (default: "berry-red")
             
         Args: Alternate
             label (Label): Label instance to create
@@ -871,9 +913,31 @@ class Board(Board_):
         Returns:
             BoardMembership: New board membership
         """
+        role = 'editor' if canComment else 'viewer'
         route = self.routes.post_board_membership(boardId=self.id)
-        return BoardMembership(**route(userId=user.id, boardId=self.id, canComment=canComment)['item']).bind(self.routes)
+        return BoardMembership(**route(userId=user.id, boardId=self.id, canComment=canComment, role=role)['item']).bind(self.routes)
     
+    @overload
+    def remove_user(self, user: User) -> User: ...
+
+    @overload
+    def remove_user(self, userId: int) -> User: ...
+
+    def remove_user(self, *args, **kwargs) -> User:
+        """Remove a user from a board
+        """
+        overload = parse_overload(args, kwargs,
+                                  model='user',
+                                  options=('userId',),
+                                  required=('userId',))
+        
+        if 'userId' not in overload: # Case if passed User
+            overload['userId'] = overload['id']
+
+        for member in self.boardMemberships:
+            if member.userId == overload['userId']:
+                member.delete()
+
     def delete(self) -> None:
         """Deletes the board
 
@@ -1364,11 +1428,12 @@ class Card(Card_):
     def add_stopwatch(self) -> None:
         """Adds a stopwatch to the card"""
         self.refresh()
+
         if self.stopwatch:
             return
         
         with self.editor():
-            self.stopwatch = dict(Stopwatch(startedAt=None, total=0).stop())
+            self.stopwatch = {**Stopwatch(startedAt=None, total=0).stop()}
 
     def remove_label(self, label: Label) -> None:
         """Removes a label from the card, does not delete the label"""
@@ -1396,7 +1461,10 @@ class Card(Card_):
     # Stopwatch handling is a bit weird, this is a hacky override to always show the user a Stopwatch instance
     def __getattribute__(self, name):
         if name == 'stopwatch':
-            return Stopwatch(_card=self, **super().__getattribute__(name))
+            current = super().__getattribute__(name)
+            if not current:
+                current = {'startedAt':None, 'total':0}
+            return Stopwatch(_card=self, **current)
         return super().__getattribute__(name)
 
     def __setattr__(self, name, value):
@@ -1462,7 +1530,7 @@ class CardLabel(CardLabel_):
 
     def delete(self) -> None:
         """Deletes the card label CANNOT BE UNDONE"""
-        route = self.routes.delete_card_label(id=self.id)
+        route = self.routes.delete_card_label(cardId=self.card.id, labelId=self.labelId)
         route()
     
 class CardMembership(CardMembership_):
@@ -1535,11 +1603,12 @@ class List(List_):
                     'isDueDateCompleted', 'stopwatch', 
                     'creatorUserId', 'coverAttachmentId', 
                     'isSubscribed'), 
-            required=('name', 'position'),
+            required=('name',),
             noarg=self)
         
         overload['boardId'] = self.boardId
         overload['listId'] = self.id
+        overload['position'] = overload.get('position', 0)
 
         route = self.routes.post_card(id=self.id)
         return Card(**route(**overload)['item']).bind(self.routes)

@@ -566,6 +566,7 @@ class User_(Model):
     organization: Optional[str]=Unset
     phone: Optional[str]=Unset
     avatarUrl: Optional[str]=Unset
+    isSso: Optional[bool]=Unset
     isAdmin: bool=Unset
     isDeletionLocked: bool=Unset
     isLocked: bool=Unset
