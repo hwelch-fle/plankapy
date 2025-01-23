@@ -407,27 +407,48 @@ class Card_(Model):
 @dataclass(eq=False)
 class Stopwatch(Model):
     """Stopwatch Model
+    
+    Note:
+        The stopwatch model is not a regular interface and instead is dynamically generated on
+        Access through the `Card` `.stopwatch` attribute. There is an override that intercepts
+        `__getitem__` to return a `Stopwatch`. 
+        
+        All `Stopwatch` methods directly update the `.stopwatch` attribute of the linked `Card` 
+        instance.
 
     Attributes:
         startedAt (datetime): The start date of the stopwatch
-        total (int): The total time of the stopwatch
+        total (int): The total time of the stopwatch (in seconds)
+        _card (Card): The card the stopwatch is associated with (Managed by the `Card` class)
     """
     _card: Optional[Card_]=Unset
     startedAt: Optional[str]=Unset
     total: Optional[int]=Unset
 
-    def start_datetime(self) -> datetime:
+    def refresh(self):
+        self._card.refresh()
+        self.startedAt = self._card.stopwatch.startedAt
+        self.total = self._card.stopwatch.total
+    
+    def start_time(self) -> datetime:
         """Returns the datetime the stopwatch was started"""
-        return datetime.fromisoformat(self.startedAt)
+        self.refresh()
+        return datetime.fromisoformat(self.startedAt) if self.startedAt else None
 
-    def start(self) -> Stopwatch:
+    def start(self) -> None:
         """Starts the stopwatch"""
+        self.refresh()
+        if self.startedAt:
+            return
         self.startedAt = datetime.now().isoformat()
-        self._card.stopwatch = self
         self._card.update()
     
-    def stop(self) -> Stopwatch:
+    def stop(self) -> None:
         """Stops the stopwatch"""
+        self.refresh()
+        if not self.startedAt:
+            return
+        
         now = datetime.now()
         started = datetime.fromisoformat(self.startedAt)
         self.total += int(now.timestamp() - started.timestamp())
@@ -435,7 +456,7 @@ class Stopwatch(Model):
         self._card.stopwatch = self
         self._card.update()
     
-    def set(self, hours: int=0, minutes: int=0, seconds: int=0) -> Stopwatch:
+    def set(self, hours: int=0, minutes: int=0, seconds: int=0) -> None:
         """Set an amount of time for the stopwatch
         
         Args:
