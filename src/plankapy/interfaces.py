@@ -409,7 +409,11 @@ class Project(Project_):
     
     @property
     def users(self) -> list[User]:
-        """Returns a list of all users in the project, updated on every access"""
+        """All users in the project
+        
+        Returns:
+            List of all users
+        """
         return [
             User(**user).bind(self.routes)
             for user in self._included['users']
@@ -417,7 +421,11 @@ class Project(Project_):
     
     @property
     def managers(self) -> list[ProjectManager]:
-        """Returns a list of all project managers, updated on every access"""
+        """All project managers
+        
+        Returns:
+            List of all project managers
+        """
         return [
             ProjectManager(**projectManager).bind(self.routes)
             for projectManager in self._included['projectManagers']
@@ -425,7 +433,16 @@ class Project(Project_):
     
     @property
     def boardMemberships(self) -> list[BoardMembership]:
-        """Returns a list of all board memberships, updated on every access"""
+        """All board memberships and roles in the project
+        
+        Note:
+            This property is not a list of users, but a list of `BoardMembership` objects
+            that define the user's role in the project boards. This is used to remove memberships
+            in associated project boards and will likely never be used directly
+        
+        Returns:
+            List of all board membership relations in the project    
+        """
         return [
             BoardMembership(**boardMembership).bind(self.routes)
             for boardMembership in self._included['boardMemberships']
@@ -433,7 +450,11 @@ class Project(Project_):
 
     @property
     def boards(self) -> list[Board]:
-        """Returns a list of all boards in the project, updated on every access"""
+        """All boards in the project
+        
+        Returns:
+            List of all boards
+        """
         return [
             Board(**board).bind(self.routes)
             for board in self._included['boards']
@@ -446,29 +467,17 @@ class Project(Project_):
     def create_board(self, name: str, position: int=0) -> Board: ...
 
     def create_board(self, *args, **kwargs) -> Board:
-        """Creates a new board in the project
-        
-        Note:
-            This method has overloaded arguments,
-            You can pass a `Board` instance or provide a required `name` argument
+        """Creates a new board in the project from a name and position or a Board instance
         
         Args:
-            Required Args:
             name (str): Name of the board
-
-            Optional Args:
-            position (int): Position of the board, defaults to 0
+            position (int): Position of the board (default: 0)
             
-            Alterate Args:
+        Args: Alterate
             board (Board): Board instance to create
 
         Returns:
             Board: New board instance
-
-        Example:
-            ```python
-            new_board = project.create_board('My Board')
-            ```
         """
         overload = parse_overload(
             args, kwargs, 
@@ -619,7 +628,7 @@ class Project(Project_):
     def set_background_image(self, image: BackgroundImage) -> None:
         """Set a background image for the project
         
-        Note:
+        Warning:
             This method is not currently supported by plankapy
 
         Args:
