@@ -1,3 +1,8 @@
+# Building Locally:
+# Run: pip install mkdocs mkdocs-material mkdocstrings[python] mkdocs-material-extensions
+# Run: mkdocs serve
+# Open: http://localhost:8000/plankapy/
+
 site_name: Plankapy
 site_url: https://hwelch-fle.github.io/plankapy
 repo_url: https://github.com/hwelch-fle/plankapy
