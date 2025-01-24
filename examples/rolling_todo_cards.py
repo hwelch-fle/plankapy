@@ -80,8 +80,10 @@ def main():
                 
     else:
         print("Today's Card already exists!")
+        print(f"Card: {today_card.link}")
+        return
     
-    print("Created Today's Card")
+    print(f"Created Today's Card\n {today_card.link}")
     
 if __name__ == '__main__':
     main()
