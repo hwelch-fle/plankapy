@@ -3,8 +3,8 @@ name: docs
 on:
   push:
     branches:
-      - 'v2'
-      - 'v2-dev'
+      - 'main'
+      
   release:
     types: [published]
   workflow_dispatch:
