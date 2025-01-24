@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Self, Any, Mapping
+from typing import Optional, Self, Any, Mapping, Generator
 from contextlib import contextmanager
 
 from .routes import Routes
