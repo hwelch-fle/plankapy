@@ -187,7 +187,7 @@ class Planka:
     
     @property
     def auth(self) -> Type[BaseAuth]:
-        """Returns the current authentication method
+        """Current authentication instance
 
         Returns:
             Authentication method
@@ -199,7 +199,7 @@ class Planka:
         """Changes the authentication method and creates a new session
         
         Args:
-            auth (BaseAuth): New authentication method
+            auth (Type[BaseAuth]): New authentication method
             
         Warning:
             Changing the authentication method will create a new session with the current url, 
