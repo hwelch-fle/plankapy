@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import overload
+from typing import Type, overload
 from datetime import datetime
 
 
@@ -119,7 +119,7 @@ class Planka:
     """Root object for interacting with the Planka API
 
     Attributes:
-        auth (BaseAuth): Authentication method
+        auth (Type[BaseAuth]): Authentication method
         url (str): Base url for the Planka instance
         handler (JSONHandler): JSONHandler instance for making requests
 
@@ -174,10 +174,7 @@ class Planka:
                 card.description = 'My New Description'
             ```
     """
-    def __init__(self, url: str, auth: BaseAuth=None):
-        if not auth:
-            raise ValueError('No authentication method provided')
-        
+    def __init__(self, url: str, auth: Type[BaseAuth]):        
         self._url = url
         self._auth = auth
         self._create_session()
@@ -189,7 +186,7 @@ class Planka:
         self.routes = Routes(self.handler)
     
     @property
-    def auth(self) -> BaseAuth:
+    def auth(self) -> Type[BaseAuth]:
         """Returns the current authentication method
 
         Returns:
@@ -198,7 +195,7 @@ class Planka:
         return self._auth
 
     @auth.setter
-    def auth(self, auth: BaseAuth):
+    def auth(self, auth: Type[BaseAuth]):
         """Changes the authentication method and creates a new session
         
         Args:
