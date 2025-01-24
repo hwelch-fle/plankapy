@@ -441,7 +441,8 @@ class Stopwatch(Model):
         if self.startedAt:
             return
         self.startedAt = datetime.now().isoformat()
-        self._card.update()
+        with self._card.editor():
+            self._card.stopwatch = self
     
     def stop(self) -> None:
         """Stops the stopwatch"""
@@ -453,8 +454,8 @@ class Stopwatch(Model):
         started = datetime.fromisoformat(self.startedAt)
         self.total += int(now.timestamp() - started.timestamp())
         self.startedAt = None
-        self._card.stopwatch = self
-        self._card.update()
+        with self._card.editor():
+            self._card.stopwatch = self
     
     def set(self, hours: int=0, minutes: int=0, seconds: int=0) -> None:
         """Set an amount of time for the stopwatch
@@ -465,8 +466,13 @@ class Stopwatch(Model):
             seconds (int): Seconds to set
         """
         self.total = (hours * 3600) + (minutes * 60) + seconds
-        self._card.stopwatch = self
-        self._card.update()
+        with self._card.editor():
+            self._card.stopwatch = self
+
+    def delete(self):
+        """Delete the stopwatch"""
+        with self._card.editor():
+            self._card.stopwatch = None
 
 @dataclass(eq=False)
 class CardLabel_(Model):
