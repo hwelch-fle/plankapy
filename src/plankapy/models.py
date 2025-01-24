@@ -238,7 +238,7 @@ class Model(Mapping):
         ...
 
     @contextmanager
-    def editor(self):
+    def editor(self) -> Generator[Self, None, None]:
         """Context manager for editing the model
 
         Example:
@@ -255,7 +255,7 @@ class Model(Mapping):
 
         """
         try:
-            yield
+            yield self
         finally:
             self.update()
 
