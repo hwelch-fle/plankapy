@@ -31,6 +31,11 @@ def get_list_by_date(board: ppy.Board, date: date):
     return None
 
 def main():
+    
+    # Flag for defaulting to last card in yesterday's list
+    # if no card is found for yesterday
+    default_to_last_card = True
+    
     planka = Planka('http://localhost:3001/', auth=PasswordAuth("demo", "demo"))
     
     today = datetime.now().date()
@@ -53,6 +58,8 @@ def main():
     
     yesterday_card = get_card_by_date(yesterday_list, yesterday)
     if not yesterday_card:
+        if len(yesterday_list.cards) > 0 and default_to_last_card:
+            yesterday_card = yesterday_list.cards[0]
         print("Yesterday's Card not found")
         return
     
