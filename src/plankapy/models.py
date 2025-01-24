@@ -27,6 +27,24 @@ class Model(Mapping):
     """
 
     @property
+    def link(self) -> str | None:
+        """Get the link to the model instance
+        
+        Note:
+            Only `Project`, `Board`, and `Card` models have links.
+             
+            All other models return `None`
+        
+        Returns:
+            str: The link to the model instance
+        """
+        if hasattr(self, 'id') and hasattr(self, '_routes'):
+            base_url = self.routes.handler.base_url
+            name = self.__class__.__name__.lower().replace('_', '')
+            if name in ('board', 'card', 'project'):
+                return f"{base_url}{name}s/{self.id}"
+    
+    @property
     def routes(self) -> Routes:
         """Get the routes for the model instance
         
