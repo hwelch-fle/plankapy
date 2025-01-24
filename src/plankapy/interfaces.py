@@ -371,7 +371,7 @@ class Planka:
         route = self.routes.post_project()
         return Project(**route(**overload)['item']).bind(self.routes)
         
-    def create_user(self, username: str, email: str, password: str) -> User:
+    def create_user(self, username: str, email: str, password: str, name: str=None) -> User:
         """Create a new user
 
         Danger:
@@ -381,9 +381,10 @@ class Planka:
             username: Will assign username to `name` and `username`
             email: 
             password: Must be moderately secure or will raise a 400 error!
+            name: The full name of the user (default: `username` value)
         """
         route = self.routes.post_user()
-        return User(**route(username=username, name=username, password=password, email=email)['item']).bind(self.routes)
+        return User(**route(username=username, name=name or username, password=password, email=email)['item']).bind(self.routes)
 
 class Project(Project_):
     """Interface for interacting with planka Projects and their included sub-objects
