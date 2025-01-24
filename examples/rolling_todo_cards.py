@@ -60,8 +60,9 @@ def main():
     if not yesterday_card:
         if len(yesterday_list.cards) > 0 and default_to_last_card:
             yesterday_card = yesterday_list.cards[0]
-        print("Yesterday's Card not found")
-        return
+        else:
+            print("Yesterday's Card not found")
+            return
     
     today_board = get_board_by_date(project, today)
     if not today_board:
