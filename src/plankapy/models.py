@@ -96,6 +96,16 @@ class Model(Mapping):
         if hasattr(self, 'updatedAt'):
             return datetime.fromisoformat(self.updatedAt)
 
+    @property
+    def deleted_at(self) -> Optional[datetime]:
+        """Get the deletion date of the model instance
+        
+        Returns:
+            Optional[datetime]: The deletion date of the model instance
+        """
+        if hasattr(self, 'deletedAt'):
+            return datetime.fromisoformat(self.deletedAt)
+    
     def bind(self, routes: Routes) -> Self:
         """Bind routes to the model
         Args:
