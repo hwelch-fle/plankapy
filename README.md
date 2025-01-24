@@ -1,6 +1,8 @@
 # plankapy V2
 A python 3 based API for controlling a self-hosted Planka instance
 
+[![Pip Deployment](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml/badge.svg?branch=main&event=deployment_status)](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml)
+
 ## Concept
 The original plankapy code is basically justa wrapper around the requests module, this re-write attemps to make it a more fully flegded API implementation that adheres more closely to Python standards
 
