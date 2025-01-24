@@ -46,22 +46,27 @@ def test_interfaces(planka: iface.Planka):
 
         card.remove_label(label1)
         card.stopwatch.set(hours=1)
-        card_copy.stopwatch.start()
-        print(card.stopwatch.total)
         card.move(list2)
         card_copy.add_label(label2)
         card_copy.move(list1)
-
         card.add_comment("Hello World")
 
         with card_copy.editor():
             card_copy.name = "New Card"
 
-        time.sleep(5)
+        card_copy.stopwatch.start()
+
+        time.sleep(2)
 
         card_copy.stopwatch.stop()
-        assert card_copy.stopwatch.total == 5
+        assert card_copy.stopwatch.total == 2, "Stopwatch timer testing failed"
+
+        print("Interface Tests - Passed")
+        return True
 
     finally:
         test_project.delete()
         test_user.delete()
+        test_user2.delete()
+    
+    return False

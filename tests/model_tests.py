@@ -29,15 +29,3 @@ def test_base_model():
     
     print("Base Model Tests - Passed")
     return True
-
-def test_model_implementations():
-    print("Implemented Models:")
-    for model in dir(models):
-        if not model.endswith('_') or model.startswith('__'):
-            continue
-        
-        model = getattr(models, model)
-        if not issubclass(model, models.Model):
-            continue
-
-        print(f"\t{model.__name__}")

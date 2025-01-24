@@ -11,7 +11,7 @@ if __name__ == '__main__':
     planka = ppy.Planka('http://localhost:3000', auth=auth)
     
 
-    model_tests.test_base_model()
-    model_tests.test_model_implementations()
+    assert model_tests.test_base_model()
+    assert interface_tests.test_interfaces(planka)
 
-    interface_tests.test_interfaces(planka)
+    print("All tests passed!")
