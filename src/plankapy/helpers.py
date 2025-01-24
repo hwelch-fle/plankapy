@@ -91,32 +91,25 @@ def add_members_to_card(card: Card, members: list[User]) -> Card:
 # Batch Delete functions
 
 def delete_projects(projects: list[Project]) -> list[Project]:
-    for project in projects:
-        project.delete()
+    return [project.delete() for project in projects]
         
 def delete_boards(boards: list[Board]) -> list[Board]:
-    for board in boards:
-        board.delete()
+    return [board.delete() for board in boards]
         
 def delete_lists(lists: list[List]) -> list[List]:
-    for list_ in lists:
-        list_.delete()
+    return [list_.delete() for list_ in lists]
         
 def delete_cards(cards: list[Card]) -> list[Card]:
-    for card in cards:
-        card.delete()
+    return [card.delete() for card in cards]
 
 def delete_labels(labels: list[Label]) -> list[Label]:
-    for label in labels:
-        label.delete()
+    return [label.delete() for label in labels]
 
 def delete_users(users: list[User]) -> list[User]:
-    for user in users:
-        user.delete()
+    return [user.delete() for user in users]
         
 def delete_actions(actions: list[Action]) -> list[Action]:
-    for action in actions:
-        action.delete()
+    return [action.delete() for action in actions]
         
 # Batch remove functions
 
