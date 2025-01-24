@@ -283,6 +283,7 @@ class Model(Mapping):
 
         """
         try:
+            self.refresh()
             yield self
         finally:
             self.update()
