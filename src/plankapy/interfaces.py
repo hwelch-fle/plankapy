@@ -372,7 +372,7 @@ class Planka:
         """Create a new user
 
         Danger:
-            Supplied password must be moderately secure
+            Supplied password must be moderately secure or a 400 error will be raised
 
         Args:
             username: Will assign username to `name` and `username`
