@@ -200,7 +200,7 @@ class PasswordAuth(BaseAuth):
             HTTPError: Failed to authenticate
         """
         self.token = JSONHandler(url, endpoint=self.endpoint).post(self.credentials)['item']
-        return f"Bearer {self.token}"
+        return {"Authorization": f"Bearer {self.token}"}
 
 class TokenAuth(BaseAuth):
     """Authentication using a pre-supplied token
@@ -242,7 +242,7 @@ class TokenAuth(BaseAuth):
         Returns:
            Supplied token with `Bearer ` prefix
         """
-        return f"Bearer {self.token}"
+        return {"Authorization": f"Bearer {self.token}"}
 
 # TODO: Implement SSO auth with httpOnlyToken
 # https://github.com/hwelch-fle/plankapy/pull/11/commits/72b8d06208dc961537ef2bcd8d65c11879b8d6b9#

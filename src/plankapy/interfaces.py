@@ -182,7 +182,7 @@ class Planka:
     def _create_session(self) -> None:
         """INTERNAL: Creates a new session with the current authentication method and url"""
         self.handler = JSONHandler(self.url)
-        self.handler.headers['Authorization'] = self.auth.authenticate(self.url)
+        self.handler.headers.update(self.auth.authenticate(self.url))
         self.routes = Routes(self.handler)
     
     @property
