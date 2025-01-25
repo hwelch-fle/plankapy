@@ -641,6 +641,13 @@ class Project(Project_):
                                   noarg=self)
         
         if 'background' in overload:
+            if isinstance(overload['background'], dict): # Handle Noarg case
+                overload['background'] = overload['background']['name']
+                
+            if overload['background'] not in self.gradients:
+                raise ValueError(
+                    f'Invalid gradient: {overload["background"]}'
+                    f'Available gradients: {self.gradients}')
             overload['background'] = {'name': overload['background'], 'type': 'gradient'}
 
         route = self.routes.patch_project(id=self.id)
@@ -649,8 +656,6 @@ class Project(Project_):
 
     def set_background_gradient(self, gradient: Gradient) -> None:
         """Set a background gradient for the project
-        See Also:
-            [Gradient][plankapy.constants.Gradient]: For available gradients
         
         Args:
             gradient (Gradient): Background gradient to set
@@ -660,6 +665,10 @@ class Project(Project_):
             project.set_background_gradient('blue-xchange')
             ```
         """
+        if gradient not in self.gradients:
+            raise ValueError(
+                f'Invalid gradient: {gradient}'
+                f'Available gradients: {self.gradients}')
         self.update(background=gradient)
 
     def set_background_image(self, image: BackgroundImage) -> None:
