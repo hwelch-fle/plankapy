@@ -27,8 +27,6 @@ from .models import (
     User_,
 )
 from .handlers import (
-    TokenAuth, 
-    PasswordAuth, 
     BaseAuth, 
     JSONHandler,
 )
@@ -36,12 +34,8 @@ from .handlers import (
 from .constants import (
     Gradient,
     LabelColor,
-    ActionType,
     BoardRole,
-    Background,
     BackgroundImage,
-    get_position,
-    set_position,
     SortOption,
     ListSorts,
 )
@@ -396,7 +390,7 @@ class Project(Project_):
         """Included data for the project
         
         Warning:
-            This property is meant to be used internally for building objects in the other proeprties
+            This property is meant to be used internally for building objects in the other properties
             It can be directly accessed, but it will only return JSON data and not objects
         
         Returns:
@@ -471,7 +465,7 @@ class Project(Project_):
             name (str): Name of the board
             position (int): Position of the board (default: 0)
             
-        Args: Alterate
+        Args: Alternate
             board (Board): Board instance to create
 
         Returns:
@@ -664,7 +658,7 @@ class Board(Board_):
         """Included data for the board
         
         Warning:
-            This property is meant to be used internally for building objects in the other proeprties
+            This property is meant to be used internally for building objects in the other properties
             It can be directly accessed, but it will only return JSON data and not objects
 
         Returns:
