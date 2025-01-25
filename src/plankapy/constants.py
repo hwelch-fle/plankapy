@@ -96,7 +96,7 @@ SortOption = Literal[
     'Newest First',
 ]
 
-LabelMap = {
+LabelColorHexMap = {
     'berry-red':'#e04556',
     'pumpkin-orange':'#f0982d',
     'lagoon-blue':'#109dc0',
@@ -124,7 +124,7 @@ LabelMap = {
     'light-cocoa':'#87564a',
 }
 
-GradientMap = {
+GradientCSSMap = {
     'ocean_dive':'linear-gradient(to top, #062e53, #1ad0e0)',
     'old_lime':'linear-gradient(to bottom, #7b920a, #add100)',
     'tzepesch_style':'linear-gradient(to bottom, #190a05, #870000)',
@@ -162,8 +162,8 @@ GradientMap = {
 
 # Filter out the gradients that are not in the Gradient type
 # There are some hidden ones here
-GradientMap = {
+GradientCSSMap = {
     k: v
-    for k, v in GradientMap.items()
+    for k, v in GradientCSSMap.items()
     if k in Gradient.__args__
 }
