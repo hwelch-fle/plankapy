@@ -761,7 +761,7 @@ class Board(Board_):
             user
             for user in self.users
             for boardMembership in self.boardMemberships
-            if boardMembership.userId == user.id and boardMembership.canComment
+            if boardMembership.userId == user.id and boardMembership.role == 'editor'
         ]
     
     @property
@@ -775,7 +775,7 @@ class Board(Board_):
             user
             for user in self.users
             for boardMembership in self.boardMemberships
-            if boardMembership.userId == user.id and not boardMembership.canComment
+            if boardMembership.userId == user.id and not boardMembership.role == 'viewer'
         ]
     
     @property
