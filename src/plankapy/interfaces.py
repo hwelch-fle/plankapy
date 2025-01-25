@@ -483,6 +483,20 @@ class Project(Project_):
             for board in self._included['boards']
         ]
     
+    def gradient_css(self) -> str | None:
+        """Get the CSS value for the project gradient
+
+        Note:
+            If the project has no gradient set, this will return `None`
+
+        Returns:
+            CSS value for the gradient
+        """
+        gradient = self.background
+        if gradient.type != 'gradient':
+            return None
+        return self.gradient_to_css[gradient.name]
+
     @overload
     def create_board(self, board: Board) -> Board: ...
 
