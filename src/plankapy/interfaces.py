@@ -957,7 +957,7 @@ class Board(Board_):
         
         # Required arguments with defaults must be manually assigned
         overload['position'] = overload.get('position', 0)
-        overload['color'] = overload.get('color', LabelColor.__args__[0])
+        overload['color'] = overload.get('color', choice(LabelColor.__args__))
         overload['boardId'] = self.id
 
         route = self.routes.post_label(boardId=self.id)
@@ -1307,7 +1307,16 @@ class BoardMembership(BoardMembership_):
                 self.__init__(**membership)
     
 class Label(Label_):
+    """Interface for interacting with planka Labels
     
+    Note:
+        Label Colors are defined in the `LabelColor` Literal
+        currently:
+
+    """
+    colors = LabelColor.__args__
+    colors_to_hex = LabelColorHexMap
+
     @property
     def board(self) -> Board:
         board_route = self.routes.get_board(id=self.boardId)
@@ -1336,11 +1345,24 @@ class Label(Label_):
             model='label', 
             options=('name', 'color', 'position'),
             noarg=self)
-              
+        
+        if 'color' in overload and overload['color'] not in self.colors:
+            raise ValueError(
+                f"Invalid color: {overload['color']}\n"
+                f"Valid colors: {self.colors}")
+
         route = self.routes.patch_label(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
     
+    def hex_color(self) -> str:
+        """Returns the hex color of the label
+        
+        Returns:
+            str: Hex color of the label
+        """
+        return self.colors_to_hex[self.color]
+
     def delete(self) -> Label:
         """Deletes the label
         
