@@ -96,7 +96,7 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
         return {**args[0]} if args else {**kwargs[model]}
 
     # Convert positional to keyword arguments
-    elif args and not kwargs:
+    elif args:
         coded_args = dict(zip(options, args))
         kwargs.update(coded_args)
 
