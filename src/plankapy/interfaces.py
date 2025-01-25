@@ -1379,22 +1379,42 @@ class Card(Card_):
     
     @property
     def creator(self) -> User:
+        """User that created the card
+        
+        Returns:
+            User: Creator of the card
+        """
         user_route = self.routes.get_user(id=self.creatorUserId)
         return User(**user_route()['item']).bind(self.routes)
     
     @property
     def board(self) -> Board:
+        """Board the card belongs to
+        
+        Returns:
+            Board: Board instance
+        """
         board_route = self.routes.get_board(id=self.boardId)
         return Board(**board_route()['item']).bind(self.routes)
     
     @property
     def list(self) -> List:
+        """List the card belongs to
+        
+        Returns:
+            List: List instance
+        """
         for list in self.board.lists:
             if list.id == self.listId:
                 return list
     
     @property
     def labels(self) -> list[Label]:
+        """All labels on the card
+        
+        Returns:
+            List of all labels on the card
+        """
         return [
             cardLabel.label
             for cardLabel in self.board.cardLabels
@@ -1403,6 +1423,11 @@ class Card(Card_):
         
     @property
     def members(self) -> list[User]:
+        """All users assigned to the card
+        
+        Returns:
+            List of all users assigned to the card
+        """
         return [
             cardMembership.user
             for cardMembership in self.board.cardMemberships
@@ -1411,6 +1436,11 @@ class Card(Card_):
       
     @property
     def comments(self) -> list[Action]:
+        """All comments on the card
+        
+        Returns:
+            List of all comments on the card
+        """
         route = self.routes.get_action_index(cardId=self.id)
         return [
             Action(**action).bind(self.routes)
@@ -1419,6 +1449,11 @@ class Card(Card_):
     
     @property
     def tasks(self) -> list[Task]:
+        """All tasks on the card
+        
+        Returns:
+            List of all tasks on the card
+        """
         return [
             task
             for task in self.board.tasks
@@ -1426,23 +1461,64 @@ class Card(Card_):
         ]
     
     def move(self, list: List) -> Card:
+        """Moves the card to a new list
+        
+        Args:
+            list (List): List instance to move the card to
+            
+        Returns:
+            Card: The moved card instance
+        """
         listId = list.id
         self.listId = listId
         self.update()
     
     def duplicate(self) -> Card:
+        """Duplicates the card
+        
+        Returns:
+            Card: The duplicated card instance
+        """
         route = self.routes.post_duplicate_card(id=self.id)
         return Card(**route(**self)['item']).bind(self.routes)
     
     def add_label(self, label: Label) -> CardLabel:
+        """Adds a label to the card
+        
+        Args:
+            label (Label): Label instance to add
+            
+        Returns:
+            CardLabel: New card label instance
+        """
         route = self.routes.post_card_label(cardId=self.id)
         return CardLabel(**route(labelId=label.id, cardId=self.id)['item']).bind(self.routes)
 
     def add_member(self, user: User) -> CardMembership:
+        """Adds a user to the card
+        
+        Args:
+            user (User): User instance to add
+            
+        Returns:
+            CardMembership: New card membership instance
+        """
         route = self.routes.post_card_membership(cardId=self.id)
         return CardMembership(**route(userId=user.id, cardId=self.id)['item']).bind(self.routes)
     
     def add_comment(self, comment: str) -> Action:
+        """Adds a comment to the card
+        
+        Note:
+            Comments can only be added by the authenticated user, all comments made
+            through plankapy will be attributed to the user in `planka.me`
+
+        Args:
+            comment (str): Comment to add
+            
+        Returns:
+            Action: New comment action instance
+        """
         route = self.routes.post_comment_action(cardId=self.id)        
         return Action(**route(text=comment, cardId=self.id)['item']).bind(self.routes)
 
@@ -1454,6 +1530,20 @@ class Card(Card_):
                  isCompleted: bool=False, isDeleted: bool=False) -> Task: ...
         
     def add_task(self, *args, **kwargs) -> Task:
+        """Adds a task to the card
+
+        Args:
+            name (str): Name of the task (required)
+            position (int): Position of the task (default: 0)
+            isCompleted (bool): Whether the task is completed (default: False)
+            isDeleted (bool): Whether the task is deleted (default: False)
+
+        Args: Alternate
+            task (Task): Task instance to create
+
+        Returns:
+            Task: New task instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='task', 
@@ -1469,8 +1559,33 @@ class Card(Card_):
 
         return Task(**route(**overload)['item']).bind(self.routes)
 
-    def add_stopwatch(self) -> None:
-        """Adds a stopwatch to the card"""
+    def add_stopwatch(self) -> Stopwatch:
+        """Adds a stopwatch to the card if there is not one already
+        
+        Warning:
+            The stopwatch stored in the Card instance dictionary is actually a dictionary
+            that is used to update the stopwatch on Planka. When you access the stopwatch
+            attribute with `card.stopwatch`, a `Stopwatch` instance is generated. This is
+            an implementation detail to keep the stopwatch interface separate from the Card
+            interface.
+        
+        Example:
+            ```python
+            card.add_stopwatch()
+            card.stopwatch
+            >>> Stopwatch(startedAt=None, total=0)
+            card.__dict__['stopwatch']
+            >>> {'startedAt': None, 'total': 0}
+            card.stopwatch.start()
+            card.stopwatch
+            >>> Stopwatch(startedAt=datetime.datetime(2024, 9, 30, 0, 0, 0), total=0)
+            card.__dict__['stopwatch']
+            >>> {'startedAt': '2024-9-30T00:00:00Z', 'total': 0}
+            ```
+        
+        Returns:
+            Stopwatch: A stopwatch instance used to track time on the card
+        """
         self.refresh()
 
         if self.stopwatch:
@@ -1478,29 +1593,71 @@ class Card(Card_):
         
         with self.editor():
             self.stopwatch = {**Stopwatch(startedAt=None, total=0).stop()}
+        
+        return self.stopwatch
 
-    def remove_label(self, label: Label) -> None:
-        """Removes a label from the card, does not delete the label"""
+    def remove_label(self, label: Label) -> Card:
+        """Removes a label from the card
+        
+        Args:
+            label (Label): Label instance to remove
+            
+        Note:
+            This method will remove the label from the card, but the label itself will not be deleted
+
+        Returns:
+            Card: The card instance with the label removed   
+        """
         for card_label in self.board.cardLabels:
             if card_label.cardId == self.id and card_label.labelId == label.id:
                 card_label.delete()
+        return self
 
-    def remove_member(self, user: User) -> None:
+    def remove_member(self, user: User) -> Card:
+        """Removes a user from the card
+        
+        Args:
+            user (User): User instance to remove
+            
+        Note:
+            This method will remove the user from the card, but the user itself will not be deleted
+            
+        Returns:
+            Card: The card instance with the user removed
+        """
         for card_membership in self.board.cardMemberships:
             if card_membership.cardId == self.id and card_membership.userId == user.id:
                 card_membership.delete()
+        return self
     
-    def remove_comment(self, comment_action: Action) -> None:
-        """Pass a comment from self.comments to remove it"""
+    def remove_comment(self, comment_action: Action) -> Card:
+        """Pass a comment from self.comments to remove it
+        
+        Args:
+            comment_action (Action): Comment instance to remove
+            
+        Note:
+            This method will remove the comment from the card, but the comment itself will not be deleted
+            
+        Returns:
+            Card: The card instance with the comment removed
+        """
         for comment in self.comments:
             if comment.id == comment_action.id:
                 comment.delete()
+        return self
 
-    def remove_stopwatch(self) -> None:
-        """Removes the stopwatch from the card"""
+    def remove_stopwatch(self) -> Stopwatch:
+        """Removes the stopwatch from the card
+        
+        Returns:
+            Stopwatch: The stopwatch instance that was removed
+        """
         self.refresh()
         with self.editor():
+            _stopwatch = self.stopwatch
             self.stopwatch = None
+        return _stopwatch
 
     # Stopwatch handling is a bit weird, this is a hacky override to always show the user a Stopwatch instance
     def __getattribute__(self, name):
@@ -1532,6 +1689,30 @@ class Card(Card_):
                     coverAttachmentId: int=None, isSubscribed: bool=None) -> Card: ...
     
     def update(self, *args, **kwargs) -> Card:
+        """Updates the card with new values
+        
+        Args:
+            name (str): Name of the card (optional)
+            position (int): Position of the card (optional)
+            description (str): Description of the card (optional)
+            dueDate (datetime): Due date of the card (optional)
+            isDueDateCompleted (bool): Whether the due date is completed (optional)
+            stopwatch (Stopwatch): Stopwatch of the card (optional)
+            boardId (int): Board id of the card (optional)
+            listId (int): List id of the card (optional)
+            creatorUserId (int): Creator user id of the card (optional)
+            coverAttachmentId (int): Cover attachment id of the card (optional)
+            isSubscribed (bool): Whether the card is subscribed (optional)
+        
+        Args: Alternate
+            card (Card): Card instance to update (required)
+            
+        Note:
+            If no arguments are provided, the card will update itself with the current values stored in its attributes
+        
+        Returns:
+            Card: Updated card instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='card', 
@@ -1560,6 +1741,11 @@ class Card(Card_):
         return self
     
     def refresh(self):
+        """Refreshes the card data
+        
+        Note:
+            This method is used to update the card instance with the latest data from the server
+        """
         route = self.routes.get_card(id=self.id)
         self.__init__(**route()['item'])
         
@@ -1567,16 +1753,31 @@ class CardLabel(CardLabel_):
     
     @property
     def card(self) -> Card:
+        """Card the label is attached to
+        
+        Returns:
+            Card: Card instance
+        """
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
     
     @property
     def board(self) -> Board:
+        """Board the card belongs to
+        
+        Returns:
+            Board: Board instance
+        """
         board_route = self.routes.get_board(id=self.card.boardId)
         return Board(**board_route()['item']).bind(self.routes)
     
     @property
     def label(self) -> Label:
+        """Label attached to the card
+        
+        Returns:
+            Label: Label instance
+        """
         for label in self.board.labels:
             if label.id == self.labelId:
                 return label
@@ -1599,11 +1800,21 @@ class CardMembership(CardMembership_):
     
     @property
     def user(self) -> User:
+        """User that is a member of the card
+        
+        Returns:
+            User: User instance
+        """
         user_route = self.routes.get_user(id=self.userId)
         return User(**user_route()['item']).bind(self.routes)
     
     @property
     def card(self) -> Card:
+        """Card the user is a member of
+        
+        Returns:
+            Card: Card instance
+        """
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
 
@@ -1625,11 +1836,21 @@ class CardSubscription(CardSubscription_):
     
     @property
     def user(self) -> User:
+        """User that is subscribed to the card
+        
+        Returns:
+            User: User instance
+        """
         user_route = self.routes.get_user(id=self.userId)
         return User(**user_route()['item']).bind(self.routes)
     
     @property
     def card(self) -> Card:
+        """Card the user is subscribed to
+        
+        Returns:
+            Card: Card instance
+        """
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
 
@@ -1637,6 +1858,11 @@ class IdentityUserProvider(IdentityProviderUser_):
     
     @property
     def user(self) -> User:
+        """User that is a member of the identity provider
+        
+        Returns:
+            User: User instance
+        """
         user_route = self.routes.get_user(id=self.userId)
         return User(**user_route()['item']).bind(self.routes)
 
@@ -1644,11 +1870,21 @@ class List(List_):
     
     @property
     def board(self) -> Board:
+        """Board the list belongs to
+        
+        Returns:
+            Board: Board instance
+        """
         board_route = self.routes.get_board(id=self.boardId)
         return Board(**board_route()['item']).bind(self.routes)
     
     @property
     def cards(self) -> list[Card]:
+        """All cards in the list
+        
+        Returns:
+            List of all cards in the list
+        """
         return [
             card
             for card in self.board.cards
@@ -1667,6 +1903,27 @@ class List(List_):
                     coverAttachmentId: int=None, isSubscribed: bool=None) -> Card: ...
     
     def create_card(self, *args, **kwargs) -> Card:
+        """Creates a card in the list
+        
+        Args:
+            name (str): Name of the card (required)
+            position (int): Position of the card (default: 0)
+            description (str): Description of the card (optional)
+            dueDate (datetime): Due date of the card (optional)
+            isDueDateCompleted (bool): Whether the due date is completed (optional)
+            stopwatch (Stopwatch): Stopwatch of the card (optional)
+            boardId (int): Board id of the card (optional)
+            listId (int): List id of the card (optional)
+            creatorUserId (int): Creator user id of the card (optional)
+            coverAttachmentId (int): Cover attachment id of the card (optional)
+            isSubscribed (bool): Whether the card is subscribed (optional)
+            
+        Args: Alternate
+            card (Card): Card instance to create
+            
+        Returns:
+            Card: New card instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='card', 
@@ -1689,15 +1946,19 @@ class List(List_):
         route(**{'type': ListSorts[sort]})
 
     def sort_by_name(self) -> None:
+        """Sorts cards in the list by name"""
         self._sort('Name')
     
     def sort_by_due_date(self) -> None:
+        """Sorts cards in the list by due date"""
         self._sort('Due date')
         
     def sort_by_newest(self) -> None:
+        """Sorts cards in the list by newest first"""
         self._sort('Newest First')
     
     def sort_by_oldest(self) -> None:
+        """Sorts cards in the list by oldest first"""
         self._sort('Oldest First')
     
     def delete(self) -> List:
@@ -1724,6 +1985,21 @@ class List(List_):
     def update(self, name: str=None, position: int=None) -> List: ...
 
     def update(self, *args, **kwargs) -> List:
+        """Updates the list with new values
+        
+        Args:
+            name (str): Name of the list (optional)
+            position (int): Position of the list (optional)
+            
+        Args: Alternate
+            _list (List): List instance to update (required)
+            
+        Note:
+            If no arguments are provided, the list will update itself with the current values stored in its attributes
+            
+        Returns:
+            List: Updated list instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='list', 
