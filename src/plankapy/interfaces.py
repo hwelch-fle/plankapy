@@ -1291,7 +1291,8 @@ class Notification(Notification_):
         Note:
             There is no way to delete a notification, only mark it as read
         """
-        self.update(isRead=True)
+        with self.editor():
+            self.isRead = True
     
     def refresh(self) -> None:
         """Refreshes the notification data"""
