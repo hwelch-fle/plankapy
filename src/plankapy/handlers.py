@@ -146,10 +146,9 @@ class JSONHandler(urllibHandler):
 class BaseAuth(Protocol):
     endpoint = None
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: {self.endpoint}"
+        return f"< {self.__class__.__name__}: {self.endpoint} >"
     
-    def authenticate(self) -> str:
-        raise NotImplementedError
+    def authenticate(self) -> str: ...
 
 class PasswordAuth(BaseAuth):
     """Authentication using a username or email and password
@@ -255,9 +254,18 @@ class HTTPOnlyAuth(PasswordAuth):
 
     def authenticate(self, url: str):
         """"""
-        import requests
+        try:
+            import requests
+        except (ModuleNotFoundError, ImportError) as e:
+            e.add_note("`requests` library required for cookie base authentication\n"
+                       "If you need this functionality, install it with `pip install requests`\n"
+                       "otherwise, use one of the other Authentication protocols")
+            raise e
         response = requests.post(urljoin(url, self.endpoint, '?withHttpOnlyToken=true'), json=self.credentials)
         headers = {}
         headers['Authorization'] = f"Bearer {response.json()['item']}"
-        headers['Cookie'] = f"httpOnlyToken={response.cookies['httpOnlyToken']}"
+        headers['Cookie'] = f"httpOnlyToken={response.cookies.get('httpOnlyToken', default='')}"
         return headers
+    
+    import pip
+    pip.main()
