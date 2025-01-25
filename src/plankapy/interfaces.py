@@ -707,6 +707,9 @@ class Board(Board_):
         and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
         property access will always provide the most up to date information. 
     """
+
+    roles = BoardRole.__args__
+
     @property
     def _included(self) -> JSONHandler.JSONResponse:
         """Included data for the board
