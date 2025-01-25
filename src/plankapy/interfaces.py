@@ -1300,6 +1300,20 @@ class BoardMembership(BoardMembership_):
         self.__init__(**route(**overload)['item'])
         return self
     
+    def delete(self) -> tuple[User, Board]:
+        """Deletes the board membership relation
+        
+        Danger:
+            This action is irreversible and cannot be undone
+            
+        Returns:
+            User: The user that was removed from the board
+        """
+        self.refresh()
+        route = self.routes.delete_board_membership(id=self.id)
+        route()
+        return (self.user, self.board)
+
     def refresh(self) -> None:
         """Refreshes the board membership data"""
         for membership in self.board.boardMemberships:
