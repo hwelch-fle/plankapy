@@ -1333,11 +1333,21 @@ class Label(Label_):
 
     @property
     def board(self) -> Board:
+        """Board the label belongs to
+        
+        Returns:
+            Board: Board instance
+        """
         board_route = self.routes.get_board(id=self.boardId)
         return Board(**board_route()['item']).bind(self.routes)
     
     @property
     def cards(self) -> list[Card]:
+        """All cards with the label in the board
+        
+        Returns:
+            List of all cards with the label in the board
+        """
         return [
             cardLabel.card
             for cardLabel in self.board.cardLabels
@@ -1354,6 +1364,29 @@ class Label(Label_):
     def update(self, name: str=None, color: LabelColor=None, position: int=None) -> Label: ...
     
     def update(self, *args, **kwargs) -> Label:
+        """Updates the label with new values
+        
+        Tip:
+            Use `.editor()` context manager to update the label with the user as an editor
+
+            Example:
+            ```python
+            with label.editor():
+                label.name = 'My New Label'
+                label.color = 'lagoon-blue'
+            ``
+
+        Args:
+            name (str): Name of the label (optional)
+            color (LabelColor): Color of the label (optional)
+            position (int): Position of the label (optional)
+            
+        Args: Alternate
+            label (Label): Label instance to update with
+            
+        Returns:
+            Label: Updated label instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='label', 
@@ -1566,6 +1599,9 @@ class Card(Card_):
     def duplicate(self) -> Card:
         """Duplicates the card
         
+        Note:
+            Duplicating a card will always insert it one slot below the original card
+
         Returns:
             Card: The duplicated card instance
         """
@@ -1659,19 +1695,19 @@ class Card(Card_):
             an implementation detail to keep the stopwatch interface separate from the Card
             interface.
         
-        Example:
-            ```python
-            card.add_stopwatch()
-            card.stopwatch
-            >>> Stopwatch(startedAt=None, total=0)
-            card.__dict__['stopwatch']
-            >>> {'startedAt': None, 'total': 0}
-            card.stopwatch.start()
-            card.stopwatch
-            >>> Stopwatch(startedAt=datetime.datetime(2024, 9, 30, 0, 0, 0), total=0)
-            card.__dict__['stopwatch']
-            >>> {'startedAt': '2024-9-30T00:00:00Z', 'total': 0}
-            ```
+            Example:
+                ```python
+                card.add_stopwatch()
+                card.stopwatch
+                >>> Stopwatch(startedAt=None, total=0)
+                card.__dict__['stopwatch']
+                >>> {'startedAt': None, 'total': 0}
+                card.stopwatch.start()
+                card.stopwatch
+                >>> Stopwatch(startedAt=datetime.datetime(2024, 9, 30, 0, 0, 0), total=0)
+                card.__dict__['stopwatch']
+                >>> {'startedAt': '2024-9-30T00:00:00Z', 'total': 0}
+                ```
         
         Returns:
             Stopwatch: A stopwatch instance used to track time on the card
@@ -1781,6 +1817,15 @@ class Card(Card_):
     def update(self, *args, **kwargs) -> Card:
         """Updates the card with new values
         
+        Tip:
+            It's recommended to use a `card.editor()` context manager to update the card
+
+            Example:
+            ```python
+            with card.editor():
+                card.name='New Name'
+            ``
+
         Args:
             name (str): Name of the card (optional)
             position (int): Position of the card (optional)
@@ -2036,19 +2081,35 @@ class List(List_):
         route(**{'type': ListSorts[sort]})
 
     def sort_by_name(self) -> None:
-        """Sorts cards in the list by name"""
+        """Sorts cards in the list by name
+        
+        Note:
+            After sorting, a call to `list.cards` will return a sorted list of cards
+        """
         self._sort('Name')
     
     def sort_by_due_date(self) -> None:
-        """Sorts cards in the list by due date"""
+        """Sorts cards in the list by due date
+        
+        Note:
+            After sorting, a call to `list.cards` will return a sorted list of cards
+        """
         self._sort('Due date')
         
     def sort_by_newest(self) -> None:
-        """Sorts cards in the list by newest first"""
+        """Sorts cards in the list by newest first
+        
+        Note:
+            After sorting, a call to `list.cards` will return a sorted list of cards
+        """
         self._sort('Newest First')
     
     def sort_by_oldest(self) -> None:
-        """Sorts cards in the list by oldest first"""
+        """Sorts cards in the list by oldest first
+        
+        Note:
+            After sorting, a call to `list.cards` will return a sorted list of cards
+        """
         self._sort('Oldest First')
     
     def delete(self) -> List:
@@ -2077,6 +2138,16 @@ class List(List_):
     def update(self, *args, **kwargs) -> List:
         """Updates the list with new values
         
+        Tip:
+            If you want to update a list, it's better to use the `editor()` context manager
+
+            Example:
+            ```python
+            with list.editor():
+                list.name = 'New List Name'
+                list.position = 1
+            ```
+
         Args:
             name (str): Name of the list (optional)
             position (int): Position of the list (optional)
@@ -2110,11 +2181,21 @@ class ProjectManager(ProjectManager_):
     
     @property
     def user(self) -> User:
+        """User that is a manager of the project
+        
+        Returns:
+            User: User instance
+        """
         user_route = self.routes.get_user(id=self.userId)
         return User(**user_route()['item']).bind(self.routes)
     
     @property
     def project(self) -> Project:
+        """Project the user is a manager of
+
+        Returns:
+            Project: Project instance
+        """
         project_route = self.routes.get_project(id=self.projectId)
         return Project(**project_route()['item']).bind(self.routes)
     
@@ -2155,6 +2236,31 @@ class Task(Task_):
     def update(self, name: str=None, isCompleted: bool=None) -> Task: ...
 
     def update(self, *args, **kwargs) -> Task:
+        """Updates the task with new values
+        
+        Tip:
+            If you want to update a task, it's better to use the `editor()` context manager
+
+            Example:
+            ```python
+            with task.editor():
+                task.name = 'New Task Name'
+                task.isCompleted = True
+            ```
+
+        Args:
+            name (str): Name of the task (optional)
+            isCompleted (bool): Whether the task is completed (optional)
+            
+        Args: Alternate
+            task (Task): Task instance to update (required)
+        
+        Note:
+            If no arguments are provided, the task will update itself with the current values stored in its attributes
+            
+        Returns:
+            Task: Updated task instance
+        """
         overload = parse_overload(
             args, kwargs, 
             model='task', 
