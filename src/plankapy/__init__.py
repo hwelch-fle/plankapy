@@ -12,6 +12,9 @@
 
 __version__ = "2.0.1"
 
+# flake8: noqa 
+# imports elevate these objects to the root module
+
 from .interfaces import (
     Planka,
     Project,
@@ -36,6 +39,7 @@ from .handlers import (
     BaseAuth,
     PasswordAuth,
     TokenAuth,
+    HTTPOnlyAuth,
 )
 
 from .constants import (
@@ -46,5 +50,7 @@ from .constants import (
     Background,
     BackgroundImage,
     BoardRole,
-    OFFSET,
 )
+
+# Allow access to submodules
+from . import helpers, constants, handlers, interfaces, models, routes
