@@ -2,7 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Self, Any, Mapping, Generator
+from typing import Any, Mapping, Generator
+## Add fallbacks if typing imports fail 3.8 compatibility
+try:
+    from typing import Self
+except ImportError:
+    pass
+
+try:
+    from typing import Optional
+except ImportError:
+    pass
+
 from contextlib import contextmanager
 import json
 import pickle
