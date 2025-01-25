@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Type, overload
 from datetime import datetime
 
+from random import choice
 from urllib.request import HTTPError
 
 from .routes import Routes
@@ -34,7 +35,9 @@ from .handlers import (
 
 from .constants import (
     Gradient,
+    GradientCSSMap,
     LabelColor,
+    LabelColorHexMap,
     BoardRole,
     BackgroundImage,
     SortOption,
