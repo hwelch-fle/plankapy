@@ -1348,6 +1348,28 @@ class BoardMembership(BoardMembership_):
             with boardMembership.editor():
                 boardMembership.role = 'editor'
             ```
+        
+        Warning:
+            canComment will always be set to True if the role is 'editor', if a context is used as a user is 
+            switched to a viewer, they will maintain their ability to comment unless explicitly set to False
+
+            Example:
+            ```python
+            boardMembership.role
+            >>> 'editor'
+
+            with boardMembership.editor():
+                boardMembership.role = 'viewer'
+\            
+            boardMembership.canComment
+            >>> True
+
+            # Using .update() will not automatically set canComment to False
+            # on role change unless specified
+            boardMembership.update(role='viewer')
+            boardMembership.canComment
+            >>> False
+            ```
 
         Args:
             role (BoardRole): Role of the user in the board (default: None)
