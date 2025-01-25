@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Type, overload
 from datetime import datetime
 
+from urllib.request import HTTPError
 
 from .routes import Routes
 from .models import (
@@ -364,18 +365,40 @@ class Planka:
         
     def create_user(self, username: str, email: str, password: str, name: str=None) -> User:
         """Create a new user
-
-        Danger:
-            Supplied password must be moderately secure or a 400 error will be raised
-
+        
         Args:
             username: Will assign username to `name` and `username`
             email: 
             password: Must be moderately secure or will raise a 400 error!
             name: The full name of the user (default: `username` value)
         """
+
+        username = username.strip()
+        if not username.islower():
+            print('Warning: Usernames are converted to lowercase')
+            username = username.lower()
+
+        for user in self.users:
+            if user.username == username:
+                raise ValueError(f'Username {username} already exists. '
+                                 'Please use a different username')
+            if user.email == email:
+                raise ValueError(f'Email {email} already exists. '
+                                 'Please use a different email address')
+            
         route = self.routes.post_user()
-        return User(**route(username=username, name=name or username, password=password, email=email)['item']).bind(self.routes)
+        try:
+            return User(**route(username=username, name=name or username, password=password, email=email)['item']).bind(self.routes)
+        except HTTPError as e:
+            if e.code == 400: # Invalid password, email, or username
+                raise ValueError(
+                    f'Failed to create user {username}:\n'
+                    '\tTry: \n'
+                    '\t\tA more secure password\n'
+                    '\t\tValidating the user\'s email address\n'
+                    '\t\tChecking that the username has no whitespace') from e
+            else: # Unknown error
+                raise e
 
 class Project(Project_):
     """Interface for interacting with planka Projects and their included sub-objects
