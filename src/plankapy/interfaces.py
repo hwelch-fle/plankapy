@@ -403,11 +403,14 @@ class Planka:
 class Project(Project_):
     """Interface for interacting with planka Projects and their included sub-objects
     
-    Note:
-        All implemented public properties return API responses with accessed. This means that the values are not cached 
-        and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
-        property access will always provide the most up to date information.
+    Attributes:
+        gradients (list[Gradient]): All available gradients
+        gradient_to_css (dict[Gradient, str]): Mapping of gradient names to CSS values
     """
+
+    gradients = Gradient.__args__
+    gradient_to_css = GradientCSSMap
+
     @property
     def _included(self) -> JSONHandler.JSONResponse:
         """Included data for the project
