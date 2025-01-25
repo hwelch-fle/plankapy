@@ -966,7 +966,7 @@ class Board(Board_):
         route = self.routes.post_label(boardId=self.id)
         return Label(**route(**overload)['item']).bind(self.routes)
 
-    def add_user(self, user: User, canComment: bool=False) -> BoardMembership:
+    def add_user(self, user: User, role: BoardRole='viewer', canComment: bool=False) -> BoardMembership:
         """Adds a user to the board
         
         Args:
@@ -976,7 +976,11 @@ class Board(Board_):
         Returns:
             BoardMembership: New board membership
         """
-        role = 'editor' if canComment else 'viewer'
+        if role not in self.roles:
+            raise ValueError(f'Invalid role: {role}')
+        
+        if role == 'editor':
+            canComment = True
         route = self.routes.post_board_membership(boardId=self.id)
         return BoardMembership(**route(userId=user.id, boardId=self.id, canComment=canComment, role=role)['item']).bind(self.routes)
     
