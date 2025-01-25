@@ -1364,6 +1364,18 @@ class BoardMembership(BoardMembership_):
             options=('role', 'canComment'),
             noarg=self)
         
+        if 'role' in overload:
+            if overload['role'] not in self.roles:
+                raise ValueError(
+                    f'Invalid role: {overload["role"]}'
+                    f'Available roles: {self.roles}')
+            
+            if overload['role'] == 'editor': # Editors can always comment
+                overload['canComment'] = True
+            
+            if overload['role'] == 'viewer': # Viewers can only comment if explicitly set
+                overload['canComment'] = overload.get('canComment', False)
+
         route = self.routes.patch_board_membership(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
