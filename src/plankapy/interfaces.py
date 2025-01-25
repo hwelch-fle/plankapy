@@ -1215,19 +1215,38 @@ class User(User_):
         self.__init__(**route()['item'])
 
 class Notification(Notification_):
+    """Interface for interacting with planka Notifications
     
+    Note:
+        Only notifications that are associated with the current user can be accessed
+    """
     @property
     def user(self) -> User:
+        """User that the notification is associated with
+        
+        Returns:
+            User: User instance
+        """
         user_route = self.routes.get_user(id=self.userId)
         return User(**user_route()['item']).bind(self.routes)
     
     @property
     def action(self) -> Action:
+        """Action that the notification is associated with
+        
+        Returns:
+            Action: Action instance
+        """
         action_route = self.routes.get_action(id=self.actionId)
         return Action(**action_route()['item']).bind(self.routes)
     
     @property
     def card(self) -> Card:
+        """Card that the notification is associated with
+        
+        Returns:
+            Card: Card instance
+        """
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
     
@@ -1241,6 +1260,21 @@ class Notification(Notification_):
     def update(self, isRead: bool=None): ...
     
     def update(self, *args, **kwargs) -> Notification:
+        """Updates the notification with new values
+        
+        Note:
+            The only value that can be updated is the 'isRead' value. There is no way to delete a notification
+            use the `.mark_as_read()` method to mark the notification as read
+
+        Args:
+            isRead (bool): Whether the notification is read (default: None)
+            
+        Args: Alternate
+            notification (Notification): Notification instance to update with
+
+        Note:
+            If no arguments are provided, the notification will update itself with the current values stored in its attributes
+        """
         overload = parse_overload(
             args, kwargs, 
             model='notification', 
@@ -1253,6 +1287,9 @@ class Notification(Notification_):
     
     def mark_as_read(self) -> None:
         """Marks the notification as read
+        
+        Note:
+            There is no way to delete a notification, only mark it as read
         """
         self.update(isRead=True)
     
@@ -1262,14 +1299,28 @@ class Notification(Notification_):
         self.__init__(**route()['item'])
 
 class BoardMembership(BoardMembership_):
+    """Interface for interacting with planka Board Memberships
     
+    Note:
+        Only memberships that the current user has manager access to can be seen
+    """
     @property
     def user(self) -> User:
+        """User that the membership is associated with
+        
+        Returns:
+            User: User instance
+        """
         user_route = self.routes.get_user(id=self.userId)
         return User(**user_route()['item']).bind(self.routes)
     
     @property
     def board(self) -> Board:
+        """Board that the membership is associated with
+        
+        Returns:
+            Board: Board instance
+        """
         board_route = self.routes.get_board(id=self.boardId)
         return Board(**board_route()['item']).bind(self.routes)
     
@@ -1282,21 +1333,31 @@ class BoardMembership(BoardMembership_):
     @overload
     def update(self, role: BoardRole=None, canComment: bool=None): ...
     
-    def delete(self) -> tuple[User, Board]:
-        """Deletes the board membership relation
-        
-        Danger:
-            This action is irreversible and cannot be undone
-            
-        Returns:
-            User: The user that was removed from the board
-        """
-        self.refresh()
-        route = self.routes.delete_board_membership(id=self.id)
-        route()
-        return (self.user, self.board)
-    
     def update(self, *args, **kwargs) -> BoardMembership:
+        """Updates the board membership with new values
+        
+        Tip:
+            Use `.editor()` context manager to update the board membership with the user as an editor
+
+            Example:
+            ```python
+            with boardMembership.editor():
+                boardMembership.role = 'editor'
+            ```
+
+        Args:
+            role (BoardRole): Role of the user in the board (default: None)
+            canComment (bool): Whether the user can comment on the board (default: None)
+        
+        Args: Alternate
+            boardMembership (BoardMembership): Board membership instance to update with
+        
+        Returns:
+            BoardMembership: Updated board membership instance
+
+        Note:
+            If no arguments are provided, the board membership will update itself with the current values stored in its attributes
+        """
         overload = parse_overload(
             args, kwargs, 
             model='boardMembership', 
