@@ -539,6 +539,15 @@ class CardMembership_(Model):
 
 @dataclass(eq=False)
 class CardSubscription_(Model):
+    """Card Subscription Model
+    
+    Attributes:
+        id (int): The ID of the card subscription
+        cardId (int): The ID of the card the subscription is associated with
+        userId (int): The ID of the user the subscription is associated with
+        createdAt (datetime): The creation date of the card subscription
+        updatedAt (datetime): The last update date of the card subscription    
+    """
     id: Optional[int]=Unset
     cardId: Optional[int]=Required
     userId: Optional[int]=Required
@@ -548,6 +557,16 @@ class CardSubscription_(Model):
 
 @dataclass(eq=False)
 class IdentityProviderUser_(Model):
+    """Identity Provider User Model
+    
+    Attributes:
+        id (int): The ID of the identity provider user
+        issuer (str): The issuer of the identity provider user
+        sub (str): The sub of the identity provider user
+        userId (int): The ID of the user the identity provider user is associated with
+        createdAt (datetime): The creation date of the identity provider user
+        updatedAt (datetime): The last update date of the identity provider user
+    """
     id: Optional[int]=Unset
     issuer: Optional[str]=Unset
     sub: Optional[str]=Unset
@@ -557,6 +576,17 @@ class IdentityProviderUser_(Model):
 
 @dataclass(eq=False)
 class Label_(Model):
+    """Label Model
+    
+    Attributes:
+        id (int): The ID of the label
+        name (str): The name of the label
+        position (int): The position of the label
+        color (str): The color of the label
+        boardId (int): The ID of the board the label is associated with
+        createdAt (datetime): The creation date of the label
+        updatedAt (datetime): The last update date of the label
+    """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -567,6 +597,16 @@ class Label_(Model):
 
 @dataclass(eq=False)
 class List_(Model):
+    """List Model
+    
+    Attributes:
+        id (int): The ID of the list
+        name (str): The name of the list
+        position (int): The position of the list
+        boardId (int): The ID of the board the list is associated with
+        createdAt (datetime): The creation date of the list
+        updatedAt (datetime): The last update date of the list
+    """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -575,7 +615,18 @@ class List_(Model):
     updatedAt: Optional[str]=Unset
 
 @dataclass(eq=False)
-class Notification_(Model): 
+class Notification_(Model):
+    """Notification Model
+    
+    Attributes:
+        id (int): The ID of the notification
+        isRead (bool): The read status of the notification
+        userId (int): The ID of the user the notification is associated with
+        actionId (int): The ID of the action the notification is associated with
+        cardId (int): The ID of the card the notification is associated with
+        createdAt (datetime): The creation date of the notification
+        updatedAt (datetime): The last update date of the notification
+    """
     id: Optional[int]=Unset
     isRead: bool=Required
     userId: Optional[int]=Required
@@ -586,6 +637,16 @@ class Notification_(Model):
 
 @dataclass(eq=False)
 class Project_(Model):
+    """Project Model
+    
+    Attributes:
+        id (int): The ID of the project
+        name (str): The name of the project
+        background (Background): The background of the project
+        backgroundImage (BackgroundImage): The background image of the project
+        createdAt (datetime): The creation date of the project
+        updatedAt (datetime): The last update date of the project
+    """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     # Background overrides backgroundImage
@@ -596,6 +657,15 @@ class Project_(Model):
     
 @dataclass(eq=False)
 class ProjectManager_(Model):
+    """Project Manager Model
+    
+    Attributes:
+        id (int): The ID of the project manager
+        projectId (int): The ID of the project the manager is associated with
+        userId (int): The ID of the user the manager is associated with
+        createdAt (datetime): The creation date of the project manager
+        updatedAt (datetime): The last update date of the project manager
+    """
     id: Optional[int]=Unset
     projectId: Optional[int]=Required
     userId: Optional[int]=Required
@@ -604,6 +674,17 @@ class ProjectManager_(Model):
 
 @dataclass(eq=False)
 class Task_(Model):
+    """Task Model
+
+    Attributes:
+        id (int): The ID of the task
+        name (str): The name of the task
+        position (int): The position of the task
+        isCompleted (bool): The completion status of the task
+        cardId (int): The ID of the card the task is associated with
+        createdAt (datetime): The creation date of the task
+        updatedAt (datetime): The last update date of the task
+    """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
@@ -614,6 +695,28 @@ class Task_(Model):
 
 @dataclass(eq=False)
 class User_(Model):
+    """User Model
+    
+    Attributes:
+        id (int): The ID of the user
+        name (str): The name of the user
+        username (str): The username of the user
+        email (str): The email of the user
+        language (str): The language of the user
+        organization (str): The organization of the user
+        phone (str): The phone of the user
+        avatarUrl (str): The avatar URL of the user
+        isSso (bool): The SSO status of the user
+        isAdmin (bool): The admin status of the user
+        isDeletionLocked (bool): The deletion lock status of the user
+        isLocked (bool): The lock status of the user
+        isRoleLocked (bool): The role lock status of the user
+        isUsernameLocked (bool): The username lock status of the user
+        subscribeToOwnCards (bool): The subscription status of the user
+        createdAt (datetime): The creation date of the user
+        updatedAt (datetime): The last update date of the user
+        deletedAt (datetime): The deletion date of the user
+    """
     id: Optional[int]=Unset
     name: Optional[str]=Required
     username: Optional[str]=Unset
