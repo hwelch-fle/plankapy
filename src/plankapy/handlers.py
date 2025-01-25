@@ -246,5 +246,13 @@ class TokenAuth(BaseAuth):
 
 # TODO: Implement SSO auth with httpOnlyToken
 # https://github.com/hwelch-fle/plankapy/pull/11/commits/72b8d06208dc961537ef2bcd8d65c11879b8d6b9#
-class HTTPOnlyAuth(BaseAuth): ...
+class HTTPOnlyAuth(PasswordAuth): 
+    """Authentication using an httpOnlyToken"""
 
+    def authenticate(self, url: str):
+        import requests
+        response = requests.post(urljoin(url, self.endpoint), '?withHttpOnlyToken=true')
+        headers = {}
+        headers['Authorization'] = f"Bearer {response.json()['item']}"
+        headers['Cookie'] = f"httpOnlyToken={response.cookies['httpOnlyToken']}"
+        return headers
