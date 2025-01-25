@@ -1,31 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, TypeAlias
-
-# All positions in Planka are multples of this number
-OFFSET = 65535
-
-# Sometimes elements get set to a half offset value
-HALF_OFFSET = 32767.5
-
-def get_position(value: int, zero_index: bool=False) -> int:
-    """Converts a Planka position to an indexed position
-    e.g. 65535 -> 1, 131070 -> 2, 196605 -> 3
-    Args:
-        value (int): The Planka position
-        zero_index (bool, optional): Whether to use 0-indexed positions. Defaults to False.
-    """
-    if value % OFFSET == HALF_OFFSET:
-        return 1
-    return int(value / OFFSET) - zero_index
-
-def set_position(value: int, zero_index: bool=False) -> int:
-    """Converts an indexed position to a Planka position
-    e.g. 1 -> 65535, 2 -> 131070, 3 -> 196605
-    Args:
-        value (int): The indexed position
-        zero_index (bool, optional): Whether to use 0-indexed positions. Defaults to False.
-    """
-    return int(value * OFFSET) - zero_index
+from typing import Literal
 
 # From https://github.com/plankanban/planka/blob/master/server/api/models/Action.js
 ActionType = Literal[
