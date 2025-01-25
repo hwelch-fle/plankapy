@@ -23,7 +23,7 @@ def test_base_model():
         assert hash(instance) == instance.id, "Hash should be equal to id"
         assert instance == instance2, "instances with same `id` should be equal"
     
-    except AssertionError as e:
+    except AssertionError:
         print("Base Model Tests - Failed")
         return False
     
