@@ -266,6 +266,3 @@ class HTTPOnlyAuth(PasswordAuth):
         headers['Authorization'] = f"Bearer {response.json()['item']}"
         headers['Cookie'] = f"httpOnlyToken={response.cookies.get('httpOnlyToken', default='')}"
         return headers
-    
-    import pip
-    pip.main()
