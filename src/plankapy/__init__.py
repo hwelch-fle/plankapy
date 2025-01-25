@@ -10,7 +10,7 @@
 # TODO: See if plankapy could be shipped in the official Planka container
 
 
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
 # flake8: noqa 
 # imports elevate these objects to the root module
