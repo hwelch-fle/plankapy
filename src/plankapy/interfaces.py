@@ -330,8 +330,9 @@ class Planka:
         """Creates a new project
         
         Note:
-            This method has overloaded arguments, 
-            You can pass a `Project` instance or provide a required `name` argument
+            If no background is provided, a random gradient will be assigned
+
+            If no position is provided, the project will be created at position 0
 
         Args:
             name (str): Name of the project (required)
@@ -352,16 +353,20 @@ class Planka:
             ```
         """
         overload = parse_overload(args, kwargs, model='project', 
-                                  options=('name', 'position', 'background', 'backgroundImage'), 
+                                  options=('name', 'position', 'background'), 
                                   required=('name',))
 
         overload['position'] = overload.get('position', 0)
         
-        if 'background' in overload: # Convert gradient to expected format
-            overload['background'] = {'name': overload['background'], 'type': 'gradient'}
-
+        style = overload.get('background', None)
         route = self.routes.post_project()
-        return Project(**route(**overload)['item']).bind(self.routes)
+        project = Project(**route(**overload)['item']).bind(self.routes)
+
+        with project.editor(): # Project POST does not accept background, so we set it after creation
+            project.set_background_gradient(style or choice(Project.gradients))
+
+        return project
+
         
     def create_user(self, username: str, email: str, password: str, name: str=None) -> User:
         """Create a new user
