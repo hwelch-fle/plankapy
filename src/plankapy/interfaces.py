@@ -1854,12 +1854,9 @@ class Card(Card_):
         """
         self.refresh()
 
-        if self.stopwatch:
-            return
-        
-        with self.editor():
-            self.stopwatch = {**Stopwatch(startedAt=None, total=0).stop()}
-        
+        if not self.stopwatch:
+            with self.editor():
+                self.stopwatch = {**Stopwatch(startedAt=None, total=0).stop()}
         return self.stopwatch
 
     def remove_label(self, label: Label) -> Card:
