@@ -1731,8 +1731,8 @@ class Card(Card_):
         Returns:
             Card: The moved card instance
         """
-        listId = list.id
-        self.listId = listId
+        self.listId = list.id
+        self.boardId = list.boardId
         self.update()
         return self
     
