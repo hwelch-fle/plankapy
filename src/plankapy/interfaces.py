@@ -446,16 +446,36 @@ class Project(Project_):
         ]
     
     @property
-    def managers(self) -> list[ProjectManager]:
-        """All project managers
+    def projectManagers(self) -> list[ProjectManager]:
+        """All project managers (ProjectManager Relations)
         
+        Note:
+            This property is not a list of users, but a list of `ProjectManager` objects
+            that define the user's role in the project. This is used to remove managers
+            in associated project boards and will likely never be used directly
+
         Returns:
-            List of all project managers
+            List of all project manager relations
         """
         return [
             ProjectManager(**projectManager).bind(self.routes)
             for projectManager in self._included['projectManagers']
         ]
+
+    @property
+    def managers(self) -> list[User]:
+        """All project managers (Users)
+        
+        Returns:
+            List of all project managers
+        """
+        return [
+            user
+            for user in self.users
+            for projectManager in self.projectManagers
+            if projectManager.userId == user.id
+        ]
+        
     
     @property
     def boardMemberships(self) -> list[BoardMembership]:
@@ -579,12 +599,12 @@ class Project(Project_):
         return ProjectManager(**route(userId=userId, projectId=self.id)['item']).bind(self.routes)
 
     @overload
-    def remove_project_manager(project_manager: User) -> User: ...
+    def remove_project_manager(project_manager: User) -> ProjectManager | None: ...
 
     @overload
-    def remove_project_manager(userId: int) -> User: ...
+    def remove_project_manager(userId: int) -> ProjectManager | None: ...
 
-    def remove_project_manager(self, *args, **kwargs) -> User:
+    def remove_project_manager(self, *args, **kwargs) -> ProjectManager | None:
         overload = parse_overload(args, kwargs,
                                   model='user',
                                   options=('userId',),
@@ -594,9 +614,9 @@ class Project(Project_):
         if 'userId' not in overload: # Case for User object
             overload['userId'] = overload['id']
         
-        for manager in self.managers:
+        for manager in self.projectManagers:
             if manager.userId == overload['userId']:
-                manager.delete()
+                return manager.delete()
 
     def delete(self) -> Project:
         """Deletes the project
@@ -1125,7 +1145,7 @@ class User(User_):
             project
             for project in self.projects
             for manager in project.managers
-            if manager.userId == self.id
+            if manager.id == self.id
         ]
     
     @property
@@ -1360,7 +1380,7 @@ class BoardMembership(BoardMembership_):
 
             with boardMembership.editor():
                 boardMembership.role = 'viewer'
-\            
+           
             boardMembership.canComment
             >>> True
 
