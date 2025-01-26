@@ -1,5 +1,5 @@
 # Constants
-## ActionType:
+## ActionType
 `createCard`
 `moveCard`
 `commentCard`
@@ -8,13 +8,13 @@
 `editor`
 `viewer`
     
-## Sort Options:
+## Sort Options
 `Name`
 `Due date`
 `Oldest First`
 `Newest First`
     
-# Label Colors:
+## Label Colors
 
 <style>
     .color-swatch {
@@ -55,6 +55,8 @@
 |<span class='color-swatch' style='background-color:#87564a'> light-cocoa </span>    | #87564a|
 
 ## Project Gradients
+
+Note: Some of these gradients are not supported currently, but I've included them here because they are defined in the planka codebase.
 
 <style>
     .gradient-swatch {
