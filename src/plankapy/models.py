@@ -693,7 +693,7 @@ class Project_(Model):
     id: Optional[int]=Unset
     name: Optional[str]=Required
     # Background overrides backgroundImage
-    background: Optional[Background]=Unset
+    background: Optional[dict]=Unset
     backgroundImage: Optional[BackgroundImage]=Unset
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
