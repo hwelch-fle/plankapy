@@ -1,5 +1,6 @@
 from datetime import datetime
 import time
+import pytest
 
 import sys
 sys.path.append('../src')
@@ -22,185 +23,169 @@ def reset_planka():
 
     for user in planka.users:
         user.delete() if user != planka.me else None
+reset_planka()
 
-def create_users() -> tuple[User, User]:
+@pytest.fixture
+def test_project():
+    return [project for project in planka.projects if project.name == 'Pytest Project'][0]
+
+@pytest.fixture
+def test_board(test_project: Project):
+    return [board for board in test_project.boards if board.name == 'Pytest Board'][0]
+
+@pytest.fixture
+def test_editor():
+    return [user for user in planka.users if user.username == 'pytest_editor'][0]
+
+@pytest.fixture
+def test_viewer():
+    return [user for user in planka.users if user.username == 'pytest_viewer'][0]
+
+@pytest.fixture
+def test_list_a(test_board: Board):
+    return test_board.lists[0]
+
+@pytest.fixture
+def test_list_b(test_board: Board):
+    return test_board.lists[1]
+
+@pytest.fixture
+def test_card(test_list_a: List):
+    return test_list_a.cards[0]
+
+@pytest.fixture(scope='session', autouse=True)
+def cleanup():
+    try:
+        yield
+    finally:
+        pass
+
+    @pytest.fixture(scope='session', autouse=True)
+    def restore(test_project: Project, test_editor: User, test_viewer: User):
+        test_project.delete()
+        test_editor.delete()
+        test_viewer.delete()
+
+def test_create_users():
     # Editor user
-    assert (editor := planka.create_user('editor', 'editor@plankapy.com', 'sdfnlksadfanksd', 'Editor'))
+    assert planka.create_user('pytest_editor', 'pytest_editor@plankapy.com', 'sdfnlksadfanksd', 'Editor'), 'Failed to create editor user'
     # Viewer user
-    assert (viewer := planka.create_user('viewer', 'viewer@plankapy.com', 'wddnflkasjfd', 'Viewer'))
+    assert planka.create_user('pytest_viewer', 'pytest_viewer@plankapy.com', 'wddnflkasjfd', 'Viewer'), 'Failed to create viewer user'
 
-    return editor, viewer
-
-def test_restore_user():
-    user, *_ = [user for user in planka.users if user != planka.me]
+def test_restore_user(test_viewer: User):
     
-    deleted_user = user.delete()
-    assert deleted_user
+    deleted_user = test_viewer.delete()
+    assert deleted_user, 'Failed to delete user'
 
     # Restore user (Passwords cannot be restored)
     restored_user = planka.create_user(deleted_user.username, deleted_user.email, 'sdfnlksadfanksd', deleted_user.name)
 
-    assert restored_user.username == deleted_user.username
+    assert restored_user.username == deleted_user.username, 'Failed to restore username'
 
     # New ID for restored user
-    assert deleted_user != restored_user
+    assert deleted_user != restored_user, 'Failed to restore user'
 
 
 def test_create_project():
-    assert (project := planka.create_project('Test Project'))
-    assert project.name == 'Test Project'
+    assert planka.create_project('Pytest Project'), 'Failed to create project'
 
-def test_change_gradient():
-    project = planka.projects[0]
-    for gradient in project.gradients:
-        with project.editor():
-            project.background = gradient
+def test_change_gradient(test_project: Project):
+    for gradient in test_project.gradients:
+        with test_project.editor():
+            test_project.background = gradient
         
-        assert project.background.get('name') == gradient
+        assert test_project.background.get('name') == gradient, f'{test_project.background.get("name")} != {gradient}'
 
-def test_add_project_manager():
-    project = planka.projects[0]
-    user, *_ = [u for u in planka.users if u.username == 'editor']
+def test_add_project_manager(test_project: Project, test_editor: User):
+    assert test_project.add_project_manager(test_editor), 'Failed to add manager'
+    assert test_editor in test_project.managers, f'{test_editor.name} not in {test_project.name} managers'
+    assert test_project in test_editor.manager_of, f'{test_editor.name} not manager of {test_project.name}'
 
-    assert project.add_project_manager(user)
-    assert user in project.managers
-    assert project in user.manager_of
+def test_remove_project_manager(test_project: Project, test_editor: User):
+    assert test_project.remove_project_manager(test_editor), 'Failed to remove manager'
+    assert test_editor not in test_project.managers, f'{test_editor.name} still in {test_project.name} managers'
+    assert test_project not in test_editor.manager_of, f'{test_editor.name} still manager of {test_project.name}'
 
-def test_remove_project_manager():
-    project = planka.projects[0]
-    user, *_ = [u for u in planka.users if u.username == 'editor']
+def test_create_board(test_project: Project):
+    assert test_project.create_board('Pytest Board'), 'Failed to create board'
 
-    assert project.remove_project_manager(user)
-    assert user not in project.managers
-    assert project not in user.manager_of
+def test_add_editor_to_board(test_board: Board, test_editor: User):
+    assert test_board.add_user(test_editor, role='editor'), 'Failed to add editor'
+    assert test_editor in test_board.editors, f'{test_editor.name} not in {test_board.name} editors'
 
-def test_create_board():
-    project = planka.projects[0]
-    assert (board := project.create_board('Test Board'))
-    assert board.name == 'Test Board'
+def test_add_viewer_to_board(test_board: Board, test_viewer: User):
+    assert test_board.add_user(test_viewer, role='viewer'), 'Failed to add viewer'
+    assert test_viewer in test_board.viewers, f'{test_viewer.name} not in {test_board.name} viewers'
 
-def test_add_editor_to_board():
-    project = planka.projects[0]
-    board = project.boards[0]
-    user, *_ = [u for u in planka.users if u.username == 'editor']
-
-    assert board.add_user(user, role='editor')
-    assert user in board.editors
-
-def test_add_viewer_to_board():
-    project = planka.projects[0]
-    board = project.boards[0]
-    user, *_ = [u for u in planka.users if u.username == 'viewer']
-
-    assert board.add_user(user, role='viewer')
-    assert user in board.viewers
-
-def test_create_labels():
-    project = planka.projects[0]
-    board = project.boards[0]
-    assert (label := board.create_label('Test Label'))
+def test_create_labels(test_board: Board):
+    assert (label := test_board.create_label('Test Label')), 'Failed to create label'
     colors = label.colors
-    label.delete()
+    assert label.delete(), 'Failed to delete label'
 
     for color in colors:
-        assert (label := board.create_label(color, color=color))
-        assert label.name == color
-        assert label.color == color
+        assert (label := test_board.create_label(color, color=color)), f'Failed to create label with color {color}'
+        assert label.name == color, f'{label.name} != {color}'
+        assert label.color == color, f'{label.color} != {color}'
 
-def test_create_list():
-    project = planka.projects[0]
-    board = project.boards[0]
-    assert (list_ := board.create_list('Test List'))
-    assert list_.name == 'Test List'
+def test_create_list(test_board: Board):
+    assert test_board.create_list('Pytest List 1', position=1), 'Failed to create list 1'
+    assert test_board.create_list('Pytest List 2', position=2), 'Failed to create list 2'
 
-    board.create_list('Test List 2')
+def test_create_card(test_list_a: List):
+    assert test_list_a.create_card('Pytest Card'), 'Failed to create card'
 
-def test_create_card():
-    project = planka.projects[0]
-    board = project.boards[0]
-    list_ = board.lists[0]
-    assert (card := list_.create_card('Test Card'))
-    assert card.name == 'Test Card'
+def test_create_card_tasks(test_card: Card):
+    for i in range(1,11):
+        test_card.add_task(f'Task {i}', position=i)
 
-def test_create_card_tasks():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
-    for i in range(1,10):
-        card.add_task(f'Task {i}', position=i)
+def test_create_card_comments(test_card: Card):
+    for i in range(1,11):
+        test_card.add_comment(f'Comment {i}')
 
-def test_create_card_comments():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
-    for i in range(1,10):
-        card.add_comment(f'Comment {i}')
-
-def test_create_card_due_date():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
+def test_create_card_due_date(test_card: Card):
     now = datetime.now()
-    card.set_due_date(now)
-    assert card.due_date.date() == now.date(), f"{card.due_date.date()} != {now.date()}"
-    assert card.dueDate[0:10] == now.isoformat()[0:10]
+    assert test_card.set_due_date(now), 'Failed to set due date'
+    assert test_card.due_date.date() == now.date(), f'{test_card.due_date.date()} != {now.date()}'
+    assert test_card.dueDate[0:10] == now.isoformat()[0:10], f'{test_card.dueDate[0:10]} != {now.isoformat()[0:10]}'
 
-def test_create_card_assignees():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
-    user, *_ = [u for u in planka.users if u.username == 'editor']
-    card.add_member(user)
-    assert user in card.members
+def test_create_card_assignees(test_card: Card, test_editor: User):
+    assert test_card.add_member(test_editor), 'Failed to add assignee'
+    assert test_editor in test_card.members, f'{test_editor.name} not in {test_card.name}'
 
-def test_create_card_labels():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
-    label = board.labels[0]
-    for label in board.labels:
-        card.add_label(label)
+def test_create_card_labels(test_card: Card, test_board: Board):
+    for label in test_board.labels:
+        assert test_card.add_label(label), f'Failed to add label {label.name}'
 
-def test_card_duplicate():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
-    assert (duplicate := card.duplicate())
-    assert duplicate.name == card.name
+def test_card_duplicate(test_card: Card):
+    assert test_card.duplicate(), 'Failed to duplicate card'
 
-def test_card_move():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
-    list_ = board.lists[1]
-    card.move(list_)
-    assert card.list == list_
+def test_card_move(test_card: Card, test_list_b: List):
+    assert test_card.move(test_list_b), 'Failed to move card'
+    assert test_card.list == test_list_b, f'Failed to move card to {test_list_b.name}'
 
-def test_card_stopwatch():
-    project = planka.projects[0]
-    board = project.boards[0]
-    card = board.cards[0]
-    card.add_stopwatch()
-    assert card.stopwatch
+def test_card_stopwatch(test_card: Card):
+    assert test_card.add_stopwatch(), 'Failed to add stopwatch'
 
-    card.stopwatch.start()
-    time.sleep(1)
-    card.stopwatch.stop()
-    assert card.stopwatch.total == 1
+    test_card.stopwatch.start()
+    time.sleep(3)
+    test_card.stopwatch.stop()
+    assert test_card.stopwatch.total == 3, f'Stopwatch failed: {test_card.stopwatch.total} != 3'
 
-    card.stopwatch.set(hours=1)
-    assert card.stopwatch.total == 3600
+    test_card.stopwatch.set(hours=1)
+    assert test_card.stopwatch.total == 3600, f'Setting time failed {test_card.stopwatch.total} != 3600'
 
-    card.stopwatch.set()
-    assert card.stopwatch.total == 0
+    test_card.stopwatch.set()
+    assert test_card.stopwatch.total == 0, f'Reset failed: {test_card.stopwatch.total}'
 
-    card.stopwatch.delete()
+    assert test_card.remove_stopwatch()
+    assert test_card.stopwatch.startedAt is None and test_card.stopwatch.total == 0, 'Failed to delete stopwatch'
+
 
 def main_test():
     # Tests run in order of declaration
     tests = [
         reset_planka,
-        create_users,
+        test_create_users,
         test_create_project,
         test_change_gradient,
         test_add_project_manager,
