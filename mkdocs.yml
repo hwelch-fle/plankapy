@@ -156,13 +156,8 @@ nav:
       - IdentityProviderUser: interfaces/IdentityProviderUser.md
       - Archive: interfaces/Archive.md
 
-  - Usage: usage.md
-  - CLI: cli/cli.md
-  - Change Log: changelog.md
-  - Recipes: recipes.md
-  - Overview: overview.md
-  - Contributing: contributing.md
-  - Installation: installation.md
+  #- CLI: cli/cli.md
+  - Examples: examples.md
 
 plugins:
   - search
