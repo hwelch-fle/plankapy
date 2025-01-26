@@ -20,7 +20,7 @@ import pickle
 import io
 
 from .routes import Routes
-from .constants import ActionType, BoardRole, Background, BackgroundImage
+from .constants import ActionType, BoardRole, BackgroundImage
 
 # Sentinel value for unset values since None is a valid value for responses
 class _Unset: 
