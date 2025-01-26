@@ -1689,6 +1689,19 @@ class Card(Card_):
             if task.cardId == self.id
         ]
     
+    @property
+    def due_date(self) -> datetime | None:
+        """Due date of the card in datetime format
+
+        Note:
+            The `dueDate` attribute is stored as an ISO 8601 string, this property will return
+            the due date as a python datetime object
+        
+        Returns:
+            Due date of the card
+        """
+        return datetime.fromisoformat(self.dueDate) if self.dueDate else None
+
     def move(self, list: List) -> Card:
         """Moves the card to a new list
         
@@ -1905,6 +1918,19 @@ class Card(Card_):
             super().__setattr__(name, dict(value))
         else:
             super().__setattr__(name, value)
+
+    def set_due_date(self, due_date: datetime  | None) -> Card:
+        """Sets the due date of the card
+        
+        Args:
+            dueDate (datetime): Due date of the card (None to remove)
+            
+        Returns:
+            Card: The card instance with the due date set
+        """
+        with self.editor():
+            self.dueDate = due_date.isoformat() if due_date else None
+        return self
 
     @overload
     def update(self) -> Card: ...
