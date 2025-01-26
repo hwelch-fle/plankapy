@@ -540,11 +540,7 @@ class Stopwatch(Model):
         self.total = (hours * 3600) + (minutes * 60) + seconds
         with self._card.editor():
             self._card.stopwatch = self
-
-    def delete(self):
-        """Delete the stopwatch"""
-        with self._card.editor():
-            self._card.stopwatch = None
+        
 
 @dataclass(eq=False)
 class CardLabel_(Model):
