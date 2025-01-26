@@ -1734,6 +1734,7 @@ class Card(Card_):
         listId = list.id
         self.listId = listId
         self.update()
+        return self
     
     def duplicate(self) -> Card:
         """Duplicates the card
