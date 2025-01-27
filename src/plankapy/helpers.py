@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .interfaces import (
     Planka,
     Project,
@@ -12,10 +14,142 @@ from .interfaces import (
     List,
 )
 
+from .models import (
+    Model,
+)
+
+from typing import (
+    Generic,
+    TypeVar,
+    Callable,
+)
 
 from .constants import (
     ActionType,
 )
+
+M = TypeVar('M', bound=Model)
+
+class QueryableList(list[M], Generic[M]):
+    """A list of Queryable objects
+    
+    This class is a subclass of the built-in `list` class that allows for querying the list of objects.
+    
+    """
+
+    def filter_where(self, **kwargs) -> list[M] | None:
+        """Filter the list of objects by keyword arguments
+        
+        Args:
+            **kwargs: See Model for the available attributes
+        
+        Returns:
+            list[M]: The objects that match the filter or None if no objects match
+
+        Example:
+        ```python
+        >>> users = QueryableList(project.users)
+        >>> users
+        [User(id=1, name='Bob'), User(id=2, name='Alice'), User(id=3, name='Bob')]
+
+        >>> users.filter_where(name='Bob')
+        [User(id=1, name='Bob'), User(id=3, name='Bob')]
+        """
+        return [item for item in self if all(getattr(item, key) == value for key, value in kwargs.items())] or None
+    
+    def select_where(self, predicate: Callable[[M], bool]) -> list[M]:
+        """Select objects from the list that match a function
+        
+        Args:
+            predicate: A function that takes an object and returns a boolean
+        
+        Returns:
+            list[M]: The objects that match the function
+
+        Example:
+        ```python
+        >>> users = QueryableList(project.users)
+        >>> users
+        [User(id=1, name='Bob'), User(id=2, name='Alice'), User(id=3, name='Frank')]
+
+        >>> users = users.select_where(lambda x: x.name in ('Bob', 'Alice'))
+        >>> users
+        [User(id=1, name='Bob'), User(id=2, name='Alice')]
+        """
+        return [item for item in self if predicate(item)]
+
+    def pop_where(self, **kwargs) -> M | None:
+        """Get the first object that matches the filter
+        
+        Args:
+            **kwargs: Keyword arguments to filter the list by
+        
+        Returns:
+            M: The first object that matches the filter
+
+        Example:
+        ```python
+        >>> users = QueryableList(project.users)
+        >>> users
+        [User(id=1, name='Bob'), User(id=2, name='Alice'), User(id=3, name='Bob')]
+
+        >>> users.pop_where(name='Bob')
+        User(id=1, name='Bob')
+
+        >>> user = users.pop_where(name='Frank')
+        >>> user
+        None
+        ```
+        """
+        vals = self.filter_where(**kwargs)
+        return vals[0] if vals else None
+    
+    def order_by(self, key: str) -> list[M]:
+        """Order the list by a key
+        
+        Args:
+            key (str): The key to order by
+        
+        Returns:
+            list[M]: The list of objects ordered by the key
+
+        Example:
+        ```python
+        >>> users = QueryableList(project.users)
+        >>> users
+        [User(name='Bob'), User(name='Alice')]
+
+        >>> users = users.order_by('name')
+        >>> users
+        [User(name='Alice'), User(name='Bob')]
+        """
+        return sorted(self, key=lambda x: getattr(x, key))
+    
+    def take(self, n: int) -> list[M]:
+        """Take the first n objects from the list
+        
+        Args:
+            n (int): The number of objects to take
+        
+        Returns:
+            list[M]: The first n objects in the list, if n is greater than the length of the list, the list is padded with `None`
+
+        Example:
+        ```python
+        >>> users = QueryableList(project.users)
+        >>> users.take(2)
+        [User(name='Alice'), User(name='Bob')]
+
+        >>> users.take(3)
+        [User(name='Alice'), User(name='Bob'), None]
+        ```
+        """
+        if n > len(self):
+            return self + [None] * (n - len(self))
+        return self[:n]
+
+
+
 
 # Get by functions
 # These all return a list of objects because Planka does not enforce unique names
