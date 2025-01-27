@@ -365,6 +365,7 @@ class QueryableList(list[M], Generic[M]):
 
         >>> users.filter_where(name='Bob')
         [User(id=1, name='Bob'), User(id=3, name='Bob')]
+        ```
         """
         return QueryableList(item for item in self if all(getattr(item, key) == value for key, value in kwargs.items())) or None
     
@@ -386,6 +387,7 @@ class QueryableList(list[M], Generic[M]):
         >>> users = users.select_where(lambda x: x.name in ('Bob', 'Alice'))
         >>> users
         [User(id=1, name='Bob'), User(id=2, name='Alice')]
+        ```
         """
         return QueryableList(item for item in self if predicate(item))
 
@@ -415,11 +417,12 @@ class QueryableList(list[M], Generic[M]):
         vals = self.filter_where(**kwargs)
         return vals[0] if vals else None
     
-    def order_by(self, key: str) -> QueryableList[M]:
+    def order_by(self, key: str, desc: bool=False) -> QueryableList[M]:
         """Order the list by a key
         
         Args:
             key (str): The key to order by
+            desc (bool): True to order in descending order, False otherwise
         
         Returns:
             list[M]: The list of objects ordered by the key
@@ -433,8 +436,13 @@ class QueryableList(list[M], Generic[M]):
         >>> users = users.order_by('name')
         >>> users
         [User(name='Alice'), User(name='Bob')]
+
+        >>> users = users.order_by('name', desc=True)
+        >>> users
+        [User(name='Bob'), User(name='Alice')]
+        ```
         """
-        return QueryableList(sorted(self, key=lambda x: getattr(x, key)))
+        return QueryableList(sorted(self, key=lambda x: getattr(x, key), reverse=desc))
     
     def take(self, n: int) -> list[M]:
         """Take the first n objects from the list

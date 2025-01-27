@@ -124,6 +124,10 @@ class Planka:
         handler (JSONHandler): JSONHandler instance for making requests
 
     Note:
+        All objects that return a list of objects will return a `QueryableList` object. This object is a subclass of `list`
+        see the `QueryableList` docs for more information
+    
+    Note:
         All implemented public properties return API responses with accessed. This means that the values are not cached 
         and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
         property access will always provide the most up to date information.
@@ -247,10 +251,10 @@ class Planka:
 
     @property
     def projects(self) -> QueryableList[Project]:
-        """List of all projects on the Planka instance
+        """Queryable List of all projects on the Planka instance
         
         Returns:
-            List of all projects
+            Queryable List of all projects
         """
         route = self.routes.get_project_index()
         return QueryableList([
@@ -260,10 +264,10 @@ class Planka:
     
     @property
     def users(self) -> QueryableList[User]:
-        """List of all users on the Planka instance
+        """Queryable List of all users on the Planka instance
         
         Returns:
-            List of all users
+            Queryable List of all users
         """
         route = self.routes.get_user_index()
         return QueryableList([
@@ -273,10 +277,10 @@ class Planka:
     
     @property
     def notifications(self) -> QueryableList[Notification]:
-        """List of all notifications for the current user
+        """Queryable List of all notifications for the current user
         
         Returns:
-            List of all notifications
+            Queryable List of all notifications
         """
         route = self.routes.get_notification_index()
         return QueryableList([
@@ -444,7 +448,7 @@ class Project(Project_):
         """All users in the project
         
         Returns:
-            List of all users
+            Queryable List of all users
         """
         return QueryableList([
             User(**user).bind(self.routes)
@@ -461,7 +465,7 @@ class Project(Project_):
             in associated project boards and will likely never be used directly
 
         Returns:
-            List of all project manager relations
+            Queryable List of all project manager relations
         """
         return QueryableList([
             ProjectManager(**projectManager).bind(self.routes)
@@ -473,7 +477,7 @@ class Project(Project_):
         """All project managers (Users)
         
         Returns:
-            List of all project managers
+            Queryable List of all project managers
         """
         return QueryableList([
             user
@@ -493,7 +497,7 @@ class Project(Project_):
             in associated project boards and will likely never be used directly
         
         Returns:
-            List of all board membership relations in the project    
+            Queryable List of all board membership relations in the project    
         """
         return QueryableList([
             BoardMembership(**boardMembership).bind(self.routes)
@@ -505,7 +509,7 @@ class Project(Project_):
         """All boards in the project
         
         Returns:
-            List of all boards
+            Queryable List of all boards
         """
         return QueryableList([
             Board(**board).bind(self.routes)
@@ -773,7 +777,7 @@ class Board(Board_):
         """All users in the board
 
         Returns:
-            List of all users
+            Queryable List of all users
         """
         return QueryableList([
             User(**user).bind(self.routes)
@@ -785,7 +789,7 @@ class Board(Board_):
         """All users that can edit the board
 
         Returns:
-            List of all editors
+            Queryable List of all editors
         """
         return QueryableList([
             user
@@ -799,7 +803,7 @@ class Board(Board_):
         """All users that can view the board
         
         Returns:
-            List of all viewers
+            Queryable List of all viewers
         """
         return QueryableList([
             user
@@ -817,7 +821,7 @@ class Board(Board_):
             are derived from the board memberships
 
         Returns:
-            List of all membership types (editor, viewer)
+            Queryable List of all membership types (editor, viewer)
         """
         return QueryableList([
             BoardMembership(**boardMembership).bind(self.routes)
@@ -829,7 +833,7 @@ class Board(Board_):
         """All labels in the board
         
         Returns:
-            List of all labels in the board
+            Queryable List of all labels in the board
         """
         return QueryableList([
             Label(**label).bind(self.routes)
@@ -841,7 +845,7 @@ class Board(Board_):
         """All lists in the board
         
         Returns:
-            List of all lists in the board
+            Queryable List of all lists in the board
         """
         return QueryableList([
             List(**_list).bind(self.routes)
@@ -1099,7 +1103,7 @@ class User(User_):
         """All projects the user is a member of
         
         Returns:
-            List of all projects the user is a member of
+            Queryable List of all projects the user is a member of
         """
         projects_route = self.routes.get_project_index()
         return QueryableList([
@@ -1112,7 +1116,7 @@ class User(User_):
         """All boards the user is a member of
         
         Returns:
-            List of all boards the user is a member of
+            Queryable List of all boards the user is a member of
         """
         return QueryableList([
             boardMembership.board
@@ -1126,7 +1130,7 @@ class User(User_):
         """All cards assigned to the user in all projects
         
         Returns:
-            List of all cards assigned to the user
+            Queryable List of all cards assigned to the user
         """
         return QueryableList([
             cardMembership.card
@@ -1140,7 +1144,7 @@ class User(User_):
         """All projects the user is a manager of
         
         Returns:
-            List of all projects the user is a manager of
+            Queryable List of all projects the user is a manager of
         """
         return QueryableList([
             project
@@ -1154,7 +1158,7 @@ class User(User_):
         """All notifications for the user
         
         Returns:
-            List of all notifications for the user
+            Queryable List of all notifications for the user
         """
         route = self.routes.get_notification_index()
         return QueryableList([
@@ -1476,7 +1480,7 @@ class Label(Label_):
         """All cards with the label in the board
         
         Returns:
-            List of all cards with the label in the board
+            Queryable List of all cards with the label in the board
         """
         return QueryableList([
             cardLabel.card
@@ -1669,7 +1673,7 @@ class Card(Card_):
         """All labels on the card
         
         Returns:
-            List of all labels on the card
+            Queryable List of all labels on the card
         """
         return QueryableList([
             cardLabel.label
@@ -1682,7 +1686,7 @@ class Card(Card_):
         """All users assigned to the card
         
         Returns:
-            List of all users assigned to the card
+            Queryable List of all users assigned to the card
         """
         return QueryableList([
             cardMembership.user
@@ -1695,7 +1699,7 @@ class Card(Card_):
         """All comments on the card
         
         Returns:
-            List of all comments on the card
+            Queryable List of all comments on the card
         """
         route = self.routes.get_action_index(cardId=self.id)
         return QueryableList([
@@ -1708,7 +1712,7 @@ class Card(Card_):
         """All tasks on the card
         
         Returns:
-            List of all tasks on the card
+            Queryable List of all tasks on the card
         """
         return QueryableList([
             task
@@ -2181,7 +2185,7 @@ class List(List_):
         """All cards in the list
         
         Returns:
-            List of all cards in the list
+            Queryable List of all cards in the list
         """
         return QueryableList([
             card
