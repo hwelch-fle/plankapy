@@ -17,11 +17,11 @@ All Interfaces are documented in the [API](https://hwelch-fle.github.io/plankapy
 ### No Keys Required
 Planka models have all been implemented as Python objects. This means that you can access all the properties of a resource as if it were a Python object:
 ```python
-project.name
->>> 'Project 1'
+>>> project.name
+'Project 1'
 
-project.managers
->>> [User(id=1, username='username', ...), User(id=2, username='username2', ...), ...]
+>>> project.managers
+[User(id=1, username='username', ...), User(id=2, username='username2', ...), ...]
 ```
 
 ### Disambiguation of resource attributes and methods
