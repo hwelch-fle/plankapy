@@ -10,7 +10,7 @@
 # TODO: See if plankapy could be shipped in the official Planka container
 
 
-__version__ = "2.0.3"
+__version__ = "2.1.0"
 
 # flake8: noqa 
 # imports elevate these objects to the root module
@@ -33,6 +33,7 @@ from .interfaces import (
     List,
     ProjectManager,
     Task,
+    QueryableList,
 )
 
 from .handlers import (

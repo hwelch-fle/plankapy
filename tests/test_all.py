@@ -13,6 +13,7 @@ from plankapy import (
     List,
     Card,
     User,
+    QueryableList,
 )
 
 planka = Planka('http://localhost:3000', PasswordAuth('demo', 'demo'))
