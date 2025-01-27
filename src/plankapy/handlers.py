@@ -1,7 +1,14 @@
 from urllib.request import Request, urlopen, HTTPError
 from urllib.parse import urljoin
 
-from typing import Optional, TypeAlias, Generator, Self, Protocol, Any
+from typing import (
+    Optional, 
+    TypeAlias, 
+    Generator, 
+    Self, 
+    Protocol, 
+    Any,
+    )
 import json
 
 from contextlib import contextmanager
