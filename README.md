@@ -30,22 +30,22 @@ All models have type hints for every property and attribute, meaning you don't h
 ### Synced by Default
 All included resources are accessible through object properties that send out a request to the server when accessed. This means that you can access up to date information about a resource without having to manually refresh it.
 ```python
-list1 = board.lists[0]
-list2 = board.lists[1]
+>>> list1 = board.lists[0]
+>>> list2 = board.lists[1]
 
-list1.cards
->>> [Card(id=1, name='Card 1', ...), Card(id=2, name='Card 2', ...)]
+>>> list1.cards
+[Card(id=1, name='Card 1', ...), Card(id=2, name='Card 2', ...)]
 
-list2.cards
->>> []
+>>> list2.cards
+[]
 
-list1.cards[0].move(list2)
+>>> list1.cards[0].move(list2)
 
-list1.cards
->>> [Card(id=2, name='Card 2', ...)]
+>>> list1.cards
+[Card(id=2, name='Card 2', ...)]
 
-list2.cards
->>> [Card(id=1, name='Card 1', ...)]
+>>> list2.cards
+[Card(id=1, name='Card 1', ...)]
 ```
 
 
@@ -54,45 +54,45 @@ Because all stored objects maintain the attributes assigned to them on their cre
 
 #### Direct editing of attributes fails to update the resource
 ```python
-c1 = list1.cards[0]
-c1.name = "New Name"
-c1.name
->>> 'New Name'
+>>> c1 = list1.cards[0]
+>>> c1.name = "New Name"
+>>> c1.name
+'New Name'
 
 # Get the resource again to see that the name has not changed
-c2 = list1.cards[0]
-c2.name
->>> 'Card 1'
+>>> c2 = list1.cards[0]
+>>> c2.name
+'Card 1'
 ```
 #### Context editing updates the resource after exiting the context
 ```python
-c1 = list1.cards[0]
-with c1.editor():
-    c1.name = "New Name"
+>>> c1 = list1.cards[0]
+>>> with c1.editor():
+...     c1.name = "New Name"
 
-c1.name
->>> 'New Name'
+>>> c1.name
+'New Name'
 
 # Get the resource again to see that the name has changed
-c2 = list1.cards[0]
+>>> c2 = list1.cards[0]
 
-c2.name
->>> 'New Name'
+>>> c2.name
+'New Name'
 ```
 
 ## Usage
 Getting started with plankapy is as simple as creating a `Planka` object and passing it your authentication method. From there, you can access all the resources available to your logged in user account.
 
 ```python
-from plankapy import Planka, PasswordAuth
+>>> from plankapy import Planka, PasswordAuth
 
-planka = Planka("https://planka.example.com", PasswordAuth("username", "password"))
+>>> planka = Planka("https://planka.example.com", PasswordAuth("username", "password"))
 
-planka.me
->>> User(id=1, username='username', ...)
+>>> planka.me
+User(id=1, username='username', ...)
 
-planka.projects
->>> [Project(id=1, name='Project 1', ...), Project(id=2, name='Project 2', ...), ...]
+>>> planka.projects
+[Project(id=1, name='Project 1', ...), Project(id=2, name='Project 2', ...), ...]
 ```
 
 ## License

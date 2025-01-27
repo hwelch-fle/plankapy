@@ -81,8 +81,8 @@ def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], re
         {'name': 'My board', 'position': 0}
 
         # No arguments
-        board = Board(name='My Board', position=0)
-        board.name = 'My New Board'
+        >>> board = Board(name='My Board', position=0)
+        >>> board.name = 'My New Board'
         >>> parse_overload((), {}, 'board', ('name', 'position'), noarg=self)
         {'name': 'My New Board', 'position': 0}
         ```
@@ -128,22 +128,22 @@ class Planka:
         
         Example:
             ```python
-            len(project.cards)
-            >>> 5
-            project.create_card('My Card')
-            len(project.cards)
-            >>> 6
+            >>> len(project.cards)
+            5
+            >>> project.create_card('My Card')
+            >>> len(project.cards)
+            6
             ```
 
     Example:
         ```python
-        from plankapy import Planka, PasswordAuth
+        >>> from plankapy import Planka, PasswordAuth
 
-        auth = PasswordAuth('username', 'password')
-        planka = Planka('https://planka.example.com', auth)
+        >>> auth = PasswordAuth('username', 'password')
+        >>> planka = Planka('https://planka.example.com', auth)
 
-        planka.me
-        >>> User(id=...9234, name='username', ...)
+        >>> planka.me
+        User(id=...9234, name='username', ...)
         ```
     
     Tip:
@@ -151,13 +151,14 @@ class Planka:
 
         Example:
             ```python
-            card = lambda: planka.project[0].boards[0].lists[0].cards[0]
-            comments = lambda: card().comments
-            len(comments())
-            >>> 2
-            card().add_comment('My Comment')
-            len(comments())
-            >>> 3
+            >>> card = lambda: planka.project[0].boards[0].lists[0].cards[0]
+            >>> comments = lambda: card().comments
+            >>> len(comments())
+            2
+            
+            >>> card().add_comment('My Comment')
+            >>> len(comments())
+            3
             ```
     
     Tip:
@@ -167,9 +168,12 @@ class Planka:
 
         Example:
             ```python
-            with card.editor():
-                card.name = 'My New Card'
-                card.description = 'My New Description'
+            >>> with card.editor():
+            ...    card.name = 'My New Card'
+            ...    card.description = 'My New Description'
+
+            >>> card.name
+            'My New Card'
             ```
     """
     def __init__(self, url: str, auth: Type[BaseAuth]):        
@@ -205,7 +209,7 @@ class Planka:
             
         Example:
             ```python
-            planka.auth = TokenAuth('<new_token>')
+            >>> planka.auth = TokenAuth('<new_token>')
             ```
         """
         self._auth = auth
@@ -233,7 +237,7 @@ class Planka:
             
         Example:
             ```python
-            planka.url = 'https://planka.example.com'
+            >>> planka.url = 'https://planka.example.com'
             ```
         """
         self._url = url
@@ -350,9 +354,9 @@ class Planka:
 
         Example:
             ```python
-            new_project = planka.create_project('My Project')
-            new_project.set_background_gradient('blue-xchange') # Set background gradient
-            new_project.add_project_manager(planka.me) # Add current user as project manager
+            >>> new_project = planka.create_project('My Project')
+            >>> new_project.set_background_gradient('blue-xchange') # Set background gradient
+            >>> new_project.add_project_manager(planka.me) # Add current user as project manager
             ```
         """
         overload = parse_overload(args, kwargs, model='project', 
@@ -575,8 +579,8 @@ class Project(Project_):
         
         Example:
             ```python
-            new_manager = project.create_project_manager(planka.me)
-            other_manager = project.create_project_manager(userId='...1234')
+            >>> new_manager = project.create_project_manager(planka.me)
+            >>> other_manager = project.create_project_manager(userId='...1234')
             ```
         
         """
@@ -656,12 +660,13 @@ class Project(Project_):
 
         Example:
             ```python
-            project.update(name='My New Project', background='blue-xchange'))
+            >>> project.update(name='My New Project', background='blue-xchange'))
             ```
         """
-        overload = parse_overload(args, kwargs, model='project', 
-                                  options=('name', 'background', 'backgroundImage'),
-                                  noarg=self)
+        overload = parse_overload(
+            args, kwargs, model='project', 
+            options=('name', 'background', 'backgroundImage'),
+            noarg=self)
         
         if 'background' in overload:
             if isinstance(overload['background'], dict): # Handle Noarg case
@@ -685,7 +690,7 @@ class Project(Project_):
         
         Example:
             ```python
-            project.set_background_gradient('blue-xchange')
+            >>> project.set_background_gradient('blue-xchange')
             ```
         """
         if gradient not in self.gradients:
@@ -934,10 +939,10 @@ class Board(Board_):
             
         Example:
             ```python
-            new_list = board.create_list('My List')
+            >>> new_list = board.create_list('My List')
 
-            l = List(name='My List', position=0)
-            new_list2 = board.create_list(l)
+            >>> l = List(name='My List', position=0)
+            >>> new_list2 = board.create_list(l)
             ```
         """
         overload = parse_overload(args, kwargs, model='list', 
@@ -972,9 +977,9 @@ class Board(Board_):
             
         Example:
             ```python
-            new_label = board.create_label('My Label')
-            label = Label(name='My Label', position=0, color='wet-moss')
-            new_label2 = board.create_label(label)
+            >>> new_label = board.create_label('My Label')
+            >>> label = Label(name='My Label', position=0, color='wet-moss')
+            >>> new_label2 = board.create_label(label)
             ```
         """
         overload = parse_overload(args, kwargs, model='label', 
@@ -1365,8 +1370,11 @@ class BoardMembership(BoardMembership_):
 
             Example:
             ```python
-            with boardMembership.editor():
-                boardMembership.role = 'editor'
+            >>> with boardMembership.editor():
+            ...    boardMembership.role = 'editor'
+
+            >>> boardMembership
+            BoardMembership(userId='...', boardId='...', role='editor', canComment=True)
             ```
         
         Warning:
@@ -1375,20 +1383,20 @@ class BoardMembership(BoardMembership_):
 
             Example:
             ```python
-            boardMembership.role
-            >>> 'editor'
+            >>> boardMembership.role
+            'editor'
 
-            with boardMembership.editor():
-                boardMembership.role = 'viewer'
+            >>> with boardMembership.editor():
+            ...    boardMembership.role = 'viewer'
            
-            boardMembership.canComment
-            >>> True
+            >>> boardMembership.canComment
+            True
 
-            # Using .update() will not automatically set canComment to False
-            # on role change unless specified
-            boardMembership.update(role='viewer')
-            boardMembership.canComment
-            >>> False
+            >>> # Using .update() will not automatically set canComment to False
+            >>> # on role change unless specified
+            >>> boardMembership.update(role='viewer')
+            >>> boardMembership.canComment
+            False
             ```
 
         Args:
@@ -1497,9 +1505,12 @@ class Label(Label_):
 
             Example:
             ```python
-            with label.editor():
-                label.name = 'My New Label'
-                label.color = 'lagoon-blue'
+            >>> with label.editor():
+            ...    label.name = 'My New Label'
+            ...    label.color = 'lagoon-blue'
+
+            >>> label
+            Label(name='My New Label', color='lagoon-blue', position=0, ...)
             ``
 
         Args:
@@ -1837,16 +1848,19 @@ class Card(Card_):
         
             Example:
                 ```python
-                card.add_stopwatch()
-                card.stopwatch
-                >>> Stopwatch(startedAt=None, total=0)
-                card.__dict__['stopwatch']
-                >>> {'startedAt': None, 'total': 0}
-                card.stopwatch.start()
-                card.stopwatch
-                >>> Stopwatch(startedAt=datetime.datetime(2024, 9, 30, 0, 0, 0), total=0)
-                card.__dict__['stopwatch']
-                >>> {'startedAt': '2024-9-30T00:00:00Z', 'total': 0}
+                >>> card.add_stopwatch()
+                >>> card.stopwatch
+                Stopwatch(startedAt=None, total=0)
+
+                >>> card.__dict__['stopwatch']
+                {'startedAt': None, 'total': 0}
+
+                >>> card.stopwatch.start()
+                >>> card.stopwatch
+                Stopwatch(startedAt=datetime.datetime(2024, 9, 30, 0, 0, 0), total=0)
+
+                >>> card.__dict__['stopwatch']
+                {'startedAt': '2024-9-30T00:00:00Z', 'total': 0}
                 ```
         
         Returns:
@@ -1972,8 +1986,11 @@ class Card(Card_):
 
             Example:
             ```python
-            with card.editor():
-                card.name='New Name'
+            >>> with card.editor():
+            ...    card.name='New Name'
+
+            >>> card
+            Card(name='New Name', ...)
             ``
 
         Args:
@@ -2216,8 +2233,7 @@ class List(List_):
                     'isDueDateCompleted', 'stopwatch', 
                     'creatorUserId', 'coverAttachmentId', 
                     'isSubscribed'), 
-            required=('name',),
-            noarg=self)
+            required=('name',))
         
         overload['boardId'] = self.boardId
         overload['listId'] = self.id
@@ -2280,7 +2296,7 @@ class List(List_):
     def update(self) -> List: ...
 
     @overload
-    def update(self, _list: List) -> List: ...
+    def update(self, list: List) -> List: ...
 
     @overload
     def update(self, name: str=None, position: int=None) -> List: ...
@@ -2293,9 +2309,12 @@ class List(List_):
 
             Example:
             ```python
-            with list.editor():
-                list.name = 'New List Name'
-                list.position = 1
+            >>> with list_.editor():
+            ...    list_.name = 'New List Name'
+            ...    list_.position = 1
+
+            >>> list
+            List(id=1, name='New List Name', position=1, ...)
             ```
 
         Args:
@@ -2303,7 +2322,7 @@ class List(List_):
             position (int): Position of the list (optional)
             
         Args: Alternate
-            _list (List): List instance to update (required)
+            list (List): List instance to update (required)
             
         Note:
             If no arguments are provided, the list will update itself with the current values stored in its attributes
@@ -2393,9 +2412,12 @@ class Task(Task_):
 
             Example:
             ```python
-            with task.editor():
-                task.name = 'New Task Name'
-                task.isCompleted = True
+            >>> with task.editor():
+            ...    task.name = 'New Task Name'
+            ...    task.isCompleted = True
+
+            >>> task
+            Task(id=1, name='New Task Name', isCompleted=True, ...)
             ```
 
         Args:
