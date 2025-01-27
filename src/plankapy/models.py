@@ -355,7 +355,7 @@ class QueryableList(list[M], Generic[M]):
             **kwargs: See Model for the available attributes
         
         Returns:
-            list[M]: The objects that match the filter or None if no objects match
+            QueryableList[M]: The objects that match the filter or None if no objects match
 
         Example:
         ```python
@@ -376,7 +376,7 @@ class QueryableList(list[M], Generic[M]):
             predicate: A function that takes an object and returns a boolean
         
         Returns:
-            list[M]: The objects that match the function
+            QueryableList[M]: The objects that match the function
 
         Example:
         ```python
@@ -425,7 +425,7 @@ class QueryableList(list[M], Generic[M]):
             desc (bool): True to order in descending order, False otherwise
         
         Returns:
-            list[M]: The list of objects ordered by the key
+            QueryableList[M]: The list of objects ordered by the key
 
         Example:
         ```python
@@ -444,14 +444,14 @@ class QueryableList(list[M], Generic[M]):
         """
         return QueryableList(sorted(self, key=lambda x: getattr(x, key), reverse=desc))
     
-    def take(self, n: int) -> list[M]:
+    def take(self, n: int) -> QueryableList[M]:
         """Take the first n objects from the list
         
         Args:
             n (int): The number of objects to take
         
         Returns:
-            list[M]: The first n objects in the list, if n is greater than the length of the list, the list is padded with `None`
+            QueryableList[M]: The first n objects in the list, if n is greater than the length of the list, the list is padded with `None`
 
         Example:
         ```python
