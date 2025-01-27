@@ -124,6 +124,7 @@ extra:
 nav:
   - Home: index.md
   - API: 
+    - QueryableList: models/QueryableList.md
     - Planka: interfaces/Planka.md
     - Authentication Interfaces:
       - PasswordAuth: auth/PasswordAuth.md
@@ -150,7 +151,7 @@ nav:
       - Stopwatch: interfaces/Stopwatch.md
     - Constants: constants/constants.md
     - Helpers: helpers/helpers.md
-    - Models: models/models.md
+    #- Models: models/models.md
 
     - Unused:
       - IdentityProviderUser: interfaces/IdentityProviderUser.md

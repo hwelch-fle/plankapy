@@ -27,6 +27,7 @@ from .models import (
     ProjectManager_,
     Task_,
     User_,
+    QueryableList,
 )
 from .handlers import (
     BaseAuth, 
@@ -43,6 +44,7 @@ from .constants import (
     SortOption,
     ListSorts,
 )
+
 
 def parse_overload(args:tuple, kwargs: dict, model: str, options: tuple[str], required: tuple[str]=(), noarg:Model=None) -> dict:
     """Helper function that allows overloading with required values or a model instance
@@ -121,6 +123,10 @@ class Planka:
         url (str): Base url for the Planka instance
         handler (JSONHandler): JSONHandler instance for making requests
 
+    Note:
+        All objects that return a list of objects will return a `QueryableList` object. This object is a subclass of `list`
+        see the `QueryableList` docs for more information
+    
     Note:
         All implemented public properties return API responses with accessed. This means that the values are not cached 
         and will be updated on every access. If you wish to cache values, you are responsible for doing so. By default, 
@@ -244,46 +250,46 @@ class Planka:
         self._create_session(self.auth)
 
     @property
-    def projects(self) -> list[Project]:
-        """List of all projects on the Planka instance
+    def projects(self) -> QueryableList[Project]:
+        """Queryable List of all projects on the Planka instance
         
         Returns:
-            List of all projects
+            Queryable List of all projects
         """
         route = self.routes.get_project_index()
-        return [
+        return QueryableList([
             Project(**project).bind(self.routes)
             for project in route()['items']
-        ]
+        ])
     
     @property
-    def users(self) -> list[User]:
-        """List of all users on the Planka instance
+    def users(self) -> QueryableList[User]:
+        """Queryable List of all users on the Planka instance
         
         Returns:
-            List of all users
+            Queryable List of all users
         """
         route = self.routes.get_user_index()
-        return [
+        return QueryableList([
             User(**user).bind(self.routes)
             for user in route()['items']
-        ]
+        ])
     
     @property
-    def notifications(self) -> list[Notification]:
-        """List of all notifications for the current user
+    def notifications(self) -> QueryableList[Notification]:
+        """Queryable List of all notifications for the current user
         
         Returns:
-            List of all notifications
+            Queryable List of all notifications
         """
         route = self.routes.get_notification_index()
-        return [
+        return QueryableList([
             Notification(**notification).bind(self.routes)
             for notification in route()['items']
-        ]
+        ])
     
     @property
-    def project_background_images(self, NOT_IMPLEMENTED) -> list[BackgroundImage]:
+    def project_background_images(self, NOT_IMPLEMENTED) -> QueryableList[BackgroundImage]:
         """Get Project Background Images
         
         Attention:
@@ -295,7 +301,7 @@ class Planka:
         raise NotImplementedError('Getting project backgrounds is not currently supported by plankapy')
 
     @property
-    def user_avatars(self, NOT_IMPLEMENTED) -> list[str]:
+    def user_avatars(self, NOT_IMPLEMENTED) -> QueryableList[str]:
         """Get User Avatars
 
         Attention:
@@ -438,19 +444,19 @@ class Project(Project_):
         return route()['included']
     
     @property
-    def users(self) -> list[User]:
+    def users(self) -> QueryableList[User]:
         """All users in the project
         
         Returns:
-            List of all users
+            Queryable List of all users
         """
-        return [
+        return QueryableList([
             User(**user).bind(self.routes)
             for user in self._included['users']
-        ]
+        ])
     
     @property
-    def projectManagers(self) -> list[ProjectManager]:
+    def projectManagers(self) -> QueryableList[ProjectManager]:
         """All project managers (ProjectManager Relations)
         
         Note:
@@ -459,30 +465,30 @@ class Project(Project_):
             in associated project boards and will likely never be used directly
 
         Returns:
-            List of all project manager relations
+            Queryable List of all project manager relations
         """
-        return [
+        return QueryableList([
             ProjectManager(**projectManager).bind(self.routes)
             for projectManager in self._included['projectManagers']
-        ]
+        ])
 
     @property
-    def managers(self) -> list[User]:
+    def managers(self) -> QueryableList[User]:
         """All project managers (Users)
         
         Returns:
-            List of all project managers
+            Queryable List of all project managers
         """
-        return [
+        return QueryableList([
             user
             for user in self.users
             for projectManager in self.projectManagers
             if projectManager.userId == user.id
-        ]
+        ])
         
     
     @property
-    def boardMemberships(self) -> list[BoardMembership]:
+    def boardMemberships(self) -> QueryableList[BoardMembership]:
         """All board memberships and roles in the project
         
         Note:
@@ -491,24 +497,24 @@ class Project(Project_):
             in associated project boards and will likely never be used directly
         
         Returns:
-            List of all board membership relations in the project    
+            Queryable List of all board membership relations in the project    
         """
-        return [
+        return QueryableList([
             BoardMembership(**boardMembership).bind(self.routes)
             for boardMembership in self._included['boardMemberships']
-        ]
+        ])
 
     @property
-    def boards(self) -> list[Board]:
+    def boards(self) -> QueryableList[Board]:
         """All boards in the project
         
         Returns:
-            List of all boards
+            Queryable List of all boards
         """
-        return [
+        return QueryableList([
             Board(**board).bind(self.routes)
             for board in self._included['boards']
-        ]
+        ])
     
     def gradient_css(self) -> str | None:
         """Get the CSS value for the project gradient
@@ -767,47 +773,47 @@ class Board(Board_):
         return Project(**project_route()['item']).bind(self.routes)
 
     @property
-    def users(self) -> list[User]:
+    def users(self) -> QueryableList[User]:
         """All users in the board
 
         Returns:
-            List of all users
+            Queryable List of all users
         """
-        return [
+        return QueryableList([
             User(**user).bind(self.routes)
             for user in self._included['users']
-        ]
+        ])
     
     @property
-    def editors(self) -> list[User]:
+    def editors(self) -> QueryableList[User]:
         """All users that can edit the board
 
         Returns:
-            List of all editors
+            Queryable List of all editors
         """
-        return [
+        return QueryableList([
             user
             for user in self.users
             for boardMembership in self.boardMemberships
             if boardMembership.userId == user.id and boardMembership.role == 'editor'
-        ]
+        ])
     
     @property
-    def viewers(self) -> list[User]:
+    def viewers(self) -> QueryableList[User]:
         """All users that can view the board
         
         Returns:
-            List of all viewers
+            Queryable List of all viewers
         """
-        return [
+        return QueryableList([
             user
             for user in self.users
             for boardMembership in self.boardMemberships
             if boardMembership.userId == user.id and boardMembership.role == 'viewer'
-        ]
+        ])
     
     @property
-    def boardMemberships(self) -> list[BoardMembership]:
+    def boardMemberships(self) -> QueryableList[BoardMembership]:
         """All board memberships
         
         Note:
@@ -815,51 +821,51 @@ class Board(Board_):
             are derived from the board memberships
 
         Returns:
-            List of all membership types (editor, viewer)
+            Queryable List of all membership types (editor, viewer)
         """
-        return [
+        return QueryableList([
             BoardMembership(**boardMembership).bind(self.routes)
             for boardMembership in self._included['boardMemberships']
-        ]
+        ])
     
     @property
-    def labels(self) -> list[Label]:
+    def labels(self) -> QueryableList[Label]:
         """All labels in the board
         
         Returns:
-            List of all labels in the board
+            Queryable List of all labels in the board
         """
-        return [
+        return QueryableList([
             Label(**label).bind(self.routes)
             for label in self._included['labels']
-        ]
+        ])
     
     @property
-    def lists(self) -> list[List]:
+    def lists(self) -> QueryableList[List]:
         """All lists in the board
         
         Returns:
-            List of all lists in the board
+            Queryable List of all lists in the board
         """
-        return [
+        return QueryableList([
             List(**_list).bind(self.routes)
             for _list in self._included['lists']
-        ]
+        ])
     
     @property
-    def cards(self) -> list[Card]:
+    def cards(self) -> QueryableList[Card]:
         """All cards in the board
         
         Returns:
             A list of all cards in the board
         """
-        return [
+        return QueryableList([
             Card(**card).bind(self.routes)
             for card in self._included['cards']
-        ]
+        ])
     
     @property
-    def cardMemberships(self) -> list[CardMembership]:
+    def cardMemberships(self) -> QueryableList[CardMembership]:
         """All card -> user relationships in the board
         
         Note:
@@ -868,13 +874,13 @@ class Board(Board_):
         Returns:
             A list of all card memberships in the board
         """
-        return [
+        return QueryableList([
             CardMembership(**cardMembership).bind(self.routes)
             for cardMembership in self._included['cardMemberships']
-        ]
+        ])
     
     @property
-    def cardLabels(self) -> list[CardLabel]:
+    def cardLabels(self) -> QueryableList[CardLabel]:
         """All card -> label relationships in the board
         
         Note:
@@ -883,13 +889,13 @@ class Board(Board_):
         Returns:
             A list of all card labels in the board
         """
-        return [
+        return QueryableList([
             CardLabel(**cardLabel).bind(self.routes)
             for cardLabel in self._included['cardLabels']
-        ]
+        ])
     
     @property
-    def tasks(self) -> list[Task]:
+    def tasks(self) -> QueryableList[Task]:
         """All tasks in the board
         
         Note:
@@ -898,13 +904,13 @@ class Board(Board_):
         Returns:
             A list of all card tasks in the board
         """
-        return [
+        return QueryableList([
             Task(**task).bind(self.routes)
             for task in self._included['tasks']
-        ]
+        ])
     
     @property
-    def attachments(self) -> list[Attachment]:
+    def attachments(self) -> QueryableList[Attachment]:
         """All attachments in the board
         
         Note:
@@ -913,10 +919,10 @@ class Board(Board_):
         Returns:
             A list of all card attachments in the board
         """
-        return [
+        return QueryableList([
             Attachment(**attachment).bind(self.routes)
             for attachment in self._included['attachments']
-        ]
+        ])
 
     @overload
     def create_list(self, _list: List) -> List: ...
@@ -1093,79 +1099,73 @@ class User(User_):
 
     """
     @property
-    def projects(self) -> list[Project]:
+    def projects(self) -> QueryableList[Project]:
         """All projects the user is a member of
         
         Returns:
-            List of all projects the user is a member of
+            Queryable List of all projects the user is a member of
         """
         projects_route = self.routes.get_project_index()
-        projects = [
+        return QueryableList([
             Project(**project).bind(self.routes)
             for project in projects_route()['items']
-        ]
-        return [
-            project
-            for project in projects
-            for user in project.users
-            if user.id == self.id
-        ]
+        ]).select_where(lambda project: self in project.users)
     
     @property
-    def boards(self) -> list[Board]:
+    def boards(self) -> QueryableList[Board]:
         """All boards the user is a member of
         
         Returns:
-            List of all boards the user is a member of
+            Queryable List of all boards the user is a member of
         """
-        return [
+        return QueryableList([
             boardMembership.board
             for project in self.projects
             for boardMembership in project.boardMemberships
             if boardMembership.userId == self.id
-        ]
+        ])
     
     @property
-    def cards(self) -> list[Card]:
+    def cards(self) -> QueryableList[Card]:
         """All cards assigned to the user in all projects
         
         Returns:
-            List of all cards assigned to the user
+            Queryable List of all cards assigned to the user
         """
-        return [
+        return QueryableList([
             cardMembership.card
             for board in self.boards
             for cardMembership in board.cardMemberships
             if cardMembership.userId == self.id
-        ]
+        ])
     
     @property
-    def manager_of(self) -> list[Project]:
+    def manager_of(self) -> QueryableList[Project]:
         """All projects the user is a manager of
         
         Returns:
-            List of all projects the user is a manager of
+            Queryable List of all projects the user is a manager of
         """
-        return [
+        return QueryableList([
             project
             for project in self.projects
             for manager in project.managers
             if manager.id == self.id
-        ]
+        ])
     
     @property
-    def notifications(self) -> list[Notification]:
+    def notifications(self) -> QueryableList[Notification]:
         """All notifications for the user
         
         Returns:
-            List of all notifications for the user
+            Queryable List of all notifications for the user
         """
         route = self.routes.get_notification_index()
-        return [
+        return QueryableList([
             Notification(**notification).bind(self.routes)
             for notification in route()['items']
             if notification['userId'] == self.id
-        ]
+        ])
     
     @overload
     def update(self) -> User: ...
@@ -1476,17 +1476,17 @@ class Label(Label_):
         return Board(**board_route()['item']).bind(self.routes)
     
     @property
-    def cards(self) -> list[Card]:
+    def cards(self) -> QueryableList[Card]:
         """All cards with the label in the board
         
         Returns:
-            List of all cards with the label in the board
+            Queryable List of all cards with the label in the board
         """
-        return [
+        return QueryableList([
             cardLabel.card
             for cardLabel in self.board.cardLabels
             if cardLabel.labelId == self.id
-        ]
+        ])
     
     @overload
     def update(self) -> Label: ...
@@ -1669,56 +1669,56 @@ class Card(Card_):
                 return list
     
     @property
-    def labels(self) -> list[Label]:
+    def labels(self) -> QueryableList[Label]:
         """All labels on the card
         
         Returns:
-            List of all labels on the card
+            Queryable List of all labels on the card
         """
-        return [
+        return QueryableList([
             cardLabel.label
             for cardLabel in self.board.cardLabels
             if cardLabel.cardId == self.id
-        ]
+        ])
         
     @property
-    def members(self) -> list[User]:
+    def members(self) -> QueryableList[User]:
         """All users assigned to the card
         
         Returns:
-            List of all users assigned to the card
+            Queryable List of all users assigned to the card
         """
-        return [
+        return QueryableList([
             cardMembership.user
             for cardMembership in self.board.cardMemberships
             if cardMembership.cardId == self.id
-        ]
+        ])
       
     @property
-    def comments(self) -> list[Action]:
+    def comments(self) -> QueryableList[Action]:
         """All comments on the card
         
         Returns:
-            List of all comments on the card
+            Queryable List of all comments on the card
         """
         route = self.routes.get_action_index(cardId=self.id)
-        return [
+        return QueryableList([
             Action(**action).bind(self.routes)
             for action in route()['items']
-        ]
+        ])
     
     @property
-    def tasks(self) -> list[Task]:
+    def tasks(self) -> QueryableList[Task]:
         """All tasks on the card
         
         Returns:
-            List of all tasks on the card
+            Queryable List of all tasks on the card
         """
-        return [
+        return QueryableList([
             task
             for task in self.board.tasks
             if task.cardId == self.id
-        ]
+        ])
     
     @property
     def due_date(self) -> datetime | None:
@@ -2181,17 +2181,17 @@ class List(List_):
         return Board(**board_route()['item']).bind(self.routes)
     
     @property
-    def cards(self) -> list[Card]:
+    def cards(self) -> QueryableList[Card]:
         """All cards in the list
         
         Returns:
-            List of all cards in the list
+            Queryable List of all cards in the list
         """
-        return [
+        return QueryableList([
             card
             for card in self.board.cards
             if card.listId == self.id
-        ]
+        ])
     
     @overload
     def create_card(self, card: Card) -> Card: ...

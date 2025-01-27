@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .interfaces import (
     Planka,
     Project,
@@ -11,7 +13,6 @@ from .interfaces import (
     CardMembership,
     List,
 )
-
 
 from .constants import (
     ActionType,
