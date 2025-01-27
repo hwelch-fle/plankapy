@@ -1,7 +1,8 @@
 # plankapy
 A python 3 based API for controlling Planka
 
-[![Release](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml/badge.svg)](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml)
+[![Release](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml/badge.svg)](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml) [![Docs](https://github.com/hwelch-fle/plankapy/actions/workflows/docs.yml/badge.svg)](https://github.com/hwelch-fle/plankapy/actions/workflows/docs.yml) ![PyPI - Downloads](https://img.shields.io/pypi/dw/plankapy) ![PyPI - Version](https://img.shields.io/pypi/v/plankapy)
+
 
 ## Installation
 ```bash
