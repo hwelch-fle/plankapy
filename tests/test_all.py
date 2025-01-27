@@ -18,40 +18,40 @@ from plankapy import (
 planka = Planka('http://localhost:3000', PasswordAuth('demo', 'demo'))
 
 def reset_planka():
-    for project in planka.projects:
+    for project in planka.projects.select_where(lambda project: project.name == 'Pytest Project'):
         project.delete()
 
-    for user in planka.users:
-        user.delete() if user != planka.me else None
+    for user in planka.users.select_where(lambda user: 'pytest' in user.username):
+        user.delete()
 reset_planka()
 
 @pytest.fixture
 def test_project():
-    return [project for project in planka.projects if project.name == 'Pytest Project'][0]
+    return planka.projects.pop_where(name='Pytest Project')
 
 @pytest.fixture
 def test_board(test_project: Project):
-    return [board for board in test_project.boards if board.name == 'Pytest Board'][0]
+    return test_project.boards.pop_where(name='Pytest Board')
 
 @pytest.fixture
 def test_editor():
-    return [user for user in planka.users if user.username == 'pytest_editor'][0]
+    return planka.users.pop_where(username='pytest_editor')
 
 @pytest.fixture
 def test_viewer():
-    return [user for user in planka.users if user.username == 'pytest_viewer'][0]
+    return planka.users.pop_where(username='pytest_viewer')
 
 @pytest.fixture
 def test_list_a(test_board: Board):
-    return test_board.lists[0]
+    return test_board.lists.pop()
 
 @pytest.fixture
 def test_list_b(test_board: Board):
-    return test_board.lists[1]
+    return test_board.lists.pop(1)
 
 @pytest.fixture
 def test_card(test_list_a: List):
-    return test_list_a.cards[0]
+    return test_list_a.cards.pop()
 
 @pytest.fixture(scope='session', autouse=True)
 def cleanup():
