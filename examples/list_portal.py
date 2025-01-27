@@ -1,66 +1,69 @@
 import time
+
+import sys
+sys.path.append('../src')
+
 from plankapy import PasswordAuth, Planka
 
-def setup(planka: Planka):
-    portal_projects = [p for p in planka.projects if p.name == 'Portal']
-    portal_project = portal_projects[0] if portal_projects else None
-    if not portal_project:
-        planka.create_project('Portal')
-
-    board_a = None
-    board_b = None
-
-    to_b = None
-    to_a = None
-    from_b = None
-    from_a = None
-
-    for board in portal_project.boards:
-        if board.name == 'Board A':
-            board_a = board
-        elif board.name == 'Board B':
-            board_b = board
+def place_portals(planka: Planka):
+    portal_project = (
+        planka.projects.pop_where(name='Portal') or 
+        planka.create_project('Portal', background='blueish-curve')
+    )
     
-    if not board_a:
-        board_a = portal_project.create_board('Board A')
-    if not board_b:
-        board_b = portal_project.create_board('Board B')
+    # Set up the test chambers
+    chamber_one = (
+        portal_project.boards.pop_where(name='Chamber One') or 
+        portal_project.create_board('Chamber One')
+    )
     
-    for list_ in board_a.lists:
-        if list_.name == 'To Board B':
-            to_b = list_
-        elif list_.name == 'From Board B':
-            from_b = list_
+    chamber_two = (
+        portal_project.boards.pop_where(name='Chamber Two') or 
+        portal_project.create_board('Chamber Two')
+    )
     
-    for list_ in board_b.lists:
-        if list_.name == 'To Board A':
-            to_a = list_
-        elif list_.name == 'From Board A':
-            from_a = list_
-
-    if not to_b:
-        to_b = board_a.create_list('To Board B')
-    if not to_a:
-        from_b = board_a.create_list('From Board B')
-    if not to_a:
-        to_a = board_b.create_list('To Board A')
-    if not from_a:
-        from_a = board_b.create_list('From Board A')
+    # Place the Orange Portal
+    orange_enter = (
+        chamber_one.lists.pop_where(name=f'To {chamber_two.name}') or 
+        chamber_one.create_list(name=f'To {chamber_two.name}', position=9999999999)
+    )
+    orange_exit = (
+        chamber_two.lists.pop_where(name=f'From {chamber_one.name}') or 
+        chamber_two.create_list(f'From {chamber_one.name}', position=1)
+    )
     
-    return to_b, to_a, from_b, from_a
+    # Place the Blue Portal
+    blue_enter = (
+        chamber_two.lists.pop_where(name=f'To {chamber_one.name}') or 
+        chamber_two.create_list(f'To {chamber_one.name}', position=9999999999)
+    )
+    
+    blue_exit = (
+        chamber_one.lists.pop_where(name=f'From {chamber_two.name}') or 
+        chamber_one.create_list(f'From {chamber_two.name}', position=1)
+    )
+    
+    # Place Player
+    player = (
+        chamber_one.cards.pop_where(name='Chell') or 
+        chamber_two.cards.pop_where(name='Chell') or 
+        orange_exit.create_card('Chell').add_member(planka.me)
+    )
+    
+    return orange_enter, orange_exit, blue_enter, blue_exit, player
 
 if __name__ == '__main__':
-    planka = Planka('http://localhost:3000', PasswordAuth('demo', 'demo'))
+    planka = Planka('http://localhost:3001', PasswordAuth('demo', 'demo'))
 
-    to_b, to_a, from_b, from_a = setup(planka)
-        
+    orange_enter, orange_exit, blue_enter, blue_exit, player = place_portals(planka)
+    
     while True:
-        for card in to_b.cards:
-            card.move(from_a)
-            print(f'Moved card {card.name} from Board A to Board B')
-
-        for card in to_a.cards:
-            card.move(from_b)
-            print(f'Moved card {card.name} from Board B to Board A')
-        
+        for card in orange_enter.cards:
+            card.move(orange_exit)
+            print(f'{card.name} Entered Orange Portal')
+            
+        for card in blue_enter.cards:
+            card.move(blue_exit)
+            print(f'{card.name} Entered Blue Portal')
+            
         time.sleep(1) # Only poll every second
