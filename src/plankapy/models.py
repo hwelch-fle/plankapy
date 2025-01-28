@@ -9,6 +9,7 @@ from typing import (
     Generic, 
     TypeVar, 
     Callable,
+    Literal,
 )
 
 ## Add fallbacks if typing imports fail 3.8 compatibility
@@ -517,20 +518,22 @@ class Attachment_(Model):
         cardId (int): The ID of the card the attachment is associated with
         dirname (str): The directory name of the attachment
         filename (str): The filename of the attachment
-        image (dict): The image of the attachment
+        image (dict): The image of the attachment in the format `{'width': int, 'height': int}`
         url (str): The URL of the attachment
         coverUrl (str): The cover URL of the attachment
+        cardId (int): The ID of the card the attachment is associated with
         creatorUserId (int): The ID of the user who created the attachment
         createdAt (datetime): The creation date of the attachment
         updatedAt (datetime): The last update date of the attachment
         """
     id: Optional[int]=Unset
     name: Optional[str]=Required
-    dirname: Optional[str]=Required
+    dirname: Optional[Literal['public', 'private/attachments']]=Required
     filename: Optional[str]=Required
     image: Optional[dict]=Unset
     url: Optional[str]=Unset
     coverUrl: Optional[str]=Unset
+    cardId: Optional[int]=Required
     creatorUserId: Optional[int]=Unset
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
