@@ -336,7 +336,11 @@ class Model(Mapping):
         """
         try:
             self.refresh()
+            _self = self
             yield self
+        except Exception as e:
+            self = _self
+            raise e
         finally:
             self.update()
 
