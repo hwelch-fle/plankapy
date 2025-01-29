@@ -648,18 +648,18 @@ class Project(Project_):
     def update(self, project: Project) -> Project: ...
 
     @overload
-    def update(self, name: str=None, background: Gradient=None, 
-               backgroundImage: BackgroundImage=None) -> Project: ...
+    def update(self, name: str=None) -> Project: ...
 
     def update(self, *args, **kwargs) -> Project:
         """Updates the project with new values
-            
+        
+        Note:
+            To set background image, use the `set_background_image` method
+            To set a background gradient, use the `set_background_gradient` method
+        
         Args:
             name (str): Name of the project (required)
-            background (Gradient): Background gradient of the project (default: None)
-            backgroundImage (BackgroundImage): Background image of the project (default: None)
-        
-
+            
         Args: Alternate
             project (Project): Project instance to update (required)
         
@@ -673,18 +673,8 @@ class Project(Project_):
         """
         overload = parse_overload(
             args, kwargs, model='project', 
-            options=('name', 'background', 'backgroundImage'),
+            options=('name',),
             noarg=self)
-        
-        if 'background' in overload:
-            if isinstance(overload['background'], dict): # Handle Noarg case
-                overload['background'] = overload['background']['name']
-                
-            if overload['background'] not in self.gradients:
-                raise ValueError(
-                    f'Invalid gradient: {overload["background"]}'
-                    f'Available gradients: {self.gradients}')
-            overload['background'] = {'name': overload['background'], 'type': 'gradient'}
 
         route = self.routes.patch_project(id=self.id)
         self.__init__(**route(**overload)['item'])
@@ -705,7 +695,11 @@ class Project(Project_):
             raise ValueError(
                 f'Invalid gradient: {gradient}'
                 f'Available gradients: {self.gradients}')
-        self.update(background=gradient)
+        with self.editor():
+            self.backgroundImage = None
+            
+        with self.editor():
+            self.background = {'name': gradient, 'type': 'gradient'}
     
     def set_background_image(self, image: Path) -> BackgroundImage:
         """Add a background image to the project
@@ -722,7 +716,9 @@ class Project(Project_):
     def remove_background_image(self) -> None:
         """Remove the background image from the project"""
         with self.editor():
-            self.backgroundImage = None
+            if self.backgroundImage:
+                self.backgroundImage = None
+                self.background = {'name': f'{choice(self.gradients)}', 'type': 'gradient'}
 
     def refresh(self) -> None:
         """Refreshes the project data
