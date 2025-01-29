@@ -336,10 +336,10 @@ class Model(Mapping):
         """
         try:
             self.refresh()
-            _self = self
+            _self = self.__dict__.copy()
             yield self
         except Exception as e:
-            self = _self
+            self.__dict__ = _self
             raise e
         finally:
             self.update()
