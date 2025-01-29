@@ -1,6 +1,11 @@
 from urllib.request import Request, urlopen, HTTPError
 from urllib.parse import urljoin
 
+from pathlib import Path
+from uuid import uuid4
+from mimetypes import guess_type
+from io import BytesIO
+
 from typing import (
     Optional, 
     TypeAlias, 
@@ -32,7 +37,7 @@ class _BaseHandler(Protocol):
     def delete(self) -> Any: ...
     @contextmanager
     def endpoint_as(self, endpoint: Optional[str]=None) -> Generator[Self, None, None]: ... 
-
+    
 class urllibHandler(_BaseHandler):
     """Base class for handling HTTP requests using urllib"""
     def __init__(self, base_url: str, *,
@@ -69,7 +74,8 @@ class urllibHandler(_BaseHandler):
         except HTTPError as error:
             error.add_note(f"endpoint: {request.full_url}\n"
                            f"headers: {request.headers}\n"
-                           f"data: {request.data}")
+                           f"data: {request.data}\n"
+                           )
             raise error
                 
 
@@ -81,10 +87,63 @@ class urllibHandler(_BaseHandler):
             )
         )
     
+    def _post_file(self, file_path: Path, file_name: str) -> bytes:
+        """Multipart formatting is hard"""
+        # Set headers for file upload
+        headers = self.headers.copy() # Make a copy of the headers
+        
+        headers['Connection'] = 'keep-alive'
+        headers['Accept'] = '*/*'
+        headers['Accept-Encoding'] = 'gzip, deflate, br'
+        
+        # Get file data and MIME type
+        # Default to binary if MIME type is not found
+        mime_type = guess_type(file_name)[0] or 'application/octet-stream' 
+        
+        # Generate boundary for multipart form data
+        boundary_uuid = uuid4().hex
+        boundary = f'--{boundary_uuid}'
+        
+        # Add multipart form data headers with boundary
+        headers['Content-Type'] = f'multipart/form-data; boundary={boundary}'
+        
+        # Get payload parts
+        payload_disposition = f'Content-Disposition: form-data; name="file"; filename="{file_name}"'.encode('utf-8')
+        payload_content_type = f"Content-Type: {mime_type}\r\n\r\n".encode('utf-8')
+        file_data = file_path.read_bytes()
+        
+        # Construct payload
+        payload = BytesIO()
+        payload.write(f'--{boundary}'.encode('utf-8'))    # Boundary
+        payload.write(b'\r\n')                            # New line
+        payload.write(payload_disposition)                # Content-Disposition
+        payload.write(b'\r\n')                            # New line
+        payload.write(payload_content_type)               # Content-Type
+        payload.write(file_data)                          # File data
+        payload.write(b'\r\n')                            # New line
+        payload.write(f'--{boundary}--'.encode('utf-8'))  # End 
+        payload.write(b'\r\n')                            # New line
+        payload = payload.getvalue()                      # Get payload as bytes
+        
+        # Add content length to headers
+        headers['Content-Length'] = len(payload)
+        
+        return self._open(Request(
+            self.endpoint, 
+            headers=headers, 
+            method='POST', 
+            data=payload
+        ))
+    
     def post(self, data: dict) -> bytes:
+        if '_file' in data:
+            file_path = Path(data.pop('_file'))
+            file_name = data.pop('_file_name', file_path.name)
+            return self._post_file(file_path, file_name)
+              
         return self._open(Request(
                 self.endpoint, 
-                headers=self.headers, 
+                headers=self.headers,
                 method='POST', 
                 data=self.encode_data(data)
             )

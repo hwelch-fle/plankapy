@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Type, overload
 from datetime import datetime
 
+from pathlib import Path
+
 from random import choice
 from urllib.request import HTTPError
 
@@ -516,6 +518,12 @@ class Project(Project_):
             for board in self._included['boards']
         ])
     
+    @property
+    def background_image(self) -> BackgroundImage:
+        """Get the project background image"""
+        route = self.routes.get_project_background_images(projectId=self.id)
+        return BackgroundImage(**route()['item'])
+    
     def gradient_css(self) -> str | None:
         """Get the CSS value for the project gradient
 
@@ -704,20 +712,23 @@ class Project(Project_):
                 f'Invalid gradient: {gradient}'
                 f'Available gradients: {self.gradients}')
         self.update(background=gradient)
-
-    def set_background_image(self, image: BackgroundImage) -> None:
-        """Set a background image for the project
-        
-        Warning:
-            This method is not currently supported by plankapy
+    
+    def set_background_image(self, image: Path) -> BackgroundImage:
+        """Add a background image to the project
 
         Args:
-            image (BackgroundImage): Background image to set
-        
-        Raises:
-            NotImplementedError: Setting background images is not currently supported by plankapy
+            image (Path): Path to the image file
+            
+        Returns:
+            BackgroundImage: New background image
         """
-        raise NotImplementedError('setting project background images is not currently supported by plankapy')
+        route = self.routes.post_project_background_image(id=self.id)
+        return BackgroundImage(**route(_file=image)['item']['backgroundImage'])
+        
+    def remove_background_image(self) -> None:
+        """Remove the background image from the project"""
+        with self.editor():
+            self.backgroundImage = None
 
     def refresh(self) -> None:
         """Refreshes the project data
@@ -1632,10 +1643,49 @@ class Attachment(Attachment_):
     
     @property
     def creator(self) -> User:
+        """User that created the attachment"""
         user_route = self.routes.get_user(id=self.creatorUserId)
         return User(**user_route()['item']).bind(self.routes)
     
+    @property
+    def card(self) -> Card:
+        """Card the attachment belongs to"""
+        card_route = self.routes.get_card(id=self.cardId)
+        return Card(**card_route()['item']).bind(self.routes)
+    
+    def refresh(self):
+        """Refreshes the attachment data"""
+        for attachment in self.card.attachments:
+            if attachment.id == self.id:
+                self.__init__(**attachment)
+    
+    def update(self) -> Attachment:
+        """Updates the attachment with new values"""
+        route = self.routes.patch_attachment(id=self.id)
+        self.__init__(**route(**self)['item'])
+        return self
+    
+    def delete(self) -> Attachment:
+        """Deletes the attachment
+        
+        Danger:
+            This action is irreversible and cannot be undone
+        
+        Returns:
+            Attachment: Deleted attachment instance
+        """
+        self.refresh()
+        route = self.routes.delete_attachment(id=self.id)
+        route()
+        return self
+    
 class Card(Card_):
+    
+    @property 
+    def _included(self) -> JSONHandler.JSONResponse:
+        route = self.routes.get_card(id=self.id)
+        return route()['included']
+        
     
     @property
     def creator(self) -> User:
@@ -1721,6 +1771,17 @@ class Card(Card_):
         ])
     
     @property
+    def attachments(self) -> QueryableList[Attachment]:
+        """All attachments on the card
+        
+        Returns:
+            Queryable List of all attachments on the card
+        """
+        return QueryableList(
+            Attachment(**attachment).bind(self.routes)
+            for attachment in self._included['attachments'])
+    
+    @property
     def due_date(self) -> datetime | None:
         """Due date of the card in datetime format
 
@@ -1732,7 +1793,7 @@ class Card(Card_):
             Due date of the card
         """
         return datetime.fromisoformat(self.dueDate) if self.dueDate else None
-
+    
     def move(self, list: List) -> Card:
         """Moves the card to a new list
         
@@ -1758,6 +1819,26 @@ class Card(Card_):
         """
         route = self.routes.post_duplicate_card(id=self.id)
         return Card(**route(**self)['item']).bind(self.routes)
+    
+    # Not currently working without a file upload endpoint
+    # For this to work, we'd need to take the aattacment data, post it to the filesystem,
+    # Then take the response object and dumb those values (url, coverUrl) into a new
+    # Attachment object then post it to the card using the `post_attachment(cardId)` route
+    def add_attachment(self, file_path: Path) -> Attachment:
+        """Adds an attachment to the card
+        
+        Danger:
+            Until file uploads are supported by the API, plankapy can only delete attachments 
+            and list existing attachments.
+        
+        Args:
+            attachment (Attachment): Attachment instance to add
+            
+        Returns:
+            Attachment: New attachment instance
+        """
+        route = self.routes.post_attachment(cardId=self.id)
+        return Attachment(**route(_file=file_path)['item']).bind(self.routes)
     
     def add_label(self, label: Label) -> CardLabel:
         """Adds a label to the card
@@ -1873,6 +1954,23 @@ class Card(Card_):
                 self.stopwatch = {**Stopwatch(startedAt=None, total=0).stop()}
         return self.stopwatch
 
+    def remove_attachment(self, attachment: Attachment) -> Attachment | None:
+        """Removes an attachment from the card
+        
+        Args:
+            attachment (Attachment): Attachment instance to remove
+            
+        Note:
+            This method will remove the attachment from the card, but the attachment itself will not be deleted
+
+        Returns:
+            Card: The card instance with the attachment removed
+        """
+        for card_attachment in self.attachments:
+            if card_attachment.id == attachment.id:
+                return card_attachment.delete()
+        return None
+    
     def remove_label(self, label: Label) -> Card:
         """Removes a label from the card
         
