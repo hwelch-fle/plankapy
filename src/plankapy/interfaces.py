@@ -518,6 +518,12 @@ class Project(Project_):
             for board in self._included['boards']
         ])
     
+    @property
+    def background_image(self) -> BackgroundImage:
+        """Get the project background image"""
+        route = self.routes.get_project_background_images(projectId=self.id)
+        return BackgroundImage(**route()['item'])
+    
     def gradient_css(self) -> str | None:
         """Get the CSS value for the project gradient
 
@@ -706,20 +712,23 @@ class Project(Project_):
                 f'Invalid gradient: {gradient}'
                 f'Available gradients: {self.gradients}')
         self.update(background=gradient)
-
-    def set_background_image(self, image: BackgroundImage) -> None:
-        """Set a background image for the project
-        
-        Warning:
-            This method is not currently supported by plankapy
+    
+    def set_background_image(self, image: Path) -> BackgroundImage:
+        """Add a background image to the project
 
         Args:
-            image (BackgroundImage): Background image to set
-        
-        Raises:
-            NotImplementedError: Setting background images is not currently supported by plankapy
+            image (Path): Path to the image file
+            
+        Returns:
+            BackgroundImage: New background image
         """
-        raise NotImplementedError('setting project background images is not currently supported by plankapy')
+        route = self.routes.post_project_background_image(id=self.id)
+        return BackgroundImage(**route(_file=image)['item']['backgroundImage'])
+        
+    def remove_background_image(self) -> None:
+        """Remove the background image from the project"""
+        with self.editor():
+            self.backgroundImage = None
 
     def refresh(self) -> None:
         """Refreshes the project data
@@ -1815,7 +1824,7 @@ class Card(Card_):
     # For this to work, we'd need to take the aattacment data, post it to the filesystem,
     # Then take the response object and dumb those values (url, coverUrl) into a new
     # Attachment object then post it to the card using the `post_attachment(cardId)` route
-    def add_attachment(self, attachment: Attachment) -> Attachment:
+    def add_attachment(self, file_path: Path) -> Attachment:
         """Adds an attachment to the card
         
         Danger:
@@ -1829,7 +1838,7 @@ class Card(Card_):
             Attachment: New attachment instance
         """
         route = self.routes.post_attachment(cardId=self.id)
-        return Attachment(**route(**attachment)['item']).bind(self.routes)
+        return Attachment(**route(_file=file_path)['item']).bind(self.routes)
     
     def add_label(self, label: Label) -> CardLabel:
         """Adds a label to the card
