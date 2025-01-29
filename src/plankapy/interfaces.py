@@ -518,12 +518,6 @@ class Project(Project_):
             for board in self._included['boards']
         ])
     
-    @property
-    def background_image(self) -> BackgroundImage:
-        """Get the project background image"""
-        route = self.routes.get_project_background_images(projectId=self.id)
-        return BackgroundImage(**route()['item'])
-    
     def gradient_css(self) -> str | None:
         """Get the CSS value for the project gradient
 
