@@ -390,11 +390,22 @@ class Planka:
     def create_user(self, username: str, email: str, password: str, name: str=None) -> User:
         """Create a new user
         
+        Note:
+            Planka will reject insecure passwords! If creating a user with a specific password fails, 
+            try a more secure password
+        
+        Note:
+            If the username is not lowercase, it will be converted to lowercase
+
         Args:
-            username: Will assign username to `name` and `username`
-            email: 
-            password: Must be moderately secure or will raise a 400 error!
-            name: The full name of the user (default: `username` value)
+            username (str): Username of the user (required)
+            email (str): Email address of the user (required)
+            password (str): Password for the user (required)
+            name (str): Full name of the user (default: `username`)
+
+        Raises:
+            ValueError: If the username or email already exists
+            ValueError: If password is insecure or a 400 code is returned
         """
 
         username = username.strip()
