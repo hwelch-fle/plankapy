@@ -1233,14 +1233,20 @@ class User(User_):
         path.write_bytes(self.routes.handler._get_file(self.avatarUrl))
         return path
 
-    def set_avatar(self, image: Path) -> None:
+    def set_avatar(self, image: Path) -> User:
         """Set the user's avatar
         
+        Note:
+            The image path can be a local filepath or a URL.
+
         Args:
             image (Path): Path to the image file
+
+        Returns:
+            User: Updated user instance
         """
         route = self.routes.post_user_avatar(id=self.id)
-        return route(_file=image)
+        return User(**route(_file=image)).bind(self.routes)
 
     def remove_avatar(self) -> None:
         """Remove the user's avatar"""
