@@ -1495,6 +1495,9 @@ class BoardMembership(BoardMembership_):
         Returns:
             BoardMembership: Updated board membership instance
 
+        Raises:
+            ValueError: If the role is invalid (must be 'viewer' or 'editor')
+
         Note:
             If no arguments are provided, the board membership will update itself with the current values stored in its attributes
         """
@@ -1609,6 +1612,9 @@ class Label(Label_):
             
         Returns:
             Label: Updated label instance
+
+        Raises:
+            ValueError: If the color is not in the available colors
         """
         overload = parse_overload(
             args, kwargs, 
