@@ -5,6 +5,7 @@ from pathlib import Path
 from uuid import uuid4
 from mimetypes import guess_type
 from io import BytesIO
+from . import __version__ # Used for User-Agent header
 
 from typing import (
     Optional, 
@@ -78,6 +79,13 @@ class urllibHandler(_BaseHandler):
                            )
             raise error
                 
+    def _get_file(self, url: str) -> bytes:
+        return self._open(Request(
+                url, 
+                method='GET',
+                headers={'User-Agent': f'Plankapy / {__version__}'}
+            )
+        )
 
     def get(self) -> bytes:
         return self._open(Request(
@@ -110,7 +118,11 @@ class urllibHandler(_BaseHandler):
         # Get payload parts
         payload_disposition = f'Content-Disposition: form-data; name="file"; filename="{file_name}"'.encode('utf-8')
         payload_content_type = f"Content-Type: {mime_type}\r\n\r\n".encode('utf-8')
-        file_data = file_path.read_bytes()
+        if str(file_path).startswith('http'):
+            # Pop the raw path from the Path object so we don't need to reformat the URL
+            file_data = BytesIO(self._get_file(file_path._raw_paths.pop())).read()
+        else:
+            file_data = file_path.read_bytes()
         
         # Construct payload
         payload = BytesIO()
@@ -136,6 +148,8 @@ class urllibHandler(_BaseHandler):
         ))
     
     def post(self, data: dict) -> bytes:
+
+        # Pass file uploads to _post_file method
         if '_file' in data:
             file_path = Path(data.pop('_file'))
             file_name = data.pop('_file_name', file_path.name)
