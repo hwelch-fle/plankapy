@@ -710,6 +710,13 @@ class Project(Project_):
             options=('name',),
             noarg=self)
 
+        # Keep it backwards compatible
+        # Allow setting gradient directly by name
+        if 'background' in overload and isinstance(overload['background'], str):
+            bg = overload.pop('background') # Remove background from overload
+            if bg in self.gradients:
+                self.set_background_gradient(bg) # Set the gradient if it's valid
+
         route = self.routes.patch_project(id=self.id)
         self.__init__(**route(**overload)['item'])
         return self
@@ -737,9 +744,7 @@ class Project(Project_):
                 f'Available gradients: {self.gradients}')
         
         with self.editor():
-            self.backgroundImage = None
-            
-        with self.editor():
+            self.backgroundImage = None            
             self.background = {'name': gradient, 'type': 'gradient'}
         
         return self
@@ -1243,7 +1248,7 @@ class User(User_):
             User: Updated user instance
         """
         route = self.routes.post_user_avatar(id=self.id)
-        return User(**route(_file=image)).bind(self.routes)
+        return User(**route(_file=image)['item']).bind(self.routes)
 
     def remove_avatar(self) -> None:
         """Remove the user's avatar"""
@@ -1916,7 +1921,7 @@ class Card(Card_):
         return Card(**route(**self)['item']).bind(self.routes)
     
     # Not currently working without a file upload endpoint
-    # For this to work, we'd need to take the aattacment data, post it to the filesystem,
+    # For this to work, we'd need to take the attacment data, post it to the filesystem,
     # Then take the response object and dumb those values (url, coverUrl) into a new
     # Attachment object then post it to the card using the `post_attachment(cardId)` route
     def add_attachment(self, file_path: Path) -> Attachment:
