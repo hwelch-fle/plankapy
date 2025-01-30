@@ -695,12 +695,18 @@ class Project(Project_):
         self.__init__(**route(**overload)['item'])
         return self
 
-    def set_background_gradient(self, gradient: Gradient) -> None:
+    def set_background_gradient(self, gradient: Gradient) -> Project:
         """Set a background gradient for the project
         
         Args:
             gradient (Gradient): Background gradient to set
         
+        Returns:
+            Project: Updated project instance
+
+        Raises:
+            ValueError: If the gradient name is not in the available gradients
+            
         Example:
             ```python
             >>> project.set_background_gradient('blue-xchange')
@@ -710,11 +716,14 @@ class Project(Project_):
             raise ValueError(
                 f'Invalid gradient: {gradient}'
                 f'Available gradients: {self.gradients}')
+        
         with self.editor():
             self.backgroundImage = None
             
         with self.editor():
             self.background = {'name': gradient, 'type': 'gradient'}
+        
+        return self
     
     def set_background_image(self, image: Path) -> BackgroundImage:
         """Add a background image to the project
