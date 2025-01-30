@@ -1740,6 +1740,23 @@ class Attachment(Attachment_):
             if attachment.id == self.id:
                 self.__init__(**attachment)
     
+    def data(self) -> bytes:
+        """Attachment data as bytes
+        
+        Returns:
+            Attachment data
+        """
+        return self.routes.handler._get_file(self.url)
+
+    def download(self, path: Path) -> None:
+        """Downloads the attachment to a file
+        
+        Args:
+            path (Path): Path to the file to save the attachment to
+        """
+        with open(path, 'wb') as file:
+            file.write(self.data())
+
     def update(self) -> Attachment:
         """Updates the attachment with new values"""
         route = self.routes.patch_attachment(id=self.id)
