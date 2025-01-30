@@ -16,7 +16,7 @@ pip install plankapy
 ## Documentation
 The full documentation can be found [here](https://hwelch-fle.github.io/plankapy/).
 
-All Interfaces are documented in the [API](https://hwelch-fle.github.io/plankapy/Planka) section.
+All Interfaces are documented in the [API](https://hwelch-fle.github.io/plankapy/interfaces/Planka/) section.
 
 ## Features
 ### No Keys Required
