@@ -291,7 +291,7 @@ class Planka:
         ])
     
     @property
-    def project_background_images(self, NOT_IMPLEMENTED) -> QueryableList[BackgroundImage]:
+    def project_background_images(self) -> QueryableList[BackgroundImage]:
         """Get Project Background Images
         
         Attention:
@@ -300,20 +300,24 @@ class Planka:
         Raises:
             NotImplementedError
         """
-        raise NotImplementedError('Getting project backgrounds is not currently supported by plankapy')
+        return QueryableList(
+            BackgroundImage(**project.backgroundImage)
+            for project in self.projects
+            if project.backgroundImage
+        )
 
     @property
-    def user_avatars(self, NOT_IMPLEMENTED) -> QueryableList[str]:
+    def user_avatars(self) -> list[str]:
         """Get User Avatars
 
-        Attention:
-            Requires client side rendering, not currently supported
-        
-        Raises:
-            NotImplementedError
+        Returns:
+            Queryable List of all user avatar links
         """
-        raise NotImplementedError('Getting user avatars is not currently supported by plankapy')
-
+        return [
+            user.avatarUrl
+            for user in self.users
+            if user.avatarUrl
+        ]
     @property
     def me(self) -> User:
         """Current Logged in User
