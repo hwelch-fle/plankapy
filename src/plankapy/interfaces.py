@@ -1217,14 +1217,21 @@ class User(User_):
             if notification['userId'] == self.id
         ])
     
-    @property
-    def avatar(self) -> str:
-        """User's avatar url
+    def download_avatar(self, path: Path) -> Path | None:
+        """Download the user's avatar to a file
         
-        Returns:
-            Avatar url
+        Args:
+            path (Path): Path to save the avatar image
+        
+        Raises:
+            ValueError: If the user has no avatar
         """
-        return self.avatarUrl
+        if self.avatarUrl is None:
+            return None
+        
+        path = Path(path)
+        path.write_bytes(self.routes.handler._get_file(self.avatarUrl))
+        return path
 
     def set_avatar(self, image: Path) -> None:
         """Set the user's avatar
