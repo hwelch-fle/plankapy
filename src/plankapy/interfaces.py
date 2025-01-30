@@ -291,7 +291,7 @@ class Planka:
         ])
     
     @property
-    def project_background_images(self, NOT_IMPLEMENTED) -> QueryableList[BackgroundImage]:
+    def project_background_images(self) -> QueryableList[BackgroundImage]:
         """Get Project Background Images
         
         Attention:
@@ -300,20 +300,24 @@ class Planka:
         Raises:
             NotImplementedError
         """
-        raise NotImplementedError('Getting project backgrounds is not currently supported by plankapy')
+        return QueryableList(
+            BackgroundImage(**project.backgroundImage)
+            for project in self.projects
+            if project.backgroundImage
+        )
 
     @property
-    def user_avatars(self, NOT_IMPLEMENTED) -> QueryableList[str]:
+    def user_avatars(self) -> list[str]:
         """Get User Avatars
 
-        Attention:
-            Requires client side rendering, not currently supported
-        
-        Raises:
-            NotImplementedError
+        Returns:
+            Queryable List of all user avatar links
         """
-        raise NotImplementedError('Getting user avatars is not currently supported by plankapy')
-
+        return [
+            user.avatarUrl
+            for user in self.users
+            if user.avatarUrl
+        ]
     @property
     def me(self) -> User:
         """Current Logged in User
@@ -386,11 +390,22 @@ class Planka:
     def create_user(self, username: str, email: str, password: str, name: str=None) -> User:
         """Create a new user
         
+        Note:
+            Planka will reject insecure passwords! If creating a user with a specific password fails, 
+            try a more secure password
+        
+        Note:
+            If the username is not lowercase, it will be converted to lowercase
+
         Args:
-            username: Will assign username to `name` and `username`
-            email: 
-            password: Must be moderately secure or will raise a 400 error!
-            name: The full name of the user (default: `username` value)
+            username (str): Username of the user (required)
+            email (str): Email address of the user (required)
+            password (str): Password for the user (required)
+            name (str): Full name of the user (default: `username`)
+
+        Raises:
+            ValueError: If the username or email already exists
+            ValueError: If password is insecure or a 400 code is returned
         """
 
         username = username.strip()
@@ -518,6 +533,28 @@ class Project(Project_):
             for board in self._included['boards']
         ])
     
+    def download_background_image(self, path: Path) -> Path | None:
+        """Download a background image from the project
+        
+        Args:
+            path (Path): Path to save the image file
+        
+        Returns:
+            Path: Path to the downloaded image file or None if no background image is set
+            
+        Example:
+            ```python
+            >>> project.download_background_image('/home/user/downloads/background.jpg')
+            ```
+        """
+        if not self.backgroundImage:
+            return None
+        
+        path = Path(path)
+        path.write_bytes(self.routes.handler._get_file(self.backgroundImage['url']))
+        return path
+        
+
     def gradient_css(self) -> str | None:
         """Get the CSS value for the project gradient
 
@@ -680,12 +717,18 @@ class Project(Project_):
         self.__init__(**route(**overload)['item'])
         return self
 
-    def set_background_gradient(self, gradient: Gradient) -> None:
+    def set_background_gradient(self, gradient: Gradient) -> Project:
         """Set a background gradient for the project
         
         Args:
             gradient (Gradient): Background gradient to set
         
+        Returns:
+            Project: Updated project instance
+
+        Raises:
+            ValueError: If the gradient name is not in the available gradients
+            
         Example:
             ```python
             >>> project.set_background_gradient('blue-xchange')
@@ -695,11 +738,14 @@ class Project(Project_):
             raise ValueError(
                 f'Invalid gradient: {gradient}'
                 f'Available gradients: {self.gradients}')
+        
         with self.editor():
             self.backgroundImage = None
             
         with self.editor():
             self.background = {'name': gradient, 'type': 'gradient'}
+        
+        return self
     
     def set_background_image(self, image: Path) -> BackgroundImage:
         """Add a background image to the project
@@ -1010,6 +1056,9 @@ class Board(Board_):
         
         Returns:
             BoardMembership: New board membership
+
+        Raises:
+            ValueError: If the role is invalid (must be 'viewer' or 'editor')
         """
         if role not in self.roles:
             raise ValueError(f'Invalid role: {role}')
@@ -1168,23 +1217,36 @@ class User(User_):
             if notification['userId'] == self.id
         ])
     
-    @property
-    def avatar(self) -> str:
-        """User's avatar url
-        
-        Returns:
-            Avatar url
-        """
-        return self.avatarUrl
-
-    def set_avatar(self, image: Path) -> None:
-        """Set the user's avatar
+    def download_avatar(self, path: Path) -> Path | None:
+        """Download the user's avatar to a file
         
         Args:
+            path (Path): Path to save the avatar image
+        
+        Raises:
+            ValueError: If the user has no avatar
+        """
+        if self.avatarUrl is None:
+            return None
+        
+        path = Path(path)
+        path.write_bytes(self.routes.handler._get_file(self.avatarUrl))
+        return path
+
+    def set_avatar(self, image: Path) -> User:
+        """Set the user's avatar
+        
+        Note:
+            The image path can be a local filepath or a URL.
+
+        Args:
             image (Path): Path to the image file
+
+        Returns:
+            User: Updated user instance
         """
         route = self.routes.post_user_avatar(id=self.id)
-        return route(_file=image)
+        return User(**route(_file=image)).bind(self.routes)
 
     def remove_avatar(self) -> None:
         """Remove the user's avatar"""
@@ -1433,6 +1495,9 @@ class BoardMembership(BoardMembership_):
         Returns:
             BoardMembership: Updated board membership instance
 
+        Raises:
+            ValueError: If the role is invalid (must be 'viewer' or 'editor')
+
         Note:
             If no arguments are provided, the board membership will update itself with the current values stored in its attributes
         """
@@ -1547,6 +1612,9 @@ class Label(Label_):
             
         Returns:
             Label: Updated label instance
+
+        Raises:
+            ValueError: If the color is not in the available colors
         """
         overload = parse_overload(
             args, kwargs, 
@@ -1672,6 +1740,23 @@ class Attachment(Attachment_):
             if attachment.id == self.id:
                 self.__init__(**attachment)
     
+    def data(self) -> bytes:
+        """Attachment data as bytes
+        
+        Returns:
+            Attachment data
+        """
+        return self.routes.handler._get_file(self.url)
+
+    def download(self, path: Path) -> None:
+        """Downloads the attachment to a file
+        
+        Args:
+            path (Path): Path to the file to save the attachment to
+        """
+        with open(path, 'wb') as file:
+            file.write(self.data())
+
     def update(self) -> Attachment:
         """Updates the attachment with new values"""
         route = self.routes.patch_attachment(id=self.id)
