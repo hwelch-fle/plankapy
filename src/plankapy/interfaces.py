@@ -1926,6 +1926,7 @@ class Card(Card_):
     # Attachment object then post it to the card using the `post_attachment(cardId)` route
     def add_attachment(self, file_path: Path) -> Attachment:
         """Adds an attachment to the card
+        
         Args:
             attachment (Attachment): Attachment instance to add (can be a file path or url)
             
