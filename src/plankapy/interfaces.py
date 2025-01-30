@@ -294,11 +294,8 @@ class Planka:
     def project_background_images(self) -> QueryableList[BackgroundImage]:
         """Get Project Background Images
         
-        Attention:
-            Requires client side rendering, not currently supported
-        
-        Raises:
-            NotImplementedError
+        Returns:
+            Queryable List of all project background images
         """
         return QueryableList(
             BackgroundImage(**project.backgroundImage)
