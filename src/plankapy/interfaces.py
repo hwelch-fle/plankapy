@@ -533,6 +533,28 @@ class Project(Project_):
             for board in self._included['boards']
         ])
     
+    def download_background_image(self, path: Path) -> Path | None:
+        """Download a background image from the project
+        
+        Args:
+            path (Path): Path to save the image file
+        
+        Returns:
+            Path: Path to the downloaded image file or None if no background image is set
+            
+        Example:
+            ```python
+            >>> project.download_background_image('/home/user/downloads/background.jpg')
+            ```
+        """
+        if not self.backgroundImage:
+            return None
+        
+        path = Path(path)
+        path.write_bytes(self.routes.handler._get_file(self.backgroundImage['url']))
+        return path
+        
+
     def gradient_css(self) -> str | None:
         """Get the CSS value for the project gradient
 
