@@ -1168,6 +1168,29 @@ class User(User_):
             if notification['userId'] == self.id
         ])
     
+    @property
+    def avatar(self) -> str:
+        """User's avatar url
+        
+        Returns:
+            Avatar url
+        """
+        return self.avatarUrl
+
+    def set_avatar(self, image: Path) -> None:
+        """Set the user's avatar
+        
+        Args:
+            image (Path): Path to the image file
+        """
+        route = self.routes.post_user_avatar(id=self.id)
+        return route(_file=image)
+
+    def remove_avatar(self) -> None:
+        """Remove the user's avatar"""
+        with self.editor():
+            self.avatarUrl = None
+
     @overload
     def update(self) -> User: ...
 
