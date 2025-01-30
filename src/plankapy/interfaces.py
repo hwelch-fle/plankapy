@@ -1056,6 +1056,9 @@ class Board(Board_):
         
         Returns:
             BoardMembership: New board membership
+
+        Raises:
+            ValueError: If the role is invalid (must be 'viewer' or 'editor')
         """
         if role not in self.roles:
             raise ValueError(f'Invalid role: {role}')
