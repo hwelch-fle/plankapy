@@ -92,10 +92,17 @@ def test_create_project():
 
 def test_change_gradient(test_project: Project):
     for gradient in test_project.gradients:
+        test_project.set_background_gradient(gradient)
+        assert test_project.background.get('name') == gradient, f'{test_project.background.get("name")} != {gradient}'
+
+    # Test backwards compatibility
+    for gradient in test_project.gradients:
         with test_project.editor():
             test_project.background = gradient
-        
         assert test_project.background.get('name') == gradient, f'{test_project.background.get("name")} != {gradient}'
+
+def test_set_project_background(test_project: Project):
+    assert test_project.set_background_image('https://planka.app/cms-content/1/uploads/images/606395ea59a7c35fa8/demo28594da7dd7582c7f4c59bb263d1048e.gif'), 'Failed to set background'        
 
 def test_add_project_manager(test_project: Project, test_editor: User):
     assert test_project.add_project_manager(test_editor), 'Failed to add manager'
@@ -106,6 +113,14 @@ def test_remove_project_manager(test_project: Project, test_editor: User):
     assert test_project.remove_project_manager(test_editor), 'Failed to remove manager'
     assert test_editor not in test_project.managers, f'{test_editor.name} still in {test_project.name} managers'
     assert test_project not in test_editor.manager_of, f'{test_editor.name} still manager of {test_project.name}'
+
+def test_remove_user_avatar(test_editor: User, test_viewer: User):
+    assert not test_editor.remove_avatar(), 'Failed to remove avatar'
+    assert not test_viewer.remove_avatar(), 'Failed to remove avatar'
+
+def test_set_user_avatar(test_editor: User, test_viewer: User):
+    assert test_editor.set_avatar('https://planka.app/cms-content/1/uploads/site/sitelogomenue.png'), 'Failed to set avatar'
+    assert test_viewer.set_avatar('https://www.python.org/static/img/python-logo-large.c36dccadd999.png'), 'Failed to set avatar'
 
 def test_create_board(test_project: Project):
     assert test_project.create_board('Pytest Board'), 'Failed to create board'
