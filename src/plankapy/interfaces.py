@@ -1928,7 +1928,7 @@ class Card(Card_):
         """Adds an attachment to the card
         
         Args:
-            attachment (Attachment): Attachment instance to add (can be a file path or url)
+            attachment (Path | <url>): Attachment instance to add (can be a file path or url)
             
         Returns:
             Attachment: New attachment instance
