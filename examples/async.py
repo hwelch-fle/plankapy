@@ -4,7 +4,7 @@ sys.path.append('../src')
 import time
 import asyncio
 from pathlib import Path
-from plankapy import Planka, PasswordAuth, QueryableList, List, Card, Attachment, Board
+from plankapy import Planka, PasswordAuth, QueryableList, List, Board
 
 planka = Planka('http://localhost:3000', PasswordAuth('demo', 'demo'))
 
@@ -21,16 +21,19 @@ def setup_board_sync(attachment: Path) -> Board:
             c = list.create_card(f"Card {i} - {list.name}")
             if attachment:
                 c.add_attachment(attachment)
-    
+        print(f"Created 100 cards in list {list.name}")
     return board
 
-async def create_cards(count: int, lists: list[List], attachment: Path):
-    for _ in (
-        list.create_card(f"Card {i} - {list.name}").add_attachment(attachment) 
-        for i in range(1, count) 
-        for list in lists
-        if attachment):
-        pass
+async def create_cards_async(count: int, lists: list[List], attachment: Path):
+    for list in lists:
+        tasks = [asyncio.to_thread(list.create_card, f"Card {i} - {list.name}") for i in range(1, count+1)]
+        cards = await asyncio.gather(*tasks)
+        print(f"Created {len(cards)} cards in list {list.name}")
+
+        if attachment:
+            print(f"Attaching {attachment.name} to cards in list {list.name}")
+            tasks = (asyncio.to_thread(card.add_attachment, attachment) for card in cards)
+            await asyncio.gather(*tasks)
 
 async def setup_board_async(attachment: Path) -> Board:
     project = planka.create_project("Async Test")
@@ -40,21 +43,15 @@ async def setup_board_async(attachment: Path) -> Board:
     for list_name in ("To Do", "Doing", "Done"):
         lists.append(board.create_list(list_name))
     
-    await create_cards(101, lists, attachment)
+    await create_cards_async(100, lists, attachment)
     return board
-
-def batch_attach_sync(cards: list[Card], attachment: Path):
-    return [card.add_attachment(attachment) for card in cards if attachment]
-
-async def batch_attach_async(cards: list[Card], attachment: Path):
-    tasks = (card.add_attachment(attachment) for card in cards if attachment)
-    return await asyncio.gather(*tasks)
 
 def cleanup_project():
     planka.projects.pop_where(name="Async Test").delete()
 
 if __name__ == "__main__":
-    attachment = Path('https://upload.wikimedia.org/wikipedia/commons/d/dc/RCA_Indian_Head_test_pattern.png')
+    #attachment = Path('https://upload.wikimedia.org/wikipedia/commons/d/dc/RCA_Indian_Head_test_pattern.png')
+    attachment = None
     test_type = 'both'
 
     if test_type == 'async' or 'both':
