@@ -89,6 +89,19 @@ ListSorts = {
     'Newest First': 'createdAt_desc',
 }
 
+ListColors = Literal[
+  'berry-red',
+  'pumpkin-orange',
+  'lagoon-blue',
+  'pink-tulip',
+  'light-mud',
+  'orange-peel',
+  'bright-moss',
+  'antique-blue',
+  'dark-granite',
+  'turquoise-sea',
+]
+
 SortOption = Literal[
     'Name',
     'Due date',
