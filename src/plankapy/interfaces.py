@@ -45,6 +45,7 @@ from .constants import (
     BackgroundImage,
     SortOption,
     ListSorts,
+    ListColors,
 )
 
 
@@ -2540,6 +2541,26 @@ class List(List_):
             if _list.id == self.id:
                 self.__init__(**_list)
 
+    def set_color(self, color: ListColors) -> List:
+        """Sets the color of the list
+        
+        Note:
+            This method is only available in Planka 2.0.0 and later
+
+        Args:
+            color (str): Color of the list
+            
+        Returns:
+            List: The list instance with the color set
+        """
+        if color not in ListColors.__args__:
+            raise ValueError(
+                f"Invalid color: {color}\n"
+                f"Valid colors: {ListColors.__args__}")
+        with self.editor():
+            self.color = color
+        return self
+    
 class ProjectManager(ProjectManager_):
     
     @property

@@ -785,6 +785,7 @@ class List_(Model):
         name (str): The name of the list
         position (int): The position of the list
         boardId (int): The ID of the board the list is associated with
+        color (str): The color of the list
         createdAt (datetime): The creation date of the list
         updatedAt (datetime): The last update date of the list
     """
@@ -792,6 +793,7 @@ class List_(Model):
     name: Optional[str]=Required
     position: Optional[int]=Required
     boardId: Optional[int]=Required
+    color: Optional[str]=Unset
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
 
