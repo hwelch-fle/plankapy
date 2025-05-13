@@ -1,0 +1,3246 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://hwelch-fle.github.io/plankapy/interfaces/List/">
+      
+      
+        <link rel="prev" href="../Label/">
+      
+      
+        <link rel="next" href="../Card/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
+    
+    
+      
+        <title>List - Plankapy</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#list" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Plankapy" class="md-header__button md-logo" aria-label="Plankapy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Plankapy
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              List
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 2C5.13 2 2 5.13 2 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7M6 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H6zm13-8h-2l-3.2 9h1.9l.7-2h3.2l.7 2h1.9zm-2.15 5.65L18 15l1.15 3.65z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="amber"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hwelch-fle/plankapy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../models/QueryableList/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../examples/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Examples
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Plankapy" class="md-nav__button md-logo" aria-label="Plankapy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Plankapy
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hwelch-fle/plankapy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/QueryableList/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    QueryableList
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Planka/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Planka
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Authentication Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Authentication Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../auth/PasswordAuth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    PasswordAuth
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../auth/TokenAuth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TokenAuth
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            User Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../User/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Notification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Notification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Project Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            Project Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ProjectManager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ProjectManager
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Board Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            Board Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Board/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Board
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BoardMembership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    BoardMembership
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Label/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Label
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    List
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    List
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List" class="md-nav__link">
+    <span class="md-ellipsis">
+      List
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.board" class="md-nav__link">
+    <span class="md-ellipsis">
+      board
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.cards" class="md-nav__link">
+    <span class="md-ellipsis">
+      cards
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.create_card" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_card
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      refresh
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.set_color" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_color
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_due_date" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_due_date
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_newest" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_newest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_oldest" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_oldest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      update
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Card Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            Card Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Card/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Card
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CardLabel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CardLabel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CardMembership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CardMembership
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CardSubscription/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CardSubscription
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Attachment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Attachment
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Action/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Action
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Stopwatch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Stopwatch
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../constants/constants/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Constants
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../helpers/helpers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Helpers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Unused
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            Unused
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentityProviderUser/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IdentityProviderUser
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Archive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List" class="md-nav__link">
+    <span class="md-ellipsis">
+      List
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.board" class="md-nav__link">
+    <span class="md-ellipsis">
+      board
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.cards" class="md-nav__link">
+    <span class="md-ellipsis">
+      cards
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.create_card" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_card
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      refresh
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.set_color" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_color
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_due_date" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_due_date
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_newest" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_newest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.sort_by_oldest" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_by_oldest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plankapy.interfaces.List.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      update
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="list">List<a class="headerlink" href="#list" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="plankapy.interfaces.List"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" href="../../models/models/#plankapy.models.List_">List_</a></code></p>
+
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2366</span>
+<span class="normal">2367</span>
+<span class="normal">2368</span>
+<span class="normal">2369</span>
+<span class="normal">2370</span>
+<span class="normal">2371</span>
+<span class="normal">2372</span>
+<span class="normal">2373</span>
+<span class="normal">2374</span>
+<span class="normal">2375</span>
+<span class="normal">2376</span>
+<span class="normal">2377</span>
+<span class="normal">2378</span>
+<span class="normal">2379</span>
+<span class="normal">2380</span>
+<span class="normal">2381</span>
+<span class="normal">2382</span>
+<span class="normal">2383</span>
+<span class="normal">2384</span>
+<span class="normal">2385</span>
+<span class="normal">2386</span>
+<span class="normal">2387</span>
+<span class="normal">2388</span>
+<span class="normal">2389</span>
+<span class="normal">2390</span>
+<span class="normal">2391</span>
+<span class="normal">2392</span>
+<span class="normal">2393</span>
+<span class="normal">2394</span>
+<span class="normal">2395</span>
+<span class="normal">2396</span>
+<span class="normal">2397</span>
+<span class="normal">2398</span>
+<span class="normal">2399</span>
+<span class="normal">2400</span>
+<span class="normal">2401</span>
+<span class="normal">2402</span>
+<span class="normal">2403</span>
+<span class="normal">2404</span>
+<span class="normal">2405</span>
+<span class="normal">2406</span>
+<span class="normal">2407</span>
+<span class="normal">2408</span>
+<span class="normal">2409</span>
+<span class="normal">2410</span>
+<span class="normal">2411</span>
+<span class="normal">2412</span>
+<span class="normal">2413</span>
+<span class="normal">2414</span>
+<span class="normal">2415</span>
+<span class="normal">2416</span>
+<span class="normal">2417</span>
+<span class="normal">2418</span>
+<span class="normal">2419</span>
+<span class="normal">2420</span>
+<span class="normal">2421</span>
+<span class="normal">2422</span>
+<span class="normal">2423</span>
+<span class="normal">2424</span>
+<span class="normal">2425</span>
+<span class="normal">2426</span>
+<span class="normal">2427</span>
+<span class="normal">2428</span>
+<span class="normal">2429</span>
+<span class="normal">2430</span>
+<span class="normal">2431</span>
+<span class="normal">2432</span>
+<span class="normal">2433</span>
+<span class="normal">2434</span>
+<span class="normal">2435</span>
+<span class="normal">2436</span>
+<span class="normal">2437</span>
+<span class="normal">2438</span>
+<span class="normal">2439</span>
+<span class="normal">2440</span>
+<span class="normal">2441</span>
+<span class="normal">2442</span>
+<span class="normal">2443</span>
+<span class="normal">2444</span>
+<span class="normal">2445</span>
+<span class="normal">2446</span>
+<span class="normal">2447</span>
+<span class="normal">2448</span>
+<span class="normal">2449</span>
+<span class="normal">2450</span>
+<span class="normal">2451</span>
+<span class="normal">2452</span>
+<span class="normal">2453</span>
+<span class="normal">2454</span>
+<span class="normal">2455</span>
+<span class="normal">2456</span>
+<span class="normal">2457</span>
+<span class="normal">2458</span>
+<span class="normal">2459</span>
+<span class="normal">2460</span>
+<span class="normal">2461</span>
+<span class="normal">2462</span>
+<span class="normal">2463</span>
+<span class="normal">2464</span>
+<span class="normal">2465</span>
+<span class="normal">2466</span>
+<span class="normal">2467</span>
+<span class="normal">2468</span>
+<span class="normal">2469</span>
+<span class="normal">2470</span>
+<span class="normal">2471</span>
+<span class="normal">2472</span>
+<span class="normal">2473</span>
+<span class="normal">2474</span>
+<span class="normal">2475</span>
+<span class="normal">2476</span>
+<span class="normal">2477</span>
+<span class="normal">2478</span>
+<span class="normal">2479</span>
+<span class="normal">2480</span>
+<span class="normal">2481</span>
+<span class="normal">2482</span>
+<span class="normal">2483</span>
+<span class="normal">2484</span>
+<span class="normal">2485</span>
+<span class="normal">2486</span>
+<span class="normal">2487</span>
+<span class="normal">2488</span>
+<span class="normal">2489</span>
+<span class="normal">2490</span>
+<span class="normal">2491</span>
+<span class="normal">2492</span>
+<span class="normal">2493</span>
+<span class="normal">2494</span>
+<span class="normal">2495</span>
+<span class="normal">2496</span>
+<span class="normal">2497</span>
+<span class="normal">2498</span>
+<span class="normal">2499</span>
+<span class="normal">2500</span>
+<span class="normal">2501</span>
+<span class="normal">2502</span>
+<span class="normal">2503</span>
+<span class="normal">2504</span>
+<span class="normal">2505</span>
+<span class="normal">2506</span>
+<span class="normal">2507</span>
+<span class="normal">2508</span>
+<span class="normal">2509</span>
+<span class="normal">2510</span>
+<span class="normal">2511</span>
+<span class="normal">2512</span>
+<span class="normal">2513</span>
+<span class="normal">2514</span>
+<span class="normal">2515</span>
+<span class="normal">2516</span>
+<span class="normal">2517</span>
+<span class="normal">2518</span>
+<span class="normal">2519</span>
+<span class="normal">2520</span>
+<span class="normal">2521</span>
+<span class="normal">2522</span>
+<span class="normal">2523</span>
+<span class="normal">2524</span>
+<span class="normal">2525</span>
+<span class="normal">2526</span>
+<span class="normal">2527</span>
+<span class="normal">2528</span>
+<span class="normal">2529</span>
+<span class="normal">2530</span>
+<span class="normal">2531</span>
+<span class="normal">2532</span>
+<span class="normal">2533</span>
+<span class="normal">2534</span>
+<span class="normal">2535</span>
+<span class="normal">2536</span>
+<span class="normal">2537</span>
+<span class="normal">2538</span>
+<span class="normal">2539</span>
+<span class="normal">2540</span>
+<span class="normal">2541</span>
+<span class="normal">2542</span>
+<span class="normal">2543</span>
+<span class="normal">2544</span>
+<span class="normal">2545</span>
+<span class="normal">2546</span>
+<span class="normal">2547</span>
+<span class="normal">2548</span>
+<span class="normal">2549</span>
+<span class="normal">2550</span>
+<span class="normal">2551</span>
+<span class="normal">2552</span>
+<span class="normal">2553</span>
+<span class="normal">2554</span>
+<span class="normal">2555</span>
+<span class="normal">2556</span>
+<span class="normal">2557</span>
+<span class="normal">2558</span>
+<span class="normal">2559</span>
+<span class="normal">2560</span>
+<span class="normal">2561</span>
+<span class="normal">2562</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2366"><span class="k">class</span><span class="w"> </span><span class="nc">List</span><span class="p">(</span><span class="n">List_</span><span class="p">):</span>
+</span><span id="__span-0-2367">
+</span><span id="__span-0-2368">    <span class="nd">@property</span>
+</span><span id="__span-0-2369">    <span class="k">def</span><span class="w"> </span><span class="nf">board</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Board</span><span class="p">:</span>
+</span><span id="__span-0-2370"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Board the list belongs to</span>
+</span><span id="__span-0-2371">
+</span><span id="__span-0-2372"><span class="sd">        Returns:</span>
+</span><span id="__span-0-2373"><span class="sd">            Board: Board instance</span>
+</span><span id="__span-0-2374"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2375">        <span class="n">board_route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">get_board</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boardId</span><span class="p">)</span>
+</span><span id="__span-0-2376">        <span class="k">return</span> <span class="n">Board</span><span class="p">(</span><span class="o">**</span><span class="n">board_route</span><span class="p">()[</span><span class="s1">&#39;item&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="p">)</span>
+</span><span id="__span-0-2377">
+</span><span id="__span-0-2378">    <span class="nd">@property</span>
+</span><span id="__span-0-2379">    <span class="k">def</span><span class="w"> </span><span class="nf">cards</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryableList</span><span class="p">[</span><span class="n">Card</span><span class="p">]:</span>
+</span><span id="__span-0-2380"><span class="w">        </span><span class="sd">&quot;&quot;&quot;All cards in the list</span>
+</span><span id="__span-0-2381">
+</span><span id="__span-0-2382"><span class="sd">        Returns:</span>
+</span><span id="__span-0-2383"><span class="sd">            Queryable List of all cards in the list</span>
+</span><span id="__span-0-2384"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2385">        <span class="k">return</span> <span class="n">QueryableList</span><span class="p">([</span>
+</span><span id="__span-0-2386">            <span class="n">card</span>
+</span><span id="__span-0-2387">            <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cards</span>
+</span><span id="__span-0-2388">            <span class="k">if</span> <span class="n">card</span><span class="o">.</span><span class="n">listId</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+</span><span id="__span-0-2389">        <span class="p">])</span>
+</span><span id="__span-0-2390">
+</span><span id="__span-0-2391">    <span class="nd">@overload</span>
+</span><span id="__span-0-2392">    <span class="k">def</span><span class="w"> </span><span class="nf">create_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">card</span><span class="p">:</span> <span class="n">Card</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Card</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="__span-0-2393">
+</span><span id="__span-0-2394">    <span class="nd">@overload</span>
+</span><span id="__span-0-2395">    <span class="k">def</span><span class="w"> </span><span class="nf">create_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+</span><span id="__span-0-2396">                    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dueDate</span><span class="p">:</span> <span class="n">datetime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-2397">                    <span class="n">isDueDateCompleted</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-2398">                    <span class="n">stopwatch</span><span class="p">:</span> <span class="n">Stopwatch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">boardId</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-2399">                    <span class="n">listId</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">creatorUserId</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-2400">                    <span class="n">coverAttachmentId</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">isSubscribed</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Card</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="__span-0-2401">
+</span><span id="__span-0-2402">    <span class="k">def</span><span class="w"> </span><span class="nf">create_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Card</span><span class="p">:</span>
+</span><span id="__span-0-2403"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a card in the list</span>
+</span><span id="__span-0-2404">
+</span><span id="__span-0-2405"><span class="sd">        Args:</span>
+</span><span id="__span-0-2406"><span class="sd">            name (str): Name of the card (required)</span>
+</span><span id="__span-0-2407"><span class="sd">            position (int): Position of the card (default: 0)</span>
+</span><span id="__span-0-2408"><span class="sd">            description (str): Description of the card (optional)</span>
+</span><span id="__span-0-2409"><span class="sd">            dueDate (datetime): Due date of the card (optional)</span>
+</span><span id="__span-0-2410"><span class="sd">            isDueDateCompleted (bool): Whether the due date is completed (optional)</span>
+</span><span id="__span-0-2411"><span class="sd">            stopwatch (Stopwatch): Stopwatch of the card (optional)</span>
+</span><span id="__span-0-2412"><span class="sd">            boardId (int): Board id of the card (optional)</span>
+</span><span id="__span-0-2413"><span class="sd">            listId (int): List id of the card (optional)</span>
+</span><span id="__span-0-2414"><span class="sd">            creatorUserId (int): Creator user id of the card (optional)</span>
+</span><span id="__span-0-2415"><span class="sd">            coverAttachmentId (int): Cover attachment id of the card (optional)</span>
+</span><span id="__span-0-2416"><span class="sd">            isSubscribed (bool): Whether the card is subscribed (optional)</span>
+</span><span id="__span-0-2417">
+</span><span id="__span-0-2418"><span class="sd">        Args: Alternate</span>
+</span><span id="__span-0-2419"><span class="sd">            card (Card): Card instance to create</span>
+</span><span id="__span-0-2420">
+</span><span id="__span-0-2421"><span class="sd">        Returns:</span>
+</span><span id="__span-0-2422"><span class="sd">            Card: New card instance</span>
+</span><span id="__span-0-2423"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2424">        <span class="n">overload</span> <span class="o">=</span> <span class="n">parse_overload</span><span class="p">(</span>
+</span><span id="__span-0-2425">            <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> 
+</span><span id="__span-0-2426">            <span class="n">model</span><span class="o">=</span><span class="s1">&#39;card&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2427">            <span class="n">options</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;dueDate&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2428">                    <span class="s1">&#39;isDueDateCompleted&#39;</span><span class="p">,</span> <span class="s1">&#39;stopwatch&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2429">                    <span class="s1">&#39;creatorUserId&#39;</span><span class="p">,</span> <span class="s1">&#39;coverAttachmentId&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2430">                    <span class="s1">&#39;isSubscribed&#39;</span><span class="p">),</span> 
+</span><span id="__span-0-2431">            <span class="n">required</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,))</span>
+</span><span id="__span-0-2432">
+</span><span id="__span-0-2433">        <span class="n">overload</span><span class="p">[</span><span class="s1">&#39;boardId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boardId</span>
+</span><span id="__span-0-2434">        <span class="n">overload</span><span class="p">[</span><span class="s1">&#39;listId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+</span><span id="__span-0-2435">        <span class="n">overload</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-0-2436">
+</span><span id="__span-0-2437">        <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">post_card</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span id="__span-0-2438">        <span class="k">return</span> <span class="n">Card</span><span class="p">(</span><span class="o">**</span><span class="n">route</span><span class="p">(</span><span class="o">**</span><span class="n">overload</span><span class="p">)[</span><span class="s1">&#39;item&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="p">)</span>
+</span><span id="__span-0-2439">
+</span><span id="__span-0-2440">    <span class="k">def</span><span class="w"> </span><span class="nf">_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sort</span><span class="p">:</span> <span class="n">SortOption</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2441">        <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">post_sort_list</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span id="__span-0-2442">        <span class="n">route</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ListSorts</span><span class="p">[</span><span class="n">sort</span><span class="p">]})</span>
+</span><span id="__span-0-2443">
+</span><span id="__span-0-2444">    <span class="k">def</span><span class="w"> </span><span class="nf">sort_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2445"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by name</span>
+</span><span id="__span-0-2446">
+</span><span id="__span-0-2447"><span class="sd">        Note:</span>
+</span><span id="__span-0-2448"><span class="sd">            After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2449"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2450">        <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+</span><span id="__span-0-2451">
+</span><span id="__span-0-2452">    <span class="k">def</span><span class="w"> </span><span class="nf">sort_by_due_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2453"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by due date</span>
+</span><span id="__span-0-2454">
+</span><span id="__span-0-2455"><span class="sd">        Note:</span>
+</span><span id="__span-0-2456"><span class="sd">            After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2457"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2458">        <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Due date&#39;</span><span class="p">)</span>
+</span><span id="__span-0-2459">
+</span><span id="__span-0-2460">    <span class="k">def</span><span class="w"> </span><span class="nf">sort_by_newest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2461"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by newest first</span>
+</span><span id="__span-0-2462">
+</span><span id="__span-0-2463"><span class="sd">        Note:</span>
+</span><span id="__span-0-2464"><span class="sd">            After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2465"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2466">        <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Newest First&#39;</span><span class="p">)</span>
+</span><span id="__span-0-2467">
+</span><span id="__span-0-2468">    <span class="k">def</span><span class="w"> </span><span class="nf">sort_by_oldest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2469"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by oldest first</span>
+</span><span id="__span-0-2470">
+</span><span id="__span-0-2471"><span class="sd">        Note:</span>
+</span><span id="__span-0-2472"><span class="sd">            After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2473"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2474">        <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Oldest First&#39;</span><span class="p">)</span>
+</span><span id="__span-0-2475">
+</span><span id="__span-0-2476">    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+</span><span id="__span-0-2477"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes the list</span>
+</span><span id="__span-0-2478">
+</span><span id="__span-0-2479"><span class="sd">        Danger:</span>
+</span><span id="__span-0-2480"><span class="sd">            This action is irreversible and cannot be undone</span>
+</span><span id="__span-0-2481">
+</span><span id="__span-0-2482"><span class="sd">        Returns:</span>
+</span><span id="__span-0-2483"><span class="sd">            List: Deleted list instance</span>
+</span><span id="__span-0-2484"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2485">        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span><span id="__span-0-2486">        <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">delete_list</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span id="__span-0-2487">        <span class="n">route</span><span class="p">()</span>
+</span><span id="__span-0-2488">        <span class="k">return</span> <span class="bp">self</span>
+</span><span id="__span-0-2489">
+</span><span id="__span-0-2490">    <span class="nd">@overload</span>
+</span><span id="__span-0-2491">    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="__span-0-2492">
+</span><span id="__span-0-2493">    <span class="nd">@overload</span>
+</span><span id="__span-0-2494">    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">list</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="__span-0-2495">
+</span><span id="__span-0-2496">    <span class="nd">@overload</span>
+</span><span id="__span-0-2497">    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="__span-0-2498">
+</span><span id="__span-0-2499">    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+</span><span id="__span-0-2500"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the list with new values</span>
+</span><span id="__span-0-2501">
+</span><span id="__span-0-2502"><span class="sd">        Tip:</span>
+</span><span id="__span-0-2503"><span class="sd">            If you want to update a list, it&#39;s better to use the `editor()` context manager</span>
+</span><span id="__span-0-2504">
+</span><span id="__span-0-2505"><span class="sd">            Example:</span>
+</span><span id="__span-0-2506"><span class="sd">            ```python</span>
+</span><span id="__span-0-2507"><span class="sd">            &gt;&gt;&gt; with list_.editor():</span>
+</span><span id="__span-0-2508"><span class="sd">            ...    list_.name = &#39;New List Name&#39;</span>
+</span><span id="__span-0-2509"><span class="sd">            ...    list_.position = 1</span>
+</span><span id="__span-0-2510">
+</span><span id="__span-0-2511"><span class="sd">            &gt;&gt;&gt; list</span>
+</span><span id="__span-0-2512"><span class="sd">            List(id=1, name=&#39;New List Name&#39;, position=1, ...)</span>
+</span><span id="__span-0-2513"><span class="sd">            ```</span>
+</span><span id="__span-0-2514">
+</span><span id="__span-0-2515"><span class="sd">        Args:</span>
+</span><span id="__span-0-2516"><span class="sd">            name (str): Name of the list (optional)</span>
+</span><span id="__span-0-2517"><span class="sd">            position (int): Position of the list (optional)</span>
+</span><span id="__span-0-2518">
+</span><span id="__span-0-2519"><span class="sd">        Args: Alternate</span>
+</span><span id="__span-0-2520"><span class="sd">            list (List): List instance to update (required)</span>
+</span><span id="__span-0-2521">
+</span><span id="__span-0-2522"><span class="sd">        Note:</span>
+</span><span id="__span-0-2523"><span class="sd">            If no arguments are provided, the list will update itself with the current values stored in its attributes</span>
+</span><span id="__span-0-2524">
+</span><span id="__span-0-2525"><span class="sd">        Returns:</span>
+</span><span id="__span-0-2526"><span class="sd">            List: Updated list instance</span>
+</span><span id="__span-0-2527"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2528">        <span class="n">overload</span> <span class="o">=</span> <span class="n">parse_overload</span><span class="p">(</span>
+</span><span id="__span-0-2529">            <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> 
+</span><span id="__span-0-2530">            <span class="n">model</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2531">            <span class="n">options</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">),</span>
+</span><span id="__span-0-2532">            <span class="n">noarg</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="__span-0-2533">
+</span><span id="__span-0-2534">        <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">patch_list</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span id="__span-0-2535">        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">route</span><span class="p">(</span><span class="o">**</span><span class="n">overload</span><span class="p">)[</span><span class="s1">&#39;item&#39;</span><span class="p">])</span>
+</span><span id="__span-0-2536">        <span class="k">return</span> <span class="bp">self</span>
+</span><span id="__span-0-2537">
+</span><span id="__span-0-2538">    <span class="k">def</span><span class="w"> </span><span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2539"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Refreshes the list data&quot;&quot;&quot;</span>
+</span><span id="__span-0-2540">        <span class="k">for</span> <span class="n">_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">lists</span><span class="p">:</span>
+</span><span id="__span-0-2541">            <span class="k">if</span> <span class="n">_list</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+</span><span id="__span-0-2542">                <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">_list</span><span class="p">)</span>
+</span><span id="__span-0-2543">
+</span><span id="__span-0-2544">    <span class="k">def</span><span class="w"> </span><span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">ListColors</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+</span><span id="__span-0-2545"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the color of the list</span>
+</span><span id="__span-0-2546">
+</span><span id="__span-0-2547"><span class="sd">        Note:</span>
+</span><span id="__span-0-2548"><span class="sd">            This method is only available in Planka 2.0.0 and later</span>
+</span><span id="__span-0-2549">
+</span><span id="__span-0-2550"><span class="sd">        Args:</span>
+</span><span id="__span-0-2551"><span class="sd">            color (str): Color of the list</span>
+</span><span id="__span-0-2552">
+</span><span id="__span-0-2553"><span class="sd">        Returns:</span>
+</span><span id="__span-0-2554"><span class="sd">            List: The list instance with the color set</span>
+</span><span id="__span-0-2555"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2556">        <span class="k">if</span> <span class="n">color</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ListColors</span><span class="o">.</span><span class="n">__args__</span><span class="p">:</span>
+</span><span id="__span-0-2557">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="__span-0-2558">                <span class="sa">f</span><span class="s2">&quot;Invalid color: </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="__span-0-2559">                <span class="sa">f</span><span class="s2">&quot;Valid colors: </span><span class="si">{</span><span class="n">ListColors</span><span class="o">.</span><span class="n">__args__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-2560">        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">():</span>
+</span><span id="__span-0-2561">            <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+</span><span id="__span-0-2562">        <span class="k">return</span> <span class="bp">self</span>
+</span></code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="plankapy.interfaces.List.board" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">board</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#plankapy.interfaces.List.board" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Board the list belongs to</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Board</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" href="../Board/#plankapy.interfaces.Board">Board</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Board instance</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="plankapy.interfaces.List.cards" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">cards</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#plankapy.interfaces.List.cards" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>All cards in the list</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" href="../../models/QueryableList/#plankapy.models.QueryableList">QueryableList</a>[<a class="autorefs autorefs-internal" href="../Card/#plankapy.interfaces.Card">Card</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Queryable List of all cards in the list</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.create_card" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create_card</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#plankapy.interfaces.List.create_card" class="headerlink" title="Permanent link">&para;</a></h2>
+          <div class="doc-overloads">
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">create_card</span><span class="p">(</span><span class="n">card</span><span class="p">:</span> <span class="n">Card</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Card</span>
+</span></code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">create_card</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dueDate</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">isDueDateCompleted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">stopwatch</span><span class="p">:</span> <span class="n">Stopwatch</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">boardId</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">listId</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">creatorUserId</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">coverAttachmentId</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">isSubscribed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Card</span>
+</span></code></pre></div>          </div>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Creates a card in the list</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the card (required)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>position</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Position of the card (default: 0)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>description</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Description of the card (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dueDate</code>
+            </td>
+            <td>
+                  <code><span title="datetime.datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Due date of the card (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>isDueDateCompleted</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the due date is completed (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>stopwatch</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" href="../Stopwatch/#plankapy.models.Stopwatch">Stopwatch</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Stopwatch of the card (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>boardId</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Board id of the card (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>listId</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List id of the card (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>creatorUserId</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Creator user id of the card (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>coverAttachmentId</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Cover attachment id of the card (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>isSubscribed</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the card is subscribed (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Alternate</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>card</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" href="../Card/#plankapy.interfaces.Card">Card</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Card instance to create</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Card</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" href="../Card/#plankapy.interfaces.Card">Card</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>New card instance</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2402</span>
+<span class="normal">2403</span>
+<span class="normal">2404</span>
+<span class="normal">2405</span>
+<span class="normal">2406</span>
+<span class="normal">2407</span>
+<span class="normal">2408</span>
+<span class="normal">2409</span>
+<span class="normal">2410</span>
+<span class="normal">2411</span>
+<span class="normal">2412</span>
+<span class="normal">2413</span>
+<span class="normal">2414</span>
+<span class="normal">2415</span>
+<span class="normal">2416</span>
+<span class="normal">2417</span>
+<span class="normal">2418</span>
+<span class="normal">2419</span>
+<span class="normal">2420</span>
+<span class="normal">2421</span>
+<span class="normal">2422</span>
+<span class="normal">2423</span>
+<span class="normal">2424</span>
+<span class="normal">2425</span>
+<span class="normal">2426</span>
+<span class="normal">2427</span>
+<span class="normal">2428</span>
+<span class="normal">2429</span>
+<span class="normal">2430</span>
+<span class="normal">2431</span>
+<span class="normal">2432</span>
+<span class="normal">2433</span>
+<span class="normal">2434</span>
+<span class="normal">2435</span>
+<span class="normal">2436</span>
+<span class="normal">2437</span>
+<span class="normal">2438</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2402"><span class="k">def</span><span class="w"> </span><span class="nf">create_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Card</span><span class="p">:</span>
+</span><span id="__span-0-2403"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a card in the list</span>
+</span><span id="__span-0-2404">
+</span><span id="__span-0-2405"><span class="sd">    Args:</span>
+</span><span id="__span-0-2406"><span class="sd">        name (str): Name of the card (required)</span>
+</span><span id="__span-0-2407"><span class="sd">        position (int): Position of the card (default: 0)</span>
+</span><span id="__span-0-2408"><span class="sd">        description (str): Description of the card (optional)</span>
+</span><span id="__span-0-2409"><span class="sd">        dueDate (datetime): Due date of the card (optional)</span>
+</span><span id="__span-0-2410"><span class="sd">        isDueDateCompleted (bool): Whether the due date is completed (optional)</span>
+</span><span id="__span-0-2411"><span class="sd">        stopwatch (Stopwatch): Stopwatch of the card (optional)</span>
+</span><span id="__span-0-2412"><span class="sd">        boardId (int): Board id of the card (optional)</span>
+</span><span id="__span-0-2413"><span class="sd">        listId (int): List id of the card (optional)</span>
+</span><span id="__span-0-2414"><span class="sd">        creatorUserId (int): Creator user id of the card (optional)</span>
+</span><span id="__span-0-2415"><span class="sd">        coverAttachmentId (int): Cover attachment id of the card (optional)</span>
+</span><span id="__span-0-2416"><span class="sd">        isSubscribed (bool): Whether the card is subscribed (optional)</span>
+</span><span id="__span-0-2417">
+</span><span id="__span-0-2418"><span class="sd">    Args: Alternate</span>
+</span><span id="__span-0-2419"><span class="sd">        card (Card): Card instance to create</span>
+</span><span id="__span-0-2420">
+</span><span id="__span-0-2421"><span class="sd">    Returns:</span>
+</span><span id="__span-0-2422"><span class="sd">        Card: New card instance</span>
+</span><span id="__span-0-2423"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2424">    <span class="n">overload</span> <span class="o">=</span> <span class="n">parse_overload</span><span class="p">(</span>
+</span><span id="__span-0-2425">        <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> 
+</span><span id="__span-0-2426">        <span class="n">model</span><span class="o">=</span><span class="s1">&#39;card&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2427">        <span class="n">options</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;dueDate&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2428">                <span class="s1">&#39;isDueDateCompleted&#39;</span><span class="p">,</span> <span class="s1">&#39;stopwatch&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2429">                <span class="s1">&#39;creatorUserId&#39;</span><span class="p">,</span> <span class="s1">&#39;coverAttachmentId&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2430">                <span class="s1">&#39;isSubscribed&#39;</span><span class="p">),</span> 
+</span><span id="__span-0-2431">        <span class="n">required</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,))</span>
+</span><span id="__span-0-2432">
+</span><span id="__span-0-2433">    <span class="n">overload</span><span class="p">[</span><span class="s1">&#39;boardId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boardId</span>
+</span><span id="__span-0-2434">    <span class="n">overload</span><span class="p">[</span><span class="s1">&#39;listId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+</span><span id="__span-0-2435">    <span class="n">overload</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-0-2436">
+</span><span id="__span-0-2437">    <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">post_card</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span id="__span-0-2438">    <span class="k">return</span> <span class="n">Card</span><span class="p">(</span><span class="o">**</span><span class="n">route</span><span class="p">(</span><span class="o">**</span><span class="n">overload</span><span class="p">)[</span><span class="s1">&#39;item&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.delete" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">delete</span><span class="p">()</span></code>
+
+<a href="#plankapy.interfaces.List.delete" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Deletes the list</p>
+
+
+<details class="danger" open>
+  <summary>Danger</summary>
+  <p>This action is irreversible and cannot be undone</p>
+</details>
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>List</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" href="#plankapy.interfaces.List">List</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Deleted list instance</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2476</span>
+<span class="normal">2477</span>
+<span class="normal">2478</span>
+<span class="normal">2479</span>
+<span class="normal">2480</span>
+<span class="normal">2481</span>
+<span class="normal">2482</span>
+<span class="normal">2483</span>
+<span class="normal">2484</span>
+<span class="normal">2485</span>
+<span class="normal">2486</span>
+<span class="normal">2487</span>
+<span class="normal">2488</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2476"><span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+</span><span id="__span-0-2477"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Deletes the list</span>
+</span><span id="__span-0-2478">
+</span><span id="__span-0-2479"><span class="sd">    Danger:</span>
+</span><span id="__span-0-2480"><span class="sd">        This action is irreversible and cannot be undone</span>
+</span><span id="__span-0-2481">
+</span><span id="__span-0-2482"><span class="sd">    Returns:</span>
+</span><span id="__span-0-2483"><span class="sd">        List: Deleted list instance</span>
+</span><span id="__span-0-2484"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2485">    <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span><span id="__span-0-2486">    <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">delete_list</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span id="__span-0-2487">    <span class="n">route</span><span class="p">()</span>
+</span><span id="__span-0-2488">    <span class="k">return</span> <span class="bp">self</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.refresh" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">refresh</span><span class="p">()</span></code>
+
+<a href="#plankapy.interfaces.List.refresh" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Refreshes the list data</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2538</span>
+<span class="normal">2539</span>
+<span class="normal">2540</span>
+<span class="normal">2541</span>
+<span class="normal">2542</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2538"><span class="k">def</span><span class="w"> </span><span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2539"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Refreshes the list data&quot;&quot;&quot;</span>
+</span><span id="__span-0-2540">    <span class="k">for</span> <span class="n">_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">lists</span><span class="p">:</span>
+</span><span id="__span-0-2541">        <span class="k">if</span> <span class="n">_list</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+</span><span id="__span-0-2542">            <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">_list</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.set_color" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span></code>
+
+<a href="#plankapy.interfaces.List.set_color" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sets the color of the list</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>This method is only available in Planka 2.0.0 and later</p>
+</details>
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>color</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Color of the list</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>List</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" href="#plankapy.interfaces.List">List</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The list instance with the color set</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2544</span>
+<span class="normal">2545</span>
+<span class="normal">2546</span>
+<span class="normal">2547</span>
+<span class="normal">2548</span>
+<span class="normal">2549</span>
+<span class="normal">2550</span>
+<span class="normal">2551</span>
+<span class="normal">2552</span>
+<span class="normal">2553</span>
+<span class="normal">2554</span>
+<span class="normal">2555</span>
+<span class="normal">2556</span>
+<span class="normal">2557</span>
+<span class="normal">2558</span>
+<span class="normal">2559</span>
+<span class="normal">2560</span>
+<span class="normal">2561</span>
+<span class="normal">2562</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2544"><span class="k">def</span><span class="w"> </span><span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">ListColors</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+</span><span id="__span-0-2545"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the color of the list</span>
+</span><span id="__span-0-2546">
+</span><span id="__span-0-2547"><span class="sd">    Note:</span>
+</span><span id="__span-0-2548"><span class="sd">        This method is only available in Planka 2.0.0 and later</span>
+</span><span id="__span-0-2549">
+</span><span id="__span-0-2550"><span class="sd">    Args:</span>
+</span><span id="__span-0-2551"><span class="sd">        color (str): Color of the list</span>
+</span><span id="__span-0-2552">
+</span><span id="__span-0-2553"><span class="sd">    Returns:</span>
+</span><span id="__span-0-2554"><span class="sd">        List: The list instance with the color set</span>
+</span><span id="__span-0-2555"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2556">    <span class="k">if</span> <span class="n">color</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ListColors</span><span class="o">.</span><span class="n">__args__</span><span class="p">:</span>
+</span><span id="__span-0-2557">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="__span-0-2558">            <span class="sa">f</span><span class="s2">&quot;Invalid color: </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="__span-0-2559">            <span class="sa">f</span><span class="s2">&quot;Valid colors: </span><span class="si">{</span><span class="n">ListColors</span><span class="o">.</span><span class="n">__args__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-2560">    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">():</span>
+</span><span id="__span-0-2561">        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+</span><span id="__span-0-2562">    <span class="k">return</span> <span class="bp">self</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.sort_by_due_date" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">sort_by_due_date</span><span class="p">()</span></code>
+
+<a href="#plankapy.interfaces.List.sort_by_due_date" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sorts cards in the list by due date</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>After sorting, a call to <code>list.cards</code> will return a sorted list of cards</p>
+</details>
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2452</span>
+<span class="normal">2453</span>
+<span class="normal">2454</span>
+<span class="normal">2455</span>
+<span class="normal">2456</span>
+<span class="normal">2457</span>
+<span class="normal">2458</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2452"><span class="k">def</span><span class="w"> </span><span class="nf">sort_by_due_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2453"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by due date</span>
+</span><span id="__span-0-2454">
+</span><span id="__span-0-2455"><span class="sd">    Note:</span>
+</span><span id="__span-0-2456"><span class="sd">        After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2457"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2458">    <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Due date&#39;</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.sort_by_name" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">sort_by_name</span><span class="p">()</span></code>
+
+<a href="#plankapy.interfaces.List.sort_by_name" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sorts cards in the list by name</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>After sorting, a call to <code>list.cards</code> will return a sorted list of cards</p>
+</details>
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2444</span>
+<span class="normal">2445</span>
+<span class="normal">2446</span>
+<span class="normal">2447</span>
+<span class="normal">2448</span>
+<span class="normal">2449</span>
+<span class="normal">2450</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2444"><span class="k">def</span><span class="w"> </span><span class="nf">sort_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2445"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by name</span>
+</span><span id="__span-0-2446">
+</span><span id="__span-0-2447"><span class="sd">    Note:</span>
+</span><span id="__span-0-2448"><span class="sd">        After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2449"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2450">    <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.sort_by_newest" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">sort_by_newest</span><span class="p">()</span></code>
+
+<a href="#plankapy.interfaces.List.sort_by_newest" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sorts cards in the list by newest first</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>After sorting, a call to <code>list.cards</code> will return a sorted list of cards</p>
+</details>
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2460</span>
+<span class="normal">2461</span>
+<span class="normal">2462</span>
+<span class="normal">2463</span>
+<span class="normal">2464</span>
+<span class="normal">2465</span>
+<span class="normal">2466</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2460"><span class="k">def</span><span class="w"> </span><span class="nf">sort_by_newest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2461"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by newest first</span>
+</span><span id="__span-0-2462">
+</span><span id="__span-0-2463"><span class="sd">    Note:</span>
+</span><span id="__span-0-2464"><span class="sd">        After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2465"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2466">    <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Newest First&#39;</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.sort_by_oldest" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">sort_by_oldest</span><span class="p">()</span></code>
+
+<a href="#plankapy.interfaces.List.sort_by_oldest" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sorts cards in the list by oldest first</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>After sorting, a call to <code>list.cards</code> will return a sorted list of cards</p>
+</details>
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2468</span>
+<span class="normal">2469</span>
+<span class="normal">2470</span>
+<span class="normal">2471</span>
+<span class="normal">2472</span>
+<span class="normal">2473</span>
+<span class="normal">2474</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2468"><span class="k">def</span><span class="w"> </span><span class="nf">sort_by_oldest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2469"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sorts cards in the list by oldest first</span>
+</span><span id="__span-0-2470">
+</span><span id="__span-0-2471"><span class="sd">    Note:</span>
+</span><span id="__span-0-2472"><span class="sd">        After sorting, a call to `list.cards` will return a sorted list of cards</span>
+</span><span id="__span-0-2473"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2474">    <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">(</span><span class="s1">&#39;Oldest First&#39;</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plankapy.interfaces.List.update" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#plankapy.interfaces.List.update" class="headerlink" title="Permanent link">&para;</a></h2>
+          <div class="doc-overloads">
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">update</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span>
+</span></code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">update</span><span class="p">(</span><span class="nb">list</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span>
+</span></code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">update</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span>
+</span></code></pre></div>          </div>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Updates the list with new values</p>
+
+
+<details class="tip" open>
+  <summary>Tip</summary>
+  <p>If you want to update a list, it's better to use the <code>editor()</code> context manager</p>
+<p>Example:
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><span class="o">&gt;&gt;&gt;</span> <span class="k">with</span> <span class="n">list_</span><span class="o">.</span><span class="n">editor</span><span class="p">():</span>
+</span><span id="__span-0-2"><span class="o">...</span>    <span class="n">list_</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;New List Name&#39;</span>
+</span><span id="__span-0-3"><span class="o">...</span>    <span class="n">list_</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="__span-0-4">
+</span><span id="__span-0-5"><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span>
+</span><span id="__span-0-6"><span class="n">List</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;New List Name&#39;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span></code></pre></div></p>
+</details>
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the list (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>position</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Position of the list (optional)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Alternate</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>list</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" href="#plankapy.interfaces.List">List</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List instance to update (required)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>If no arguments are provided, the list will update itself with the current values stored in its attributes</p>
+</details>
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>List</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" href="#plankapy.interfaces.List">List</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Updated list instance</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/plankapy/interfaces.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2499</span>
+<span class="normal">2500</span>
+<span class="normal">2501</span>
+<span class="normal">2502</span>
+<span class="normal">2503</span>
+<span class="normal">2504</span>
+<span class="normal">2505</span>
+<span class="normal">2506</span>
+<span class="normal">2507</span>
+<span class="normal">2508</span>
+<span class="normal">2509</span>
+<span class="normal">2510</span>
+<span class="normal">2511</span>
+<span class="normal">2512</span>
+<span class="normal">2513</span>
+<span class="normal">2514</span>
+<span class="normal">2515</span>
+<span class="normal">2516</span>
+<span class="normal">2517</span>
+<span class="normal">2518</span>
+<span class="normal">2519</span>
+<span class="normal">2520</span>
+<span class="normal">2521</span>
+<span class="normal">2522</span>
+<span class="normal">2523</span>
+<span class="normal">2524</span>
+<span class="normal">2525</span>
+<span class="normal">2526</span>
+<span class="normal">2527</span>
+<span class="normal">2528</span>
+<span class="normal">2529</span>
+<span class="normal">2530</span>
+<span class="normal">2531</span>
+<span class="normal">2532</span>
+<span class="normal">2533</span>
+<span class="normal">2534</span>
+<span class="normal">2535</span>
+<span class="normal">2536</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2499"><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+</span><span id="__span-0-2500"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Updates the list with new values</span>
+</span><span id="__span-0-2501">
+</span><span id="__span-0-2502"><span class="sd">    Tip:</span>
+</span><span id="__span-0-2503"><span class="sd">        If you want to update a list, it&#39;s better to use the `editor()` context manager</span>
+</span><span id="__span-0-2504">
+</span><span id="__span-0-2505"><span class="sd">        Example:</span>
+</span><span id="__span-0-2506"><span class="sd">        ```python</span>
+</span><span id="__span-0-2507"><span class="sd">        &gt;&gt;&gt; with list_.editor():</span>
+</span><span id="__span-0-2508"><span class="sd">        ...    list_.name = &#39;New List Name&#39;</span>
+</span><span id="__span-0-2509"><span class="sd">        ...    list_.position = 1</span>
+</span><span id="__span-0-2510">
+</span><span id="__span-0-2511"><span class="sd">        &gt;&gt;&gt; list</span>
+</span><span id="__span-0-2512"><span class="sd">        List(id=1, name=&#39;New List Name&#39;, position=1, ...)</span>
+</span><span id="__span-0-2513"><span class="sd">        ```</span>
+</span><span id="__span-0-2514">
+</span><span id="__span-0-2515"><span class="sd">    Args:</span>
+</span><span id="__span-0-2516"><span class="sd">        name (str): Name of the list (optional)</span>
+</span><span id="__span-0-2517"><span class="sd">        position (int): Position of the list (optional)</span>
+</span><span id="__span-0-2518">
+</span><span id="__span-0-2519"><span class="sd">    Args: Alternate</span>
+</span><span id="__span-0-2520"><span class="sd">        list (List): List instance to update (required)</span>
+</span><span id="__span-0-2521">
+</span><span id="__span-0-2522"><span class="sd">    Note:</span>
+</span><span id="__span-0-2523"><span class="sd">        If no arguments are provided, the list will update itself with the current values stored in its attributes</span>
+</span><span id="__span-0-2524">
+</span><span id="__span-0-2525"><span class="sd">    Returns:</span>
+</span><span id="__span-0-2526"><span class="sd">        List: Updated list instance</span>
+</span><span id="__span-0-2527"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2528">    <span class="n">overload</span> <span class="o">=</span> <span class="n">parse_overload</span><span class="p">(</span>
+</span><span id="__span-0-2529">        <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> 
+</span><span id="__span-0-2530">        <span class="n">model</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> 
+</span><span id="__span-0-2531">        <span class="n">options</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">),</span>
+</span><span id="__span-0-2532">        <span class="n">noarg</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="__span-0-2533">
+</span><span id="__span-0-2534">    <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">patch_list</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span id="__span-0-2535">    <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">route</span><span class="p">(</span><span class="o">**</span><span class="n">overload</span><span class="p">)[</span><span class="s1">&#39;item&#39;</span><span class="p">])</span>
+</span><span id="__span-0-2536">    <span class="k">return</span> <span class="bp">self</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../Label/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Label">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Label
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../Card/" class="md-footer__link md-footer__link--next" aria-label="Next: Card">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Card
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.code.annotate", "content.code.copy", "content.code.select", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.preview", "navigation.instant.progress", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
