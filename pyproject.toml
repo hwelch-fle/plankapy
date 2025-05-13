@@ -1,6 +1,6 @@
 [project]
 name = "plankapy"
-version = "2.2.1"
+version = "2.2.2"
 
 # Contributors can add their info here
 authors = [
