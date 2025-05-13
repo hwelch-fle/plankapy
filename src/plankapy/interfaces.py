@@ -2544,6 +2544,9 @@ class List(List_):
     def set_color(self, color: ListColors) -> List:
         """Sets the color of the list
         
+        Note:
+            This method is only available in Planka 2.0.0 and later
+
         Args:
             color (str): Color of the list
             
