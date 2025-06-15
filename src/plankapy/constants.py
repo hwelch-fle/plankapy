@@ -172,3 +172,28 @@ GradientCSSMap = {
     'green-mist':'linear-gradient(180.5deg, rgba(0, 128, 128, 1) 8.5%, rgba(174, 206, 100, 1) 118.2%)',
     'red-curtain':'radial-gradient(circle 371px at 2.9% 14.3%, rgba(255, 0, 102, 1) 0%, rgba(80, 5, 35, 1) 100.7%)'
 }
+
+
+# Additional User flags for 2.0.0-rc-3
+UserRole = Literal[
+    'admin',
+    'projectOwner',
+    'boardUser',
+]
+
+EditorMode = Literal[
+    'wysiwyg',
+    'markup',
+]
+
+HomeView = Literal[
+    'gridProjects',
+    'groupedProjects',
+]
+
+ProjectsOrder = Literal[
+    'byDefault',
+    'alphabetically',
+    'byCreationTime',
+]
+
