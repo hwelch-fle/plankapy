@@ -926,3 +926,18 @@ class User_(Model):
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
     deletedAt: Optional[str]=Unset
+
+    # 2.0.0 Additions
+    role: UserRole=Required
+    subscribeToCardWhenCommenting: Optional[bool]=Unset
+    turnOffRecentCardHighlighting: Optional[bool]=Unset
+    enableFavoritesByDefault: Optional[bool]=Unset
+    defaultEditorMode: Optional[EditorMode]=Unset
+    defaultHomeView: Optional[HomeView]=Unset
+    defaultProjectsOrder: Optional[ProjectsOrder]=Unset
+    isSsoUser: Optional[bool]=Unset
+    isDeactivated: Optional[bool]=Unset
+    avatar: Optional[str]=Unset
+    isDefaultAdmin: Optional[bool]=Unset
+    # Set by isSsoUser and isDefaultAdmin
+    lockedFieldNames: Optional[list[str]]=Unset
