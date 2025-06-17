@@ -37,6 +37,8 @@ from .constants import (
     EditorMode,
     HomeView,
     ProjectsOrder,
+    Gradient,
+    BackgroundType,
 )
 
 # Sentinel value for unset values since None is a valid value for responses
@@ -845,6 +847,13 @@ class Project_(Model):
     backgroundImage: Optional[BackgroundImage]=Unset
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
+    description: Optional[str]=Unset
+    # 2.0.0-rc-3 Additions
+
+    # This replaces 'background' in v2
+    backgroundType: Optional[BackgroundType]=Unset
+    backgroundGradient: Optional[BackgroundGradient]=Unset
+
     
 @dataclass(eq=False)
 class ProjectManager_(Model):
@@ -907,6 +916,19 @@ class User_(Model):
         createdAt (datetime): The creation date of the user
         updatedAt (datetime): The last update date of the user
         deletedAt (datetime): The deletion date of the user
+    Attributes v2.0:
+        role (`UserRole`): Role of the user as defined by `UserRole` literals
+        subscribeToCardWhenCommenting (bool): Subscribe to cards when commenting
+        turnOffRecentCardHighlighting (bool): Highlight recently updated cards?
+        enableFavoritesByDefault (bool): Enable favorites?
+        defaultEditorMode (`EditorMode`): Use WYSIWYG or Markdown editor by default
+        defaultHomeView (`HomeView`): Project grid or project group view by default
+        defaultProjectsOrder (`ProjectsOrder`): Sort by Default, Alphabetical, or Creation Date
+        isSsoUser (bool): Is the user authenticated by SSO?
+        isDeactivated (bool): Is the user account active?
+        avatar (str): Replaces `avatarUrl` in v2.0.0
+        isDefaultAdmin (bool): Is the user the Default Admin account?
+        lockedFieldNames (list[str]): SSO locks (`email`, `name`, ``)
     """
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -928,7 +950,7 @@ class User_(Model):
     deletedAt: Optional[str]=Unset
 
     # 2.0.0 Additions
-    role: UserRole=Required
+    role: UserRole=Unset
     subscribeToCardWhenCommenting: Optional[bool]=Unset
     turnOffRecentCardHighlighting: Optional[bool]=Unset
     enableFavoritesByDefault: Optional[bool]=Unset

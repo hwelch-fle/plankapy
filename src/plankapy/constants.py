@@ -16,31 +16,31 @@ BoardRole = Literal[
 
 # From https://github.com/plankanban/planka/blob/master/server/api/models/Project.js
 Gradient = Literal[
-'old-lime',
-  'ocean-dive',
-  'tzepesch-style',
-  'jungle-mesh',
-  'strawberry-dust',
-  'purple-rose',
-  'sun-scream',
-  'warm-rust',
-  'sky-change',
-  'green-eyes',
-  'blue-xchange',
-  'blood-orange',
-  'sour-peel',
-  'green-ninja',
-  'algae-green',
-  'coral-reef',
-  'steel-grey',
-  'heat-waves',
-  'velvet-lounge',
-  'purple-rain',
-  'blue-steel',
-  'blueish-curve',
-  'prism-light',
-  'green-mist',
-  'red-curtain',
+    'old-lime',
+    'ocean-dive',
+    'tzepesch-style',
+    'jungle-mesh',
+    'strawberry-dust',
+    'purple-rose',
+    'sun-scream',
+    'warm-rust',
+    'sky-change',
+    'green-eyes',
+    'blue-xchange',
+    'blood-orange',
+    'sour-peel',
+    'green-ninja',
+    'algae-green',
+    'coral-reef',
+    'steel-grey',
+    'heat-waves',
+    'velvet-lounge',
+    'purple-rain',
+    'blue-steel',
+    'blueish-curve',
+    'prism-light',
+    'green-mist',
+    'red-curtain',
 ]
 
 @dataclass
@@ -197,3 +197,8 @@ ProjectsOrder = Literal[
     'byCreationTime',
 ]
 
+# Additional Project flags for 2.0.0-rc-3
+BackgroundType = Literal[
+    'gradient',
+    'image',
+]
