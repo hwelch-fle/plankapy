@@ -19,6 +19,8 @@ import json
 
 from contextlib import contextmanager
 
+import httpx
+
 class _BaseHandler(Protocol):
     """Protocol for implementing HTTP/s request handlers"""
     
@@ -26,7 +28,7 @@ class _BaseHandler(Protocol):
                  endpoint: Optional[str]=None, 
                  headers: Optional[dict[str, str]]=None) -> None: ...
     @property
-    def endpoint(self) -> str: ...
+    def endpoint(self) -> Optional[str]: ...
     @endpoint.setter
     def endpoint(self, value: str): ...
     def encode_data(self, data: dict, encoding: str='utf-8') -> bytes: ...
@@ -38,7 +40,108 @@ class _BaseHandler(Protocol):
     def delete(self) -> Any: ...
     @contextmanager
     def endpoint_as(self, endpoint: Optional[str]=None) -> Generator[Self, None, None]: ... 
+
+
+class SyncHttpxHandler(_BaseHandler): 
+    """Handle all requests using HTTPX"""
+    def __init__(self, base_url: str, *,
+                 endpoint: Optional[str]=None, 
+                 headers: Optional[dict[str, str]]=None) -> None:
+        self.base_url = base_url
+        self.headers = headers
+        self._endpoint = endpoint
+        self._client = httpx.Client
+
+        # Auth is created seperately and passed to handler
+        # Auth context adds cookies and token refreshing
+        self._auth: httpx.Auth | None = None
+
+    @property
+    def auth(self) -> httpx.Auth:
+        if self._auth is None:
+            raise AuthError(f'No authentication provided for {self.base_url}')
+        return self._auth
+
+    @auth.setter
+    def auth(self, auth: httpx.Auth) -> None:
+        self._auth = auth
+
+    @property
+    def client(self) -> httpx.Client:
+        return self._client(headers=self.headers, auth=self.auth)
+
+    @property
+    def endpoint(self) -> str:
+        return urljoin(self.base_url, self._endpoint)
     
+    @endpoint.setter
+    def endpoint(self, value: str) -> None:
+        self._endpoint = value
+
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__} {self.endpoint} >'
+    
+    def __str__(self) -> str:
+        return self.endpoint
+
+    def get(self) -> httpx.Response:
+        with self._client() as client:
+            return client.get(self.endpoint)
+
+    def _get_file(self, url: str) -> bytes:
+        with self._client() as client:
+            return b''.join(client.get(url).iter_bytes())
+
+    def post(self, data: dict) -> httpx.Response:
+        with self.client as client:
+            return client.post(self.endpoint, data=data)
+
+    def _post_file(self, file_path: Path | str, file_name: str) -> httpx.Response:
+        with self.client as client:
+            client.headers['Connection'] = 'keep-alive'
+            client.headers['Accept'] = '*/*'
+            client.headers['Accept-Encoding'] = 'gzip, defalte, br'
+            
+            # Get file data and MIME type
+            # Default to binary if MIME type is not found
+            mime_type = guess_type(file_name)[0] or 'application/octet-stream' 
+
+            # Handle string situations
+            if isinstance(file_path, str):
+
+                # Cast local path to Path
+                if not file_path.startswith('http'):
+                    file_path = Path(file_path)
+
+                # Use _get_file to stream webfiles
+                else:
+                    with self.client as client:
+                        return client.post(
+                            self.endpoint, files={
+                                'file': (file_name, self._get_file(file_path), mime_type)
+                                }
+                            )
+            
+            # At this point all remaining paths are Path objects
+            with self.client as client:
+                return client.post(
+                    self.endpoint, files={
+                        'file': (file_name, file_path.read_bytes(), mime_type)
+                        }
+                    )
+
+    def put(self, data: dict) -> httpx.Response:
+        with self.client as client:
+            return client.put(self.endpoint, data=data)
+
+    def patch(self, data: dict) -> httpx.Response:
+        with self.client as client:
+            return client.patch(self.endpoint, data=data)
+    
+    def delete(self) -> httpx.Response:
+        with self.client as client:
+            return client.delete(self.endpoint)
+
 class urllibHandler(_BaseHandler):
     """Base class for handling HTTP requests using urllib"""
     def __init__(self, base_url: str, *,
@@ -223,6 +326,8 @@ class JSONHandler(urllibHandler):
     def delete(self) -> JSONResponse:
         return self.decode_data(super().delete())
 
+class AuthError(Exception): ...
+
 class BaseAuth(Protocol):
     endpoint = None
     def __repr__(self) -> str:
@@ -304,6 +409,63 @@ class TokenAuth(BaseAuth):
            Headers with the token in the `Authorization` key
         """
         return {"Authorization": f"Bearer {self.token}"}
+
+class httpxPasswordAuth(httpx.Auth):
+    """Password Authentication implementaion for use with the httpx Handlers
+    
+    Note:
+        As long as the username and password is valid, expired tokens will be renewed
+    
+    Warning:
+        This method will send your username and password in the headers as plaintext!
+        If this is unacceptable (accessing over a network), make sure you are accessing
+        the instance using SSL! For local management and 
+    """
+    def __init__(self, username: str, password: str) -> None:
+        self.credentials = {'emailOrUsername': username, 'password': password}
+
+        # Set by _get_token
+        self.token = None
+        self.cookies = httpx.Cookies()
+
+    def auth_flow(self, request: httpx.Request) -> Generator[httpx.Request, httpx.Response, None]:
+        # Set cookies/token if token is None
+        if self.token is None:
+            self.token, self.cookies = self._get_token(url=httpx.URL(request.url.host))
+
+        # Use client context to pass cookies and auth header to request
+        with httpx.Client(cookies=self.cookies, headers={'Authorization': f'Bearer {self.token}'}):
+            response = yield request
+
+        # Handle expired token/cookies
+        if response.status_code == 401:
+            self.token = None
+            self.cookies = httpx.Cookies()
+            self.auth_flow(request)
+
+    def _get_token(self, url: httpx.URL) -> tuple[str, httpx.Cookies]:
+        with httpx.Client(cookies=self.cookies) as client:
+            response = client.post(url, data=self.credentials, params={'withHttpOnlyToken': True})
+
+        # Call raise_for_status on response to allow HTTP Errors to bubble up
+        self.cookies.update(response.raise_for_status().cookies)
+        return response.json()['item']
+
+class httpxTokenAuth(httpx.Auth):
+    """Token Authentication implementaion for use with the httpx Handlers
+    
+    Note:
+        Token based authentication cannot automatically renew when the token expires!
+    """
+    def __init__(self, token: str) -> None:
+        self.token = token
+        self.cookies = httpx.Cookies()
+
+    def auth_flow(self, request: httpx.Request) -> Generator[httpx.Request, httpx.Response, None]:
+        # Use client context to pass cookies and auth header to request
+        with httpx.Client(cookies=self.cookies, headers={'Authorization': f'Bearer {self.token}'}):
+            response = yield request
+            response.raise_for_status()
 
 # TODO: Implement SSO auth with httpOnlyToken
 # https://github.com/hwelch-fle/plankapy/pull/11/commits/72b8d06208dc961537ef2bcd8d65c11879b8d6b9#
