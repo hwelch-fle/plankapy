@@ -1,5 +1,7 @@
 # plankapy
 A Python API for [Planka](https://github.com/plankanban/planka)
+## NOTE: 
+### This package currently only works on <v2.x instances of Planka, See [#27](https://github.com/hwelch-fle/plankapy/issues/27) For details
 
 ![PyPI - License](https://img.shields.io/pypi/l/plankapy)
 
