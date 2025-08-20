@@ -978,7 +978,7 @@ class Board(Board_):
     def create_list(self, _list: List) -> List: ...
 
     @overload
-    def create_list(self, name: str, position: int) -> List: ...
+    def create_list(self, name: str, position: int, active: bool=True) -> List: ...
 
     def create_list(self, *args, **kwargs) -> List:
         """Creates a new list in the board
@@ -986,6 +986,7 @@ class Board(Board_):
         Args:
             name (str): Name of the list (required)
             position (int): Position of the list (default: 0)
+            active (bool): true if the list is non-archived, false if this is an archive list
             
         Args: Alternate
             list (List): List instance to create
@@ -1002,10 +1003,11 @@ class Board(Board_):
             ```
         """
         overload = parse_overload(args, kwargs, model='list', 
-                                  options=('name', 'position'), 
+                                  options=('name', 'position', 'active'),
                                   required=('name',))
         
         overload['position'] = overload.get('position', 0)
+        overload['type'] = 'active' if overload.get('active', True) else 'closed'
         overload['boardId'] = self.id
 
         route = self.routes.post_list(boardId=self.id)
