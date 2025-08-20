@@ -571,6 +571,10 @@ class Board_(Model):
     projectId: Optional[int]=Required
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
+    defaultView: Optional[bool]=Unset
+    defaultCardType: Optional[str]=Unset
+    limitCardTypesToDefaultOne: Optional[bool]=Unset
+    alwaysDisplayCardCreator: Optional[bool]=Unset
 
 @dataclass(eq=False)
 class BoardMembership_(Model):
@@ -798,6 +802,7 @@ class List_(Model):
         color (str): The color of the list
         createdAt (datetime): The creation date of the list
         updatedAt (datetime): The last update date of the list
+        type (str): 'active' for normal and 'closed' for Archived lists
     """
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -806,6 +811,7 @@ class List_(Model):
     color: Optional[str]=Unset
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
+    type: Optional[str]=Required
 
 @dataclass(eq=False)
 class Notification_(Model):
@@ -839,6 +845,7 @@ class Project_(Model):
         backgroundImage (BackgroundImage): The background image of the project
         createdAt (datetime): The creation date of the project
         updatedAt (datetime): The last update date of the project
+        description (str): The description of the project
     """
     id: Optional[int]=Unset
     name: Optional[str]=Required
@@ -853,7 +860,10 @@ class Project_(Model):
     # This replaces 'background' in v2
     backgroundType: Optional[BackgroundType]=Unset
     backgroundGradient: Optional[BackgroundGradient]=Unset
-
+    isHidden: Optional[bool]=Unset
+    ownerProjectManagerId: Optional[str]=Unset
+    backgroundImageId: Optional[str]=Unset
+    isFavorite: Optional[bool]=Unset
     
 @dataclass(eq=False)
 class ProjectManager_(Model):
