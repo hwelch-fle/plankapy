@@ -141,7 +141,7 @@ class Routes:
     @register_route('POST', '/api/boards/{boardId}/lists')
     def post_list(self, boardId: int) -> Route: ...
 
-    @register_route('POST', '/api/boards/{boardId}/memberships')
+    @register_route('POST', '/api/boards/{boardId}/board-memberships')
     def post_board_membership(self, boardId: int) -> Route: ...
 
     @register_route('POST', '/api/cards/{cardId}/attachments')

@@ -596,6 +596,7 @@ class BoardMembership_(Model):
     userId: Optional[int]=Required
     createdAt: Optional[str]=Unset
     updatedAt: Optional[str]=Unset
+    projectId: Optional[int] = Unset
 
 @dataclass(eq=False)
 class Card_(Model):
@@ -971,5 +972,6 @@ class User_(Model):
     isDeactivated: Optional[bool]=Unset
     avatar: Optional[str]=Unset
     isDefaultAdmin: Optional[bool]=Unset
+    termsType: Optional[str] = Unset
     # Set by isSsoUser and isDefaultAdmin
     lockedFieldNames: Optional[list[str]]=Unset
