@@ -135,6 +135,10 @@ LabelColorHexMap = {
     'egg-yellow':'#f7d036',
     'coral-green':'#2b6a6c',
     'light-cocoa':'#87564a',
+    'piggy-red': '#f9859f',
+    'lavender-fields': '#b388bb',
+    'shady-rust': '#86584c',
+    'sugar-plum': '#8185c4',
 }
 
 GradientCSSMap = {
