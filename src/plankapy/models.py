@@ -497,6 +497,7 @@ class Action_(Model):
     """
 
     id: Optional[int]=Unset
+    boardId: Optional[int]=Unset
     type: Optional[ActionType]=Required
     data: Optional[dict]=Required
     cardId: Optional[int]=Required
@@ -570,6 +571,7 @@ class Board_(Model):
     position: Optional[int]=Required
     projectId: Optional[int]=Required
     createdAt: Optional[str]=Unset
+    isSubscribed: Optional[bool]=Unset
     updatedAt: Optional[str]=Unset
     defaultView: Optional[bool]=Unset
     defaultCardType: Optional[str]=Unset
@@ -619,6 +621,10 @@ class Card_(Model):
         updatedAt (datetime): The last update date of the card
     """
     id: Optional[int]=Unset
+    type: Optional[str]=Unset
+    commentsTotal: Optional[int]=Unset
+    listChangedAt: Optional[int]=Unset
+    prevListId: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
     description: Optional[str]=Unset
@@ -897,6 +903,8 @@ class Task_(Model):
         updatedAt (datetime): The last update date of the task
     """
     id: Optional[int]=Unset
+    taskListId: Optional[int]=Unset
+    assigneeUserId: Optional[int]=Unset
     name: Optional[str]=Required
     position: Optional[int]=Required
     isCompleted: bool=Unset
