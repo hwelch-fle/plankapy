@@ -577,6 +577,8 @@ class Board_(Model):
     defaultCardType: Optional[str]=Unset
     limitCardTypesToDefaultOne: Optional[bool]=Unset
     alwaysDisplayCardCreator: Optional[bool]=Unset
+    expandTaskListsByDefault: Optional[bool]=Unset
+
 
 @dataclass(eq=False)
 class BoardMembership_(Model):

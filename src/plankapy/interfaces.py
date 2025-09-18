@@ -385,7 +385,7 @@ class Planka:
         return project
 
         
-    def create_user(self, username: str, email: str, password: str, name: str=None) -> User:
+    def create_user(self, username: str, email: str, password: str, name: str=None, role: str='boardUser') -> User:
         """Create a new user
         
         Note:
@@ -421,7 +421,7 @@ class Planka:
             
         route = self.routes.post_user()
         try:
-            return User(**route(username=username, name=name or username, password=password, email=email)['item']).bind(self.routes)
+            return User(**route(username=username, name=name or username, password=password, email=email, role=role)['item']).bind(self.routes)
         except HTTPError as e:
             if e.code == 400: # Invalid password, email, or username
                 raise ValueError(
