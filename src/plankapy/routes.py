@@ -153,7 +153,7 @@ class Routes:
     @register_route('POST', '/api/cards/{cardId}/labels')
     def post_card_label(self, cardId: int) -> Route: ...
 
-    @register_route('POST', '/api/cards/{cardId}/memberships')
+    @register_route('POST', '/api/cards/{cardId}/card-memberships')
     def post_card_membership(self, cardId: int) -> Route: ...
 
     @register_route('POST', '/api/cards/{cardId}/tasks')
