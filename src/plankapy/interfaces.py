@@ -2327,9 +2327,9 @@ class CardMembership(CardMembership_):
             tuple[User, Card]: The user and card that were removed from each other
         """
         self.refresh()
-        route = self.routes.delete_card_membership(id=self.id)
+        route = self.routes.delete_card_membership(cardId=self.cardId, userId=self.userId)
         route()
-        return (self.user, self.card)
+        return (self.card)
     
 class CardSubscription(CardSubscription_): 
     
