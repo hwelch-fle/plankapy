@@ -6,11 +6,11 @@ import asyncio
 
 from time import perf_counter
 
-sync_client = Client(base_url='http://192.168.90.250:1337', limits=Limits(max_connections=100))
+sync_client = Client(base_url='http://localhost:3000', limits=Limits(max_connections=100))
 sync_planka = PlankaEndpoints(sync_client)
 
 
-async_client = AsyncClient(base_url='http://192.168.90.250:1337', limits=Limits(max_connections=100))
+async_client = AsyncClient(base_url='http://localhost:3000', limits=Limits(max_connections=100))
 async_planka = AsyncPlankaEndpoints(async_client)
 
 def sync_auth():
