@@ -2317,19 +2317,19 @@ class CardMembership(CardMembership_):
         card_route = self.routes.get_card(id=self.cardId)
         return Card(**card_route()['item']).bind(self.routes)
 
-    def delete(self) -> tuple[User, Card]:
+    def delete(self) -> Card:
         """Deletes the card membership
         
         Danger:
             This action is irreversible and cannot be undone
             
         Returns:
-            tuple[User, Card]: The user and card that were removed from each other
+            Card: The card that were removed from the user
         """
         self.refresh()
         route = self.routes.delete_card_membership(cardId=self.cardId, userId=self.userId)
         route()
-        return (self.card)
+        return self.card
     
 class CardSubscription(CardSubscription_): 
     
