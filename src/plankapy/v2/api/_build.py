@@ -22,6 +22,7 @@ SWAGGER_FILE = Path("swagger.json")
 INIT_MOD = Path("__init__.py")
 SCHEMA_MOD = Path("schemas.py")
 PATH_MOD = Path("paths.py")
+ASYNC_PATH_MOD = Path("async_paths.py")
 RESPONSES_MOD = Path("responses.py")
 
 TYPES = {
@@ -340,6 +341,17 @@ def yield_paths() -> Generator[str]:
         yield ""
 
 
+def yield_async_paths() -> Generator[str]:
+    for line in yield_paths():
+        if '__init__' not in line:
+            line = line.replace('def ', 'async def ')
+        if 'PlankaEndpoints' in line:
+            line = line.replace('PlankaEndpoints', 'AsyncPlankaEndpoints')
+        line = line.replace(': Client', ': AsyncClient')
+        line = line.replace('import Client', 'import AsyncClient')
+        line = line.replace('resp = ', 'resp = await ')
+        yield line
+
 def yield_responses() -> Generator[str]:
     yield "from __future__ import annotations"
     yield "from httpx import HTTPStatusError"
@@ -361,6 +373,7 @@ def yield_init() -> Generator[str]:
     yield ""
     yield "from .schemas import *"
     yield "from .paths import *"
+    yield "from .async_paths import *"
     yield "from .responses import *"
     yield ""
     yield f'__version__ = "{_version}"'
@@ -401,6 +414,7 @@ def yield_schema() -> Generator[str]:
 INIT_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '), yield_init())))
 SCHEMA_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_schema())))
 PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_paths())))
+ASYNC_PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_async_paths())))
 RESPONSES_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_responses())))
 # Delete the file after it is used
 # this ensures that the api typing module

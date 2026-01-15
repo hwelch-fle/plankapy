@@ -2,6 +2,7 @@
 
 from .schemas import *
 from .paths import *
+from .async_paths import *
 from .responses import *
 
 __version__ = "2.0.0"
