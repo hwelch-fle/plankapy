@@ -1,6 +1,6 @@
-"""PLANKA API (2.0.0) - Generated on Wed Jan 14 2026"""
+"""PLANKA API (2.0.0) - Generated on Thu Jan 15 2026"""
 
-from .schema import *
+from .schemas import *
 from .paths import *
 from .responses import *
 

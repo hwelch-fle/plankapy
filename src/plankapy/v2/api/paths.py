@@ -1,1281 +1,3398 @@
 from __future__ import annotations
-from typing import Protocol
-from typing import Any
+from typing import (
+    Any,
+    Literal,
+    Unpack,
+    TypedDict,
+    NotRequired,
+)
+from httpx import Client
 from .schemas import *
 
-
-class Response(Protocol):
-    def json(self, *args: Any, **kwargs: Any) -> dict[str, Any]: ...
-
-
-# Note: Clients require a base_url implementation that overrides the provided
-# endpoint:
-# e.g.
-# >>> client = Client(base_url='http://<url>')
-# >>> client.get('endpoint/id').request
-# Request('http://<url>/endpoint/id')
-# This functionality is provided by httpx.Client and httpx.AsyncClient
-# But is missing from the requests.Session object
-# This can be overcome by subclassing requests.Session:
-# >>> class SessionURL(Session):
-# ... 	def __init__(self, base_url: str|None=None):
-# ...		super().__init__()
-# ...		self.base_url = base_url
-# ...
-# ... 	@wraps(Session.request)
-# ... 	def request(self, method, url, *args, **kwargs):
-# ... 		if self.base_url is not None:
-# ... 			url = self.base_url.rstrip('/') + '/' + url.lstrip('/')
-# ... 		return super().request(method, url, *args, **kwargs)
-
-
-class Client(Protocol):
-    base_url: str
-
-    def get(self, *args: Any, **kwargs: Any) -> Response: ...
-    def post(self, *args: Any, **kwargs: Any) -> Response: ...
-    def patch(self, *args: Any, **kwargs: Any) -> Response: ...
-    def delete(self, *args: Any, **kwargs: Any) -> Response: ...
-
+__all__ = ("PlankaEndpoints",)
 
 class PlankaEndpoints:
     def __init__(self, client: Client) -> None:
         self.client = client
 
-    def acceptTerms(self, **body: Any) -> Any:
+    def acceptTerms(self, **kwargs: Unpack[Request_acceptTerms]) -> Response_acceptTerms:
         """Accept terms during the authentication flow. Converts the pending token to an access token.
-        pendingToken (str): Pending token received from the authentication flow
-        signature (str): Terms signature hash based on user role
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/access-tokens/accept-terms".format(**params), data=body
-        )
 
-    def createAccessToken(self, **body: Any) -> Any:
+        Args:
+            pendingToken (str): Pending token received from the authentication flow
+            signature (str): Terms signature hash based on user role
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Error: 401 Invalid pending token
+            Error: 403 Authentication restriction
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/access-tokens/accept-terms".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createAccessToken(self, **kwargs: Unpack[Request_createAccessToken]) -> Response_createAccessToken:
         """Authenticates a user using email/username and password. Returns an access token for API authentication.
-        emailOrUsername (str): Email address or username of the user
-        password (str): Password of the user
-        withHttpOnlyToken (bool): Whether to include an HTTP-only authentication cookie
+
+        Args:
+            emailOrUsername (str): Email address or username of the user
+            password (str): Password of the user
+            withHttpOnlyToken (bool): Whether to include an HTTP-only authentication cookie
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Error: 401 Invalid credentials
+            Error: 403 Authentication restriction
         """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/access-tokens".format(**params), data=body)
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/access-tokens".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
 
-    def deleteAccessToken(self) -> Any:
-        """Logs out the current user by deleting the session and access token. Clears HTTP-only cookies if present."""
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/access-tokens/me".format(**params))
+    def deleteAccessToken(self) -> Response_deleteAccessToken:
+        """Logs out the current user by deleting the session and access token. Clears HTTP-only cookies if present.
 
-    def exchangeForAccessTokenWithOidc(self, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            Unauthorized: 401 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/access-tokens/me".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def exchangeForAccessTokenWithOidc(self, **kwargs: Unpack[Request_exchangeForAccessTokenWithOidc]) -> Response_exchangeForAccessTokenWithOidc:
         """Exchanges an OIDC authorization code for an access token. Creates a user if they do not exist.
-        code (str): Authorization code from OIDC provider
-        nonce (str): Nonce value for OIDC security
-        withHttpOnlyToken (bool): Whether to include HTTP-only authentication cookie
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/access-tokens/exchange-with-oidc".format(**params), data=body
-        )
 
-    def revokePendingToken(self, **body: Any) -> Any:
+        Args:
+            code (str): Authorization code from OIDC provider
+            nonce (str): Nonce value for OIDC security
+            withHttpOnlyToken (bool): Whether to include HTTP-only authentication cookie
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Error: 401 OIDC authentication error
+            Error: 403 Authentication restriction
+            Error: 409 Conflict error
+            Error: 422 Missing required values
+            Error: 500 OIDC configuration error
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/access-tokens/exchange-with-oidc".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def revokePendingToken(self, **kwargs: Unpack[Request_revokePendingToken]) -> Response_revokePendingToken:
         """Revokes a pending authentication token and cancels the authentication flow.
-        pendingToken (str): Pending token to revoke
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/access-tokens/revoke-pending-token".format(**params), data=body
-        )
 
-    def getBoardActions(self, boardId: str, beforeId: str) -> Any:
+        Args:
+            pendingToken (str): Pending token to revoke
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/access-tokens/revoke-pending-token".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def getBoardActions(self, boardId: str, **kwargs: Unpack[Request_getBoardActions]) -> Response_getBoardActions:
         """Retrieves a list of actions (activity history) for a specific board, with pagination support.
 
         Args:
-                boardId (str): ID of the board to get actions for)
-                beforeId (str): ID to get actions before (for pagination))
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/boards/{boardId}/actions".format(**params))
+            boardId (str): ID of the board to get actions for)
+            beforeId (str): ID to get actions before (for pagination)) (optional)
 
-    def getCardActions(self, cardId: str, beforeId: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        valid_params = ('beforeId',)
+        passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
+        resp = self.client.get("api/boards/{boardId}/actions".format(**args), params=passed_params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def getCardActions(self, cardId: str, **kwargs: Unpack[Request_getCardActions]) -> Response_getCardActions:
         """Retrieves a list of actions (activity history) for a specific card, with pagination support.
 
         Args:
-                cardId (str): ID of the card to get actions for)
-                beforeId (str): ID to get actions before (for pagination))
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/cards/{cardId}/actions".format(**params))
+            cardId (str): ID of the card to get actions for)
+            beforeId (str): ID to get actions before (for pagination)) (optional)
 
-    def createAttachment(self, cardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        valid_params = ('beforeId',)
+        passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
+        resp = self.client.get("api/cards/{cardId}/actions".format(**args), params=passed_params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createAttachment(self, cardId: str, **kwargs: Unpack[Request_createAttachment]) -> Response_createAttachment:
         """Creates an attachment on a card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to create the attachment on)
-                type (str): Type of the attachment
-                file (str): File to upload
-                url (str): URL for the link attachment
-                name (str): Name/title of the attachment
-                requestId (str): Request ID for tracking
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/cards/{cardId}/attachments".format(**params), data=body
-        )
+            cardId (str): ID of the card to create the attachment on)
+            type (Literal['file', 'link']): Type of the attachment
+            file (str): File to upload
+            url (str): URL for the link attachment
+            name (str): Name/title of the attachment
+            requestId (str): Request ID for tracking
 
-    def deleteAttachment(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Error: 422 Upload or validation error
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/cards/{cardId}/attachments".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteAttachment(self, id: str) -> Response_deleteAttachment:
         """Deletes an attachment. Requires board editor permissions.
 
         Args:
-                id (str): ID of the attachment to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/attachments/{id}".format(**params))
+            id (str): ID of the attachment to delete)
 
-    def updateAttachment(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/attachments/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateAttachment(self, id: str, **kwargs: Unpack[Request_updateAttachment]) -> Response_updateAttachment:
         """Updates an attachment. Requires board editor permissions.
 
         Args:
-                id (str): ID of the attachment to update)
-                name (str): Name/title of the attachment
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/attachments/{id}".format(**params), data=body)
+            id (str): ID of the attachment to update)
+            name (str): Name/title of the attachment
 
-    def createBackgroundImage(self, projectId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/attachments/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createBackgroundImage(self, projectId: str, **kwargs: Unpack[Request_createBackgroundImage]) -> Response_createBackgroundImage:
         """Uploads a background image for a project. Requires project manager permissions.
 
         Args:
-                projectId (str): ID of the project to upload background image for)
-                file (str): Background image file (must be an image format)
-                requestId (str): Request ID for tracking
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/projects/{projectId}/background-images".format(**params), data=body
-        )
+            projectId (str): ID of the project to upload background image for)
+            file (str): Background image file (must be an image format)
+            requestId (str): Request ID for tracking
 
-    def deleteBackgroundImage(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Error: 422 File upload error
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/projects/{projectId}/background-images".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteBackgroundImage(self, id: str) -> Response_deleteBackgroundImage:
         """Deletes a background image. Requires project manager permissions.
 
         Args:
-                id (str): ID of the background image to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/background-images/{id}".format(**params))
+            id (str): ID of the background image to delete)
 
-    def createBaseCustomFieldGroup(self, projectId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/background-images/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def createBaseCustomFieldGroup(self, projectId: str, **kwargs: Unpack[Request_createBaseCustomFieldGroup]) -> Response_createBaseCustomFieldGroup:
         """Creates a base custom field group within a project. Requires project manager permissions.
 
         Args:
-                projectId (str): ID of the project to create the base custom field group in)
-                name (str): Name/title of the base custom field group
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/projects/{projectId}/base-custom-field-groups".format(**params),
-            data=body,
-        )
+            projectId (str): ID of the project to create the base custom field group in)
+            name (str): Name/title of the base custom field group
 
-    def deleteBaseCustomFieldGroup(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/projects/{projectId}/base-custom-field-groups".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteBaseCustomFieldGroup(self, id: str) -> Response_deleteBaseCustomFieldGroup:
         """Deletes a base custom field group. Requires project manager permissions.
 
         Args:
-                id (str): ID of the base custom field group to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/base-custom-field-groups/{id}".format(**params))
+            id (str): ID of the base custom field group to delete)
 
-    def updateBaseCustomFieldGroup(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/base-custom-field-groups/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateBaseCustomFieldGroup(self, id: str, **kwargs: Unpack[Request_updateBaseCustomFieldGroup]) -> Response_updateBaseCustomFieldGroup:
         """Updates a base custom field group. Requires project manager permissions.
 
         Args:
-                id (str): ID of the base custom field group to update)
-                name (str): Name/title of the base custom field group
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch(
-            "api/base-custom-field-groups/{id}".format(**params), data=body
-        )
+            id (str): ID of the base custom field group to update)
+            name (str): Name/title of the base custom field group
 
-    def createBoardMembership(self, boardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/base-custom-field-groups/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createBoardMembership(self, boardId: str, **kwargs: Unpack[Request_createBoardMembership]) -> Response_createBoardMembership:
         """Creates a board membership within a board. Requires project manager permissions.
 
         Args:
-                boardId (str): ID of the board to create the board membership in)
-                userId (str): ID of the user who is a member of the board
-                role (str): Role of the user in the board
-                canComment (bool): Whether the user can comment on cards (applies only to viewers)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/boards/{boardId}/board-memberships".format(**params), data=body
-        )
+            boardId (str): ID of the board to create the board membership in)
+            userId (str): ID of the user who is a member of the board
+            role (Literal['editor', 'viewer']): Role of the user in the board
+            canComment (bool): Whether the user can comment on cards (applies only to viewers)
 
-    def deleteBoardMembership(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/boards/{boardId}/board-memberships".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteBoardMembership(self, id: str) -> Response_deleteBoardMembership:
         """Deletes a board membership. Users can remove their own membership, project managers can remove any membership.
 
         Args:
-                id (str): ID of the board membership to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/board-memberships/{id}".format(**params))
+            id (str): ID of the board membership to delete)
 
-    def updateBoardMembership(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/board-memberships/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateBoardMembership(self, id: str, **kwargs: Unpack[Request_updateBoardMembership]) -> Response_updateBoardMembership:
         """Updates a board membership. Requires project manager permissions.
 
         Args:
-                id (str): ID of the board membership to update)
-                role (str): Role of the user in the board
-                canComment (bool): Whether the user can comment on cards (applies only to viewers)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch(
-            "api/board-memberships/{id}".format(**params), data=body
-        )
+            id (str): ID of the board membership to update)
+            role (Literal['editor', 'viewer']): Role of the user in the board
+            canComment (bool): Whether the user can comment on cards (applies only to viewers)
 
-    def createBoard(self, projectId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/board-memberships/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createBoard(self, projectId: str, **kwargs: Unpack[Request_createBoard]) -> Response_createBoard:
         """Creates a board within a project. Supports importing from Trello. Requires project manager permissions.
 
         Args:
-                projectId (str): ID of the project to create the board in)
-                position (int): Position of the board within the project
-                name (str): Name/title of the board
-                importType (str): Type of import
-                importFile (str): Import file
-                requestId (str): Request ID for tracking
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/projects/{projectId}/boards".format(**params), data=body
-        )
+            projectId (str): ID of the project to create the board in)
+            position (int): Position of the board within the project
+            name (str): Name/title of the board
+            importType (Literal['trello']): Type of import
+            importFile (str): Import file
+            requestId (str): Request ID for tracking
 
-    def deleteBoard(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+            Error: 422 Import file upload error
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/projects/{projectId}/boards".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteBoard(self, id: str) -> Response_deleteBoard:
         """Deletes a board and all its contents (lists, cards, etc.). Requires project manager permissions.
 
         Args:
-                id (str): ID of the board to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/boards/{id}".format(**params))
+            id (str): ID of the board to delete)
 
-    def getBoard(self, id: str, subscribe: bool) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/boards/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getBoard(self, id: str, **kwargs: Unpack[Request_getBoard]) -> Response_getBoard:
         """Retrieves comprehensive board information, including lists, cards, and other related data.
 
         Args:
-                id (str): ID of the board to retrieve)
-                subscribe (bool): Whether to subscribe to real-time updates for this board (only for socket connections))
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/boards/{id}".format(**params))
+            id (str): ID of the board to retrieve)
+            subscribe (bool): Whether to subscribe to real-time updates for this board (only for socket connections)) (optional)
 
-    def updateBoard(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        valid_params = ('subscribe',)
+        passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
+        resp = self.client.get("api/boards/{id}".format(**args), params=passed_params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateBoard(self, id: str, **kwargs: Unpack[Request_updateBoard]) -> Response_updateBoard:
         """Updates a board. Project managers can update all fields, board members can only subscribe/unsubscribe.
 
         Args:
-                id (str): ID of the board to update)
-                position (int): Position of the board within the project
-                name (str): Name/title of the board
-                defaultView (str): Default view for the board
-                defaultCardType (str): Default card type for new cards
-                limitCardTypesToDefaultOne (bool): Whether to limit card types to default one
-                alwaysDisplayCardCreator (bool): Whether to always display card creators
-                expandTaskListsByDefault (bool): Whether to expand task lists by default
-                isSubscribed (bool): Whether the current user is subscribed to the board
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/boards/{id}".format(**params), data=body)
+            id (str): ID of the board to update)
+            position (int): Position of the board within the project
+            name (str): Name/title of the board
+            defaultView (Literal['kanban', 'grid', 'list']): Default view for the board
+            defaultCardType (Literal['project', 'story']): Default card type for new cards
+            limitCardTypesToDefaultOne (bool): Whether to limit card types to default one
+            alwaysDisplayCardCreator (bool): Whether to always display card creators
+            expandTaskListsByDefault (bool): Whether to expand task lists by default
+            isSubscribed (bool): Whether the current user is subscribed to the board
 
-    def createCardLabel(self, cardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/boards/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createCardLabel(self, cardId: str, **kwargs: Unpack[Request_createCardLabel]) -> Response_createCardLabel:
         """Adds a label to a card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to add the label to)
-                labelId (str): ID of the label to add to the card
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/cards/{cardId}/card-labels".format(**params), data=body
-        )
+            cardId (str): ID of the card to add the label to)
+            labelId (str): ID of the label to add to the card
 
-    def deleteCardLabel(self, cardId: str, labelId: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/cards/{cardId}/card-labels".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteCardLabel(self, cardId: str, labelId: str) -> Response_deleteCardLabel:
         """Removes a label from a card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to remove the label from)
-                labelId (str): ID of the label to remove from the card)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete(
-            "api/cards/{cardId}/card-labels/labelId:{labelId}".format(**params)
-        )
+            cardId (str): ID of the card to remove the label from)
+            labelId (str): ID of the label to remove from the card)
 
-    def createCardMembership(self, cardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/cards/{cardId}/card-labels/labelId:{labelId}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def createCardMembership(self, cardId: str, **kwargs: Unpack[Request_createCardMembership]) -> Response_createCardMembership:
         """Adds a user to a card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to add the user to)
-                userId (str): ID of the card to add the user to
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/cards/{cardId}/card-memberships".format(**params), data=body
-        )
+            cardId (str): ID of the card to add the user to)
+            userId (str): ID of the card to add the user to
 
-    def deleteCardMembership(self, cardId: str, userId: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/cards/{cardId}/card-memberships".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteCardMembership(self, cardId: str, userId: str) -> Response_deleteCardMembership:
         """Removes a user from a card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to remove the user from)
-                userId (str): ID of the user to remove from the card)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete(
-            "api/cards/{cardId}/card-memberships/userId:{userId}".format(**params)
-        )
+            cardId (str): ID of the card to remove the user from)
+            userId (str): ID of the user to remove from the card)
 
-    def createCard(self, listId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/cards/{cardId}/card-memberships/userId:{userId}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def createCard(self, listId: str, **kwargs: Unpack[Request_createCard]) -> Response_createCard:
         """Creates a card within a list. Requires board editor permissions.
 
         Args:
-                listId (str): ID of the list to create the card in)
-                type (str): Type of the card
-                position (int): Position of the card within the list
-                name (str): Name/title of the card
-                description (str): Detailed description of the card
-                dueDate (str): Due date for the card
-                isDueCompleted (bool): Whether the due date is completed
-                stopwatch (dict[str, Any]): Stopwatch data for time tracking
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/lists/{listId}/cards".format(**params), data=body)
+            listId (str): ID of the list to create the card in)
+            type (Literal['project', 'story']): Type of the card
+            position (int): Position of the card within the list
+            name (str): Name/title of the card
+            description (str): Detailed description of the card
+            dueDate (str): Due date for the card
+            isDueCompleted (bool): Whether the due date is completed
+            stopwatch (dict[str, Any]): Stopwatch data for time tracking
 
-    def getCards(
-        self,
-        listId: str,
-        before: str,
-        search: str,
-        filterUserIds: str,
-        filterLabelIds: str,
-    ) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/lists/{listId}/cards".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def getCards(self, listId: str, **kwargs: Unpack[Request_getCards]) -> Response_getCards:
         """Retrieves cards from an endless list with filtering, search, and pagination support.
 
         Args:
-                listId (str): ID of the list to get cards from (must be an endless list))
-                before (str): Pagination cursor (JSON object with id and listChangedAt))
-                search (str): Search term to filter cards)
-                filterUserIds (str): Comma-separated user IDs to filter by members)
-                filterLabelIds (str): Comma-separated label IDs to filter by labels)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/lists/{listId}/cards".format(**params))
+            listId (str): ID of the list to get cards from (must be an endless list))
+            before (str): Pagination cursor (JSON object with id and listChangedAt)) (optional)
+            search (str): Search term to filter cards) (optional)
+            filterUserIds (str): Comma-separated user IDs to filter by members) (optional)
+            filterLabelIds (str): Comma-separated label IDs to filter by labels) (optional)
 
-    def deleteCard(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        valid_params = ('before', 'search', 'filterUserIds', 'filterLabelIds')
+        passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
+        resp = self.client.get("api/lists/{listId}/cards".format(**args), params=passed_params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteCard(self, id: str) -> Response_deleteCard:
         """Deletes a card and all its contents (tasks, attachments, etc.). Requires board editor permissions.
 
         Args:
-                id (str): ID of the card to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/cards/{id}".format(**params))
+            id (str): ID of the card to delete)
 
-    def getCard(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/cards/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getCard(self, id: str) -> Response_getCard:
         """Retrieves comprehensive card information, including tasks, attachments, and other related data.
 
         Args:
-                id (str): ID of the card to retrieve)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/cards/{id}".format(**params))
+            id (str): ID of the card to retrieve)
 
-    def updateCard(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/cards/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateCard(self, id: str, **kwargs: Unpack[Request_updateCard]) -> Response_updateCard:
         """Updates a card. Board editors can update all fields, viewers can only subscribe/unsubscribe.
 
         Args:
-                id (str): ID of the card to update)
-                boardId (str): ID of the board to move the card to
-                listId (str): ID of the list to move the card to
-                coverAttachmentId (str): ID of the attachment used as cover
-                type (str): Type of the card
-                position (int): Position of the card within the list
-                name (str): Name/title of the card
-                description (str): Detailed description of the card
-                dueDate (str): Due date for the card
-                isDueCompleted (bool): Whether the due date is completed
-                stopwatch (dict[str, Any]): Stopwatch data for time tracking
-                isSubscribed (bool): Whether the current user is subscribed to the card
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/cards/{id}".format(**params), data=body)
+            id (str): ID of the card to update)
+            boardId (str): ID of the board to move the card to
+            listId (str): ID of the list to move the card to
+            coverAttachmentId (str): ID of the attachment used as cover
+            type (Literal['project', 'story']): Type of the card
+            position (int): Position of the card within the list
+            name (str): Name/title of the card
+            description (str): Detailed description of the card
+            dueDate (str): Due date for the card
+            isDueCompleted (bool): Whether the due date is completed
+            stopwatch (dict[str, Any]): Stopwatch data for time tracking
+            isSubscribed (bool): Whether the current user is subscribed to the card
 
-    def duplicateCard(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/cards/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def duplicateCard(self, id: str, **kwargs: Unpack[Request_duplicateCard]) -> Response_duplicateCard:
         """Creates a duplicate of a card with all its contents (tasks, attachments, etc.). Requires board editor permissions.
 
         Args:
-                id (str): ID of the card to duplicate)
-                position (int): Position for the duplicated card within the list
-                name (str): Name/title for the duplicated card
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/cards/{id}/duplicate".format(**params), data=body)
+            id (str): ID of the card to duplicate)
+            position (int): Position for the duplicated card within the list
+            name (str): Name/title for the duplicated card
 
-    def readCardNotifications(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/cards/{id}/duplicate".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def readCardNotifications(self, id: str) -> Response_readCardNotifications:
         """Marks all notifications for a specific card as read for the current user. Requires access to the card.
 
         Args:
-                id (str): ID of the card to mark notifications as read for)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.post("api/cards/{id}/read-notifications".format(**params))
+            id (str): ID of the card to mark notifications as read for)
 
-    def createComment(self, cardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.post("api/cards/{id}/read-notifications".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def createComment(self, cardId: str, **kwargs: Unpack[Request_createComment]) -> Response_createComment:
         """Creates a new comment on a card. Requires board editor permissions or comment permissions.
 
         Args:
-                cardId (str): ID of the card to create the comment on)
-                text (str): Content of the comment
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/cards/{cardId}/comments".format(**params), data=body
-        )
+            cardId (str): ID of the card to create the comment on)
+            text (str): Content of the comment
 
-    def getComments(self, cardId: str, beforeId: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/cards/{cardId}/comments".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def getComments(self, cardId: str, **kwargs: Unpack[Request_getComments]) -> Response_getComments:
         """Retrieves comments for a card with pagination support. Requires access to the card.
 
         Args:
-                cardId (str): ID of the card to retrieve comments for)
-                beforeId (str): ID to get comments before (for pagination))
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/cards/{cardId}/comments".format(**params))
+            cardId (str): ID of the card to retrieve comments for)
+            beforeId (str): ID to get comments before (for pagination)) (optional)
 
-    def deleteComment(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        valid_params = ('beforeId',)
+        passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
+        resp = self.client.get("api/cards/{cardId}/comments".format(**args), params=passed_params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteComment(self, id: str) -> Response_deleteComment:
         """Deletes a comment. Can be deleted by the comment author (with comment permissions) or project manager.
 
         Args:
-                id (str): ID of the comment to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/comments/{id}".format(**params))
+            id (str): ID of the comment to delete)
 
-    def updateComments(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/comments/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateComments(self, id: str, **kwargs: Unpack[Request_updateComments]) -> Response_updateComments:
         """Updates a comment. Only the author of the comment can update it.
 
         Args:
-                id (str): ID of the comment to update)
-                text (str): Content of the comment
+            id (str): ID of the comment to update)
+            text (str): Content of the comment
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
         """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/comments/{id}".format(**params), data=body)
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/comments/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
 
-    def getConfig(self) -> Any:
-        """Retrieves the application configuration."""
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/config".format(**params))
+    def getConfig(self) -> Response_getConfig:
+        """Retrieves the application configuration.
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/config".format(**args))
+        resp.raise_for_status()
+        return resp.json()
 
-    def createBoardCustomFieldGroup(self, boardId: str, **body: Any) -> Any:
+    def createBoardCustomFieldGroup(self, boardId: str, **kwargs: Unpack[Request_createBoardCustomFieldGroup]) -> Response_createBoardCustomFieldGroup:
         """Creates a custom field group within a board. Either `baseCustomFieldGroupId` or `name` must be provided. Requires board editor permissions.
 
         Args:
-                boardId (str): ID of the board to create the custom field group in)
-                baseCustomFieldGroupId (str): ID of the base custom field group used as a template
-                position (int): Position of the custom field group within the board
-                name (str): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/boards/{boardId}/custom-field-groups".format(**params), data=body
-        )
+            boardId (str): ID of the board to create the custom field group in)
+            baseCustomFieldGroupId (str): ID of the base custom field group used as a template
+            position (int): Position of the custom field group within the board
+            name (str): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
 
-    def createCardCustomFieldGroup(self, cardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/boards/{boardId}/custom-field-groups".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createCardCustomFieldGroup(self, cardId: str, **kwargs: Unpack[Request_createCardCustomFieldGroup]) -> Response_createCardCustomFieldGroup:
         """Creates a custom field group within a card. Either `baseCustomFieldGroupId` or `name` must be provided. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to create the custom field group in)
-                baseCustomFieldGroupId (str): ID of the base custom field group used as a template
-                position (int): Position of the custom field group within the card
-                name (str): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/cards/{cardId}/custom-field-groups".format(**params), data=body
-        )
+            cardId (str): ID of the card to create the custom field group in)
+            baseCustomFieldGroupId (str): ID of the base custom field group used as a template
+            position (int): Position of the custom field group within the card
+            name (str): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
 
-    def deleteCustomFieldGroup(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/cards/{cardId}/custom-field-groups".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteCustomFieldGroup(self, id: str) -> Response_deleteCustomFieldGroup:
         """Deletes a custom field group. Requires board editor permissions.
 
         Args:
-                id (str): ID of the custom field group to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/custom-field-groups/{id}".format(**params))
+            id (str): ID of the custom field group to delete)
 
-    def getCustomFieldGroup(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/custom-field-groups/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getCustomFieldGroup(self, id: str) -> Response_getCustomFieldGroup:
         """Retrieves comprehensive custom field group information, including fields and values. Requires access to the board/card.
 
         Args:
-                id (str): ID of the custom field group to retrieve)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/custom-field-groups/{id}".format(**params))
+            id (str): ID of the custom field group to retrieve)
 
-    def updateCustomFieldGroup(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/custom-field-groups/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateCustomFieldGroup(self, id: str, **kwargs: Unpack[Request_updateCustomFieldGroup]) -> Response_updateCustomFieldGroup:
         """Updates a custom field group. Supports both board-wide and card-specific groups. Requires board editor permissions.
 
         Args:
-                id (str): ID of the custom field group to update)
-                position (int): Position of the custom field group within the board/card
-                name (str): Name/title of the custom field group
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch(
-            "api/custom-field-groups/{id}".format(**params), data=body
-        )
+            id (str): ID of the custom field group to update)
+            position (int): Position of the custom field group within the board/card
+            name (str): Name/title of the custom field group
 
-    def updateCustomFieldValue(
-        self, cardId: str, customFieldGroupId: str, customFieldId: str, **body: Any
-    ) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/custom-field-groups/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str, **kwargs: Unpack[Request_updateCustomFieldValue]) -> Response_updateCustomFieldValue:
         """Creates or updates a custom field value for a card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to set the custom field value for)
-                customFieldGroupId (str): ID of the custom field group the value belongs to)
-                customFieldId (str): ID of the custom field the value belongs to)
-                content (str): Content/value of the custom field
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch(
-            "api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(
-                **params
-            ),
-            data=body,
-        )
+            cardId (str): ID of the card to set the custom field value for)
+            customFieldGroupId (str): ID of the custom field group the value belongs to)
+            customFieldId (str): ID of the custom field the value belongs to)
+            content (str): Content/value of the custom field
 
-    def deleteCustomFieldValue(
-        self, cardId: str, customFieldGroupId: str, customFieldId: str
-    ) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str) -> Response_deleteCustomFieldValue:
         """Deletes a custom field value for a specific card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to delete the custom field value from)
-                customFieldGroupId (str): ID of the custom field group the value belongs to)
-                customFieldId (str): ID of the custom field the value belongs to)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete(
-            "api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(
-                **params
-            )
-        )
+            cardId (str): ID of the card to delete the custom field value from)
+            customFieldGroupId (str): ID of the custom field group the value belongs to)
+            customFieldId (str): ID of the custom field the value belongs to)
 
-    def createCustomFieldInBaseGroup(
-        self, baseCustomFieldGroupId: str, **body: Any
-    ) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def createCustomFieldInBaseGroup(self, baseCustomFieldGroupId: str, **kwargs: Unpack[Request_createCustomFieldInBaseGroup]) -> Response_createCustomFieldInBaseGroup:
         """Creates a custom field within a base custom field group. Requires project manager permissions.
 
         Args:
-                baseCustomFieldGroupId (str): ID of the base custom field group to create the custom field in)
-                position (int): Position of the custom field within the group
-                name (str): Name/title of the custom field
-                showOnFrontOfCard (bool): Whether to show the field on the front of cards
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields".format(
-                **params
-            ),
-            data=body,
-        )
+            baseCustomFieldGroupId (str): ID of the base custom field group to create the custom field in)
+            position (int): Position of the custom field within the group
+            name (str): Name/title of the custom field
+            showOnFrontOfCard (bool): Whether to show the field on the front of cards
 
-    def createCustomFieldInGroup(self, customFieldGroupId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createCustomFieldInGroup(self, customFieldGroupId: str, **kwargs: Unpack[Request_createCustomFieldInGroup]) -> Response_createCustomFieldInGroup:
         """Creates a custom field within a custom field group. Requires board editor permissions.
 
         Args:
-                customFieldGroupId (str): ID of the custom field group to create the custom field in)
-                position (int): Position of the custom field within the group
-                name (str): Name/title of the custom field
-                showOnFrontOfCard (bool): Whether to show the field on the front of cards
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/custom-field-groups/{customFieldGroupId}/custom-fields".format(
-                **params
-            ),
-            data=body,
-        )
+            customFieldGroupId (str): ID of the custom field group to create the custom field in)
+            position (int): Position of the custom field within the group
+            name (str): Name/title of the custom field
+            showOnFrontOfCard (bool): Whether to show the field on the front of cards
 
-    def deleteCustomField(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/custom-field-groups/{customFieldGroupId}/custom-fields".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteCustomField(self, id: str) -> Response_deleteCustomField:
         """Deletes a custom field. Can delete the in base custom field group (requires project manager permissions) or the custom field group (requires board editor permissions).
 
         Args:
-                id (str): ID of the custom field to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/custom-fields/{id}".format(**params))
+            id (str): ID of the custom field to delete)
 
-    def updateCustomField(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/custom-fields/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateCustomField(self, id: str, **kwargs: Unpack[Request_updateCustomField]) -> Response_updateCustomField:
         """Updates a custom field. Can update in the base custom field group (requires project manager permissions) or the custom field group (requires board editor permissions).
 
         Args:
-                id (str): ID of the custom field to update)
-                position (int): Position of the custom field within the group
-                name (str): Name/title of the custom field
-                showOnFrontOfCard (bool): Whether to show the field on the front of cards
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/custom-fields/{id}".format(**params), data=body)
+            id (str): ID of the custom field to update)
+            position (int): Position of the custom field within the group
+            name (str): Name/title of the custom field
+            showOnFrontOfCard (bool): Whether to show the field on the front of cards
 
-    def createLabel(self, boardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/custom-fields/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createLabel(self, boardId: str, **kwargs: Unpack[Request_createLabel]) -> Response_createLabel:
         """Creates a label within a board. Requires board editor permissions.
 
         Args:
-                boardId (str): ID of the board to create the label in)
-                position (int): Position of the label within the board
-                name (str): Name/title of the label
-                color (str): Color of the label
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/boards/{boardId}/labels".format(**params), data=body
-        )
+            boardId (str): ID of the board to create the label in)
+            position (int): Position of the label within the board
+            name (str): Name/title of the label
+            color (Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']): Color of the label
 
-    def deleteLabel(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/boards/{boardId}/labels".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteLabel(self, id: str) -> Response_deleteLabel:
         """Deletes a label. Requires board editor permissions.
 
         Args:
-                id (str): ID of the label to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/labels/{id}".format(**params))
+            id (str): ID of the label to delete)
 
-    def updateLabel(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/labels/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateLabel(self, id: str, **kwargs: Unpack[Request_updateLabel]) -> Response_updateLabel:
         """Updates a label. Requires board editor permissions.
 
         Args:
-                id (str): ID of the label to update)
-                position (int): Position of the label within the board
-                name (str): Name/title of the label
-                color (str): Color of the label
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/labels/{id}".format(**params), data=body)
+            id (str): ID of the label to update)
+            position (int): Position of the label within the board
+            name (str): Name/title of the label
+            color (Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']): Color of the label
 
-    def clearList(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/labels/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def clearList(self, id: str) -> Response_clearList:
         """Deletes all cards from a list. Only works with trash-type lists. Requires project manager or board editor permissions.
 
         Args:
-                id (str): ID of the list to clear (must be a trash-type list))
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.post("api/lists/{id}/clear".format(**params))
+            id (str): ID of the list to clear (must be a trash-type list))
 
-    def createList(self, boardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.post("api/lists/{id}/clear".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def createList(self, boardId: str, **kwargs: Unpack[Request_createList]) -> Response_createList:
         """Creates a list within a board. Requires board editor permissions.
 
         Args:
-                boardId (str): ID of the board to create the list in)
-                type (str): Type/status of the list
-                position (int): Position of the list within the board
-                name (str): Name/title of the list
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/boards/{boardId}/lists".format(**params), data=body
-        )
+            boardId (str): ID of the board to create the list in)
+            type (Literal['active', 'closed']): Type/status of the list
+            position (int): Position of the list within the board
+            name (str): Name/title of the list
 
-    def deleteList(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/boards/{boardId}/lists".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteList(self, id: str) -> Response_deleteList:
         """Deletes a list and moves its cards to a trash list. Can only delete finite lists. Requires board editor permissions.
 
         Args:
-                id (str): ID of the list to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/lists/{id}".format(**params))
+            id (str): ID of the list to delete)
 
-    def getList(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/lists/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getList(self, id: str) -> Response_getList:
         """Retrieves comprehensive list information, including cards, attachments, and other related data. Requires access to the board.
 
         Args:
-                id (str): ID of the list to retrieve)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/lists/{id}".format(**params))
+            id (str): ID of the list to retrieve)
 
-    def updateList(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/lists/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateList(self, id: str, **kwargs: Unpack[Request_updateList]) -> Response_updateList:
         """Updates a list. Can move lists between boards. Requires board editor permissions.
 
         Args:
-                id (str): ID of the list to update)
-                boardId (str): ID of the board to move list to
-                type (str): Type/status of the list
-                position (int): Position of the list within the board
-                name (str): Name/title of the list
-                color (str): Color for the list
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/lists/{id}".format(**params), data=body)
+            id (str): ID of the list to update)
+            boardId (str): ID of the board to move list to
+            type (Literal['active', 'closed']): Type/status of the list
+            position (int): Position of the list within the board
+            name (str): Name/title of the list
+            color (Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea']): Color for the list
 
-    def moveListCards(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/lists/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def moveListCards(self, id: str, **kwargs: Unpack[Request_moveListCards]) -> Response_moveListCards:
         """Moves all cards from a closed list to an archive list. Requires board editor permissions.
 
         Args:
-                id (str): ID of the source list (must be a closed-type list))
-                listId (str): ID of the target list (must be an archive-type list)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/lists/{id}/move-cards".format(**params), data=body)
+            id (str): ID of the source list (must be a closed-type list))
+            listId (str): ID of the target list (must be an archive-type list)
 
-    def sortList(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/lists/{id}/move-cards".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def sortList(self, id: str, **kwargs: Unpack[Request_sortList]) -> Response_sortList:
         """Sorts all cards within a list. Requires board editor permissions.
 
         Args:
-                id (str): ID of the list to sort)
-                fieldName (str): Field to sort cards by
-                order (str): Sorting order
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/lists/{id}/sort".format(**params), data=body)
+            id (str): ID of the list to sort)
+            fieldName (Literal['name', 'dueDate', 'createdAt']): Field to sort cards by
+            order (Literal['asc', 'desc']): Sorting order
 
-    def createBoardNotificationService(self, boardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/lists/{id}/sort".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createBoardNotificationService(self, boardId: str, **kwargs: Unpack[Request_createBoardNotificationService]) -> Response_createBoardNotificationService:
         """Creates a new notification service for a board. Requires project manager permissions.
 
         Args:
-                boardId (str): ID of the board to create notification service for)
-                url (str): URL endpoint for notifications
-                format (str): Format for notification messages
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/boards/{boardId}/notification-services".format(**params), data=body
-        )
+            boardId (str): ID of the board to create notification service for)
+            url (str): URL endpoint for notifications
+            format (Literal['text', 'markdown', 'html']): Format for notification messages
 
-    def createUserNotificationService(self, userId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/boards/{boardId}/notification-services".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createUserNotificationService(self, userId: str, **kwargs: Unpack[Request_createUserNotificationService]) -> Response_createUserNotificationService:
         """Creates a new notification service for a user. Users can only create services for themselves.
 
         Args:
-                userId (str): ID of the user to create notification service for (must be the current user))
-                url (str): URL endpoint for notifications
-                format (str): Format for notification messages
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/users/{userId}/notification-services".format(**params), data=body
-        )
+            userId (str): ID of the user to create notification service for (must be the current user))
+            url (str): URL endpoint for notifications
+            format (Literal['text', 'markdown', 'html']): Format for notification messages
 
-    def deleteNotificationService(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/users/{userId}/notification-services".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteNotificationService(self, id: str) -> Response_deleteNotificationService:
         """Deletes a notification service. Users can delete their own services, project managers can delete board services.
 
         Args:
-                id (str): ID of the notification service to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/notification-services/{id}".format(**params))
+            id (str): ID of the notification service to delete)
 
-    def updateNotificationService(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/notification-services/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateNotificationService(self, id: str, **kwargs: Unpack[Request_updateNotificationService]) -> Response_updateNotificationService:
         """Updates a notification service. Users can update their own services, project managers can update board services.
 
         Args:
-                id (str): ID of the notification service to update)
-                url (str): URL endpoint for notifications
-                format (str): Format for notification messages
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch(
-            "api/notification-services/{id}".format(**params), data=body
-        )
+            id (str): ID of the notification service to update)
+            url (str): URL endpoint for notifications
+            format (Literal['text', 'markdown', 'html']): Format for notification messages
 
-    def testNotificationService(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/notification-services/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def testNotificationService(self, id: str) -> Response_testNotificationService:
         """Sends a test notification to verify the notification service is working. Users can test their own services, project managers can test board services.
 
         Args:
-                id (str): ID of the notification service to test)
+            id (str): ID of the notification service to test)
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
         """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.post("api/notification-services/{id}/test".format(**params))
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.post("api/notification-services/{id}/test".format(**args))
+        resp.raise_for_status()
+        return resp.json()
 
-    def getNotifications(self) -> Any:
-        """Retrieves all unread notifications for the current user, including creator users."""
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/notifications".format(**params))
+    def getNotifications(self) -> Response_getNotifications:
+        """Retrieves all unread notifications for the current user, including creator users.
 
-    def readAllNotifications(self) -> Any:
-        """Marks all notifications for the current user as read."""
-        params = locals().copy()
-        params.pop("self")
-        return self.client.post("api/notifications/read-all".format(**params))
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
 
-    def getNotification(self, id: str) -> Any:
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/notifications".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def readAllNotifications(self) -> Response_readAllNotifications:
+        """Marks all notifications for the current user as read.
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.post("api/notifications/read-all".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getNotification(self, id: str) -> Response_getNotification:
         """Retrieves notification, including creator users. Users can only access their own notifications.
 
         Args:
-                id (str): ID of the notification to retrieve)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/notifications/{id}".format(**params))
+            id (str): ID of the notification to retrieve)
 
-    def updateNotification(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/notifications/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateNotification(self, id: str, **kwargs: Unpack[Request_updateNotification]) -> Response_updateNotification:
         """Updates a notification. Users can only update their own notifications.
 
         Args:
-                id (str): ID of the notification to update)
-                isRead (bool): Whether the notification has been read
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/notifications/{id}".format(**params), data=body)
+            id (str): ID of the notification to update)
+            isRead (bool): Whether the notification has been read
 
-    def createProjectManager(self, projectId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/notifications/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createProjectManager(self, projectId: str, **kwargs: Unpack[Request_createProjectManager]) -> Response_createProjectManager:
         """Creates a project manager within a project. Requires admin privileges for shared projects or existing project manager permissions. The user must be an admin or project owner.
 
         Args:
-                projectId (str): ID of the project to create the project manager in)
-                userId (str): ID of the user who is assigned as project manager
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/projects/{projectId}/project-managers".format(**params), data=body
-        )
+            projectId (str): ID of the project to create the project manager in)
+            userId (str): ID of the user who is assigned as project manager
 
-    def deleteProjectManager(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/projects/{projectId}/project-managers".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteProjectManager(self, id: str) -> Response_deleteProjectManager:
         """Deletes a project manager. Requires admin privileges for shared projects or existing project manager permissions. Cannot remove the last project manager.
 
         Args:
-                id (str): ID of the project manager to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/project-managers/{id}".format(**params))
+            id (str): ID of the project manager to delete)
 
-    def createProject(self, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/project-managers/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def createProject(self, **kwargs: Unpack[Request_createProject]) -> Response_createProject:
         """Creates a project. The current user automatically becomes a project manager.
-        type (str): Type of the project
-        name (str): Name/title of the project
-        description (str): Detailed description of the project
+
+        Args:
+            type (Literal['public', 'private']): Type of the project
+            name (str): Name/title of the project
+            description (str): Detailed description of the project
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
         """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/projects".format(**params), data=body)
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/projects".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
 
-    def getProjects(self) -> Any:
-        """Retrieves all projects the current user has access to, including managed projects, membership projects, and shared projects (for admins)."""
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/projects".format(**params))
+    def getProjects(self) -> Response_getProjects:
+        """Retrieves all projects the current user has access to, including managed projects, membership projects, and shared projects (for admins).
 
-    def deleteProject(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/projects".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteProject(self, id: str) -> Response_deleteProject:
         """Deletes a project. The project must not have any boards. Requires project manager permissions.
 
         Args:
-                id (str): ID of the project to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/projects/{id}".format(**params))
+            id (str): ID of the project to delete)
 
-    def getProject(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/projects/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getProject(self, id: str) -> Response_getProject:
         """Retrieves comprehensive project information, including boards, board memberships, and other related data.
 
         Args:
-                id (str): ID of the project to retrieve)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/projects/{id}".format(**params))
+            id (str): ID of the project to retrieve)
 
-    def updateProject(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/projects/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateProject(self, id: str, **kwargs: Unpack[Request_updateProject]) -> Response_updateProject:
         """Updates a project. Accessible fields depend on user permissions.
 
         Args:
-                id (str): ID of the project to update)
-                ownerProjectManagerId (str): ID of the project manager who owns the project
-                backgroundImageId (str): ID of the background image used as background
-                name (str): Name/title of the project
-                description (str): Detailed description of the project
-                backgroundType (str): Type of background for the project
-                backgroundGradient (str): Gradient background for the project
-                isHidden (bool): Whether the project is hidden
-                isFavorite (bool): Whether the project is marked as favorite by the current user
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/projects/{id}".format(**params), data=body)
+            id (str): ID of the project to update)
+            ownerProjectManagerId (str): ID of the project manager who owns the project
+            backgroundImageId (str): ID of the background image used as background
+            name (str): Name/title of the project
+            description (str): Detailed description of the project
+            backgroundType (Literal['gradient', 'image']): Type of background for the project
+            backgroundGradient (Literal['old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange', 'sour-peel', 'green-ninja', 'algae-green', 'coral-reef', 'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain', 'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 'red-curtain']): Gradient background for the project
+            isHidden (bool): Whether the project is hidden
+            isFavorite (bool): Whether the project is marked as favorite by the current user
 
-    def createTaskList(self, cardId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/projects/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createTaskList(self, cardId: str, **kwargs: Unpack[Request_createTaskList]) -> Response_createTaskList:
         """Creates a task list within a card. Requires board editor permissions.
 
         Args:
-                cardId (str): ID of the card to create task list in)
-                position (int): Position of the task list within the card
-                name (str): Name/title of the task list
-                showOnFrontOfCard (bool): Whether to show the task list on the front of the card
-                hideCompletedTasks (bool): Whether to hide completed tasks
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/cards/{cardId}/task-lists".format(**params), data=body
-        )
+            cardId (str): ID of the card to create task list in)
+            position (int): Position of the task list within the card
+            name (str): Name/title of the task list
+            showOnFrontOfCard (bool): Whether to show the task list on the front of the card
+            hideCompletedTasks (bool): Whether to hide completed tasks
 
-    def deleteTaskList(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/cards/{cardId}/task-lists".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteTaskList(self, id: str) -> Response_deleteTaskList:
         """Deletes a task list and all its tasks. Requires board editor permissions.
 
         Args:
-                id (str): ID of the task list to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/task-lists/{id}".format(**params))
+            id (str): ID of the task list to delete)
 
-    def getTaskList(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/task-lists/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getTaskList(self, id: str) -> Response_getTaskList:
         """Retrieves task list information, including tasks. Requires access to the card.
 
         Args:
-                id (str): ID of the task list to retrieve)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/task-lists/{id}".format(**params))
+            id (str): ID of the task list to retrieve)
 
-    def updateTaskList(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/task-lists/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateTaskList(self, id: str, **kwargs: Unpack[Request_updateTaskList]) -> Response_updateTaskList:
         """Updates a task list. Requires board editor permissions.
 
         Args:
-                id (str): ID of the task list to update)
-                position (int): Position of the task list within the card
-                name (str): Name/title of the task list
-                showOnFrontOfCard (bool): Whether to show the task list on the front of the card
-                hideCompletedTasks (bool): Whether to hide completed tasks
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/task-lists/{id}".format(**params), data=body)
+            id (str): ID of the task list to update)
+            position (int): Position of the task list within the card
+            name (str): Name/title of the task list
+            showOnFrontOfCard (bool): Whether to show the task list on the front of the card
+            hideCompletedTasks (bool): Whether to hide completed tasks
 
-    def createTask(self, taskListId: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/task-lists/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createTask(self, taskListId: str, **kwargs: Unpack[Request_createTask]) -> Response_createTask:
         """Creates a task within a task list. Either `linkedCardId` or `name` must be provided. Requires board editor permissions.
 
         Args:
-                taskListId (str): ID of the task list to create task in)
-                linkedCardId (str): ID of the card linked to the task
-                position (int): Position of the task within the task list
-                name (str): Name/title of the task (required if `linkedCardId` is not provided)
-                isCompleted (bool): Whether the task is completed
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post(
-            "api/task-lists/{taskListId}/tasks".format(**params), data=body
-        )
+            taskListId (str): ID of the task list to create task in)
+            linkedCardId (str): ID of the card linked to the task
+            position (int): Position of the task within the task list
+            name (str): Name/title of the task (required if `linkedCardId` is not provided)
+            isCompleted (bool): Whether the task is completed
 
-    def deleteTask(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/task-lists/{taskListId}/tasks".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteTask(self, id: str) -> Response_deleteTask:
         """Deletes a task. Requires board editor permissions.
 
         Args:
-                id (str): ID of the task to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/tasks/{id}".format(**params))
+            id (str): ID of the task to delete)
 
-    def updateTask(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/tasks/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateTask(self, id: str, **kwargs: Unpack[Request_updateTask]) -> Response_updateTask:
         """Updates a task. Linked card tasks have limited update options. Requires board editor permissions.
 
         Args:
-                id (str): ID of the task to update)
-                taskListId (str): ID of the task list to move the task to
-                assigneeUserId (str): ID of the user assigned to the task (null to unassign)
-                position (int): Position of the task within the task list
-                name (str): Name/title of the task
-                isCompleted (bool): Whether the task is completed
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/tasks/{id}".format(**params), data=body)
+            id (str): ID of the task to update)
+            taskListId (str): ID of the task list to move the task to
+            assigneeUserId (str): ID of the user assigned to the task (null to unassign)
+            position (int): Position of the task within the task list
+            name (str): Name/title of the task
+            isCompleted (bool): Whether the task is completed
 
-    def getTerms(self, type: str, language: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/tasks/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def getTerms(self, type: Literal['general', 'extended'], **kwargs: Unpack[Request_getTerms]) -> Response_getTerms:
         """Retrieves terms and conditions in the specified language.
 
         Args:
-                type (str): Type of terms to retrieve)
-                language (str): Language code for terms localization)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/terms/{type}".format(**params))
+            type (Literal['general', 'extended']): Type of terms to retrieve)
+            language (Literal['de-DE', 'en-US']): Language code for terms localization) (optional)
 
-    def createUser(self, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        valid_params = ('language',)
+        passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
+        resp = self.client.get("api/terms/{type}".format(**args), params=passed_params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createUser(self, **kwargs: Unpack[Request_createUser]) -> Response_createUser:
         """Creates a user account. Requires admin privileges.
-        email (str): Email address for login and notifications
-        password (str): Password for user authentication (must meet password requirements)
-        role (str): User role defining access permissions
-        name (str): Full display name of the user
-        username (str): Unique username for user identification
-        phone (str): Contact phone number
-        organization (str): Organization or company name
-        language (str): Preferred language for user interface and notifications
-        subscribeToOwnCards (bool): Whether the user subscribes to their own cards
-        subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
-        turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
+
+        Args:
+            email (str): Email address for login and notifications
+            password (str): Password for user authentication (must meet password requirements)
+            role (Literal['admin', 'projectOwner', 'boardUser']): User role defining access permissions
+            name (str): Full display name of the user
+            username (str): Unique username for user identification
+            phone (str): Contact phone number
+            organization (str): Organization or company name
+            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']): Preferred language for user interface and notifications
+            subscribeToOwnCards (bool): Whether the user subscribes to their own cards
+            subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
+            turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            Conflict: 409 
         """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/users".format(**params), data=body)
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/users".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
 
-    def getUsers(self) -> Any:
-        """Retrieves a list of all users. Requires admin or project owner privileges."""
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/users".format(**params))
+    def getUsers(self) -> Response_getUsers:
+        """Retrieves a list of all users. Requires admin or project owner privileges.
 
-    def deleteUser(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/users".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteUser(self, id: str) -> Response_deleteUser:
         """Deletes a user account. Cannot delete the default admin user. Requires admin privileges.
 
         Args:
-                id (str): ID of the user to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/users/{id}".format(**params))
+            id (str): ID of the user to delete)
 
-    def getUser(self, id: str, subscribe: bool) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/users/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def getUser(self, id: str, **kwargs: Unpack[Request_getUser]) -> Response_getUser:
         """Retrieves a user. Use 'me' as ID to get the current user.
 
         Args:
-                id (str): ID of the user or 'me' for current user)
-                subscribe (bool): Whether to subscribe to real-time updates for this user (only for socket connections))
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/users/{id}".format(**params))
+            id (str): ID of the user or 'me' for current user)
+            subscribe (bool): Whether to subscribe to real-time updates for this user (only for socket connections)) (optional)
 
-    def updateUser(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        valid_params = ('subscribe',)
+        passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
+        resp = self.client.get("api/users/{id}".format(**args), params=passed_params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateUser(self, id: str, **kwargs: Unpack[Request_updateUser]) -> Response_updateUser:
         """Updates a user. Users can update their own profile, admins can update any user.
 
         Args:
-                id (str): ID of the user to update)
-                role (str): User role defining access permissions
-                name (str): Full display name of the user
-                avatar (dict[str, Any]): Avatar of the user (only null value to remove avatar)
-                phone (str): Contact phone number
-                organization (str): Organization or company name
-                language (str): Preferred language for user interface and notifications
-                subscribeToOwnCards (bool): Whether the user subscribes to their own cards
-                subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
-                turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
-                enableFavoritesByDefault (bool): Whether favorites are enabled by default
-                defaultEditorMode (str): Default markdown editor mode
-                defaultHomeView (str): Default view mode for the home page
-                defaultProjectsOrder (str): Default sort order for projects display
-                isDeactivated (bool): Whether the user account is deactivated and cannot log in (for admins)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/users/{id}".format(**params), data=body)
+            id (str): ID of the user to update)
+            role (Literal['admin', 'projectOwner', 'boardUser']): User role defining access permissions
+            name (str): Full display name of the user
+            avatar (dict[str, Any]): Avatar of the user (only null value to remove avatar)
+            phone (str): Contact phone number
+            organization (str): Organization or company name
+            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']): Preferred language for user interface and notifications
+            subscribeToOwnCards (bool): Whether the user subscribes to their own cards
+            subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
+            turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
+            enableFavoritesByDefault (bool): Whether favorites are enabled by default
+            defaultEditorMode (Literal['wysiwyg', 'markup']): Default markdown editor mode
+            defaultHomeView (Literal['gridProjects', 'groupedProjects']): Default view mode for the home page
+            defaultProjectsOrder (Literal['byDefault', 'alphabetically', 'byCreationTime']): Default sort order for projects display
+            isDeactivated (bool): Whether the user account is deactivated and cannot log in (for admins)
 
-    def updateUserAvatar(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/users/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateUserAvatar(self, id: str, **kwargs: Unpack[Request_updateUserAvatar]) -> Response_updateUserAvatar:
         """Updates a user's avatar image. Users can update their own avatar, admins can update any user's avatar.
 
         Args:
-                id (str): ID of the user whose avatar to update)
-                file (str): Avatar image file (must be an image format)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/users/{id}/avatar".format(**params), data=body)
+            id (str): ID of the user whose avatar to update)
+            file (str): Avatar image file (must be an image format)
 
-    def updateUserEmail(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+            UnprocessableEntity: 422 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/users/{id}/avatar".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateUserEmail(self, id: str, **kwargs: Unpack[Request_updateUserEmail]) -> Response_updateUserEmail:
         """Updates a user's email address. Users must provide current password when updating their own email. Admins can update any user's email without a password.
 
         Args:
-                id (str): ID of the user whose email to update)
-                email (str): Email address for login and notifications
-                currentPassword (str): Current password (required when updating own email)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/users/{id}/email".format(**params), data=body)
+            id (str): ID of the user whose email to update)
+            email (str): Email address for login and notifications
+            currentPassword (str): Current password (required when updating own email)
 
-    def updateUserPassword(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/users/{id}/email".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateUserPassword(self, id: str, **kwargs: Unpack[Request_updateUserPassword]) -> Response_updateUserPassword:
         """Updates a user's password. Users must provide a current password when updating their own password. Admins can update any user's password without the current password. Returns a new access token when updating own password.
 
         Args:
-                id (str): ID of the user whose password to update)
-                password (str): Password (must meet password requirements)
-                currentPassword (str): Current password (required when updating own password)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/users/{id}/password".format(**params), data=body)
+            id (str): ID of the user whose password to update)
+            password (str): Password (must meet password requirements)
+            currentPassword (str): Current password (required when updating own password)
 
-    def updateUserUsername(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/users/{id}/password".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateUserUsername(self, id: str, **kwargs: Unpack[Request_updateUserUsername]) -> Response_updateUserUsername:
         """Updates a user's username. Users must provide a current password when updating their own username (unless they are SSO users with `oidcIgnoreUsername` enabled). Admins can update any user's username without the current password.
 
         Args:
-                id (str): ID of the user whose username to update)
-                username (str): Unique username for user identification
-                currentPassword (str): Current password (required when updating own username)
-        """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/users/{id}/username".format(**params), data=body)
+            id (str): ID of the user whose username to update)
+            username (str): Unique username for user identification
+            currentPassword (str): Current password (required when updating own username)
 
-    def createWebhook(self, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            NotFound: 404 
+            Conflict: 409 
+        """
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/users/{id}/username".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def createWebhook(self, **kwargs: Unpack[Request_createWebhook]) -> Response_createWebhook:
         """Creates a webhook. Requires admin privileges.
-        name (str): Name/title of the webhook
-        url (str): URL endpoint for the webhook
-        accessToken (str): Access token for webhook authentication
-        events (str): Comma-separated list of events that trigger the webhook
-        excludedEvents (str): Comma-separated list of events excluded from the webhook
+
+        Args:
+            name (str): Name/title of the webhook
+            url (str): URL endpoint for the webhook
+            accessToken (str): Access token for webhook authentication
+            events (str): Comma-separated list of events that trigger the webhook
+            excludedEvents (str): Comma-separated list of events excluded from the webhook
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Conflict: 409 
         """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.post("api/webhooks".format(**params), data=body)
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.post("api/webhooks".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
 
-    def getWebhooks(self) -> Any:
-        """Retrieves a list of all configured webhooks. Requires admin privileges."""
-        params = locals().copy()
-        params.pop("self")
-        return self.client.get("api/webhooks".format(**params))
+    def getWebhooks(self) -> Response_getWebhooks:
+        """Retrieves a list of all configured webhooks. Requires admin privileges.
 
-    def deleteWebhook(self, id: str) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.get("api/webhooks".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def deleteWebhook(self, id: str) -> Response_deleteWebhook:
         """Deletes a webhook. Requires admin privileges.
 
         Args:
-                id (str): ID of the webhook to delete)
-        """
-        params = locals().copy()
-        params.pop("self")
-        return self.client.delete("api/webhooks/{id}".format(**params))
+            id (str): ID of the webhook to delete)
 
-    def updateWebhook(self, id: str, **body: Any) -> Any:
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        args = locals().copy()
+        args.pop('self')
+        resp = self.client.delete("api/webhooks/{id}".format(**args))
+        resp.raise_for_status()
+        return resp.json()
+
+    def updateWebhook(self, id: str, **kwargs: Unpack[Request_updateWebhook]) -> Response_updateWebhook:
         """Updates a webhook. Requires admin privileges.
 
         Args:
-                id (str): ID of the webhook to update)
-                name (str): Name/title of the webhook
-                url (str): URL endpoint for the webhook
-                accessToken (str): Access token for webhook authentication
-                events (str): Comma-separated list of events that trigger the webhook
-                excludedEvents (str): Comma-separated list of events excluded from the webhook
+            id (str): ID of the webhook to update)
+            name (str): Name/title of the webhook
+            url (str): URL endpoint for the webhook
+            accessToken (str): Access token for webhook authentication
+            events (str): Comma-separated list of events that trigger the webhook
+            excludedEvents (str): Comma-separated list of events excluded from the webhook
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
         """
-        params = locals().copy()
-        params.pop("self")
-        body = params.pop("body")
-        return self.client.patch("api/webhooks/{id}".format(**params), data=body)
+        args = locals().copy()
+        args.pop('self')
+        kwargs = args.pop('kwargs')
+        resp = self.client.patch("api/webhooks/{id}".format(**args), data=kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+
+# Request Typing
+class Request_acceptTerms(TypedDict):
+    pendingToken: str
+    """Pending token received from the authentication flow"""
+    signature: str
+    """Terms signature hash based on user role"""
+
+class Request_createAccessToken(TypedDict):
+    emailOrUsername: str
+    """Email address or username of the user"""
+    password: str
+    """Password of the user"""
+    withHttpOnlyToken: NotRequired[bool]
+    """Whether to include an HTTP-only authentication cookie"""
+
+class Request_exchangeForAccessTokenWithOidc(TypedDict):
+    code: str
+    """Authorization code from OIDC provider"""
+    nonce: str
+    """Nonce value for OIDC security"""
+    withHttpOnlyToken: NotRequired[bool]
+    """Whether to include HTTP-only authentication cookie"""
+
+class Request_revokePendingToken(TypedDict):
+    pendingToken: str
+    """Pending token to revoke"""
+
+class Request_getBoardActions(TypedDict):
+    beforeId: NotRequired[str]
+    """ID to get actions before (for pagination)"""
+
+class Request_getCardActions(TypedDict):
+    beforeId: NotRequired[str]
+    """ID to get actions before (for pagination)"""
+
+class Request_createAttachment(TypedDict):
+    type: Literal['file', 'link']
+    """Type of the attachment"""
+    file: NotRequired[str]
+    """File to upload"""
+    url: NotRequired[str]
+    """URL for the link attachment"""
+    name: str
+    """Name/title of the attachment"""
+    requestId: NotRequired[str]
+    """Request ID for tracking"""
+
+class Request_updateAttachment(TypedDict):
+    name: NotRequired[str]
+    """Name/title of the attachment"""
+
+class Request_createBackgroundImage(TypedDict):
+    file: str
+    """Background image file (must be an image format)"""
+    requestId: NotRequired[str]
+    """Request ID for tracking"""
+
+class Request_createBaseCustomFieldGroup(TypedDict):
+    name: str
+    """Name/title of the base custom field group"""
+
+class Request_updateBaseCustomFieldGroup(TypedDict):
+    name: NotRequired[str]
+    """Name/title of the base custom field group"""
+
+class Request_createBoardMembership(TypedDict):
+    userId: str
+    """ID of the user who is a member of the board"""
+    role: Literal['editor', 'viewer']
+    """Role of the user in the board"""
+    canComment: NotRequired[bool]
+    """Whether the user can comment on cards (applies only to viewers)"""
+
+class Request_updateBoardMembership(TypedDict):
+    role: NotRequired[Literal['editor', 'viewer']]
+    """Role of the user in the board"""
+    canComment: NotRequired[bool]
+    """Whether the user can comment on cards (applies only to viewers)"""
+
+class Request_createBoard(TypedDict):
+    position: int
+    """Position of the board within the project"""
+    name: str
+    """Name/title of the board"""
+    importType: NotRequired[Literal['trello']]
+    """Type of import"""
+    importFile: NotRequired[str]
+    """Import file"""
+    requestId: NotRequired[str]
+    """Request ID for tracking"""
+
+class Request_getBoard(TypedDict):
+    subscribe: NotRequired[bool]
+    """Whether to subscribe to real-time updates for this board (only for socket connections)"""
+
+class Request_updateBoard(TypedDict):
+    position: NotRequired[int]
+    """Position of the board within the project"""
+    name: NotRequired[str]
+    """Name/title of the board"""
+    defaultView: NotRequired[Literal['kanban', 'grid', 'list']]
+    """Default view for the board"""
+    defaultCardType: NotRequired[Literal['project', 'story']]
+    """Default card type for new cards"""
+    limitCardTypesToDefaultOne: NotRequired[bool]
+    """Whether to limit card types to default one"""
+    alwaysDisplayCardCreator: NotRequired[bool]
+    """Whether to always display card creators"""
+    expandTaskListsByDefault: NotRequired[bool]
+    """Whether to expand task lists by default"""
+    isSubscribed: NotRequired[bool]
+    """Whether the current user is subscribed to the board"""
+
+class Request_createCardLabel(TypedDict):
+    labelId: str
+    """ID of the label to add to the card"""
+
+class Request_createCardMembership(TypedDict):
+    userId: str
+    """ID of the card to add the user to"""
+
+class Request_createCard(TypedDict):
+    type: Literal['project', 'story']
+    """Type of the card"""
+    position: NotRequired[int]
+    """Position of the card within the list"""
+    name: str
+    """Name/title of the card"""
+    description: NotRequired[str]
+    """Detailed description of the card"""
+    dueDate: NotRequired[str]
+    """Due date for the card"""
+    isDueCompleted: NotRequired[bool]
+    """Whether the due date is completed"""
+    stopwatch: NotRequired[dict[str, Any]]
+    """Stopwatch data for time tracking"""
+
+class Request_getCards(TypedDict):
+    before: NotRequired[str]
+    """Pagination cursor (JSON object with id and listChangedAt)"""
+    search: NotRequired[str]
+    """Search term to filter cards"""
+    filterUserIds: NotRequired[str]
+    """Comma-separated user IDs to filter by members"""
+    filterLabelIds: NotRequired[str]
+    """Comma-separated label IDs to filter by labels"""
+
+class Request_updateCard(TypedDict):
+    boardId: NotRequired[str]
+    """ID of the board to move the card to"""
+    listId: NotRequired[str]
+    """ID of the list to move the card to"""
+    coverAttachmentId: NotRequired[str]
+    """ID of the attachment used as cover"""
+    type: NotRequired[Literal['project', 'story']]
+    """Type of the card"""
+    position: NotRequired[int]
+    """Position of the card within the list"""
+    name: NotRequired[str]
+    """Name/title of the card"""
+    description: NotRequired[str]
+    """Detailed description of the card"""
+    dueDate: NotRequired[str]
+    """Due date for the card"""
+    isDueCompleted: NotRequired[bool]
+    """Whether the due date is completed"""
+    stopwatch: NotRequired[dict[str, Any]]
+    """Stopwatch data for time tracking"""
+    isSubscribed: NotRequired[bool]
+    """Whether the current user is subscribed to the card"""
+
+class Request_duplicateCard(TypedDict):
+    position: int
+    """Position for the duplicated card within the list"""
+    name: str
+    """Name/title for the duplicated card"""
+
+class Request_createComment(TypedDict):
+    text: str
+    """Content of the comment"""
+
+class Request_getComments(TypedDict):
+    beforeId: NotRequired[str]
+    """ID to get comments before (for pagination)"""
+
+class Request_updateComments(TypedDict):
+    text: NotRequired[str]
+    """Content of the comment"""
+
+class Request_createBoardCustomFieldGroup(TypedDict):
+    baseCustomFieldGroupId: NotRequired[str]
+    """ID of the base custom field group used as a template"""
+    position: int
+    """Position of the custom field group within the board"""
+    name: NotRequired[str]
+    """Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)"""
+
+class Request_createCardCustomFieldGroup(TypedDict):
+    baseCustomFieldGroupId: NotRequired[str]
+    """ID of the base custom field group used as a template"""
+    position: int
+    """Position of the custom field group within the card"""
+    name: NotRequired[str]
+    """Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)"""
+
+class Request_updateCustomFieldGroup(TypedDict):
+    position: NotRequired[int]
+    """Position of the custom field group within the board/card"""
+    name: NotRequired[str]
+    """Name/title of the custom field group"""
+
+class Request_updateCustomFieldValue(TypedDict):
+    content: str
+    """Content/value of the custom field"""
+
+class Request_createCustomFieldInBaseGroup(TypedDict):
+    position: int
+    """Position of the custom field within the group"""
+    name: str
+    """Name/title of the custom field"""
+    showOnFrontOfCard: NotRequired[bool]
+    """Whether to show the field on the front of cards"""
+
+class Request_createCustomFieldInGroup(TypedDict):
+    position: int
+    """Position of the custom field within the group"""
+    name: str
+    """Name/title of the custom field"""
+    showOnFrontOfCard: NotRequired[bool]
+    """Whether to show the field on the front of cards"""
+
+class Request_updateCustomField(TypedDict):
+    position: NotRequired[int]
+    """Position of the custom field within the group"""
+    name: NotRequired[str]
+    """Name/title of the custom field"""
+    showOnFrontOfCard: NotRequired[bool]
+    """Whether to show the field on the front of cards"""
+
+class Request_createLabel(TypedDict):
+    position: int
+    """Position of the label within the board"""
+    name: NotRequired[str]
+    """Name/title of the label"""
+    color: Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']
+    """Color of the label"""
+
+class Request_updateLabel(TypedDict):
+    position: NotRequired[int]
+    """Position of the label within the board"""
+    name: NotRequired[str]
+    """Name/title of the label"""
+    color: NotRequired[Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']]
+    """Color of the label"""
+
+class Request_createList(TypedDict):
+    type: Literal['active', 'closed']
+    """Type/status of the list"""
+    position: int
+    """Position of the list within the board"""
+    name: str
+    """Name/title of the list"""
+
+class Request_updateList(TypedDict):
+    boardId: NotRequired[str]
+    """ID of the board to move list to"""
+    type: NotRequired[Literal['active', 'closed']]
+    """Type/status of the list"""
+    position: NotRequired[int]
+    """Position of the list within the board"""
+    name: NotRequired[str]
+    """Name/title of the list"""
+    color: NotRequired[Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea']]
+    """Color for the list"""
+
+class Request_moveListCards(TypedDict):
+    listId: str
+    """ID of the target list (must be an archive-type list)"""
+
+class Request_sortList(TypedDict):
+    fieldName: Literal['name', 'dueDate', 'createdAt']
+    """Field to sort cards by"""
+    order: NotRequired[Literal['asc', 'desc']]
+    """Sorting order"""
+
+class Request_createBoardNotificationService(TypedDict):
+    url: str
+    """URL endpoint for notifications"""
+    format: Literal['text', 'markdown', 'html']
+    """Format for notification messages"""
+
+class Request_createUserNotificationService(TypedDict):
+    url: str
+    """URL endpoint for notifications"""
+    format: Literal['text', 'markdown', 'html']
+    """Format for notification messages"""
+
+class Request_updateNotificationService(TypedDict):
+    url: NotRequired[str]
+    """URL endpoint for notifications"""
+    format: NotRequired[Literal['text', 'markdown', 'html']]
+    """Format for notification messages"""
+
+class Request_updateNotification(TypedDict):
+    isRead: NotRequired[bool]
+    """Whether the notification has been read"""
+
+class Request_createProjectManager(TypedDict):
+    userId: str
+    """ID of the user who is assigned as project manager"""
+
+class Request_createProject(TypedDict):
+    type: Literal['public', 'private']
+    """Type of the project"""
+    name: str
+    """Name/title of the project"""
+    description: NotRequired[str]
+    """Detailed description of the project"""
+
+class Request_updateProject(TypedDict):
+    ownerProjectManagerId: NotRequired[str]
+    """ID of the project manager who owns the project"""
+    backgroundImageId: NotRequired[str]
+    """ID of the background image used as background"""
+    name: NotRequired[str]
+    """Name/title of the project"""
+    description: NotRequired[str]
+    """Detailed description of the project"""
+    backgroundType: NotRequired[Literal['gradient', 'image']]
+    """Type of background for the project"""
+    backgroundGradient: NotRequired[Literal['old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange', 'sour-peel', 'green-ninja', 'algae-green', 'coral-reef', 'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain', 'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 'red-curtain']]
+    """Gradient background for the project"""
+    isHidden: NotRequired[bool]
+    """Whether the project is hidden"""
+    isFavorite: NotRequired[bool]
+    """Whether the project is marked as favorite by the current user"""
+
+class Request_createTaskList(TypedDict):
+    position: int
+    """Position of the task list within the card"""
+    name: str
+    """Name/title of the task list"""
+    showOnFrontOfCard: NotRequired[bool]
+    """Whether to show the task list on the front of the card"""
+    hideCompletedTasks: NotRequired[bool]
+    """Whether to hide completed tasks"""
+
+class Request_updateTaskList(TypedDict):
+    position: NotRequired[int]
+    """Position of the task list within the card"""
+    name: NotRequired[str]
+    """Name/title of the task list"""
+    showOnFrontOfCard: NotRequired[bool]
+    """Whether to show the task list on the front of the card"""
+    hideCompletedTasks: NotRequired[bool]
+    """Whether to hide completed tasks"""
+
+class Request_createTask(TypedDict):
+    linkedCardId: NotRequired[str]
+    """ID of the card linked to the task"""
+    position: int
+    """Position of the task within the task list"""
+    name: NotRequired[str]
+    """Name/title of the task (required if `linkedCardId` is not provided)"""
+    isCompleted: NotRequired[bool]
+    """Whether the task is completed"""
+
+class Request_updateTask(TypedDict):
+    taskListId: NotRequired[str]
+    """ID of the task list to move the task to"""
+    assigneeUserId: NotRequired[str]
+    """ID of the user assigned to the task (null to unassign)"""
+    position: NotRequired[int]
+    """Position of the task within the task list"""
+    name: NotRequired[str]
+    """Name/title of the task"""
+    isCompleted: NotRequired[bool]
+    """Whether the task is completed"""
+
+class Request_getTerms(TypedDict):
+    language: NotRequired[str]
+    """Language code for terms localization"""
+
+class Request_createUser(TypedDict):
+    email: str
+    """Email address for login and notifications"""
+    password: str
+    """Password for user authentication (must meet password requirements)"""
+    role: Literal['admin', 'projectOwner', 'boardUser']
+    """User role defining access permissions"""
+    name: str
+    """Full display name of the user"""
+    username: NotRequired[str]
+    """Unique username for user identification"""
+    phone: NotRequired[str]
+    """Contact phone number"""
+    organization: NotRequired[str]
+    """Organization or company name"""
+    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']]
+    """Preferred language for user interface and notifications"""
+    subscribeToOwnCards: NotRequired[bool]
+    """Whether the user subscribes to their own cards"""
+    subscribeToCardWhenCommenting: NotRequired[bool]
+    """Whether the user subscribes to cards when commenting"""
+    turnOffRecentCardHighlighting: NotRequired[bool]
+    """Whether recent card highlighting is disabled"""
+
+class Request_getUser(TypedDict):
+    subscribe: NotRequired[bool]
+    """Whether to subscribe to real-time updates for this user (only for socket connections)"""
+
+class Request_updateUser(TypedDict):
+    role: NotRequired[Literal['admin', 'projectOwner', 'boardUser']]
+    """User role defining access permissions"""
+    name: NotRequired[str]
+    """Full display name of the user"""
+    avatar: NotRequired[dict[str, Any]]
+    """Avatar of the user (only null value to remove avatar)"""
+    phone: NotRequired[str]
+    """Contact phone number"""
+    organization: NotRequired[str]
+    """Organization or company name"""
+    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']]
+    """Preferred language for user interface and notifications"""
+    subscribeToOwnCards: NotRequired[bool]
+    """Whether the user subscribes to their own cards"""
+    subscribeToCardWhenCommenting: NotRequired[bool]
+    """Whether the user subscribes to cards when commenting"""
+    turnOffRecentCardHighlighting: NotRequired[bool]
+    """Whether recent card highlighting is disabled"""
+    enableFavoritesByDefault: NotRequired[bool]
+    """Whether favorites are enabled by default"""
+    defaultEditorMode: NotRequired[Literal['wysiwyg', 'markup']]
+    """Default markdown editor mode"""
+    defaultHomeView: NotRequired[Literal['gridProjects', 'groupedProjects']]
+    """Default view mode for the home page"""
+    defaultProjectsOrder: NotRequired[Literal['byDefault', 'alphabetically', 'byCreationTime']]
+    """Default sort order for projects display"""
+    isDeactivated: NotRequired[bool]
+    """Whether the user account is deactivated and cannot log in (for admins)"""
+
+class Request_updateUserAvatar(TypedDict):
+    file: str
+    """Avatar image file (must be an image format)"""
+
+class Request_updateUserEmail(TypedDict):
+    email: str
+    """Email address for login and notifications"""
+    currentPassword: NotRequired[str]
+    """Current password (required when updating own email)"""
+
+class Request_updateUserPassword(TypedDict):
+    password: str
+    """Password (must meet password requirements)"""
+    currentPassword: NotRequired[str]
+    """Current password (required when updating own password)"""
+
+class Request_updateUserUsername(TypedDict):
+    username: NotRequired[str]
+    """Unique username for user identification"""
+    currentPassword: NotRequired[str]
+    """Current password (required when updating own username)"""
+
+class Request_createWebhook(TypedDict):
+    name: str
+    """Name/title of the webhook"""
+    url: str
+    """URL endpoint for the webhook"""
+    accessToken: NotRequired[str]
+    """Access token for webhook authentication"""
+    events: NotRequired[str]
+    """Comma-separated list of events that trigger the webhook"""
+    excludedEvents: NotRequired[str]
+    """Comma-separated list of events excluded from the webhook"""
+
+class Request_updateWebhook(TypedDict):
+    name: NotRequired[str]
+    """Name/title of the webhook"""
+    url: NotRequired[str]
+    """URL endpoint for the webhook"""
+    accessToken: NotRequired[str]
+    """Access token for webhook authentication"""
+    events: NotRequired[str]
+    """Comma-separated list of events that trigger the webhook"""
+    excludedEvents: NotRequired[str]
+    """Comma-separated list of events excluded from the webhook"""
+
+
+
+# Response Typing
+class Response_acceptTerms(TypedDict):
+    """Terms accepted successfully"""
+    item: str
+    """Access token for API authentication"""
+
+class Response_createAccessToken(TypedDict):
+    """Login successful"""
+    item: str
+    """Access token for API authentication"""
+
+class Response_deleteAccessToken(TypedDict):
+    """Logout successful"""
+    item: str
+    """Revoked access token"""
+
+class Response_exchangeForAccessTokenWithOidc(TypedDict):
+    """OIDC exchange successful"""
+    item: str
+    """Access token for API authentication"""
+
+class Response_revokePendingToken(TypedDict):
+    """Pending token revoked successfully"""
+    item: dict[str, Any]
+    """No data returned"""
+
+class Response_getBoardActions(TypedDict):
+    """Board actions retrieved successfully"""
+    items: list[Action]
+    included: Included_getBoardActions
+
+class Included_getBoardActions(TypedDict):
+    users: list[User]
+
+class Response_getCardActions(TypedDict):
+    """Card actions retrieved successfully"""
+    items: list[Action]
+    included: Included_getCardActions
+
+class Included_getCardActions(TypedDict):
+    users: list[User]
+
+class Response_createAttachment(TypedDict):
+    """Attachment created successfully"""
+    item: Attachment
+
+class Response_deleteAttachment(TypedDict):
+    """Attachment deleted successfully"""
+    item: Attachment
+
+class Response_updateAttachment(TypedDict):
+    """Attachment updated successfully"""
+    item: Attachment
+
+class Response_createBackgroundImage(TypedDict):
+    """Background image uploaded successfully"""
+    item: BackgroundImage
+
+class Response_deleteBackgroundImage(TypedDict):
+    """Background image deleted successfully"""
+    item: BackgroundImage
+
+class Response_createBaseCustomFieldGroup(TypedDict):
+    """Base custom field group created successfully"""
+    item: BaseCustomFieldGroup
+
+class Response_deleteBaseCustomFieldGroup(TypedDict):
+    """Base custom field group deleted successfully"""
+    item: BaseCustomFieldGroup
+
+class Response_updateBaseCustomFieldGroup(TypedDict):
+    """Base custom field group updated successfully"""
+    item: BaseCustomFieldGroup
+
+class Response_createBoardMembership(TypedDict):
+    """Board membership created successfully"""
+    item: BoardMembership
+
+class Response_deleteBoardMembership(TypedDict):
+    """Board membership deleted successfully"""
+    item: BoardMembership
+
+class Response_updateBoardMembership(TypedDict):
+    """Board membership updated successfully"""
+    item: BoardMembership
+
+class Response_createBoard(TypedDict):
+    """Board created successfully"""
+    item: Board
+    included: Included_createBoard
+
+class Included_createBoard(TypedDict):
+    boardMemberships: list[BoardMembership]
+
+class Response_deleteBoard(TypedDict):
+    """Board deleted successfully"""
+    item: Board
+
+class Response_getBoard(TypedDict):
+    """Board details retrieved successfully"""
+    item: Item_getBoard
+    included: Included_getBoard
+
+class Included_getBoard(TypedDict):
+    users: list[User]
+    projects: list[Project]
+    boardMemberships: list[BoardMembership]
+    labels: list[Label]
+    lists: list[List]
+    cards: list[Included_getBoard_all]
+    """Related cards"""
+    cardMemberships: list[CardMembership]
+    cardLabels: list[CardLabel]
+    taskLists: list[TaskList]
+    tasks: list[Task]
+    attachments: list[Attachment]
+    customFieldGroups: list[CustomFieldGroup]
+    customFields: list[CustomField]
+    customFieldValues: list[CustomFieldValue]
+
+class Included_getBoard_all(TypedDict):
+    isSubscribed: bool
+    """Whether the current user is subscribed to the card"""
+
+class Item_getBoard(Board):
+    isSubscribed: bool
+    """Whether the current user is subscribed to the board"""
+
+class Response_updateBoard(TypedDict):
+    """Board updated successfully"""
+    item: Board
+
+class Response_createCardLabel(TypedDict):
+    """Label added to card successfully"""
+    item: CardLabel
+
+class Response_deleteCardLabel(TypedDict):
+    """Label removed from card successfully"""
+    item: CardLabel
+
+class Response_createCardMembership(TypedDict):
+    """User added to card successfully"""
+    item: CardMembership
+
+class Response_deleteCardMembership(TypedDict):
+    """User removed from card successfully"""
+    item: CardMembership
+
+class Response_createCard(TypedDict):
+    """Card created successfully"""
+    item: Card
+
+class Response_getCards(TypedDict):
+    """Cards retrieved successfully"""
+    items: Items_getCards
+    included: Included_getCards
+
+class Included_getCards(TypedDict):
+    users: list[User]
+    cardMemberships: list[CardMembership]
+    cardLabels: list[CardLabel]
+    taskLists: list[TaskList]
+    tasks: list[Task]
+    attachments: list[Attachment]
+    customFieldGroups: list[CustomFieldGroup]
+    customFields: list[CustomField]
+    customFieldValues: list[CustomFieldValue]
+
+class Items_getCards(Card):
+    isSubscribed: bool
+    """Whether the current user is subscribed to the card"""
+
+class Response_deleteCard(TypedDict):
+    """Card deleted successfully"""
+    item: Card
+
+class Response_getCard(TypedDict):
+    """Card details retrieved successfully"""
+    item: Item_getCard
+    included: Included_getCard
+
+class Included_getCard(TypedDict):
+    users: list[User]
+    cardMemberships: list[CardMembership]
+    cardLabels: list[CardLabel]
+    taskLists: list[TaskList]
+    tasks: list[Task]
+    attachments: list[Attachment]
+    customFieldGroups: list[CustomFieldGroup]
+    customFields: list[CustomField]
+    customFieldValues: list[CustomFieldValue]
+
+class Item_getCard(Card):
+    isSubscribed: bool
+    """Whether the current user is subscribed to the card"""
+
+class Response_updateCard(TypedDict):
+    """Card updated successfully"""
+    item: Card
+
+class Response_duplicateCard(TypedDict):
+    """Card duplicated successfully"""
+    item: Card
+    included: Included_duplicateCard
+
+class Included_duplicateCard(TypedDict):
+    cardMemberships: list[CardMembership]
+    cardLabels: list[CardLabel]
+    taskLists: list[TaskList]
+    tasks: list[Task]
+    attachments: list[Attachment]
+    customFieldGroups: list[CustomFieldGroup]
+    customFields: list[CustomField]
+    customFieldValues: list[CustomFieldValue]
+
+class Response_readCardNotifications(TypedDict):
+    """Notifications marked as read successfully"""
+    item: Card
+    included: Included_readCardNotifications
+
+class Included_readCardNotifications(TypedDict):
+    notifications: list[Notification]
+
+class Response_createComment(TypedDict):
+    """Comment created successfully"""
+    item: Comment
+
+class Response_getComments(TypedDict):
+    """Comments retrieved successfully"""
+    items: list[Comment]
+    included: Included_getComments
+
+class Included_getComments(TypedDict):
+    users: list[User]
+
+class Response_deleteComment(TypedDict):
+    """Comment deleted successfully"""
+    item: Comment
+
+class Response_updateComments(TypedDict):
+    """Comment updated successfully"""
+    item: Comment
+
+class Response_getConfig(TypedDict):
+    """Configuration retrieved successfully"""
+    item: Config
+
+class Response_createBoardCustomFieldGroup(TypedDict):
+    """Custom field group created successfully"""
+    item: CustomFieldGroup
+
+class Response_createCardCustomFieldGroup(TypedDict):
+    """Custom field group created successfully"""
+    item: CustomFieldGroup
+
+class Response_deleteCustomFieldGroup(TypedDict):
+    """Custom field group deleted successfully"""
+    item: CustomFieldGroup
+
+class Response_getCustomFieldGroup(TypedDict):
+    """Custom field group details retrieved successfully"""
+    item: CustomFieldGroup
+    included: Included_getCustomFieldGroup
+
+class Included_getCustomFieldGroup(TypedDict):
+    customFields: list[CustomField]
+    customFieldValues: list[CustomFieldValue]
+
+class Response_updateCustomFieldGroup(TypedDict):
+    """Custom field group updated successfully"""
+    item: CustomFieldGroup
+
+class Response_updateCustomFieldValue(TypedDict):
+    """Custom field value created or updated successfully"""
+    item: CustomFieldValue
+
+class Response_deleteCustomFieldValue(TypedDict):
+    """Custom field value deleted successfully"""
+    item: CustomFieldValue
+
+class Response_createCustomFieldInBaseGroup(TypedDict):
+    """Custom field created successfully"""
+    item: CustomField
+
+class Response_createCustomFieldInGroup(TypedDict):
+    """Custom field created successfully"""
+    item: CustomField
+
+class Response_deleteCustomField(TypedDict):
+    """Custom field deleted successfully"""
+    item: CustomField
+
+class Response_updateCustomField(TypedDict):
+    """Custom field updated successfully"""
+    item: CustomField
+
+class Response_createLabel(TypedDict):
+    """Label created successfully"""
+    item: Label
+
+class Response_deleteLabel(TypedDict):
+    """Label deleted successfully"""
+    item: Label
+
+class Response_updateLabel(TypedDict):
+    """Label updated successfully"""
+    item: Label
+
+class Response_clearList(TypedDict):
+    """List cleared successfully"""
+    item: List
+
+class Response_createList(TypedDict):
+    """List created successfully"""
+    item: List
+
+class Response_deleteList(TypedDict):
+    """List deleted successfully"""
+    item: List
+    included: Included_deleteList
+
+class Included_deleteList(TypedDict):
+    cards: list[Card]
+
+class Response_getList(TypedDict):
+    """List details retrieved successfully"""
+    item: List
+    included: Included_getList
+
+class Included_getList(TypedDict):
+    users: list[User]
+    cards: list[Included_getList_all]
+    """Related cards"""
+    cardMemberships: list[CardMembership]
+    cardLabels: list[CardLabel]
+    taskLists: list[TaskList]
+    tasks: list[Task]
+    attachments: list[Attachment]
+    customFieldGroups: list[CustomFieldGroup]
+    customFields: list[CustomField]
+    customFieldValues: list[CustomFieldValue]
+
+class Included_getList_all(TypedDict):
+    isSubscribed: bool
+    """Whether the current user is subscribed to the card"""
+
+class Response_updateList(TypedDict):
+    """List updated successfully"""
+    item: List
+
+class Response_moveListCards(TypedDict):
+    """Cards moved successfully"""
+    item: List
+    included: Included_moveListCards
+
+class Included_moveListCards(TypedDict):
+    cards: list[Card]
+    actions: list[Action]
+
+class Response_sortList(TypedDict):
+    """List sorted successfully"""
+    item: List
+    included: Included_sortList
+
+class Included_sortList(TypedDict):
+    cards: list[Card]
+
+class Response_createBoardNotificationService(TypedDict):
+    """Notification service created successfully"""
+    item: NotificationService
+
+class Response_createUserNotificationService(TypedDict):
+    """Notification service created successfully"""
+    item: NotificationService
+
+class Response_deleteNotificationService(TypedDict):
+    """Notification service deleted successfully"""
+    item: NotificationService
+
+class Response_updateNotificationService(TypedDict):
+    """Notification service updated successfully"""
+    item: NotificationService
+
+class Response_testNotificationService(TypedDict):
+    """Test notification sent successfully"""
+    item: NotificationService
+
+class Response_getNotifications(TypedDict):
+    """Notifications retrieved successfully"""
+    items: list[Notification]
+    included: Included_getNotifications
+
+class Included_getNotifications(TypedDict):
+    users: list[User]
+
+class Response_readAllNotifications(TypedDict):
+    """Notifications marked as read successfully"""
+    items: list[Notification]
+
+class Response_getNotification(TypedDict):
+    """Notification details retrieved successfully"""
+    item: Notification
+    included: Included_getNotification
+
+class Included_getNotification(TypedDict):
+    users: list[User]
+
+class Response_updateNotification(TypedDict):
+    """Notification updated successfully"""
+    item: Notification
+
+class Response_createProjectManager(TypedDict):
+    """Project manager created successfully"""
+    item: ProjectManager
+
+class Response_deleteProjectManager(TypedDict):
+    """Project manager deleted successfully"""
+    item: ProjectManager
+
+class Response_createProject(TypedDict):
+    """Project created successfully"""
+    item: Project
+    included: Included_createProject
+
+class Included_createProject(TypedDict):
+    projectManagers: list[ProjectManager]
+
+class Response_getProjects(TypedDict):
+    """Projects retrieved successfully"""
+    items: Items_getProjects
+    included: Included_getProjects
+
+class Included_getProjects(TypedDict):
+    users: list[User]
+    projectManagers: list[ProjectManager]
+    backgroundImages: list[BackgroundImage]
+    baseCustomFieldGroups: list[BaseCustomFieldGroup]
+    boards: list[Board]
+    boardMemberships: list[BoardMembership]
+    customFields: list[CustomField]
+    notificationServices: list[NotificationService]
+
+class Items_getProjects(Project):
+    isFavorite: bool
+    """Whether the project is marked as favorite by the current user"""
+
+class Response_deleteProject(TypedDict):
+    """Project deleted successfully"""
+    item: Project
+
+class Response_getProject(TypedDict):
+    """Project details retrieved successfully"""
+    item: Item_getProject
+    included: Included_getProject
+
+class Included_getProject(TypedDict):
+    users: list[User]
+    projectManagers: list[ProjectManager]
+    backgroundImages: list[BackgroundImage]
+    baseCustomFieldGroups: list[BaseCustomFieldGroup]
+    boards: list[Board]
+    boardMemberships: list[BoardMembership]
+    customFields: list[CustomField]
+    notificationServices: list[NotificationService]
+
+class Item_getProject(Project):
+    isFavorite: bool
+    """Whether the project is marked as favorite by the current user"""
+
+class Response_updateProject(TypedDict):
+    """Project updated successfully"""
+    item: Project
+
+class Response_createTaskList(TypedDict):
+    """Task list created successfully"""
+    item: TaskList
+
+class Response_deleteTaskList(TypedDict):
+    """Task list deleted successfully"""
+    item: TaskList
+
+class Response_getTaskList(TypedDict):
+    """Task list details retrieved successfully"""
+    item: TaskList
+    included: Included_getTaskList
+
+class Included_getTaskList(TypedDict):
+    tasks: list[Task]
+
+class Response_updateTaskList(TypedDict):
+    """Task list updated successfully"""
+    item: TaskList
+
+class Response_createTask(TypedDict):
+    """Task created successfully"""
+    item: Task
+
+class Response_deleteTask(TypedDict):
+    """Task deleted successfully"""
+    item: Task
+
+class Response_updateTask(TypedDict):
+    """Task updated successfully"""
+    item: Task
+
+class Response_getTerms(TypedDict):
+    """Terms content retrieved successfully"""
+    item: Item_getTerms
+
+class Item_getTerms(TypedDict):
+    type: Literal['general', 'extended']
+    language: Literal['de-DE', 'en-US']
+    content: str
+    signature: str
+
+class Response_createUser(TypedDict):
+    """User created successfully"""
+    item: User
+
+class Response_getUsers(TypedDict):
+    """List of users retrieved successfully"""
+    items: list[User]
+
+class Response_deleteUser(TypedDict):
+    """User deleted successfully"""
+    item: User
+
+class Response_getUser(TypedDict):
+    """User details retrieved successfully"""
+    item: User
+    included: Included_getUser
+
+class Included_getUser(TypedDict):
+    notificationServices: list[NotificationService]
+
+class Response_updateUser(TypedDict):
+    """User updated successfully"""
+    item: User
+
+class Response_updateUserAvatar(TypedDict):
+    """Avatar updated successfully"""
+    item: User
+
+class Response_updateUserEmail(TypedDict):
+    """Email updated successfully"""
+    item: User
+
+class Response_updateUserPassword(TypedDict):
+    """Password updated successfully"""
+    item: User
+    included: Included_updateUserPassword
+
+class Included_updateUserPassword(TypedDict):
+    accessTokens: list[str]
+    """New acces tokens (when updating own password)"""
+
+class Response_updateUserUsername(TypedDict):
+    """Username updated successfully"""
+    item: User
+
+class Response_createWebhook(TypedDict):
+    """Webhook created successfully"""
+    item: Webhook
+
+class Response_getWebhooks(TypedDict):
+    """List of webhooks retrieved successfully"""
+    items: list[Webhook]
+
+class Response_deleteWebhook(TypedDict):
+    """Webhook deleted successfully"""
+    item: Webhook
+
+class Response_updateWebhook(TypedDict):
+    """Webhook updated successfully"""
+    item: Webhook
+

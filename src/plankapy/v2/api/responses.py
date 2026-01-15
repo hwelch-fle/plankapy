@@ -1,16 +1,17 @@
 from __future__ import annotations
+from httpx import HTTPStatusError
 
 __all__ = (
-	"PlankaError",
-	"Conflict",
-	"Forbidden",
-	"NotFound",
-	"Unauthorized",
-	"UnprocessableEntity",
-	"ValidationError",
+    "PlankaError",
+    "Conflict",
+    "Forbidden",
+    "NotFound",
+    "Unauthorized",
+    "UnprocessableEntity",
+    "ValidationError",
 )
 
-class PlankaError(Exception): ...
+class PlankaError(HTTPStatusError): ...
 
 class Conflict(PlankaError): ...
 """Request conflicts with current state of the resource"""
