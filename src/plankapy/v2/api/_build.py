@@ -225,7 +225,7 @@ def yield_paths() -> Generator[str]:
                 if has_item:
                     resps[f'Response_{oid}'].append(f'item: Item_{oid}')
                 if has_items:
-                    resps[f'Response_{oid}'].append(f'items: Items_{oid}')
+                    resps[f'Response_{oid}'].append(f'items: list[Items_{oid}]')
                 if has_included:
                     resps[f'Response_{oid}'].append(f'included: Included_{oid}')
             

@@ -3249,7 +3249,7 @@ class Included_createProject(TypedDict):
 
 class Response_getProjects(TypedDict):
     """Projects retrieved successfully"""
-    items: Items_getProjects
+    items: list[Items_getProjects]
     included: Included_getProjects
 
 class Included_getProjects(TypedDict):
