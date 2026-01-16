@@ -238,9 +238,9 @@ class BackgroundImage(PlankaModel[sch.BackgroundImage]):
         for size, url in self.thumbnails.items():
             yield size, self.client.get(url).iter_bytes()
     
-    def sync(self):
-        """Sync the BackgroundImage with the Planka server"""
-        self.schema = self.board
+    #def sync(self):
+    #    """Sync the BackgroundImage with the Planka server"""
+    #    self.schema = self.board
     
     def delete(self):
         """Delete the BackgroundImage"""
