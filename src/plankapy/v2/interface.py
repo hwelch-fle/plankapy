@@ -1,5 +1,6 @@
 from .api import PlankaEndpoints
 from httpx import Client
+from .models import *
 
 class Planka:
     def __init__(self, client: Client, lang: str='en_US') -> None:
@@ -26,4 +27,18 @@ class Planka:
     
     def logout(self) -> None:
         self.endpoints.deleteAccessToken()
-        
+    
+    @property
+    def projects(self) -> list[Project]:
+        """Get all Projects available to the current user"""
+        return [Project(p, self.endpoints) for p in self.endpoints.getProjects()['items']]
+
+    @property
+    def users(self) -> list[User]:
+        """Get all Users on the current instance"""
+        return [User(u, self.endpoints) for u in self.endpoints.getUsers()['items']]
+    
+    @property
+    def me(self) -> User:
+        """The current logged on user"""
+        return User(self.client.get('/api/me').json()['item'], self.endpoints)

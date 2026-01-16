@@ -1,1 +1,1 @@
-from interface import Planka as Planka
+from .interface import Planka as Planka

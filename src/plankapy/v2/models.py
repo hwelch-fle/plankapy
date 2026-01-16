@@ -55,18 +55,18 @@ class PlankaModel(Generic[_S]):
         self._live_mode = False
     
     @property
+    def schema(self) -> _S:
+        return self._schema
+    @schema.setter
+    def schema(self, schema: _S) -> None:
+        self._schema = schema
+    
+    @property
     def live_mode(self) -> bool:
         return self._live_mode
     @live_mode.setter
     def live_mode(self, enabled: bool) -> None:
         self._live_mode = enabled
-        
-    @property
-    def schema(self) -> _S:
-        return self._schema
-    @schema.setter
-    def schema(self, val: Any) -> None:
-        raise AttributeError(f'schema attribute is read only, use `update` or `editor` to make changes')
     
     @property
     def id(self) -> str:
@@ -90,9 +90,9 @@ class PlankaModel(Generic[_S]):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(schema={self.__dict__})'
     
-    def __getattribute__(self, name: str) -> Any:
-        # TODO: use `_live_mode` to force a `sync` call on attribute acces
-        return super().__getattribute__(name)           
+    #def __getattribute__(self, name: str) -> Any:
+    #    # TODO: use `_live_mode` to force a `sync` call on attribute acces
+    #    return super().__getattribute__(name)           
     
     def json(self, **kwargs: Any) -> str:
         return json.dumps(self.schema, **kwargs)
@@ -473,6 +473,12 @@ class Card(PlankaModel[sch.Card]):
     def list(self)-> List:
         """The List the Card belongs to"""
         return List(self.endpoints.getList(self.schema['listId'])['item'], self.endpoints)
+    @list.setter
+    def list(self, list: List) -> Self:
+        """Set List the Card belongs to"""
+        self.update(listId=list.id, boardId=list.board.id)
+        return self
+
     @property
     def creator(self) -> User:
         """The User who Created the card"""
@@ -595,7 +601,8 @@ class Card(PlankaModel[sch.Card]):
         Returns:
             Self
         """
-        self.update(listId=list.id)
+        if list.id != self.list.id:
+            self.update(listId=list.id)
         return self
     
     def add_attachment(self, attachment: str | bytes, *, cover: bool=False, name: str | None=None) -> Attachment:
@@ -712,14 +719,109 @@ class Label(PlankaModel[sch.Label]):
     def update(self): ...
     def delete(self): ...
 
-  
+
+ListColor = Literal[
+    'berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 
+    'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 
+    'dark-granite', 'turquoise-sea',
+]
 class List(PlankaModel[sch.List]):
     """Python interface for Planka Lists"""
     
+    # List Included
+    @property
+    def _included(self):
+        return self.endpoints.getList(self.id)['included']
+    @property
+    def users(self) ->  list[User]:
+        """Users associated with the List"""
+        return [User(u, self.endpoints) for u in self._included['users']]
+    
+    @property
+    def cards(self) -> list[Card]:
+        """Cards associated with the List"""
+        return [Card(c, self.endpoints) for c in self._included['cards']]
+    
+    @property
+    def cardMemberships(self) -> list[CardMembership]:
+        """CardMemberships associated with the List"""
+        return [CardMembership(cm, self.endpoints) for cm in self._included['cardMemberships']]
+    
+    @property
+    def cardLabels(self) -> list[CardLabel]:
+        """CardLabels associated with the List"""
+        return [CardLabel(cl, self.endpoints) for cl in self._included['cardLabels']]
+    
+    @property
+    def taskLists(self) -> list[TaskList]: ...
+    @property
+    def tasks(self) ->  list[Task]: ...
+    @property
+    def attachments(self) -> list[Attachment]: ...
+    @property
+    def customFieldGroups(self) ->  list[CustomFieldGroup]: ...
+    @property
+    def customFields(self) ->  list[CustomField]: ...
+    @property
+    def customFieldValues(self) -> list[CustomFieldValue]: ...
+    
+    # List Properties
+    @property
+    def board(self) -> Board:
+        """The Board the List belongs to"""
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+    
+    @property
+    def type(self): 
+        """Type/status of the list"""
+        return self.schema['type']
+    @type.setter
+    # Possibly ['archive', 'trash'] ?
+    def type(self, type: Literal['active', 'closed']) -> None:
+        """Set the List type"""
+        self.update(type=type)
+    
+    @property 
+    def position(self) -> int:
+        """Position of the List within the Board"""
+        return self.schema['position']
+
+    @property
+    def name(self) -> str:
+        """Name/title of the List"""
+        return self.schema['name']
+    
+    @property
+    def color(self) -> ListColor:
+        """Color for the List"""
+        return self.schema['color']
+    @color.setter
+    def color(self, color: ListColor) -> None:
+        """Set the List color"""
+        self.update(color=color)
+
+    @property    
+    def created_at(self) -> datetime:
+        """When the List was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the List was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+    
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the List with the Planka server"""
+        self.schema = self.endpoints.getList(self.id)['item']
+    
+    def update(self, **list: Unpack[paths.Request_updateList]):
+        """Update the List"""
+        self.endpoints.updateList(self.id, **list)
+    
+    def delete(self):
+        """Delete the List"""
+        return self.endpoints.deleteList(self.id)
 
   
 class Notification(PlankaModel[sch.Notification]):
@@ -878,7 +980,7 @@ class Project(PlankaModel[sch.Project]):
         
     def update(self, **project: Unpack[paths.Request_updateProject]) -> None:
         """Update the Project"""
-        self.schema = self.endpoints.updateProject(self.id, **project)
+        self.schema = self.endpoints.updateProject(self.id, **project)['item']
         
     def delete(self) -> None:
         """Delete the Project"""
