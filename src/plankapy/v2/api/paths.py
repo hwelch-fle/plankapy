@@ -2974,7 +2974,7 @@ class Response_createCard(TypedDict):
 
 class Response_getCards(TypedDict):
     """Cards retrieved successfully"""
-    items: Items_getCards
+    items: list[Items_getCards]
     included: Included_getCards
 
 class Included_getCards(TypedDict):
