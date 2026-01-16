@@ -2940,7 +2940,7 @@ class Included_getBoard(TypedDict):
     customFields: list[CustomField]
     customFieldValues: list[CustomFieldValue]
 
-class Included_getBoard_all(TypedDict):
+class Included_getBoard_all(Card):
     isSubscribed: bool
     """Whether the current user is subscribed to the card"""
 
@@ -3162,7 +3162,7 @@ class Included_getList(TypedDict):
     customFields: list[CustomField]
     customFieldValues: list[CustomFieldValue]
 
-class Included_getList_all(TypedDict):
+class Included_getList_all(Card):
     isSubscribed: bool
     """Whether the current user is subscribed to the card"""
 

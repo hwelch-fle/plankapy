@@ -154,7 +154,7 @@ def yield_paths() -> Generator[str]:
                                 for obj in prop['items']['allOf'][1:]
                                 for prop_name, prop in obj['properties'].items()
                             ]
-                            resps[f'Included_{oid}_all'] = additional_keys
+                            resps[f'Included_{oid}_all({base_type}):'] = additional_keys
                             resps[f'Included_{oid}'].append(f'{p_name}: list[Included_{oid}_all]\n\t"""{prop["description"]}"""')
                         else:
                             if prop['type'] == 'array':
