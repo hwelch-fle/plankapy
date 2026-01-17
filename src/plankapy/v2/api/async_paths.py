@@ -5,7 +5,7 @@ from typing import (
 )
 from httpx import AsyncClient
 from .schemas import *
-from .types import *
+from .typ import *
 
 __all__ = ("AsyncPlankaEndpoints",)
 
@@ -32,7 +32,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens/accept-terms".format(**args), data=kwargs)
+        resp = await self.client.post("api/access-tokens/accept-terms", data=kwargs)
         resp.raise_for_status()
         return resp.json()
 
@@ -56,7 +56,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens".format(**args), data=kwargs)
+        resp = await self.client.post("api/access-tokens", data=kwargs)
         resp.raise_for_status()
         return resp.json()
 
@@ -72,7 +72,7 @@ class AsyncPlankaEndpoints:
         """
         args = locals().copy()
         args.pop('self')
-        resp = await self.client.delete("api/access-tokens/me".format(**args))
+        resp = await self.client.delete("api/access-tokens/me")
         resp.raise_for_status()
         return resp.json()
 
@@ -99,7 +99,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens/exchange-with-oidc".format(**args), data=kwargs)
+        resp = await self.client.post("api/access-tokens/exchange-with-oidc", data=kwargs)
         resp.raise_for_status()
         return resp.json()
 
@@ -120,7 +120,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens/revoke-pending-token".format(**args), data=kwargs)
+        resp = await self.client.post("api/access-tokens/revoke-pending-token", data=kwargs)
         resp.raise_for_status()
         return resp.json()
 
@@ -922,7 +922,7 @@ class AsyncPlankaEndpoints:
         """
         args = locals().copy()
         args.pop('self')
-        resp = await self.client.get("api/config".format(**args))
+        resp = await self.client.get("api/config")
         resp.raise_for_status()
         return resp.json()
 
@@ -1570,7 +1570,7 @@ class AsyncPlankaEndpoints:
         """
         args = locals().copy()
         args.pop('self')
-        resp = await self.client.get("api/notifications".format(**args))
+        resp = await self.client.get("api/notifications")
         resp.raise_for_status()
         return resp.json()
 
@@ -1587,7 +1587,7 @@ class AsyncPlankaEndpoints:
         """
         args = locals().copy()
         args.pop('self')
-        resp = await self.client.post("api/notifications/read-all".format(**args))
+        resp = await self.client.post("api/notifications/read-all")
         resp.raise_for_status()
         return resp.json()
 
@@ -1703,7 +1703,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects".format(**args), data=kwargs)
+        resp = await self.client.post("api/projects", data=kwargs)
         resp.raise_for_status()
         return resp.json()
 
@@ -1720,7 +1720,7 @@ class AsyncPlankaEndpoints:
         """
         args = locals().copy()
         args.pop('self')
-        resp = await self.client.get("api/projects".format(**args))
+        resp = await self.client.get("api/projects")
         resp.raise_for_status()
         return resp.json()
 
@@ -2029,7 +2029,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/users".format(**args), data=kwargs)
+        resp = await self.client.post("api/users", data=kwargs)
         resp.raise_for_status()
         return resp.json()
 
@@ -2047,7 +2047,7 @@ class AsyncPlankaEndpoints:
         """
         args = locals().copy()
         args.pop('self')
-        resp = await self.client.get("api/users".format(**args))
+        resp = await self.client.get("api/users")
         resp.raise_for_status()
         return resp.json()
 
@@ -2259,7 +2259,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/webhooks".format(**args), data=kwargs)
+        resp = await self.client.post("api/webhooks", data=kwargs)
         resp.raise_for_status()
         return resp.json()
 
@@ -2276,7 +2276,7 @@ class AsyncPlankaEndpoints:
         """
         args = locals().copy()
         args.pop('self')
-        resp = await self.client.get("api/webhooks".format(**args))
+        resp = await self.client.get("api/webhooks")
         resp.raise_for_status()
         return resp.json()
 
