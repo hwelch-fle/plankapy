@@ -4,18 +4,20 @@ version = "2.2.2"
 
 # Contributors can add their info here
 authors = [
-  { name="Hayden Welch", email="hwelch@finelines-engineering.com" },
+  { name = "Hayden Welch", email = "hwelch@finelines-engineering.com" },
 ]
 
 description = "A Python interface for Plankanban"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Operating System :: OS Independent",
 ]
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
