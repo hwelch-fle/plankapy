@@ -20,10 +20,12 @@ SWAGGER_URL = "https://plankanban.github.io/planka/swagger-ui/swagger.json"
 SWAGGER_FILE = Path("swagger.json")
 
 INIT_MOD = Path("__init__.py")
-SCHEMA_MOD = Path("schemas.py")
-PATH_MOD = Path("paths.py")
-ASYNC_PATH_MOD = Path("async_paths.py")
-RESPONSES_MOD = Path("responses.py")
+SCHEMA_MOD = Path("schemas.py") # Schema for each planka object
+
+PATH_MOD = Path("paths.py") # Endpoints
+ASYNC_PATH_MOD = Path("async_paths.py") # Async Endpoints
+TYPES_MOD = Path("types.py") # Typing for response/request json
+ERRORS_MOD = Path("errors.py") # Error implementations
 
 TYPES = {
     "string": "str",
@@ -81,20 +83,19 @@ def get_schemas(swg: dict[str, Any]) -> dict[str, Schema]:
 def get_responses(swg: dict[str, Any]) -> dict[str, Response]:
     return swg["components"]["responses"]
 
-
+REQUESTS: dict[str, Any] | None = None
+RESPONSES: dict[str, Any] | None = None
 def yield_paths() -> Generator[str]:
     """This is a beautiful function. My god is it a mess I'm sorry"""
     
     yield "from __future__ import annotations"
     yield "from typing import ("
-    yield "\tAny,"
     yield "\tLiteral,"
     yield "\tUnpack,"
-    yield "\tTypedDict,"
-    yield "\tNotRequired,"
     yield ")"
     yield "from httpx import Client"
     yield "from .schemas import *"
+    yield "from .types import *"
     yield ""
     yield '__all__ = ("PlankaEndpoints",)'
     yield ""
@@ -154,7 +155,7 @@ def yield_paths() -> Generator[str]:
                                 for obj in prop['items']['allOf'][1:]
                                 for prop_name, prop in obj['properties'].items()
                             ]
-                            resps[f'Included_{oid}_all({base_type}):'] = additional_keys
+                            resps[f'Included_{oid}_all({base_type})'] = additional_keys
                             resps[f'Included_{oid}'].append(f'{p_name}: list[Included_{oid}_all]\n\t"""{prop["description"]}"""')
                         else:
                             if prop['type'] == 'array':
@@ -314,32 +315,10 @@ def yield_paths() -> Generator[str]:
             yield "\t\treturn resp.json()"
             yield ""
 
-    if kwarg_reqs:
-        yield ""
-        yield "# Request Typing"
-        for c_name, attrs in kwarg_reqs.items():
-            yield f"class {c_name}(TypedDict):"
-            for attr in attrs:
-                yield f"\t{attr}"
-            yield ""
-        yield ""
-    
-    if resps:
-        yield ""
-        yield "# Response Typing"
-        for r_name, attrs in resps.items():
-            if not attrs:
-                continue
-            if '(' in r_name:
-                yield f"class {r_name}:"
-            else:
-                yield f"class {r_name}(TypedDict):"
-            
-            for attr in attrs:
-                yield f"\t{attr}"
-            yield ""
-        yield ""
-
+    # Store for writing to types module
+    global REQUESTS, RESPONSES
+    REQUESTS = kwarg_reqs
+    RESPONSES = resps
 
 def yield_async_paths() -> Generator[str]:
     for line in yield_paths():
@@ -352,7 +331,43 @@ def yield_async_paths() -> Generator[str]:
         line = line.replace('resp = ', 'resp = await ')
         yield line
 
-def yield_responses() -> Generator[str]:
+def yield_types() -> Generator[str]:
+    yield "from __future__ import annotations"
+    yield "from typing import ("
+    yield "\tAny,"
+    yield "\tLiteral,"
+    yield "\tTypedDict,"
+    yield "\tNotRequired,"
+    yield ")"
+    yield "from .schemas import *"
+    yield ""
+    if REQUESTS:
+        yield ""
+        yield "# Request Typing"
+        for c_name, attrs in REQUESTS.items():
+            yield f"class {c_name}(TypedDict):"
+            for attr in attrs:
+                yield f"\t{attr}"
+            yield ""
+        yield ""
+
+    if RESPONSES:
+        yield ""
+        yield "# Response Typing"
+        for r_name, attrs in RESPONSES.items():
+            if not attrs:
+                continue
+            if '(' in r_name:
+                yield f"class {r_name}:"
+            else:
+                yield f"class {r_name}(TypedDict):"
+            
+            for attr in attrs:
+                yield f"\t{attr}"
+            yield ""
+        yield ""
+
+def yield_errors() -> Generator[str]:
     yield "from __future__ import annotations"
     yield "from httpx import HTTPStatusError"
     yield ""
@@ -415,7 +430,8 @@ INIT_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '), yield_init(
 SCHEMA_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_schema())))
 PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_paths())))
 ASYNC_PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_async_paths())))
-RESPONSES_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_responses())))
+ERRORS_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_errors())))
+TYPES_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_types())))
 # Delete the file after it is used
 # this ensures that the api typing module
 # is always up to date
