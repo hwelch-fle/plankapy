@@ -24,7 +24,7 @@ SCHEMA_MOD = Path("schemas.py") # Schema for each planka object
 
 PATH_MOD = Path("paths.py") # Endpoints
 ASYNC_PATH_MOD = Path("async_paths.py") # Async Endpoints
-TYPES_MOD = Path("types.py") # Typing for response/request json
+TYP_MOD = Path("typ.py") # Typing for response/request json
 ERRORS_MOD = Path("errors.py") # Error implementations
 
 TYPES = {
@@ -83,8 +83,8 @@ def get_schemas(swg: dict[str, Any]) -> dict[str, Schema]:
 def get_responses(swg: dict[str, Any]) -> dict[str, Response]:
     return swg["components"]["responses"]
 
-REQUESTS: dict[str, Any] | None = None
-RESPONSES: dict[str, Any] | None = None
+requests: dict[str, Any] | None = None
+responses: dict[str, Any] | None = None
 def yield_paths() -> Generator[str]:
     """This is a beautiful function. My god is it a mess I'm sorry"""
     
@@ -95,7 +95,7 @@ def yield_paths() -> Generator[str]:
     yield ")"
     yield "from httpx import Client"
     yield "from .schemas import *"
-    yield "from .types import *"
+    yield "from .typ import *"
     yield ""
     yield '__all__ = ("PlankaEndpoints",)'
     yield ""
@@ -295,30 +295,45 @@ def yield_paths() -> Generator[str]:
             yield "\t\targs = locals().copy()"
             yield "\t\targs.pop('self')"
             if not body and not optional_params:
-                yield f'\t\tresp = self.client.{typ}("api{r}".format(**args))'
+                if '{' in r:
+                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args))'
+                else:
+                    yield f'\t\tresp = self.client.{typ}("api{r}")'
             elif body and not optional_params:
                 yield f"\t\tkwargs = args.pop('kwargs')"
-                yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), data=kwargs)'
+                if '{' in r:
+                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), data=kwargs)'
+                else:
+                    yield f'\t\tresp = self.client.{typ}("api{r}", data=kwargs)'
             elif optional_params or body:
                 yield f"\t\tkwargs = args.pop('kwargs')"
                 if optional_params:
                     yield f'\t\tvalid_params = {tuple([p['name'] for p in optional_params])}'
                     yield f'\t\tpassed_params = ''{k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}'
                 if optional_params and body:
-                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params, data=kwargs)'
+                    if '{' in r:
+                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params, data=kwargs)'
+                    else:
+                        yield f'\t\tresp = self.client.{typ}("api{r}", params=passed_params, data=kwargs)'
                 elif optional_params:
-                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params)'
+                    if '{' in r:
+                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params)'
+                    else:
+                        yield f'\t\tresp = self.client.{typ}("api{r}", params=passed_params)'
                 elif body:
-                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), data=kwargs)'
+                    if '{' in r:
+                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), data=kwargs)'
+                    else:
+                        yield f'\t\tresp = self.client.{typ}("api{r}", data=kwargs)'
             
             yield "\t\tresp.raise_for_status()"
             yield "\t\treturn resp.json()"
             yield ""
 
     # Store for writing to types module
-    global REQUESTS, RESPONSES
-    REQUESTS = kwarg_reqs
-    RESPONSES = resps
+    global requests, responses
+    requests = kwarg_reqs
+    responses = resps
 
 def yield_async_paths() -> Generator[str]:
     for line in yield_paths():
@@ -341,20 +356,20 @@ def yield_types() -> Generator[str]:
     yield ")"
     yield "from .schemas import *"
     yield ""
-    if REQUESTS:
+    if requests:
         yield ""
         yield "# Request Typing"
-        for c_name, attrs in REQUESTS.items():
+        for c_name, attrs in requests.items():
             yield f"class {c_name}(TypedDict):"
             for attr in attrs:
                 yield f"\t{attr}"
             yield ""
         yield ""
 
-    if RESPONSES:
+    if responses:
         yield ""
         yield "# Response Typing"
-        for r_name, attrs in RESPONSES.items():
+        for r_name, attrs in responses.items():
             if not attrs:
                 continue
             if '(' in r_name:
@@ -431,7 +446,7 @@ SCHEMA_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_sche
 PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_paths())))
 ASYNC_PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_async_paths())))
 ERRORS_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_errors())))
-TYPES_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_types())))
+TYP_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_types())))
 # Delete the file after it is used
 # this ensures that the api typing module
 # is always up to date
