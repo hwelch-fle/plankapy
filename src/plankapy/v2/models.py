@@ -674,17 +674,40 @@ class Card(PlankaModel[schemas.Card]):
         """Delete the Card"""
         return self.endpoints.deleteCard(self.id)
 
-    def move(self, list: List) -> Self:
-        """Move the card to a new list
+    def move(self, list: List, position: Literal['top', 'bottom'] | int = 'top') -> Card:
+        """Move the card to a new list"""
+
+        # Get bottom pos or requested pos
+        if isinstance(position, int):
+            pos = position
+        else:
+            pos = max((c.position for c in list.cards), default=0)
+
+        # Moving Card out of trash/archive
+        if self.prev_list is not None:
+            self.update(
+                listId=self.prev_list.id, 
+                boardId=self.prev_list.board.id, 
+                position=0 if position == 'top' else pos
+            )
         
-        Args:
-            list (List): The list to move the card to
+        # Change Card position in same List
+        elif list.id == self.list.id:
+            self.update(position=0 if position == 'top' else pos)
         
-        Returns:
-            Self
-        """
-        if list.id != self.list.id:
-            self.update(listId=list.id)
+        # Moving Card to another list
+        else:
+            self.update(
+                listId=list.id, 
+                boardId=list.board.id, 
+                position=0 if position == 'top' else pos
+            )
+        return self
+
+    def restore(self, position: Literal['top', 'bottom'] | int='top') -> Card:
+        """Restore the Card from arcive/trash to its previous list"""
+        if self.prev_list is not None:
+            self.move(self.prev_list, position)
         return self
     
     def add_attachment(self, attachment: str | bytes, *, cover: bool=False, name: str | None=None) -> Attachment:
