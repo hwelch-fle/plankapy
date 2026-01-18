@@ -190,23 +190,28 @@ class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
     def created_at(self) -> datetime:
         """When the BackgroundImage was created"""
         return datetime.fromisoformat(self.schema['createdAt'])
+    
     @property
     def updated_at(self) -> datetime:
         """When the BackgroundImage was last updated"""
         return datetime.fromisoformat(self.schema['updatedAt'])
+    
     @property
     def project(self) -> Project:
         """The Project the BackgroundImage belongs to"""
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
+    
     @property
     def size_in_bytes(self) -> int:
         """The size of the BackgroundImage in bytes"""
         # The Swagger schema says this is a string, but it's should be an int
         return int(self.schema['sizeInBytes'])
+    
     @property
     def url(self) -> str:
         """The URL to access the BackgroundImage"""
         return self.schema['url']
+    
     @property
     def thumbnails(self) -> dict[str, str]:
         """URLs for different thumbnail sizes of the background image"""
@@ -278,6 +283,7 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
         """Delete the BaseCustomFieldGroup"""
         return self.endpoints.deleteBaseCustomFieldGroup(self.id)
 
+
 BoardView = Literal['kanban', 'grid', 'list']
 CardType = Literal['project', 'story']
 
@@ -292,58 +298,71 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def _included(self):
         return self.endpoints.getBoard(self.id)['included']
+    
     @property
     def labels(self) -> list[Label]:
         """Get all Labels on the Board"""
         return [Label(l, self.endpoints) for l in self._included['labels']]
+    
     @property
     def cards(self) -> list[Card]:
-        """Get all Cards on the Board"""
+        """Get all active Cards on the Board (use archived_cards and trashed_cards for archived/trashed Card lists)"""
         return [Card(c, self.endpoints) for c in self._included['cards']]
     @property
     def subscribed_cards(self) -> list[Card]:
         """Get all Cards on the Board that the current User is subscribed to"""
         return [Card(sc, self.endpoints) for sc in self._included['cards'] if sc['isSubscribed']]
+    
     @property
     def projects(self) -> list[Project]:
         """Get all Projects that the Board is associated with (use `Board.Project` instead, this is always one item)"""
         return [Project(p, self.endpoints) for p in self._included['projects']]
+    
     @property
     def board_memberships(self) -> list[BoardMembership]:
         """Get all BoardMemberships for the Board"""
         return [BoardMembership(bm, self.endpoints) for bm in self._included['boardMemberships']]
+    
     @property
     def lists(self) -> list[List]:
         """Get all Lists associated with the Board"""
         return [List(l, self.endpoints) for l in self._included['lists']]
+    
     @property
     def card_memberships(self) -> list[CardMembership]:
         """Get all CardMemberships associated with the Board"""
         return [CardMembership(cm, self.endpoints) for cm in self._included['cardMemberships']]
+    
     @property
     def card_labels(self) -> list[CardLabel]:
         """Get all CardLabels associated with the Board"""
         return [CardLabel(cl, self.endpoints) for cl in self._included['cardLabels']]
+    
     @property
     def task_lists(self) -> list[TaskList]:
         """Get all TaskLists associated with the Board"""
         return [TaskList(tl, self.endpoints) for tl in self._included['taskLists']]
+    
     @property
     def tasks(self) -> list[Task]:
         """Get all Tasks associated with the Board"""
         return [Task(t, self.endpoints) for t in self._included['tasks']]
+    
     @property
     def attachments(self) -> list[Attachment]:
         """Get all Attachments associated with the Board"""
         return [Attachment(a, self.endpoints) for a in self._included['attachments']]
+    
     @property
     def custom_field_groups(self) -> list[CustomFieldGroup]:
         """Get all CustomFieldGroups associated with the Board"""
         return [CustomFieldGroup(cfg, self.endpoints) for cfg in self._included['customFieldGroups']]
+    
     @property
     def custom_fields(self) -> list[CustomField]:
         """Get all CustomFields associated with the Board"""
         return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+    
     @property
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Board"""
@@ -356,7 +375,7 @@ class Board(PlankaModel[schemas.Board]):
         return self.endpoints.getBoard(self.id)['item']['isSubscribed']
     
     @property
-    def project_id(self) -> Project:
+    def project(self) -> Project:
         """TheProject the Board belongs to"""
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
     
@@ -468,39 +487,48 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def _included(self):
         return self.endpoints.getCard(self.id)['included']
+    
     @property
     def attachments(self) -> list[Attachment]:
         """Get all Attachments associated with the Card"""
         return [Attachment(a, self.endpoints) for a in self._included['attachments']]
+    
     @property
     def card_memberships(self) -> list[CardMembership]:
         """Get all CardMemberships associated with the Card"""
         return [CardMembership(cm, self.endpoints) for cm in self._included['cardMemberships']]
+    
     @property
     def members(self) -> list[User]:
         """Get all User members associated with the Card"""
         return [User(u, self.endpoints) for u in self._included['users']]
+    
     @property
     def labels(self) -> list[Label]:
         """Get all Labels associated with the Card"""
         _card_label_ids = [l['id'] for l in self._included['cardLabels']]
         return [l for l in self.board.labels if l.id in _card_label_ids]
+    
     @property
     def tasks(self) -> list[Task]:
         """Get all Tasks associated with the card"""
         return [Task(t, self.endpoints) for t in self._included['tasks']]
+    
     @property
     def task_lists(self) -> list[TaskList]:
         """Get all TaskLists associated with the Card"""
         return [TaskList(tl, self.endpoints) for tl in self._included['taskLists']]
+    
     @property
     def custom_field_groups(self) -> list[CustomFieldGroup]:
         """Get all CustomFieldGroups associated with the Card"""
         return [CustomFieldGroup(cfg, self.endpoints) for cfg in self._included['customFieldGroups']]
+    
     @property
     def custom_fields(self) -> list[CustomField]:
          """Get all CustomFields associated with the Card"""
          return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+    
     @property
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Card"""
@@ -515,6 +543,7 @@ class Card(PlankaModel[schemas.Card]):
     def board(self) -> Board:
         """The Board the Card belongs to"""
         return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+    
     @property
     def list(self)-> List:
         """The List the Card belongs to"""
@@ -607,6 +636,7 @@ class Card(PlankaModel[schemas.Card]):
     def stopwatch(self) -> Stopwatch:
         """Stopwatch for time tracking"""
         return Stopwatch(self)
+    
     @property
     def comments_count(self) -> int:
         """Total number of comments on the Card"""
@@ -615,14 +645,17 @@ class Card(PlankaModel[schemas.Card]):
     def is_closed(self) -> bool:
         """Whether the Card is closed"""
         return self.schema['isClosed']
+    
     @property
-    def last_moved(self) -> datetime:
+    def list_changed_at(self) -> datetime:
         """When the Card was last moved between Lists"""
         return datetime.fromisoformat(self.schema['listChangedAt'])
+    
     @property
     def created_at(self) -> datetime:
         """When the Card was created"""
         return datetime.fromisoformat(self.schema['createdAt'])
+    
     @property
     def updated_at(self) -> datetime:
         """When the Card was last updated"""
@@ -867,7 +900,7 @@ class List(PlankaModel[schemas.List]):
         """Type/status of the list"""
         return self.schema['type']
     @type.setter
-    # Possibly ['archive', 'trash'] ?
+    # ['archive', 'trash'] are system types and cannot be set
     def type(self, type: Literal['active', 'closed']) -> None:
         """Set the List type"""
         self.update(type=type)
