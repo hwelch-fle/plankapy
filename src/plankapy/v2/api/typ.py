@@ -280,7 +280,7 @@ class Request_updateList(TypedDict):
     """Position of the list within the board"""
     name: NotRequired[str]
     """Name/title of the list"""
-    color: NotRequired[Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea']]
+    color: NotRequired[Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea'] | None]
     """Color for the list"""
 
 class Request_moveListCards(TypedDict):
