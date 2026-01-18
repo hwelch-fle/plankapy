@@ -512,9 +512,32 @@ class Board(PlankaModel[schemas.Board]):
         return self.endpoints.deleteBoard(self.id)
 
     def create_list(self, **lst: Unpack[paths.Request_createList]) -> List:
-        """Create a new list on the Board"""
+        """Create a new List on the Board"""
         return List(self.endpoints.createList(self.id, **lst)['item'], self.endpoints)
 
+    def create_label(self, **lbl: Unpack[paths.Request_createLabel]) -> Label:
+        """Create a new Label on the Board"""
+        return Label(self.endpoints.createLabel(self.id, **lbl)['item'], self.endpoints)
+    
+    def add_user(self, user: User, role: BoardRole) -> None:
+        """Add a User to the Board"""
+        self.endpoints.createBoardMembership(self.id, userId=user.id, role=role)
+    
+    def add_editor(self, user: User) -> None:
+        """Add a Board editor"""
+        if user not in self.users or user in self.viewers:
+            self.endpoints.createBoardMembership(self.id, userId=user.id, role='editor')
+        elif user in self.viewers:
+            bm = [bm for bm in self.board_memberships if bm.user == user].pop()
+            self.endpoints.updateBoardMembership(bm.id, role='editor')
+
+    def add_viewer(self, user: User, *, can_comment: bool=False) -> None:
+        """Add a Board viewer Set can_comment flag to True for commenting privelege"""
+        if user not in self.users:
+            self.endpoints.createBoardMembership(self.id, userId=user.id, role='viewer')
+        elif user in self.editors:
+            bm = [bm for bm in self.board_memberships if bm.user == user].pop()
+            self.endpoints.updateBoardMembership(bm.id, role='viewer', canComment=can_comment)
 
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
