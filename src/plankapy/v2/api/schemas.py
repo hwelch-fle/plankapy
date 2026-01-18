@@ -453,7 +453,7 @@ class User(TypedDict):
     """Default view mode for the home page (personal field)"""
     defaultProjectsOrder: NotRequired[Literal['byDefault', 'alphabetically', 'byCreationTime']]
     """Default sort order for projects display (personal field)"""
-    termsType: str
+    termsType: Literal['general', 'extended']
     """Type of terms applicable to the user based on role"""
     isSsoUser: NotRequired[bool]
     """Whether the user is SSO user (private field)"""

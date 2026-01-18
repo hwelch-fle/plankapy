@@ -320,7 +320,7 @@ class Request_createProjectManager(TypedDict):
     """ID of the user who is assigned as project manager"""
 
 class Request_createProject(TypedDict):
-    type: Literal['public', 'private']
+    type: Literal['shared', 'private']
     """Type of the project"""
     name: str
     """Name/title of the project"""
