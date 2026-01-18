@@ -1250,9 +1250,17 @@ class User(PlankaModel[sch.User]):
         return datetime.fromisoformat(self.schema['updatedAt'])
 
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the User with the Planka server"""
+        self.schema = self.endpoints.getUser(self.id)['item']
+
+    def update(self, **kwargs: Unpack[paths.Request_updateUser]):
+        """Update the User"""
+        self.schema = self.endpoints.updateUser(self.id, **kwargs)['item']
+
+    def delete(self):
+        """Delete the User"""
+        return self.endpoints.deleteUser(self.id)
 
 
 class Webhook(PlankaModel[sch.Webhook]):
