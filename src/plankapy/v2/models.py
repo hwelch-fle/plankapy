@@ -932,10 +932,9 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
         """When the card-label association was last updated"""
         return datetime.fromisoformat(self.schema['updatedAt'])
 
-    # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def delete(self):
+        """Delete the CardLabel"""
+        return self.endpoints.deleteCardLabel(cardId=self.card.id, labelId=self.label.id)
 
 
 class CardMembership(PlankaModel[schemas.CardMembership]):
