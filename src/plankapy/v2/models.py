@@ -207,10 +207,10 @@ class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
         """The Project the BackgroundImage belongs to"""
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
     @property
-    def size(self) -> int:
+    def size_in_bytes(self) -> int:
         """The size of the BackgroundImage in bytes"""
-        # The Swagger schema says this is a string, but it's actually an int
-        return int(self.schema['size'])
+        # The Swagger schema says this is a string, but it's should be an int
+        return int(self.schema['sizeInBytes'])
     @property
     def url(self) -> str:
         """The URL to access the BackgroundImage"""
@@ -1061,7 +1061,14 @@ class Project(PlankaModel[schemas.Project]):
             # Defer deletion to the ProjectManager object
             project_manager.delete()
 
+    def create_board(self, **board: Unpack[paths.Request_createBoard]) -> Board:
+        """Create a new Board in the Project"""
+        return Board(self.endpoints.createBoard(self.id, **board)['item'], self.endpoints)
 
+    def create_base_custom_field_group(self, **bcfg: Unpack[paths.Request_createBaseCustomFieldGroup]) -> BaseCustomFieldGroup:
+        """Create a BaseCustomFieldGroup in the Project"""
+        return BaseCustomFieldGroup(self.endpoints.createBaseCustomFieldGroup(self.id, **bcfg)['item'], self.endpoints)
+    
 class ProjectManager(PlankaModel[schemas.ProjectManager]):
     """Python interface for Planka ProjectManagers"""
     

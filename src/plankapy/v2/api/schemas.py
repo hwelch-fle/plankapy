@@ -69,7 +69,7 @@ class BackgroundImage(TypedDict):
     """Unique identifier for the background image"""
     projectId: str
     """ID of the project the background image belongs to"""
-    size: str
+    sizeInBytes: str
     """File size of the background image in bytes"""
     url: str
     """URL to access the full-size background image"""
