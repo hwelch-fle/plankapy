@@ -286,6 +286,7 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
 
 BoardView = Literal['kanban', 'grid', 'list']
 CardType = Literal['project', 'story']
+BoardRole = Literal['editor', 'viewer']
 
 class Board(PlankaModel[schemas.Board]):
     """Python interface for Planka Boards"""
