@@ -1040,9 +1040,12 @@ class Project(PlankaModel[schemas.Project]):
             return None
         return bgis.pop()
     @background_image.setter
-    def background_image(self, background_image: BackgroundImage) -> None:
+    def background_image(self, background_image: BackgroundImage | None) -> None:
         """Set the Project BackgroundImage"""
-        self.update(backgroundImageId=background_image.id, backgroundType='image')
+        if background_image is None:
+            self.remove_background()
+        else:
+            self.update(backgroundImageId=background_image.id, backgroundType='image')
     
     @property
     def name(self) -> str:
@@ -1076,8 +1079,12 @@ class Project(PlankaModel[schemas.Project]):
         """Gradient background for the project"""
         return self.schema['backgroundGradient']
     @background_gradient.setter
-    def background_gradient(self, gradient: BackgroundGradient) -> None:
-        self.update(backgroundGradient=gradient, backgroundType='gradient')
+    def background_gradient(self, gradient: BackgroundGradient | None) -> None:
+        """Set the Project background gradient"""
+        if gradient is None:
+            self.remove_background()
+        else:
+            self.update(backgroundGradient=gradient, backgroundType='gradient')
     
     @property
     def hidden(self) -> bool:
@@ -1114,6 +1121,10 @@ class Project(PlankaModel[schemas.Project]):
         """Add a User to the Project as a ProjectManager"""
         return ProjectManager(self.endpoints.createProjectManager(self.id, userId=user.id)['item'], self.endpoints)
     
+    def remove_background(self) -> None:
+        """Reset the Project background to the default grey"""
+        self.update(backgroundType=None) # type: ignore
+
     def remove_project_manager(self, project_manager: ProjectManager | User) -> None:
         """Remove a ProjectManager from the Project"""
         if isinstance(project_manager, User):
