@@ -52,7 +52,6 @@ class PlankaModel(Generic[_S]):
         self._schema = schema
         self.endpoints = endpoints
         self.client = self.endpoints.client
-        self._live_mode = False
     
     @property
     def schema(self) -> _S:
@@ -60,13 +59,6 @@ class PlankaModel(Generic[_S]):
     @schema.setter
     def schema(self, schema: _S) -> None:
         self._schema = schema
-    
-    @property
-    def live_mode(self) -> bool:
-        return self._live_mode
-    @live_mode.setter
-    def live_mode(self, enabled: bool) -> None:
-        self._live_mode = enabled
     
     @property
     def id(self) -> str:
