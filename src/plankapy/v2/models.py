@@ -26,7 +26,7 @@ __all__ = (
     "BoardMembership",
     "Card",
     "CardLabel",
-    "CardMembership", #TODO
+    "CardMembership",
     "Comment", #TODO
     "Config", #TODO
     "CustomField", #TODO
@@ -940,10 +940,31 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
 class CardMembership(PlankaModel[schemas.CardMembership]):
     """Python interface for Planka CardMemberships"""
 
-    # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    # CardMembership properties
+    
+    @property
+    def card(self) -> Card:
+        """The Card the User is a member of"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+
+    @property
+    def user(self) -> User:
+        """The User who is a member of the Card"""
+        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.endpoints)
+
+    @property
+    def created_at(self) -> datetime:
+        """When the card membership was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+
+    @property
+    def updated_at(self) -> datetime:
+        """When the card membership was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
+    def delete(self):
+        """Delete the CardMembership"""
+        return self.endpoints.deleteCardMembership(userId=self.user.id, cardId=self.card.id)
 
    
 class Comment(PlankaModel[schemas.Comment]):
