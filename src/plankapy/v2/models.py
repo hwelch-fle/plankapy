@@ -1754,6 +1754,21 @@ class User(PlankaModel[schemas.User]):
         else:
             self.endpoints.updateUserPassword(self.id, password=new_password, currentPassword=current_password)
 
+    def add_to_card(self, card: Card) -> None:
+        """Add the User to a Card"""
+        self.endpoints.createCardMembership(card.id, userId=self.id)
+    
+    def add_to_board(self, board: Board, role: BoardRole, *, can_comment: bool=False) -> None:
+        """Add the User to a board"""
+        if self not in board.users:
+            self.endpoints.createBoardMembership(board.id, userId=self.id, role=role, canComment=can_comment)
+        _existing_membership = [bm for bm in board.board_memberships if bm.user == self].pop()
+        if _existing_membership.role != role or _existing_membership.can_comment != can_comment:
+            if role == 'viewer':
+                _existing_membership.update(role=role, canComment=can_comment)
+            else:
+                _existing_membership.update(role=role)
+
 
 class Webhook(PlankaModel[schemas.Webhook]):
     """Python interface for Planka Webhooks"""
