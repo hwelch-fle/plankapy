@@ -324,7 +324,7 @@ class Board(PlankaModel[schemas.Board]):
         return [BoardMembership(bm, self.endpoints) for bm in self._included['boardMemberships']]
     
     @property
-    def lists(self) -> list[List]:
+    def all_lists(self) -> list[List]:
         """Get all Lists associated with the Board"""
         return [List(l, self.endpoints) for l in self._included['lists']]
     
