@@ -25,7 +25,7 @@ __all__ = (
     "Board",
     "BoardMembership",
     "Card",
-    "CardLabel", #TODO
+    "CardLabel",
     "CardMembership", #TODO
     "Comment", #TODO
     "Config", #TODO
@@ -707,6 +707,31 @@ class Card(PlankaModel[schemas.Card]):
 
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
+
+    # CardLabel properties
+
+    @property
+    def card(self) -> Card:
+        """The Card the Label is associated with"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+
+    @property
+    def label(self) -> Label:
+        """The Label associated with the card"""
+        _cls = [l for l in self.card.labels if l.id == self.id]
+        if _cls:
+            return _cls.pop()
+        raise ValueError(f'Label no longer exists')
+
+    @property
+    def created_at(self) -> datetime:
+        """When the card-label association was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+
+    @property
+    def updated_at(self) -> datetime:
+        """When the card-label association was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
 
     # Special Methods
     def sync(self): ...
