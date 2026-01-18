@@ -6,7 +6,7 @@ from .api import (
     PlankaEndpoints, 
     typ, # Response / Request typing
 )
-from models import *
+from .models import *
 
 class Planka:
     def __init__(self, client: Client, lang: str='en_US') -> None:
