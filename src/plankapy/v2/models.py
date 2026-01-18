@@ -1189,9 +1189,17 @@ class User(PlankaModel[schemas.User]):
         """Email address for login and notifications (private field)"""
         return self.schema.get('email')
     @email.setter
-    def email(self, email: str|None) -> None:
-        """Set the User email"""
-        self.update()
+    def email(self, email: str) -> None:
+        """Set the User email (Direct assignment only allowed for Admin users)"""
+        self.endpoints.updateUserEmail(self.id, email=email)
+
+    @property
+    def password(self) -> None:
+        raise AttributeError(f'Passwords can only be set by Admin Users and read by nobody')
+    @password.setter
+    def password(self, password: str) -> None:
+        """Set a User's password (Admin only)"""
+        self.endpoints.updateUserPassword(self.id, password=password)
 
     @property
     def role(self):
@@ -1371,6 +1379,23 @@ class User(PlankaModel[schemas.User]):
     def delete(self):
         """Delete the User"""
         return self.endpoints.deleteUser(self.id)
+    
+    def update_email(self, email: str, *, password: str|None=None) -> None:
+        """Update the current User's email (requires password)"""
+        # Allow Admins to set user email directly or ignore password kwarg
+        if not password:
+            self.endpoints.updateUserEmail(self.id, email=email)
+        else:
+            self.endpoints.updateUserEmail(self.id, email=email, currentPassword=password)
+
+    def update_password(self, *, new_password: str, current_password: str|None=None) -> None:
+        """Update the current User's password (requires current password)"""
+        # Allow Admins to set user passwords by ignoring current password
+        # or setting password property directly
+        if not current_password:
+            self.endpoints.updateUserPassword(self.id, password=new_password)
+        else:
+            self.endpoints.updateUserPassword(self.id, password=new_password, currentPassword=current_password)
 
 
 class Webhook(PlankaModel[schemas.Webhook]):
