@@ -1688,7 +1688,7 @@ class PlankaEndpoints:
         """Creates a project. The current user automatically becomes a project manager.
 
         Args:
-            type (Literal['public', 'private']): Type of the project
+            type (Literal['shared', 'private']): Type of the project
             name (str): Name/title of the project
             description (str): Detailed description of the project
 
