@@ -33,7 +33,7 @@ __all__ = (
     "CustomFieldGroup", #TODO
     "CustomFieldValue", #TODO
     "Label",
-    "List", #TODO
+    "List",
     "Notification", #TODO
     "NotificationService", #TODO
     "Project",
