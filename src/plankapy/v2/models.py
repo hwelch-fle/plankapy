@@ -286,6 +286,8 @@ class BaseCustomFieldGroup(PlankaModel[sch.BaseCustomFieldGroup]):
         """Delete the BaseCustomFieldGroup"""
         return self.endpoints.deleteBaseCustomFieldGroup(self.id)
 
+BoardView = Literal['kanban', 'grid', 'list']
+CardType = Literal['project', 'story']
 
 class Board(PlankaModel[sch.Board]):
     """Python interface for Planka Boards"""
@@ -360,38 +362,75 @@ class Board(PlankaModel[sch.Board]):
     def subscribed(self) -> bool:
         """Whether the current user is subscribed to the Board"""
         return self.endpoints.getBoard(self.id)['item']['isSubscribed']
+    
     @property
-    def projectId(self) -> Project:
+    def project_id(self) -> Project:
         """TheProject the Board belongs to"""
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
+    
     @property
     def position(self) -> int:
         """Position of the Board within the Project"""
         return self.schema['position']
+    @position.setter
+    def position(self, position: int) -> None:
+        """Position of the Board within the Project"""
+        self.update(position=position)
+
     @property
     def name(self) -> str:
         """Name/title of the Board"""
         return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the name/title of the Board"""
+        self.update(name=name)
+
     @property
-    def default_view(self):
+    def default_view(self) -> BoardView:
         """Default view for the board"""
         return self.schema['defaultView']
+    @default_view.setter
+    def default_view(self, default_view: BoardView) -> None:
+        """Set default view for the board"""
+        self.update(defaultView=default_view)
+
     @property
-    def defaultCardType(self):
+    def default_card_type(self) -> CardType:
         """Default Card type for new Cards"""
         return self.schema['defaultCardType']
+    @default_card_type.setter
+    def default_card_type(self, default_card_type: CardType) -> None:
+        """Set default Card type for new Cards"""
+        self.update(defaultCardType=default_card_type)
+
     @property
     def limit_card_types_to_default_one(self) -> bool:
         """Whether to limit Card types to default one"""
         return self.schema['limitCardTypesToDefaultOne']
+    @limit_card_types_to_default_one.setter
+    def limit_card_types_to_default_one(self, limit_card_types_to_default_one: bool) -> None:
+        """Set whether to limit Card types to default one"""
+        self.update(limitCardTypesToDefaultOne=limit_card_types_to_default_one)
+
     @property
     def always_display_card_creator(self) -> bool:
         """Whether to always display the Card creator"""
         return self.schema['alwaysDisplayCardCreator']
+    @always_display_card_creator.setter
+    def always_display_card_creator(self, always_display_card_creator: bool) -> None:
+        """Set whether to always display the Card creator"""
+        self.update(alwaysDisplayCardCreator=always_display_card_creator)
+
     @property
-    def expandTaskListsByDefault(self) -> bool:
+    def expand_task_lists_by_default(self) -> bool:
         """Whether to expand TaskLists by default"""
         return self.schema['expandTaskListsByDefault']
+    @expand_task_lists_by_default.setter
+    def expand_task_lists_by_default(self, expand_task_lists_by_default: bool) -> None:
+        """Set whether to expand TaskLists by default"""
+        self.update(expandTaskListsByDefault=expand_task_lists_by_default)
+
     @property
     def created_at(self) -> datetime:
         """When the Board was created"""
