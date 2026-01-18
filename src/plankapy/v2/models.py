@@ -368,6 +368,26 @@ class Board(PlankaModel[schemas.Board]):
         """Get all CustomFieldValues associated with the Board"""
         return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
     
+    @property
+    def archive_list(self) -> List:
+        """Get the archive List for the Board (archive List is not a normal List!)"""
+        return [l for l in self.all_lists if l.type == 'archive'].pop()
+    
+    @property
+    def trash_list(self) -> List:
+        """Get the trash List for the Board (trash List is not a normal List!)"""
+        return [l for l in self.all_lists if l.type == 'trash'].pop()
+    
+    @property
+    def active_lists(self) -> list[List]:
+        """Get all active Lists for the Board"""
+        return [l for l in self.all_lists if l.type == 'active']
+    
+    @property
+    def closed_lists(self) -> list[List]:
+        """Get all closed Lists for the Board"""
+        return [l for l in self.all_lists if l.type == 'closed']
+
     # Board props
     @property
     def subscribed(self) -> bool:
