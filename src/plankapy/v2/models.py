@@ -32,7 +32,7 @@ __all__ = (
     "CustomField", #TODO
     "CustomFieldGroup", #TODO
     "CustomFieldValue", #TODO
-    "Label", #TODO
+    "Label",
     "List", #TODO
     "Notification", #TODO
     "NotificationService", #TODO
@@ -1048,14 +1048,79 @@ class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     def update(self): ...
     def delete(self): ...
 
-   
+
+LabelColor = Literal[
+    'muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 
+    'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 
+    'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 
+    'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 
+    'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 
+    'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 
+    'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 
+    'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 
+    'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 
+    'red-burgundy', 'pirate-gold',
+]
+
 class Label(PlankaModel[schemas.Label]):
     """Python interface for Planka Labels"""
     
+    @property
+    def board(self) -> Board:
+        """The Board the Label belongs to"""
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+    
+    @property
+    def position(self) -> int:
+        """Position of the Label within the Board"""
+        return self.schema['position']
+    @position.setter
+    def position(self, position: int) -> None:
+        """Set the position of the Label within the Board"""
+        self.update()
+
+    @property
+    def name(self) -> str:
+        """Name/title of the Label"""
+        return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the name/title of the Label"""
+        self.update(name=name)
+
+    @property
+    def color(self) -> LabelColor: 
+        """Color of the label"""
+        return self.schema['color']
+    @color.setter
+    def color(self, color: LabelColor) -> None:
+        """Set the Label color"""
+        self.update(color=color)
+
+    @property
+    def created_at(self) -> datetime:
+        """When the label was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the label was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+    
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the Label with the Planka server"""
+        _lbls = [l for l in self.board.labels if l == self]
+        if _lbls:
+            self.schema = _lbls.pop().schema
+
+    def update(self, **kwargs: Unpack[paths.Request_updateLabel]):
+        """Update the Label"""
+        self.schema = self.endpoints.updateLabel(self.id, **kwargs)['item']
+
+    def delete(self):
+        """Delete the Label"""
+        return self.endpoints.deleteLabel(self.id)
 
 
 ListColor = Literal[
