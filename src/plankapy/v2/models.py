@@ -920,7 +920,7 @@ class List(PlankaModel[schemas.List]):
         """Color for the List"""
         return self.schema['color']
     @color.setter
-    def color(self, color: ListColor) -> None:
+    def color(self, color: ListColor | None) -> None:
         """Set the List color"""
         self.update(color=color)
 
