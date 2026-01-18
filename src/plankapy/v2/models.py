@@ -537,16 +537,19 @@ class Card(PlankaModel[schemas.Card]):
     def creator(self) -> User:
         """The User who Created the card"""
         return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.endpoints)
+    
     @property
     def prevlist(self) -> List:
         """The previous List the card was in (available when in archive or trash)"""
         return List(self.endpoints.getList(self.schema['prevListId'])['item'], self.endpoints)
+    
     @property
     def cover(self) -> Attachment | None:
         """The Attachment used as cover (None if no cover)"""
         for attachment in self.attachments:
             if attachment.id == self.schema['coverAttachmentId']:
                 return attachment
+            
     @cover.setter
     def cover(self, attachment: Attachment) -> None:
         """Set the Card cover"""
@@ -1280,7 +1283,7 @@ class User(PlankaModel[schemas.User]):
         self.update(defaultProjectsOrder=default_projects_order)
     
     @property
-    def termsType(self) -> TermsType:
+    def terms_type(self) -> TermsType:
         """Type of terms applicable to the user based on role"""
         return self.schema['termsType']
     
