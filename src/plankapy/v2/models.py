@@ -947,6 +947,31 @@ class List(PlankaModel[schemas.List]):
         """Delete the List"""
         return self.endpoints.deleteList(self.id)
 
+    def create_card(self, **crd: Unpack[paths.Request_createCard]) -> Card:
+        """Create a new card in the List"""
+        return Card(self.endpoints.createCard(self.id, **crd)['item'], self.endpoints)
+    
+    def sort_cards(self, **kwargs: Unpack[paths.Request_sortList]) -> list[Card]:
+        """Sort all cards in the List and return the sorted Cards"""
+        return [Card(c, self.endpoints) for c in self.endpoints.sortList(self.id, **kwargs)['included']['cards']]
+    
+    def archive_cards(self) -> None:
+        """Move all cards in the List to the Board archive"""
+        if self.type != 'closed':
+            raise TypeError(f'List {self.name} in Board {self.board.name} is type: {self.type}, must be a `closed` type')
+        self.endpoints.moveListCards(self.id, listId=self.board.archive_list.id)['item']
+
+    def delete_cards(self) -> None:
+        """Delete all Cards in the List (must be a trash list)"""
+        if self.type != 'trash':
+            raise TypeError(f'Only trash type lists can be deleted')
+        self.endpoints.clearList(self.id)['item']
+    
+    def move_cards(self, list: List, position: Literal['top', 'bottom'] | int='top') -> None:
+        """Move all Cards in this List to another List"""
+        for c in self.cards:
+            c.move(list, position)
+
   
 class Notification(PlankaModel[schemas.Notification]):
     """Python interface for Planka Notifications"""
