@@ -29,9 +29,9 @@ __all__ = (
     "CardMembership",
     "Comment",
     "Config", #TODO
-    "CustomField", #TODO
-    "CustomFieldGroup", #TODO
-    "CustomFieldValue", #TODO
+    "CustomField",
+    "CustomFieldGroup",
+    "CustomFieldValue",
     "Label",
     "List",
     "Notification", #TODO
@@ -903,6 +903,23 @@ class Card(PlankaModel[schemas.Card]):
             self.update(coverAttachmentId=a.id)
         return a
 
+    def get_field_values(self, *, with_groups: bool=False) -> dict[str, Any]:
+        """Get a mapping of CustomFields to CustomFieldValues
+        
+        Args:
+            with_groups (bool): If set to `True`, 
+                return a nested dict with `{group: {field: value, ...}, ...}`, otherwise `{field: value ...}` (default: `False`)
+        """
+        if with_groups:
+            return {
+                cfg.name: {cfv.custom_field.name: cfv.content for cfv in cfg.custom_field_values}
+                for cfg in self.custom_field_groups
+            }
+        else:
+            return {
+                cfv.custom_field.name: cfv.content
+                for cfv in self.custom_field_values
+            }
 
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
@@ -1025,29 +1042,205 @@ class Config(PlankaModel[schemas.Config]):
 class CustomField(PlankaModel[schemas.CustomField]):
     """Python interface for Planka CustomFields"""
     
+    # CustomField props
+    @property
+    def base_custom_field_group(self) -> BaseCustomFieldGroup:
+        """The BaseCustomFieldGroup the custom field belongs to"""
+        return self.custom_field_group.base_custom_field_group
+    
+    @property
+    def custom_field_group(self) -> CustomFieldGroup:
+        """The CustomFieldGroup the CustomField belongs to"""
+        return CustomFieldGroup(self.endpoints.getCustomFieldGroup(self.schema['customFieldGroupId'])['item'], self.endpoints)
+    
+    @property
+    def position(self) -> int:
+        """Position of the CustomField within the CustomFieldGroup"""
+        return self.schema['position']
+    @position.setter
+    def position(self, position: int) -> None:
+        """Set the position of the CustomField within the CustomFieldGroup"""
+        self.update(position=position)
+
+    @property
+    def name(self) -> str:
+        """Name/title of the custom field"""
+        return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        self.update(name=name)
+
+    @property
+    def show_on_front_of_card(self) -> bool:
+        """Whether to show the CustomField on the front of Cards"""
+        return self.schema['showOnFrontOfCard']
+    @show_on_front_of_card.setter
+    def show_on_front_of_card(self, show_on_front_of_card: bool) -> None:
+        """Set Wwether to show the CustomField on the front of Cards"""
+        self.update(showOnFrontOfCard=show_on_front_of_card)
+
+    @property
+    def created_at(self) -> datetime:
+        """When the custom field was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+
+    @property
+    def updated_at(self) -> datetime:
+        """When the custom field was last updated"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the CustomField with the Planka server"""
+
+    def update(self, **kwargs: Unpack[paths.Request_updateCustomField]):
+        """Update the CustomField"""
+        self.schema = self.endpoints.updateCustomField(self.id, **kwargs)['item']
+    
+    def delete(self):
+        """Delete the CustomField"""
+        self.endpoints.deleteCustomField(self.id)
 
    
 class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
     """Python interface for Planka CustomFieldGroups"""
     
+    # CustomFieldGroup included
+
+    @property
+    def _included(self):
+        return self.endpoints.getCustomFieldGroup(self.id)['included']
+
+    @property
+    def custom_fields(self) -> list[CustomField]:
+        return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+
+    @property
+    def custom_field_values(self) -> list[CustomFieldValue]:
+        return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
+
+    # CustomFieldGroup props
+
+    @property
+    def board(self) -> Board:
+        """The Board the CustomFieldGroup belongs to"""
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+    
+    @property
+    def card(self) -> Card:
+        """The Card the CustomFieldGroup belongs to"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+    
+    @property
+    def base_custom_field_group(self) -> BaseCustomFieldGroup:
+        """The BaseCustomFieldGroup used as a template"""
+        _bcfgs = [bcfg for bcfg in self.board.project.base_custom_field_groups if bcfg.id == self.schema['baseCustomFieldGroupId']]
+        return _bcfgs.pop()
+    
+    @property
+    def position(self) -> int:
+        """Position of the CustomFieldGroup within the Board/Card"""
+        return self.schema['position']
+    @position.setter
+    def position(self, position: int) -> None:
+        """Set the CustomFieldGroup position within the Board/Card"""
+        self.update(position=position) 
+
+    @property
+    def name(self) -> str:
+        """Name/title of the CustomFieldGroup"""
+        return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the CustomFieldGroup name"""
+        self.update(name=name)
+
+    @property
+    def created_at(self) -> datetime:
+        """When the CustomFieldGroup was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the CustomFieldGroup was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the CustomFieldGroup with the Planka server"""
+        self.schema = self.endpoints.getCustomFieldGroup(self.id)['item']
+    
+    def update(self, **kwargs: Unpack[paths.Request_updateCustomFieldGroup]):
+        """Update the CustomFieldGroup"""
+        self.schema = self.endpoints.updateCustomFieldGroup(self.id, **kwargs)['item']
+
+    def delete(self):
+        """Delete the CustomFieldGroup"""
+        return self.endpoints.deleteCustomFieldGroup(self.id)
 
   
 class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     """Python interface for Planka CustomFieldValues"""
     
-    # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    # CustomFieldValue props
 
+    @property
+    def card(self) -> Card:
+        """The Card the CustomFieldValue belongs to"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+    
+    @property
+    def custom_field_group(self) -> CustomFieldGroup:
+        """The CustomFieldGroup the CustomFieldValue belongs to"""
+        return CustomFieldGroup(self.endpoints.getCustomFieldGroup(self.schema['customFieldGroupId'])['item'], self.endpoints)
+
+    @property
+    def custom_field(self) -> CustomField:
+        """The CustomField the CustomFieldValue belongs to"""
+        _cfs = [cf for cf in self.custom_field_group.custom_fields if cf.id == self.schema['customFieldId']]
+        return _cfs.pop()
+
+    @property
+    def content(self) -> str:
+        """Content/value of the custom field"""
+        return self.schema['content']
+    @content.setter
+    def content(self, content: str) -> None:
+        """Set the content value of the CustomFieldValue"""
+        self.update(content=content)
+
+    @property
+    def created_at(self) -> datetime:
+        """When the CustomFieldValue was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the CustomFieldValue was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
+    # Special Methods
+    def sync(self):
+        """Sync the CustomFieldValue with the Planka server"""
+        _cfvs = [cfv for cfv in self.card.custom_field_values if cfv.id == self.id]
+        if _cfvs:
+            self.schema = _cfvs.pop().schema
+
+    def update(self, **kwargs: Unpack[paths.Request_updateCustomFieldValue]):
+        """Update the CustomFieldValue"""
+        self.schema = self.endpoints.updateCustomFieldValue(
+            cardId=self.schema['cardId'],
+            customFieldGroupId=self.schema['customFieldGroupId'],
+            customFieldId=self.schema['customFieldId'],
+            **kwargs)['item']
+    
+    def delete(self):
+        """Delete the CustomFieldValue"""
+        self.endpoints.deleteCustomFieldValue(
+            cardId=self.schema['cardId'],
+            customFieldGroupId=self.schema['customFieldGroupId'],
+            customFieldId=self.schema['customFieldId'],
+        )
 
 LabelColor = Literal[
     'muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 
