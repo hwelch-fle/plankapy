@@ -27,7 +27,7 @@ __all__ = (
     "Card",
     "CardLabel",
     "CardMembership",
-    "Comment", #TODO
+    "Comment",
     "Config", #TODO
     "CustomField", #TODO
     "CustomFieldGroup", #TODO
@@ -970,10 +970,47 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
 class Comment(PlankaModel[schemas.Comment]):
     """Python interface for Planka Comments"""
     
+    # Comment properties
+
+    @property
+    def card(self) -> Card:
+        """The Card the Comment belongs to"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+    
+    @property
+    def user(self) -> User:
+        """The User who created the Comment"""
+        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.endpoints)
+    
+    @property
+    def text(self) -> str:
+        """Content of the Comment"""
+        return self.schema['text']
+    
+    @property
+    def created_at(self) -> datetime:
+        """When the comment was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+
+    @property
+    def updated_at(self) -> datetime:
+        """When the comment was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the Comment with the Planka server"""
+        _cm = [cm for cm in self.card.comments if cm == self]
+        if _cm:
+            self.schema = _cm.pop().schema
+
+    def update(self, **kwargs: Unpack[paths.Request_updateComments]):
+        """Update the Comment (must be the comment Creator or an Admin)"""
+        self.endpoints.updateComments(self.id, **kwargs)
+
+    def delete(self):
+        """Delete the Comment"""
+        return self.endpoints.deleteComment(self.id)
 
    
 class Config(PlankaModel[schemas.Config]):
