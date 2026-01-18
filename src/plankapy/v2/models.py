@@ -335,6 +335,21 @@ class Board(PlankaModel[schemas.Board]):
         return [BoardMembership(bm, self.endpoints) for bm in self._included['boardMemberships']]
     
     @property
+    def users(self) -> list[User]:
+        """Get all Users on the Board"""
+        return [bm.user for bm in self.board_memberships]
+
+    @property
+    def editors(self) -> list[User]:
+        """Get all editor Users for the Board"""
+        return [bm.user for bm in self.board_memberships if bm.role == 'editor']
+    
+    @property
+    def viewers(self) -> list[User]:
+        """Get all viewer Users for the Board"""
+        return [bm.user for bm in self.board_memberships if bm.role == 'editor']
+
+    @property
     def all_lists(self) -> list[List]:
         """Get all Lists associated with the Board"""
         return [List(l, self.endpoints) for l in self._included['lists']]
