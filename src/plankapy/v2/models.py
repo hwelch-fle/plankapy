@@ -560,9 +560,10 @@ class Card(PlankaModel[schemas.Card]):
         return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.endpoints)
     
     @property
-    def prevlist(self) -> List:
+    def prev_list(self) -> List | None:
         """The previous List the card was in (available when in archive or trash)"""
-        return List(self.endpoints.getList(self.schema['prevListId'])['item'], self.endpoints)
+        if self.schema['prevListId']:
+            return List(self.endpoints.getList(self.schema['prevListId'])['item'], self.endpoints)
     
     @property
     def cover(self) -> Attachment | None:
