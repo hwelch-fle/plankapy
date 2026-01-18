@@ -12,7 +12,7 @@ from typing import (
 )
 
 from .api import (
-    schemas as sch,
+    schemas,
     PlankaEndpoints,
     paths,
 )
@@ -71,7 +71,7 @@ class PlankaModel(Generic[_S]):
     @property
     def id(self) -> str:
         if 'id' not in self.schema:
-            # Should only happen for sch.Config
+            # Should only happen for schemas.Config
             raise AttributeError(f'{self.__class__.__name__}: Does not have an `id` attribute')
         return self.schema['id']
     
@@ -98,7 +98,7 @@ class PlankaModel(Generic[_S]):
         return json.dumps(self.schema, **kwargs)
 
 
-class Action(PlankaModel[sch.Action]):
+class Action(PlankaModel[schemas.Action]):
     """Python interface for Planka Actions"""
     
     @property
@@ -131,7 +131,7 @@ class Action(PlankaModel[sch.Action]):
         return self.schema['type']
 
   
-class Attachment(PlankaModel[sch.Attachment]):
+class Attachment(PlankaModel[schemas.Attachment]):
     """Python interface for Planka Attachments"""
     
     @property
@@ -190,7 +190,7 @@ class Attachment(PlankaModel[sch.Attachment]):
         return self.client.get(self.schema['data']['url']).iter_bytes()
 
            
-class BackgroundImage(PlankaModel[sch.BackgroundImage]):
+class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
     """Python interface for Planka Background Images"""
 
     # BackgroundImage Properties
@@ -243,7 +243,7 @@ class BackgroundImage(PlankaModel[sch.BackgroundImage]):
         return self.endpoints.deleteBackgroundImage(self.id)
 
     
-class BaseCustomFieldGroup(PlankaModel[sch.BaseCustomFieldGroup]):
+class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
     """Python interface for Planka BaseCustomFieldGroups"""
 
     # BaseCustomFieldGroup Properties
@@ -289,7 +289,7 @@ class BaseCustomFieldGroup(PlankaModel[sch.BaseCustomFieldGroup]):
 BoardView = Literal['kanban', 'grid', 'list']
 CardType = Literal['project', 'story']
 
-class Board(PlankaModel[sch.Board]):
+class Board(PlankaModel[schemas.Board]):
     """Python interface for Planka Boards"""
     
     @property
@@ -454,7 +454,7 @@ class Board(PlankaModel[sch.Board]):
         return self.endpoints.deleteBoard(self.id)
 
 
-class BoardMembership(PlankaModel[sch.BoardMembership]):
+class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
 
 
@@ -464,7 +464,7 @@ class BoardMembership(PlankaModel[sch.BoardMembership]):
     def delete(self): ...
 
 
-class Card(PlankaModel[sch.Card]):
+class Card(PlankaModel[schemas.Card]):
     """Python interface for Planka Cards"""
     
     @property
@@ -702,7 +702,7 @@ class Card(PlankaModel[sch.Card]):
         return a
 
 
-class CardLabel(PlankaModel[sch.CardLabel]):
+class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
 
     # Special Methods
@@ -711,7 +711,7 @@ class CardLabel(PlankaModel[sch.CardLabel]):
     def delete(self): ...
 
 
-class CardMembership(PlankaModel[sch.CardMembership]):
+class CardMembership(PlankaModel[schemas.CardMembership]):
     """Python interface for Planka CardMemberships"""
 
     # Special Methods
@@ -720,7 +720,7 @@ class CardMembership(PlankaModel[sch.CardMembership]):
     def delete(self): ...
 
    
-class Comment(PlankaModel[sch.Comment]):
+class Comment(PlankaModel[schemas.Comment]):
     """Python interface for Planka Comments"""
     
     # Special Methods
@@ -729,7 +729,7 @@ class Comment(PlankaModel[sch.Comment]):
     def delete(self): ...
 
    
-class Config(PlankaModel[sch.Config]):
+class Config(PlankaModel[schemas.Config]):
     """Python interface for Planka Config"""
     
     # Special Methods
@@ -738,7 +738,7 @@ class Config(PlankaModel[sch.Config]):
     def delete(self): ...
 
   
-class CustomField(PlankaModel[sch.CustomField]):
+class CustomField(PlankaModel[schemas.CustomField]):
     """Python interface for Planka CustomFields"""
     
     # Special Methods
@@ -747,7 +747,7 @@ class CustomField(PlankaModel[sch.CustomField]):
     def delete(self): ...
 
    
-class CustomFieldGroup(PlankaModel[sch.CustomFieldGroup]):
+class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
     """Python interface for Planka CustomFieldGroups"""
     
     # Special Methods
@@ -756,7 +756,7 @@ class CustomFieldGroup(PlankaModel[sch.CustomFieldGroup]):
     def delete(self): ...
 
   
-class CustomFieldValue(PlankaModel[sch.CustomFieldValue]):
+class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     """Python interface for Planka CustomFieldValues"""
     
     # Special Methods
@@ -765,7 +765,7 @@ class CustomFieldValue(PlankaModel[sch.CustomFieldValue]):
     def delete(self): ...
 
    
-class Label(PlankaModel[sch.Label]):
+class Label(PlankaModel[schemas.Label]):
     """Python interface for Planka Labels"""
     
     # Special Methods
@@ -779,7 +779,7 @@ ListColor = Literal[
     'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 
     'dark-granite', 'turquoise-sea',
 ]
-class List(PlankaModel[sch.List]):
+class List(PlankaModel[schemas.List]):
     """Python interface for Planka Lists"""
     
     # List Included
@@ -878,7 +878,7 @@ class List(PlankaModel[sch.List]):
         return self.endpoints.deleteList(self.id)
 
   
-class Notification(PlankaModel[sch.Notification]):
+class Notification(PlankaModel[schemas.Notification]):
     """Python interface for Planka Notifications"""
     
     # Special Methods
@@ -887,7 +887,7 @@ class Notification(PlankaModel[sch.Notification]):
     def delete(self): ...
 
   
-class NotificationService(PlankaModel[sch.NotificationService]):
+class NotificationService(PlankaModel[schemas.NotificationService]):
     """Python interface for Planka NotificationServices"""
     
     # Special Methods
@@ -906,7 +906,7 @@ BackgroundGradient = Literal[
     'red-curtain'
 ]
 
-class Project(PlankaModel[sch.Project]):
+class Project(PlankaModel[schemas.Project]):
     """Python interface for Planka Projects"""
     
     # Project Included
@@ -1062,7 +1062,7 @@ class Project(PlankaModel[sch.Project]):
             project_manager.delete()
 
 
-class ProjectManager(PlankaModel[sch.ProjectManager]):
+class ProjectManager(PlankaModel[schemas.ProjectManager]):
     """Python interface for Planka ProjectManagers"""
     
     # ProjectManager Properties
@@ -1097,7 +1097,7 @@ class ProjectManager(PlankaModel[sch.ProjectManager]):
         self.endpoints.deleteProjectManager(self.id)
 
    
-class Task(PlankaModel[sch.Task]):
+class Task(PlankaModel[schemas.Task]):
     """Python interface for Planka Tasks"""
     
     # Special Methods
@@ -1106,7 +1106,7 @@ class Task(PlankaModel[sch.Task]):
     def delete(self): ...
 
  
-class TaskList(PlankaModel[sch.TaskList]):
+class TaskList(PlankaModel[schemas.TaskList]):
     """Python interface for Planka TaskLists"""
     
     # Special Methods
@@ -1129,7 +1129,7 @@ ProjectOrdering = Literal['byDefault', 'alphabetically', 'byCreationTime']
 TermsType = Literal['general', 'extended']
 LockableField = Literal['email', 'password', 'name']
 
-class User(PlankaModel[sch.User]):
+class User(PlankaModel[schemas.User]):
     """Python interface for Planka Users"""
 
     @property
@@ -1321,7 +1321,7 @@ class User(PlankaModel[sch.User]):
         return self.endpoints.deleteUser(self.id)
 
 
-class Webhook(PlankaModel[sch.Webhook]):
+class Webhook(PlankaModel[schemas.Webhook]):
     """Python interface for Planka Webhooks"""
     
     # Special Methods

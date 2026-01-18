@@ -1,6 +1,12 @@
-from .api import PlankaEndpoints
+from __future__ import annotations
+from typing import Unpack
+
 from httpx import Client
-from .models import *
+from .api import (
+    PlankaEndpoints, 
+    typ, # Response / Request typing
+)
+from . import models
 
 class Planka:
     def __init__(self, client: Client, lang: str='en_US') -> None:
@@ -37,8 +43,74 @@ class Planka:
     def users(self) -> list[User]:
         """Get all Users on the current instance"""
         return [User(u, self.endpoints) for u in self.endpoints.getUsers()['items']]
-    
-    @property
-    def me(self) -> User:
-        """The current logged on user"""
-        return User(self.client.get('/api/me').json()['item'], self.endpoints)
+class Action(models.Action): ...
+
+
+class Attachment(models.Attachment): ...
+
+
+class BackgroundImage(models.BackgroundImage): ...
+
+
+class BaseCustomFieldGroup(models.BaseCustomFieldGroup): ...
+
+
+class Board(models.Board): ...
+
+
+class BoardMembership(models.BoardMembership): ...
+
+
+class Card(models.Card): ...
+
+
+class CardLabel(models.CardLabel): ...
+
+
+class CardMembership(models.CardMembership): ...
+
+
+class Comment(models.Comment): ...
+
+
+class Config(models.Config): ...
+
+
+class CustomField(models.CustomField): ...
+
+
+class CustomFieldGroup(models.CustomFieldGroup): ... 
+
+
+class CustomFieldValue(models.CustomFieldValue): ... 
+
+
+class Label(models.Label): ... 
+
+
+class List(models.List): ... 
+
+
+class Notification(models.Notification): ... 
+
+
+class NotificationService(models.NotificationService): ... 
+
+
+class Project(models.Project): ...
+
+
+class ProjectManager(models.ProjectManager): ...
+
+
+class Task(models.Task): ... 
+
+
+class TaskList(models.TaskList): ... 
+
+
+class User(models.User): ...
+
+
+class Webhook(models.Webhook): ...
+
