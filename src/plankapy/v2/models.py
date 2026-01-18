@@ -664,7 +664,12 @@ class Card(PlankaModel[schemas.Card]):
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Card"""
         return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
-     
+    
+    @property
+    def comments(self) -> list[Comment]:
+        """Get all Comments on the Card"""
+        return [Comment(c, self.endpoints) for c in self.endpoints.getComments(self.id)['items']]
+
     # Card props
     @property
     def subscribed(self) -> bool:
