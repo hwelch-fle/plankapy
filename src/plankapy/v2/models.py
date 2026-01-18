@@ -464,6 +464,10 @@ class Board(PlankaModel[schemas.Board]):
         """Delete the Board"""
         return self.endpoints.deleteBoard(self.id)
 
+    def create_list(self, **lst: Unpack[paths.Request_createList]) -> List:
+        """Create a new list on the Board"""
+        return List(self.endpoints.createList(self.id, **lst)['item'], self.endpoints)
+
 
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
