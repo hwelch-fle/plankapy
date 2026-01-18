@@ -40,7 +40,7 @@ __all__ = (
     "ProjectManager",
     "Task", #TODO
     "TaskList", #TODO
-    "User", #TODO
+    "User",
     "Webhook", #TODO
 )
 
@@ -237,11 +237,7 @@ class BackgroundImage(PlankaModel[sch.BackgroundImage]):
         """
         for size, url in self.thumbnails.items():
             yield size, self.client.get(url).iter_bytes()
-    
-    #def sync(self):
-    #    """Sync the BackgroundImage with the Planka server"""
-    #    self.schema = self.board
-    
+        
     def delete(self):
         """Delete the BackgroundImage"""
         return self.endpoints.deleteBackgroundImage(self.id)
@@ -277,7 +273,7 @@ class Board(PlankaModel[sch.Board]):
     
     @property
     def url(self) -> str:
-        return str(self.client.base_url.join(f'/api/boards/{self.id}'))
+        return str(self.client.base_url.join(f'/boards/{self.id}'))
     
     # Included objects
     @property
@@ -416,7 +412,7 @@ class Card(PlankaModel[sch.Card]):
     @property
     def url(self) -> str:
         """The URL to the card"""
-        return str(self.client.base_url.join(f'/api/cards/{self.id}'))
+        return str(self.client.base_url.join(f'/cards/{self.id}'))
     
     # Included objects
     @property
