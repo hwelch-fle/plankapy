@@ -800,28 +800,45 @@ class List(PlankaModel[schemas.List]):
         return [Card(c, self.endpoints) for c in self._included['cards']]
     
     @property
-    def cardMemberships(self) -> list[CardMembership]:
+    def card_memberships(self) -> list[CardMembership]:
         """CardMemberships associated with the List"""
         return [CardMembership(cm, self.endpoints) for cm in self._included['cardMemberships']]
     
     @property
-    def cardLabels(self) -> list[CardLabel]:
+    def card_labels(self) -> list[CardLabel]:
         """CardLabels associated with the List"""
         return [CardLabel(cl, self.endpoints) for cl in self._included['cardLabels']]
     
     @property
-    def taskLists(self) -> list[TaskList]: ...
-    @property
-    def tasks(self) ->  list[Task]: ...
-    @property
-    def attachments(self) -> list[Attachment]: ...
-    @property
-    def customFieldGroups(self) ->  list[CustomFieldGroup]: ...
-    @property
-    def customFields(self) ->  list[CustomField]: ...
-    @property
-    def customFieldValues(self) -> list[CustomFieldValue]: ...
+    def task_lists(self) -> list[TaskList]:
+        """TaskLists associated with the List"""
+        return [TaskList(tl, self.endpoints) for tl in self._included['taskLists']]
     
+    @property
+    def tasks(self) ->  list[Task]:
+        """Tasks associated with the List"""
+        return [Task(t, self.endpoints) for t in self._included['tasks']]
+
+    @property
+    def attachments(self) -> list[Attachment]:
+        """Attachments associated with the List"""
+        return [Attachment(a, self.endpoints) for a in self._included['attachments']]
+
+    @property
+    def custom_field_groups(self) ->  list[CustomFieldGroup]:
+        """CustomFieldGroups associated with the List"""
+        return [CustomFieldGroup(cfg, self.endpoints) for cfg in self._included['customFieldGroups']]
+
+    @property
+    def custom_fields(self) ->  list[CustomField]:
+        """CustomFields associated with the List"""
+        return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+
+    @property
+    def custom_field_values(self) -> list[CustomFieldValue]:
+        """CustomFieldValues associated with the List"""
+        return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
+
     # List Properties
     @property
     def board(self) -> Board:
