@@ -1061,9 +1061,198 @@ class TaskList(PlankaModel[sch.TaskList]):
     def delete(self): ...
 
 
+# User Literals
+Language = Literal[
+    'ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 
+    'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 
+    'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 
+    'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 
+    'zh-CN', 'zh-TW',
+]
+EditorMode = Literal['wysiwyg', 'markup']
+HomeView = Literal['gridProjects', 'groupedProjects']
+ProjectOrdering = Literal['byDefault', 'alphabetically', 'byCreationTime']
+TermsType = Literal['general', 'extended']
+LockableField = Literal['email', 'password', 'name']
+
 class User(PlankaModel[sch.User]):
     """Python interface for Planka Users"""
+
+    @property
+    def email(self) -> str | None:
+        """Email address for login and notifications (private field)"""
+        return self.schema.get('email')
+    @email.setter
+    def email(self, email: str|None) -> None:
+        """Set the User email"""
+        self.update()
+
+    @property
+    def role(self):
+        """User role defining access permissions"""
+        return self.schema['role']
+    @role.setter
+    def role(self, role: Literal['admin', 'projectOwner', 'boardUser']) -> None:
+        """Set the User role"""
+        self.update(role=role)
+
+    @property
+    def name(self) -> str:
+        """Full display name of the user"""
+        return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the User's name"""
+        self.update(name=name)
+
+    @property
+    def username(self) -> str:
+        """Unique username for user identification"""
+        return self.schema['username']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the User's username"""
+        self.update(name=name)
+
+    @property
+    def avatar(self) -> dict[str, Any]:
+        """Avatar information for the user with generated URLs"""
+        return self.schema['avatar']
+    @avatar.setter
+    def avatar(self, avatar: Any) -> None:
+        """Set the User's avatar"""
+        raise NotImplementedError('Avatar setting has not been implemented') 
     
+    @property
+    def gravatar_url(self) -> str | None:
+        """Gravatar URL for the user (conditionally added if configured)"""
+        return self.schema.get('gravatarUrl')
+    
+    @property
+    def phone(self) -> str:
+        """Contact phone number"""
+        return self.schema['phone']
+    @phone.setter
+    def phone(self, phone: str) -> None:
+        """Set the User's phone"""
+        self.update(phone=phone)
+
+    @property
+    def organization(self) -> str:
+        """Organization or company name"""
+        return self.schema['organization']
+    @organization.setter
+    def organization(self, organization: str) -> None:
+        """Set the User's organization"""
+        self.update(organization=organization)
+
+    @property
+    def language(self) -> Language | None:
+        """Preferred language for user interface and notifications (personal field)"""
+        return self.schema.get('language')
+    @language.setter
+    def language(self, language: Language) -> None:
+        """Set the User's language"""
+        self.update(language=language)
+
+    @property
+    def subscribe_to_own_cards(self) -> bool:
+        """Whether the user subscribes to their own cards (personal field)"""
+        return self.schema.get('subscribeToOwnCards', False)
+    @subscribe_to_own_cards.setter
+    def subscribe_to_own_cards(self, subscribe_to_own_cards: bool) -> None:
+        """Set Whether the user subscribes to their own cards (personal field)"""
+        self.update(subscribeToOwnCards=subscribe_to_own_cards)
+
+    @property
+    def subscribe_to_card_when_commenting(self) -> bool:
+        """Whether the user subscribes to cards when commenting (personal field)"""
+        return self.schema.get('subscribeToCardWhenCommenting', False)
+    @subscribe_to_card_when_commenting.setter
+    def subscribe_to_card_when_commenting(self, subscribe_to_card_when_commenting: bool) -> None:
+        """Set whether the user subscribes to cards when commenting (personal field)"""
+        self.update(subscribeToCardWhenCommenting=subscribe_to_card_when_commenting)
+
+    @property
+    def turn_off_recent_card_highlighting(self) -> bool:
+        """Whether recent card highlighting is disabled (personal field)"""
+        return self.schema.get('turnOffRecentCardHighlighting', False)
+    @turn_off_recent_card_highlighting.setter
+    def turn_off_recent_card_highlighting(self, turn_off_recent_card_highlighting: bool) -> None:
+        """Set whether recent card highlighting is disabled (personal field)"""
+        self.update(turnOffRecentCardHighlighting=turn_off_recent_card_highlighting)
+
+    @property
+    def enable_favorites_by_default(self) -> bool:
+        """Whether favorites are enabled by default (personal field)"""
+        return self.schema.get('enableFavoritesByDefault', False)
+    @enable_favorites_by_default.setter
+    def enable_favorites_by_default(self, enable_favorites_by_default: bool) -> None:
+        """Set whether favorites are enabled by default (personal field)"""
+        self.update(enableFavoritesByDefault=enable_favorites_by_default)
+
+    @property
+    def default_editor_mode(self) -> EditorMode:
+        """Default markdown editor mode (personal field)"""
+        return self.schema.get('defaultEditorMode', 'wysiwyg')
+    @default_editor_mode.setter
+    def default_editor_mode(self, default_editor_mode: EditorMode) -> None:
+        """Set default markdown editor mode (personal field)"""
+        self.update(defaultEditorMode=default_editor_mode)
+
+    @property
+    def default_home_view(self) -> HomeView | None:
+        """Default view mode for the home page (personal field)"""
+        return self.schema.get('defaultHomeView')
+    @default_home_view.setter
+    def default_home_view(self, default_home_view: HomeView) -> None:
+        """Default view mode for the home page (personal field)"""
+        self.update(defaultHomeView=default_home_view)
+
+    @property
+    def default_projects_order(self) -> ProjectOrdering | None:
+        """Default sort order for projects display (personal field)"""
+        return self.schema.get('defaultProjectsOrder')
+    @default_projects_order.setter
+    def default_projects_order(self, default_projects_order: ProjectOrdering) -> None:
+        """Default sort order for projects display (personal field)"""
+        self.update(defaultProjectsOrder=default_projects_order)
+    
+    @property
+    def termsType(self) -> TermsType:
+        """Type of terms applicable to the user based on role"""
+        return self.schema['termsType']
+    
+    @property
+    def is_sso_user(self) -> bool:
+        """Whether the user is SSO user (private field)"""
+        return self.schema.get('isSsoUser', False)
+    
+    @property
+    def is_deactivated(self) -> bool:
+        """Whether the user account is deactivated and cannot log in"""
+        return self.schema['isDeactivated']
+    
+    @property
+    def is_default_admin(self) -> bool:
+        """Whether the user is the default admin (visible only to current user or admin)"""
+        return self.schema.get('isDefaultAdmin', False)
+    
+    @property
+    def locked_field_names(self) -> list[LockableField]:
+        """List of fields locked from editing (visible only to current user or admin)"""
+        return self.schema.get('lockedFieldNames', [])
+    
+    @property
+    def created_at(self) -> datetime:
+        """When the user was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the user was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
     # Special Methods
     def sync(self): ...
     def update(self): ...
