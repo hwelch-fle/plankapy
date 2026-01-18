@@ -252,6 +252,25 @@ class BaseCustomFieldGroup(PlankaModel[sch.BaseCustomFieldGroup]):
         """The Project that the BaseCustomFieldGroup is associated with"""
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
 
+    @property
+    def name(self) -> str:
+        """Name/title of the base custom field group"""
+        return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the name/title of the base custom field group"""
+        self.update(name=name)
+    
+    @property
+    def created_at(self) -> datetime:
+        """When the base custom field group was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the base custom field group was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
     # Special Methods
     def sync(self):
         """Sync the BaseCustomFieldGroup with the Planka server"""
