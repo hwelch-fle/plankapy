@@ -6,7 +6,7 @@ from .api import (
     PlankaEndpoints, 
     typ, # Response / Request typing
 )
-from . import models
+from models import *
 
 class Planka:
     def __init__(self, client: Client, lang: str='en_US') -> None:
@@ -14,10 +14,7 @@ class Planka:
         self.endpoints = PlankaEndpoints(client)
         self.lang = lang
         
-    def logon(self, username: str, password: str, 
-              *, token: str='', 
-              accept_terms: bool=False
-        ):
+    def logon(self, username: str, password: str, *, token: str='', accept_terms: bool=False):
         """Authenticate with the planka instance"""
         if not token:
             token = self.endpoints.createAccessToken(
@@ -32,8 +29,14 @@ class Planka:
         self.client.headers['Authorization'] = f'Bearer {token}'
     
     def logout(self) -> None:
+        """Logout the current User"""
         self.endpoints.deleteAccessToken()
     
+    @property
+    def me(self) -> User:
+        """Get the User object for the currently logged in user"""
+        return User(self.endpoints.getUser('me')['item'], self.endpoints)
+
     @property
     def projects(self) -> list[Project]:
         """Get all Projects available to the current user"""
@@ -43,74 +46,53 @@ class Planka:
     def users(self) -> list[User]:
         """Get all Users on the current instance"""
         return [User(u, self.endpoints) for u in self.endpoints.getUsers()['items']]
-class Action(models.Action): ...
 
+    def create_project(self, **kwargs: Unpack[typ.Request_createProject]) -> Project:
+        """Creates a project. The current user automatically becomes a project manager.
 
-class Attachment(models.Attachment): ...
+        Args:
+            type (Literal['public', 'private']): Type of the project
+            name (str): Name/title of the project
+            description (str): Detailed description of the project
 
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
 
-class BackgroundImage(models.BackgroundImage): ...
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+        """
+        return Project(self.endpoints.createProject(**kwargs)['item'], self.endpoints)
+    
+    def create_user(self, **kwargs: Unpack[typ.Request_createUser]) -> User:
+        """Creates a user account. Requires admin privileges.
 
+        Args:
+            email (str): Email address for login and notifications
+            password (str): Password for user authentication (must meet password requirements)
+            role (Literal['admin', 'projectOwner', 'boardUser']): User role defining access permissions
+            name (str): Full display name of the user
+        
+        Optional:
+            username (str): Unique username for user identification
+            phone (str): Contact phone number
+            organization (str): Organization or company name
+            language (LanguageCode): Preferred language for user interface and notifications (example: 'en-US')
+            subscribeToOwnCards (bool): Whether the user subscribes to their own cards
+            subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
+            turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
 
-class BaseCustomFieldGroup(models.BaseCustomFieldGroup): ...
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            Planka internal status errors are included here for disambiguation
 
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            Forbidden: 403 
+            Conflict: 409 
+        """
+        return User(self.endpoints.createUser(**kwargs)['item'], self.endpoints)
 
-class Board(models.Board): ...
-
-
-class BoardMembership(models.BoardMembership): ...
-
-
-class Card(models.Card): ...
-
-
-class CardLabel(models.CardLabel): ...
-
-
-class CardMembership(models.CardMembership): ...
-
-
-class Comment(models.Comment): ...
-
-
-class Config(models.Config): ...
-
-
-class CustomField(models.CustomField): ...
-
-
-class CustomFieldGroup(models.CustomFieldGroup): ... 
-
-
-class CustomFieldValue(models.CustomFieldValue): ... 
-
-
-class Label(models.Label): ... 
-
-
-class List(models.List): ... 
-
-
-class Notification(models.Notification): ... 
-
-
-class NotificationService(models.NotificationService): ... 
-
-
-class Project(models.Project): ...
-
-
-class ProjectManager(models.ProjectManager): ...
-
-
-class Task(models.Task): ... 
-
-
-class TaskList(models.TaskList): ... 
-
-
-class User(models.User): ...
-
-
-class Webhook(models.Webhook): ...
 
