@@ -667,7 +667,16 @@ class Card(PlankaModel[schemas.Card]):
         self.schema = self.endpoints.getCard(self.id)['item']
         
     def update(self, **card: Unpack[paths.Request_updateCard]):
-        """Update the Card"""
+        """Update the Card
+
+        Note:
+            dueDate can be set using iso string or datetime object
+        """
+        # Convert the dueDate to a iso string if a datetime is passed
+        if 'dueDate' in card and isinstance(card['dueDate'], datetime):
+            card['dueDate'] = card['dueDate'].isoformat()
+        if 'type' not in card:
+            card['type'] = self.schema['type']
         self.schema = self.endpoints.updateCard(self.id, **card)['item']
  
     def delete(self):
