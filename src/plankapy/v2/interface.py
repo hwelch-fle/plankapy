@@ -1,5 +1,4 @@
 from __future__ import annotations
-from functools import cached_property
 from typing import Unpack
 
 from httpx import Client
@@ -33,12 +32,12 @@ class Planka:
         """Logout the current User"""
         self.endpoints.deleteAccessToken()
     
-    @cached_property
+    @property
     def me(self) -> User:
         """Get the User object for the currently logged in user"""
         return User(self.endpoints.getUser('me')['item'], self)
 
-    @cached_property
+    @property
     def config(self) -> Config:
         """Get the configuration info for the current Planka server"""
         return Config(self.endpoints.getConfig()['item'], self)
