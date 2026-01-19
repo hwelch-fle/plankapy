@@ -25,6 +25,10 @@ class Planka:
             lang = DEFAULT_LANG
         self.lang = lang
         
+        # Assigned after logon() is called
+        self.current_role = None
+        self.current_id = None
+        
     def logon(self, username: str, password: str, *, token: str='', accept_terms: bool=False):
         """Authenticate with the planka instance"""
         if not token:
@@ -38,6 +42,8 @@ class Planka:
             self.endpoints.getTerms(type='general', language=self.lang)
             self.endpoints.acceptTerms(pendingToken=token, signature=None)
         self.client.headers['Authorization'] = f'Bearer {token}'
+        self.current_role = self.me.role
+        self.current_id = self.me.id
     
     def logout(self) -> None:
         """Logout the current User"""
