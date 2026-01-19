@@ -33,7 +33,7 @@ __all__ = (
     "CustomFieldValue",
     "Label",
     "List",
-    "Notification", #TODO
+    "Notification",
     "NotificationService", #TODO
     "Project",
     "ProjectManager",
@@ -55,10 +55,10 @@ __all__ = (
     "ProjectOrderings",
     "TermsTypes",
     "LockableFields",
+    "NotificationTypes",
 )
 
 TYPE_CHECKING = False
-
 if TYPE_CHECKING:
     # Models take a Planka session to allow checking User permissions
     from .interface import Planka
@@ -745,6 +745,11 @@ class Card(PlankaModel[schemas.Card]):
     def comments(self) -> list[Comment]:
         """Get all Comments on the Card"""
         return [Comment(c, self.session) for c in self.endpoints.getComments(self.id)['items']]
+
+    @property
+    def actions(self) -> list[Action]:
+        """Get all Actions associated with the Card"""
+        return [Action(a, self.session) for a in self.endpoints.getCardActions(self.id)['items']]
 
     # Card props
     @property
@@ -1585,14 +1590,90 @@ class List(PlankaModel[schemas.List]):
         for c in self.cards:
             c.move(list, position)
 
-  
+NotificationType = Literal['moveCard', 'commentCard', 'addMemberToCard', 'mentionInComment']
+NotificationTypes: tuple[NotificationType] = NotificationType.__args__
+
 class Notification(PlankaModel[schemas.Notification]):
     """Python interface for Planka Notifications"""
     
+    # Notification included
+    @property
+    def _included(self):
+        return self.endpoints.getNotification(self.id)['included']
+    
+    @property
+    def users(self) -> list[User]:
+        """All Users associated with the Notification"""
+        return [User(u, self.session) for u in self._included['users']]
+    
+    # Notification props
+    @property
+    def user(self) -> User:
+        """The User who receives the Notification"""
+        return [u for u in self.users if self.schema['userId'] == u.id].pop()
+    
+    @property
+    def creator(self) -> User:
+        """The User who created the Notification"""
+        return [u for u in self.users if self.schema['creatorUserId'] == u.id].pop()
+        
+    @property
+    def board(self) -> Board:
+        """The Board associated with the Notification (denormalized)"""
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
+    
+    @property
+    def card(self) -> Card:
+        """The Card associated with the Notification"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
+    
+    @property
+    def comment(self) -> Comment:
+        """The Comment associated with the Notification"""
+        return [c for c in self.card.comments if c.id == self.schema['commentId']].pop()
+    
+    @property
+    def action(self) -> Action:
+        """The Action associated with the Notification"""
+        return [a for a in self.card.actions if a.id == self.schema['actionId']].pop()
+        
+    @property
+    def type(self) -> NotificationType:
+        """Type of the Notification"""
+        return self.schema['type']
+    
+    @property
+    def data(self) -> dict[str, Any]:
+        """Notification specific data (varies by type)"""
+        return self.schema['data']
+        
+    @property
+    def is_read(self) -> bool:
+        """Whether the Notification has been read"""
+        return self.schema['isRead']
+    @is_read.setter
+    def is_read(self, is_read: bool) -> None:
+        """Set the read status of the Notification"""
+        self.update(isRead=is_read)
+    
+    @property
+    def created_at(self) -> datetime:
+        """When the Notification was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the Notification was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+    
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the Notification with the Planka server"""
+        self.schema = self.endpoints.getNotification(self.id)['item']
+ 
+    def update(self, **kwargs: Unpack[paths.Request_updateNotification]) -> None:
+        """Update the Notification"""
+        self.schema = self.endpoints.updateNotification(self.id, **kwargs)['item']
 
   
 class NotificationService(PlankaModel[schemas.NotificationService]):
