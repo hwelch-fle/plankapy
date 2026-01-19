@@ -565,9 +565,27 @@ class Board(PlankaModel[schemas.Board]):
         """Create a new List on the Board"""
         return List(self.endpoints.createList(self.id, **lst)['item'], self.session)
 
+    def remove_list(self, list: List) -> None:
+        """Remove a List from the Board
+        
+        Args:
+            list (List): The list to remove (must be associated with the Board and not `trash` or `archive`)
+        """
+        if list in self.active_lists:
+            list.delete()
+
     def create_label(self, **lbl: Unpack[paths.Request_createLabel]) -> Label:
         """Create a new Label on the Board"""
         return Label(self.endpoints.createLabel(self.id, **lbl)['item'], self.session)
+    
+    def remove_label(self, label: Label) -> None:
+        """Remove a Label from the Board
+        
+        Args:
+            label (Label): The Label to remove (must be associated with the board)
+        """
+        if label in self.labels:
+            label.delete()
     
     def add_member(self, user: User, 
                    *,
@@ -685,7 +703,8 @@ class Board(PlankaModel[schemas.Board]):
         """
         for user in users:
             self.remove_user(user)
-    
+
+   
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
     
@@ -790,10 +809,14 @@ class Card(PlankaModel[schemas.Card]):
         return [cm.user for cm in self.card_memberships]
     
     @property
+    def card_labels(self) -> list[CardLabel]:
+        """Get all CardLabel associations for the Card"""
+        return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
+    
+    @property
     def labels(self) -> list[Label]:
         """Get all Labels associated with the Card"""
-        _card_label_ids = [l['id'] for l in self._included['cardLabels']]
-        return [l for l in self.board.labels if l.id in _card_label_ids]
+        return [cl.label for cl in self.card_labels]
     
     @property
     def tasks(self) -> list[Task]:
@@ -1186,6 +1209,46 @@ class Card(PlankaModel[schemas.Card]):
             if cm.user == user:
                 cm.delete()
 
+    def add_label(self, label: Label, 
+                  *, 
+                  add_to_board: bool=False) -> CardLabel:
+        """Add a Label to the Card
+        
+        Args:
+            label (Label): The Label to add to the card
+            add_to_board (bool): If the Label is not in the board, add it (default: `False`)
+        
+        Returns:
+            CardLabel: The CardLabel relationship
+        
+        Raises:
+            LookupError: If the Label is not in the Board and `add_to_board` is not set
+        
+        Note:
+            When using `add_to_board` The label position will default to the top of the label list
+        """
+        # Handle adding Label if it doesn't exist
+        if label not in self.board.labels:
+            if add_to_board:
+                label = label.add_to_board(self.board)
+            else:
+                raise LookupError(
+                    f'Label ({label.name}:{label.id}) not found in Board ({self.board.name}:{self.board.id})\n'
+                    'run with `add_to_board` flag set to add this label to the board'
+                )
+        return CardLabel(self.endpoints.createCardLabel(self.id, labelId=label.id)['item'], self.session)
+      
+    def remove_label(self, label: Label) -> None:
+        """Remove the Label from the Card
+        
+        Args:
+            label (Label): The label to remove (must be associated with the Card)
+        """
+        for card_label in self.card_labels:
+            if card_label == label:
+                card_label.delete()
+            
+
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
 
@@ -1318,7 +1381,8 @@ class Config(PlankaModel[schemas.Config]):
     def oidc(self) -> dict[str, Any] | None:
         """OpenID Connect configuration (null if not configured)"""
         return self.schema.get('oidc')
-  
+
+ 
 class CustomField(PlankaModel[schemas.CustomField]):
     """Python interface for Planka CustomFields"""
     
@@ -1546,7 +1610,8 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
         """
         if field in self.custom_fields:
             field.delete()
-  
+
+ 
 class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     """Python interface for Planka CustomFieldValues"""
     
@@ -1684,6 +1749,59 @@ class Label(PlankaModel[schemas.Label]):
         """Delete the Label"""
         return self.endpoints.deleteLabel(self.id)
 
+    def add_to_board(self, board: Board, 
+                     *, 
+                     position: Literal['top', 'bottom'] | int='top',
+                     color: LabelColor|None=None) -> Label:
+        """Add the label to another Board
+        
+        Args:
+            board (Board): The Board to add the Label to
+            position (Literal['top', 'bottom'] | int): The position of the Label within the Board (default: `top`)
+            color (LabelColor | None): Optionally change the LabelColor in the new Board
+        
+        Returns:
+            Label: The new Label
+            
+        Note:
+            If you attempt to add a label to a Board with an existing Label that has both 
+            matching color and name properties, that label will be returned
+        """
+        # Don't re-add label to same board
+        if board == self.board:
+            return self
+        
+        _schema = self.schema.copy()
+        # Set new boardId
+        _schema['boardId'] = board.id
+        
+        # Set position
+        if isinstance(position, int):
+            pass
+        elif position == 'top':
+            position = 0
+        else:
+            position = max((l.position for l in board.labels), default=-1) + 1
+        _schema['position'] = position
+        
+        # Don't add the Label if one with matching name and color exists
+        _existing_labels = board.labels
+        if (self.name, self.color) in [(lbl.name, lbl.color) for lbl in _existing_labels]:
+            return [lbl for lbl in _existing_labels if (self.name, self.color) == (lbl.name, lbl.color)].pop()
+        
+        # Update color
+        if color:
+            _schema['color'] = color
+        return Label(self.endpoints.createLabel(**_schema)['item'], self.session)
+
+    def gather_cards(self) -> list[Card]:
+        """All Cards that have this Label"""
+        return [
+            cl.card
+            for cl in self.board.card_labels
+            # Avoid initializing another Label
+            if cl.schema['labelId'] == self.schema['id']
+        ]
 
 ListColor = Literal[
     'berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 
@@ -2374,7 +2492,7 @@ class TaskList(PlankaModel[schemas.TaskList]):
 
     def add_task(self, name: str, *, 
                  is_completed: bool=False, 
-                 position: Literal['top', 'bottom'] | int='bottom') -> Task:
+                 position: Literal['top', 'bottom'] | int='top') -> Task:
         """Create a new Task in the TaskList"""
         if not isinstance(position, int):
             if position == 'top':
