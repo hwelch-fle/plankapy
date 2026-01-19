@@ -1,6 +1,7 @@
 from __future__ import annotations
 from functools import cached_property
 from typing import Unpack
+from warnings import warn
 
 from httpx import Client
 from .api import (
@@ -9,10 +10,19 @@ from .api import (
 )
 from .models import *
 
+# Allow Users to set `PLANKA_LANG` environment variable with their language
+# Default to en-US if not set
+import os
+DEFAULT_LANG = os.environ.get('PLANKA_LANG', 'en-US')
+del os
+
 class Planka:
-    def __init__(self, client: Client, lang: str='en_US') -> None:
+    def __init__(self, client: Client, lang: str=DEFAULT_LANG) -> None:
         self.client = client
         self.endpoints = PlankaEndpoints(client)
+        if lang not in Languages:
+            warn(f'{lang} is not currently supported by Planka, using {DEFAULT_LANG}', EncodingWarning)
+            lang = DEFAULT_LANG
         self.lang = lang
         
     def logon(self, username: str, password: str, *, token: str='', accept_terms: bool=False):
