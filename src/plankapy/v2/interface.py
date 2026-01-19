@@ -91,16 +91,29 @@ class Planka:
 
     @property
     def projects(self) -> list[Project]:
-        """Get all Projects available to the current user"""
+        """Get all Projects available to the current user
+        
+        Note:
+            admins will get all instance Projects
+            projectOwners will get all owned projects and shared projects
+            all others will get only assigned and shared projects
+        """
         return [Project(p, self) for p in self.endpoints.getProjects()['items']]
 
     @property
     def users(self) -> list[User]:
-        """Get all Users on the current instance"""
-        if self.me.role in ('admin', 'projectOwner'): 
-            return [User(u, self) for u in self.endpoints.getUsers()['items']]
-        else:
-            raise PermissionError(f'Current user is not Admin or Project Owner!')
+        """Get all Users on the current instance (requires admin or projectOwner role)
+        
+        Note:
+            projectOwners will only get Users in their Projects
+            admins will get all instance Users
+            all others will get an empty list 
+        """
+        return [
+            User(u, self) 
+            for u in self.endpoints.getUsers()['items']
+            if self.current_role in ('admin', 'projectOwner')
+        ]
     
     def create_project(self, **kwargs: Unpack[typ.Request_createProject]) -> Project:
         """Creates a project. The current user automatically becomes a project manager.
@@ -115,9 +128,12 @@ class Planka:
             Planka internal status errors are included here for disambiguation
 
         Raises:
+            PermissionError: If User is not an admin or projectOwner
             ValidationError: 400 
             Unauthorized: 401 
         """
+        if self.current_role not in ('admin', 'projectOwner'):
+            raise PermissionError(f'Onlt Admins and Project Owners can create Projects')
         return Project(self.endpoints.createProject(**kwargs)['item'], self)
     
     def create_user(self, **kwargs: Unpack[typ.Request_createUser]) -> User:
@@ -143,11 +159,33 @@ class Planka:
             Planka internal status errors are included here for disambiguation
 
         Raises:
+            PermissionError: If the current user is not an admin
             ValidationError: 400 
             Unauthorized: 401 
             Forbidden: 403 
             Conflict: 409 
         """
+        if self.current_role != 'admin':
+            raise PermissionError(f'Only Admins can create Users')
         return User(self.endpoints.createUser(**kwargs)['item'], self)
 
-
+    def create_webhook(self, **kwargs: Unpack[typ.Request_createWebhook]) -> Webhook:
+        """Create a Webhook (admin only)
+        
+        Args:
+            name (str) : Name/title of the webhook
+            url (str): URL endpoint for the webhook
+            accessToken (NotRequired[str]): Access token for webhook authentication
+            events (NotRequired[WebhookEvent]): list of events that trigger the webhook
+            excludedEvents (NotRequired[WebhookEvent]): Comma-separated list of events excluded from the webhook
+        
+        Returns:
+            Webhook
+        
+        Raises:
+            PermissionError: If the current user is not an admin
+        """
+        if self.current_role != 'admin':
+            raise PermissionError(f'Only admins can create Webhooks')
+        return Webhook(self.endpoints.createWebhook(**kwargs)['item'], self)
+        
