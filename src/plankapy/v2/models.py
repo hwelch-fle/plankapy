@@ -576,6 +576,7 @@ class Board(PlankaModel[schemas.Board]):
         """Add a User to the Board
         
         Args:
+            user (User): The User to add
             role (Literal['viewer', 'editor']): The Role to assign to the user (default: `viewer`)
             can_comment (bool): If role is `viewer` set commenting status (default: `False`)
         """
@@ -598,31 +599,93 @@ class Board(PlankaModel[schemas.Board]):
             membership.can_comment = can_comment
         return membership
     
-    def add_editor(self, user: User) -> None:
-        """Add a Board editor"""
-        if user not in self.users or user in self.viewers:
-            self.endpoints.createBoardMembership(self.id, userId=user.id, role='editor')
-        elif user in self.viewers:
-            bm = [bm for bm in self.board_memberships if bm.user == user].pop()
-            self.endpoints.updateBoardMembership(bm.id, role='editor')
+    def add_members(self, users: Sequence[User], 
+                    *,
+                    role: BoardRole='viewer',
+                    can_comment: bool=False) -> list[BoardMembership]:
+        """Add a Users to the Board
+        
+        Args:
+            users (Sequence[User]): The Users to add
+            role (Literal['viewer', 'editor']): The Role to assign to the user (default: `viewer`)
+            can_comment (bool): If role is `viewer` set commenting status (default: `False`)
+            
+        Returns:
+            list[BoardMembership]
+        """
+        return [
+            self.add_member(
+                user,
+                role=role,
+                can_comment=can_comment,
+            )
+            for user in users
+        ]
+    
+    def add_editor(self, user: User) -> BoardMembership:
+        """Add a Board editor
+        
+        Args:
+            user (User): The User to add as an editor
+            
+        Returns:
+            BoardMembership
+        """
+        return self.add_member(user, role='editor', can_comment=True)
 
-    def add_viewer(self, user: User, *, can_comment: bool=False) -> None:
-        """Add a Board viewer Set can_comment flag to True for commenting privelege"""
-        if user not in self.users:
-            self.endpoints.createBoardMembership(self.id, userId=user.id, role='viewer')
-        elif user in self.editors:
-            bm = [bm for bm in self.board_memberships if bm.user == user].pop()
-            self.endpoints.updateBoardMembership(bm.id, role='viewer', canComment=can_comment)
+    def add_editors(self, users: Sequence[User]) -> list[BoardMembership]:
+        """Add Board editors
+        
+        Args:
+            users (Sequence[User]): The Users to add as editors
+            
+        Returns:
+            list[BoardMembership]
+        """
+        return [self.add_editor(user) for user in users]
+
+    def add_viewer(self, user: User, *, can_comment: bool=False) -> BoardMembership:
+        """Add a Board viewer
+        
+        Args:
+            user (User): The User to add as a viewer
+            can_comment (bool): Whether the viewer User can comment on cards
+            
+        Returns:
+            BoardMembership
+        """
+        return self.add_member(user, role='viewer', can_comment=can_comment)
+
+    def add_viewers(self, users: Sequence[User], *, can_comment: bool=False) -> list[BoardMembership]:
+        """Add a Board viewer
+        
+        Args:
+            users (Sequence[User]): The Users to add as viewers
+            can_comment (bool): Whether the viewer Users can comment on cards
+            
+        Returns:
+            list[BoardMembership]
+        """
+        return [self.add_viewer(user, can_comment=can_comment) for user in users]
 
     def remove_user(self, user: User) -> None:
-        """Remove a user from the Board
+        """Remove a User from the Board
         
         Note:
             If the User is not a member, no change will be made
         """
         if user in self.users:
             [bm for bm in self.board_memberships if bm.user == user].pop().delete()
-
+    
+    def remove_users(self, users: Sequence[User]) -> None:
+        """Remove Users from the Board
+        
+        Note:
+            If a User is not a member, no change will be made
+        """
+        for user in users:
+            self.remove_user(user)
+    
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
     
