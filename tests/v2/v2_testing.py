@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../src')
+sys.path.append('../../src')
 
 from datetime import datetime
 from plankapy.v2 import Planka
