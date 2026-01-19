@@ -46,15 +46,16 @@ except HTTPStatusError as e:
 project = planka.projects[0]
 
 for board in project.boards:
-    if board.name == 'My Board':
+    if 'My Board' in board.name:
         board.delete()
 
 board = project.create_board(position=0, name='My Board')
+board2 = project.create_board(position=0, name='My Board2')
 board.project.background_gradient = 'purple-rose'
 l1 = board.create_list(position=1, name='Active', type='active')
 l2 = board.create_list(position=2, name='Closed', type='closed')
-
-
+lbl = board.create_label(position=0, name='TODO', color='autumn-leafs')
+lbl.add_to_board(board2)
 
 for i in range(1, 11):
     card = l1.create_card(
@@ -64,6 +65,9 @@ for i in range(1, 11):
         description=f'The {i}th card in the {l1.name}', 
         dueDate=datetime.now() + timedelta(days=5)
     )
+    card.add_label(lbl)
 
-for card in l1.cards:
-    card.add_members(planka.users, add_to_board=True, role='editor', can_comment=True)
+#for card in l1.cards:
+#    card.add_members(planka.users, add_to_board=True, role='editor', can_comment=True)
+
+#print(len(lbl.cards))
