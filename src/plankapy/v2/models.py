@@ -28,7 +28,7 @@ __all__ = (
     "CardLabel",
     "CardMembership",
     "Comment",
-    "Config", #TODO
+    "Config",
     "CustomField",
     "CustomFieldGroup",
     "CustomFieldValue",
@@ -539,6 +539,7 @@ class Board(PlankaModel[schemas.Board]):
             bm = [bm for bm in self.board_memberships if bm.user == user].pop()
             self.endpoints.updateBoardMembership(bm.id, role='viewer', canComment=can_comment)
 
+
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
     
@@ -921,6 +922,7 @@ class Card(PlankaModel[schemas.Card]):
                 for cfv in self.custom_field_values
             }
 
+
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
 
@@ -1033,11 +1035,20 @@ class Comment(PlankaModel[schemas.Comment]):
 class Config(PlankaModel[schemas.Config]):
     """Python interface for Planka Config"""
     
-    # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    @property
+    def version(self) -> str:
+        """Current version of the PLANKA application"""
+        return self.schema['version']
+    
+    @property
+    def activeUsersLimit(self) -> int | None:
+        """Maximum number of active users allowed (conditionally added for admins if configured)"""
+        return self.schema.get('activeUsersLimit')
 
+    @property
+    def oidc(self) -> dict[str, Any] | None:
+        """OpenID Connect configuration (null if not configured)"""
+        return self.schema.get('oidc')
   
 class CustomField(PlankaModel[schemas.CustomField]):
     """Python interface for Planka CustomFields"""
