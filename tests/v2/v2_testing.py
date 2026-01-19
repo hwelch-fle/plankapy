@@ -1,4 +1,5 @@
 import sys
+from typing import Any
 sys.path.append('../../src')
 
 from datetime import datetime, timedelta
@@ -8,6 +9,38 @@ from httpx import Client, HTTPStatusError
 URL = 'http://localhost:1337'
 USER = 'demo'
 PASS = 'demo'
+
+import logging.config
+import httpx
+
+LOGGING_CONFIG: dict[str, Any] = {
+    "version": 1,
+    "handlers": {
+        "default": {
+            "class": "logging.StreamHandler",
+            "formatter": "http",
+            "stream": "ext://sys.stderr"
+        }
+    },
+    "formatters": {
+        "http": {
+            "format": "%(levelname)s [%(asctime)s] %(name)s - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        }
+    },
+    'loggers': {
+        'httpx': {
+            'handlers': ['default'],
+            'level': 'INFO',
+        },
+        'httpcore': {
+            'handlers': ['default'],
+            'level': 'INFO',
+        },
+    }
+}
+
+logging.config.dictConfig(LOGGING_CONFIG)
 
 client = Client(base_url=URL)
 planka = Planka(client)
@@ -30,7 +63,6 @@ try:
         if not (existing := [u for u in planka.users if u.name == 'New User'])
         else existing.pop()
     )
-    print(new_user.name)
     new_user.delete()
     #p1.delete()
     #p1.background_gradient = 'blue-steel'
@@ -67,7 +99,7 @@ for i in range(1, 11):
     )
     card.add_label(lbl)
 
-#for card in l1.cards:
-#    card.add_members(planka.users, add_to_board=True, role='editor', can_comment=True)
+for card in l1.cards:
+    card.add_members(planka.users, add_to_board=True, role='editor', can_comment=True)
 
-#print(len(lbl.cards))
+print(len(lbl.gather_cards()))
