@@ -72,7 +72,6 @@ class PlankaModel(Generic[_S]):
         self.session = session
         self.endpoints = session.endpoints
         self.client = session.client
-        self.current_user = session.me
     
     @property
     def schema(self) -> _S:
