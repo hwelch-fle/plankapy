@@ -1125,6 +1125,7 @@ class Card(PlankaModel[schemas.Card]):
         """Add a User to the Card
         
         Args:
+            user (User): The User to add to the Card
             add_to_board (bool): Add the User to the Board if they are not already a member
             role (Literal['viewer', 'editor']): If User is added to board, set role (default: `viewer`)
             can_comment (bool): If User is added as a `viewer`, set commenting status (default: `False`)
@@ -1136,17 +1137,48 @@ class Card(PlankaModel[schemas.Card]):
             Default options for adding to Board abide by least privilege so role and comment must be set 
         """
         # User is already a member
-        if user in self.members:
-            return [cm for cm in self.card_memberships if cm.user == user].pop()
+        for membership in self.card_memberships:
+            if membership.user == user:
+                return membership
         
         # User is not in the board
-        elif user not in self.board.users:
+        if user not in self.board.users:
             # Add the user to the board
             if add_to_board:
                 self.board.add_member(user, role=role, can_comment=can_comment if role == 'viewer' else True)
             else:
                 raise PermissionError(f'User must be added to the Board to become a Card Member')        
         return CardMembership(self.endpoints.createCardMembership(self.id, userId=user.id)['item'], self.session)
+
+    def add_members(self, users: Sequence[User], 
+                    *, 
+                    add_to_board: bool=False, 
+                    role: BoardRole='viewer', 
+                    can_comment: bool=False) -> list[CardMembership]:
+        """Add multiple members to a Card
+        
+        Args:
+            users (Sequence[User]): The Users to add to the Card
+            add_to_board (bool): Add the User to the Board if they are not already a member
+            role (Literal['viewer', 'editor']): If User is added to board, set role (default: `viewer`)
+            can_comment (bool): If User is added as a `viewer`, set commenting status (default: `False`)
+        
+        Raises:
+            PermissionError: If the User is not a member of the Board and `add_to_board` is `False`
+        
+        Note:
+            Default options for adding to Board abide by least privilege so role and comment must be set
+
+        """
+        return [
+            self.add_member(
+                user, 
+                add_to_board=add_to_board, 
+                role=role, 
+                can_comment=can_comment,
+            )
+            for user in users
+        ]
 
     def remove_member(self, user: User) -> None:
         """Remove a User member from the Card"""
