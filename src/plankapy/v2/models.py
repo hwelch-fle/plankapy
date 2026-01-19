@@ -1,5 +1,10 @@
 from __future__ import annotations
-from collections.abc import Generator, Iterator, Mapping
+from collections.abc import (
+    Generator, 
+    Iterator, 
+    Mapping, 
+    Sequence,
+)
 from datetime import datetime
 import json
 from typing import (
