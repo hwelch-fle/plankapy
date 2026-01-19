@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../../src')
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from plankapy.v2 import Planka
 from httpx import Client, HTTPStatusError
 
@@ -54,15 +54,16 @@ board.project.background_gradient = 'purple-rose'
 l1 = board.create_list(position=1, name='Active', type='active')
 l2 = board.create_list(position=2, name='Closed', type='closed')
 
+
+
 for i in range(1, 11):
-    l1.create_card(
+    card = l1.create_card(
         type='project', 
         position=i, 
         name=f'Card {i}', 
         description=f'The {i}th card in the {l1.name}', 
-        dueDate=datetime.now().isoformat()
+        dueDate=datetime.now() + timedelta(days=5)
     )
 
 for card in l1.cards:
-    for user in planka.users:
-        card.add_member(user, add_to_board=True, role='editor', can_comment=True)
+    card.add_members(planka.users, add_to_board=True, role='editor', can_comment=True)
