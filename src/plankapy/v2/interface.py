@@ -60,6 +60,15 @@ class Planka:
         return Config(self.endpoints.getConfig()['item'], self)
 
     @property
+    def webhooks(self) -> list[Webhook]:
+        """Get all configured Webhooks (requires admin)"""
+        return [
+            Webhook(w, self) 
+            for w in self.endpoints.getWebhooks()['items']
+            if self.me.role == 'admin'
+        ]
+
+    @property
     def projects(self) -> list[Project]:
         """Get all Projects available to the current user"""
         return [Project(p, self) for p in self.endpoints.getProjects()['items']]
