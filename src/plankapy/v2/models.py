@@ -868,6 +868,7 @@ class Card(PlankaModel[schemas.Card]):
             self.move(self.prev_list, position)
         return self
     
+    # TODO: Handle uploading files better. See v1 implementation, but use httpx `files` streaming
     def add_attachment(self, attachment: str | bytes, *, cover: bool=False, name: str | None=None) -> Attachment:
         """Add an Attachment to the card
         
@@ -906,7 +907,7 @@ class Card(PlankaModel[schemas.Card]):
             raise ValueError(f'Expected str or bytes for Attachment, got {type(attachment)}')
 
         # Set cover if requested
-        if cover:
+        if cover and a.type != 'link':
             self.update(coverAttachmentId=a.id)
         return a
 
