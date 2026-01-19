@@ -1074,6 +1074,49 @@ class Card(PlankaModel[schemas.Card]):
                 for cfv in self.custom_field_values
             }
 
+    def add_card_fields(self, *fields: str, 
+                        group: str='Fields', 
+                        position: Literal['top', 'bottom'] | int='top') -> CustomFieldGroup:
+        """Add fields directly to a Card
+        
+        Args:
+            *fields (str): Varargs of the Fieldnames to add to the Card
+            group (str): An optional FieldGroup name to add the fields to (default: `Fields`)
+            position (Literal['top', 'bottom'] | int): The position to add the Card field group at (default: `top`)
+        
+        Returns:
+            CustomFieldGroup
+        """
+        _existing_cfgs = [cfg for cfg in self.custom_field_groups]
+        # Create a new CustomFieldGroup if it doesn't exist
+        if group not in [cfg.name for cfg in _existing_cfgs]:
+            if isinstance(position, int):
+                pass
+            
+            if position == 'top':
+                position = 0
+            
+            elif position == 'bottom':
+                position = max((cfg.position for cfg in _existing_cfgs), default=-1) + 1
+            
+            cfg = CustomFieldGroup(
+                self.endpoints.createCardCustomFieldGroup(
+                    self.id, 
+                    name=group, 
+                    position=position)['item'], 
+                self.session
+            )
+        
+        else:
+            cfg = [cfg for cfg in _existing_cfgs if cfg.name == group].pop()
+        
+        _existing_fields = [cf for cf in cfg.custom_fields]
+        for field in fields:
+            if field not in [cf.name for cf in _existing_fields]:
+                cfg.add_field(name=field)
+        
+        return cfg
+        
     def add_member(self, user: User, 
                    *, 
                    add_to_board: bool=False, 
@@ -1383,6 +1426,94 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
         """Delete the CustomFieldGroup"""
         return self.endpoints.deleteCustomFieldGroup(self.id)
 
+    def add_to_card(self, card: Card) -> CustomFieldGroup:
+        """Add the CustomFieldGroup to a Card
+        
+        Args:
+            card (Card): The Card to add the CustomFieldGroup to
+        """
+        # Replace the Current cardId with the ID of the Card we are adding to
+        _schema = self.schema.copy()
+        _schema['cardId'] = card.id
+        return CustomFieldGroup(self.endpoints.createCardCustomFieldGroup(**_schema)['item'], self.session)
+    
+    def make_base_group(self, project: Project) -> BaseCustomFieldGroup:
+        """Convert a CustomFieldGroup into a BaseCustomFieldGroup for a Project or Board
+        
+        Args:
+            project (Project): The project to add the BaseCustomFieldGroup to
+        
+        Returns:
+            BaseCustomFieldGroup: The new BaseCustomFieldGroup
+        """
+        return BaseCustomFieldGroup(self.endpoints.createBaseCustomFieldGroup(project.id, name=self.name)['item'], self.session)
+    
+    def add_field(self, name: str,
+                  *,
+                  position: Literal['top', 'bottom'] | int='top',
+                  show_on_card: bool=False) -> CustomField:
+        """Add a Field to the CustomFieldGroup
+        
+        Args:
+            name (str): The name of the Field to add
+            position (Literal['top', 'bottom'] | int): The position of the field within the group (default: `top`)
+            show_on_card (bool): Show the field on the Card front (default: `False`)
+        
+        Returns:
+            CustomField: If the Field aleady exists, that Field is returned
+        """
+        # Return existing field
+        _existing_field = [cf for cf in self.custom_fields if cf.name == name]
+        if _existing_field:
+            return _existing_field.pop()
+        
+        # Get position and create new Field
+        if isinstance(position, int):
+            pass
+        elif position == 'bottom':
+            position = max((cf.position for cf in self.custom_fields), default=-1) + 1
+        else:
+            position = 0
+        
+        return CustomField(
+            self.endpoints.createCustomFieldInGroup(
+                self.id,
+                name=self.name,
+                position=position,
+                showOnFrontOfCard=show_on_card, 
+            )['item'], self.session
+        )
+  
+    def add_fields(self,
+                   *names: str,
+                   position: Literal['top', 'bottom'] | int='top',
+                   show_on_card: bool=False) -> list[CustomField]:
+        """Add fields to the CustomFieldGroup
+        
+        Args:
+            *names (str): Varargs of the names to add
+            position (Literal['top', 'bottom'] | int): The position of the field within the group (default: `top`)
+            show_on_card (bool): Show the field on the Card front (default: `False`)
+            
+        Returns:
+            list[CustomField] : The fields added
+            
+        Note:
+            Field positions will be calculated in the order passed
+        """
+        return [
+            self.add_field(name=name, position=position, show_on_card=show_on_card)
+            for name in names
+        ]
+  
+    def remove_field(self, field: CustomField) -> None:
+        """Remove the field from the CustomFieldGroup
+        
+        Args:
+            field (CustomField): The CustomField to remove (must be in this Group)
+        """
+        if field in self.custom_fields:
+            field.delete()
   
 class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     """Python interface for Planka CustomFieldValues"""
