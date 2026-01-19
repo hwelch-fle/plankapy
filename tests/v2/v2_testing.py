@@ -62,3 +62,7 @@ for i in range(1, 11):
         description=f'The {i}th card in the {l1.name}', 
         dueDate=datetime.now().isoformat()
     )
+
+for card in l1.cards:
+    for user in planka.users:
+        card.add_member(user, add_to_board=True, role='editor', can_comment=True)
