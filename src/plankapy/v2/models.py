@@ -38,8 +38,8 @@ __all__ = (
     "NotificationService", #TODO
     "Project",
     "ProjectManager",
-    "Task", #TODO
-    "TaskList", #TODO
+    "Task",
+    "TaskList",
     "User",
     "Webhook", #TODO
 )
@@ -1685,7 +1685,8 @@ class Project(PlankaModel[schemas.Project]):
     def create_base_custom_field_group(self, **bcfg: Unpack[paths.Request_createBaseCustomFieldGroup]) -> BaseCustomFieldGroup:
         """Create a BaseCustomFieldGroup in the Project"""
         return BaseCustomFieldGroup(self.endpoints.createBaseCustomFieldGroup(self.id, **bcfg)['item'], self.endpoints)
-    
+
+
 class ProjectManager(PlankaModel[schemas.ProjectManager]):
     """Python interface for Planka ProjectManagers"""
     
@@ -1723,20 +1724,187 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
    
 class Task(PlankaModel[schemas.Task]):
     """Python interface for Planka Tasks"""
-    
+
+    # Task props
+
+    @property
+    def task_list(self) -> TaskList:
+        """The TaskList the Task belongs to"""
+        return TaskList(self.endpoints.getTaskList(self.schema['taskListId'])['item'], self.endpoints)
+    @task_list.setter
+    def task_list(self, task_list: TaskList) -> None:
+        """Move the Task to a different TaskList"""
+        self.update(taskListId=task_list.id)
+
+    @property
+    def card(self) -> Card:
+        """The Card the Task is linked to"""
+        return Card(self.endpoints.getCard(self.schema['linkedCardId'])['item'], self.endpoints)
+
+    @property
+    def assignee(self) -> User | None:
+        """The User assigned to the Task if there is one"""
+        return User(self.endpoints.getUser(self.schema['assigneeUserId'])['item'], self.endpoints)
+    @assignee.setter
+    def assignee(self, assignee: User | None) -> None:
+        """Assign a User to the Task"""
+        # TODO: Fix _build to add <Type> | None to `nullable` fields
+        if assignee is not None:
+            self.update(assigneeUserId=assignee.id)
+        else:
+            self.update(assigneeUserId=None) # type: ignore
+
+    @property
+    def position(self) -> int:
+        """Position of the Task within the TaskList"""
+        return self.schema['position']
+    @position.setter
+    def position(self, position: int) -> None:
+        """Set the position of the Task within the TaskList"""
+
+    @property
+    def name(self) -> str:
+        """Name/title of the Task"""
+        return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the Task name"""
+        self.update(name=name)
+
+    @property
+    def is_completed(self) -> bool:
+        """Whether the Task is completed"""
+        return self.schema['isCompleted']
+    @is_completed.setter
+    def is_completed(self, is_completed: bool) -> None: 
+        """Set whether the Task is completed"""
+        self.update(isCompleted=is_completed)
+
+    @property
+    def created_at(self) -> datetime:
+        """When the Task was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+
+    @property
+    def updated_at(self) -> datetime:
+        """When the Task was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the Task with the Planka server"""
+        _tsks = [tsk for tsk in self.task_list.tasks if tsk == self]
+        if _tsks:
+            self.schema = _tsks.pop().schema
+
+    def update(self, **kwargs: Unpack[paths.Request_updateTask]):
+        """Update the Task"""
+        self.schema = self.endpoints.updateTask(self.id, **kwargs)['item']
+
+    def delete(self):
+        """Delete the Task"""
+        self.endpoints.deleteTask(self.id)
 
  
 class TaskList(PlankaModel[schemas.TaskList]):
     """Python interface for Planka TaskLists"""
     
+    # TaskList included
+
+    @property
+    def _included(self):
+        return self.endpoints.getTaskList(self.id)['included']
+    
+    @property
+    def tasks(self) -> list[Task]:
+        """All Tasks associated with the TaskList"""
+        return [Task(t, self.endpoints) for t in self._included['tasks']]
+
+    # TaskList props
+
+    @property
+    def card(self) -> Card:
+        """The Card the TaskList belongs to"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+    
+    @property
+    def position(self) -> int:
+        """Position of the TaskList within the Card"""
+        return self.schema['position']
+    @position.setter
+    def positon(self, position: int) -> None:
+        """Set the TaskList position within the Card"""
+        self.update(position=position)
+
+    @property
+    def name(self) -> str:
+        """Name/title of the TaskList"""
+        return self.schema['name']
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set the name of the TaskList"""
+        self.update(name=name)
+
+    @property
+    def show_on_front_of_card(self) -> bool:
+        """Whether to show the TaskList on the front of the Card"""
+        return self.schema['showOnFrontOfCard']
+    @show_on_front_of_card.setter
+    def show_on_front_of_card(self, show_on_front_of_card: bool) -> None:
+        """Set whether to show TaskList on the front of the Card"""
+
+    @property
+    def hide_completed_tasks(self) -> bool:
+        """Whether to hide completed Tasks"""
+        return self.schema['hideCompletedTasks']
+    @hide_completed_tasks.setter
+    def hide_completed_tasks(self, hide_completed_tasks: bool) -> None:
+        """Set whether to hide completed Tasks"""
+        self.update(hideCompletedTasks=hide_completed_tasks)
+
+    @property
+    def created_at(self) -> datetime:
+        """When the TaskList was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+    
+    @property
+    def updated_at(self) -> datetime:
+        """When the TaskList was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
+
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
+    def sync(self):
+        """Sync the TaskList with the Planka server"""
+        self.schema = self.endpoints.getTaskList(self.id)['item']
+
+    def update(self, **kwargs: Unpack[paths.Request_updateTaskList]):
+        """Update the TaskList"""
+        self.schema = self.endpoints.updateTaskList(self.id, **kwargs)['item']
+
+    def delete(self):
+        """Delete the TaskList"""
+        self.endpoints.deleteTaskList(self.id)
+
+    def add_task(self, name: str, *, 
+                 is_completed: bool=False, 
+                 position: Literal['top', 'bottom'] | int='bottom') -> Task:
+        """Create a new Task in the TaskList"""
+        if not isinstance(position, int):
+            if position == 'top':
+                position = 0
+            else:
+                # Find nest slot for 'bottom' (or any other invalid option)
+                position = max((t.position for t in self.tasks), default=0) + 1
+
+        return Task(self.endpoints.createTask(
+                self.id, 
+                linkedCardId=self.card.id, 
+                name=name, 
+                position=position, 
+                isCompleted=is_completed
+            )['item'], 
+            self.endpoints
+        )
 
 
 # User Literals
