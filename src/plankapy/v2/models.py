@@ -181,7 +181,7 @@ class Attachment(PlankaModel[schemas.Attachment]):
 
     def delete(self):
         """Delete the Attachment"""
-        return self.endpoints.deleteAttachment(self.id)    
+        return self.endpoints.deleteAttachment(self.id)
     
     def download(self) -> Iterator[bytes]:
         """Get a byte Iterator for stream downloading"""
@@ -833,33 +833,22 @@ class Card(PlankaModel[schemas.Card]):
         return self.endpoints.deleteCard(self.id)
 
     def move(self, list: List, position: Literal['top', 'bottom'] | int = 'top') -> Card:
-        """Move the card to a new list"""
+        """Move the card to a new list (default to top of new list)"""
 
-        # Get bottom pos or requested pos
         if isinstance(position, int):
             pos = position
-        else:
+        elif position == 'top':
+            pos = 0
+        elif position == 'bottom':
             pos = max((c.position for c in list.cards), default=0)
-
-        # Moving Card out of trash/archive
-        if self.prev_list is not None:
-            self.update(
-                listId=self.prev_list.id, 
-                boardId=self.prev_list.board.id, 
-                position=0 if position == 'top' else pos
-            )
-        
-        # Change Card position in same List
-        elif list.id == self.list.id:
-            self.update(position=0 if position == 'top' else pos)
-        
-        # Moving Card to another list
         else:
-            self.update(
-                listId=list.id, 
-                boardId=list.board.id, 
-                position=0 if position == 'top' else pos
-            )
+            raise ValueError(f'position must be int or one of `top`/`bottom`')
+        
+        self.update(
+            listId=list.id, 
+            boardId=list.board.id, 
+            position=pos,
+        )
         return self
 
     def restore(self, position: Literal['top', 'bottom'] | int='top') -> Card:
