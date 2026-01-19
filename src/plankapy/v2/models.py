@@ -561,9 +561,34 @@ class Board(PlankaModel[schemas.Board]):
         """Create a new Label on the Board"""
         return Label(self.endpoints.createLabel(self.id, **lbl)['item'], self.session)
     
-    def add_user(self, user: User, role: BoardRole) -> None:
-        """Add a User to the Board"""
-        self.endpoints.createBoardMembership(self.id, userId=user.id, role=role)
+    def add_member(self, user: User, 
+                   *,
+                   role: BoardRole='viewer',
+                   can_comment: bool=False) -> BoardMembership:
+        """Add a User to the Board
+        
+        Args:
+            role (Literal['viewer', 'editor']): The Role to assign to the user (default: `viewer`)
+            can_comment (bool): If role is `viewer` set commenting status (default: `False`)
+        """
+        # Create a new membership
+        if user not in self.users:
+            BoardMembership(
+                self.endpoints.createBoardMembership(
+                    self.id, 
+                    userId=user.id, 
+                    role=role, 
+                    canComment=can_comment)['item'], 
+                self.session
+            )
+        
+        # Get existing membership and update role different
+        membership = [bm for bm in self.board_memberships if bm.user == user].pop()
+        if membership.role != role:
+            membership.role = role
+        if membership.can_comment != can_comment:
+            membership.can_comment = can_comment
+        return membership
     
     def add_editor(self, user: User) -> None:
         """Add a Board editor"""
@@ -965,17 +990,42 @@ class Card(PlankaModel[schemas.Card]):
                 for cfv in self.custom_field_values
             }
 
-    def add_member(self, user: User, *, add_to_board: bool=False) -> CardMembership:
+    def add_member(self, user: User, 
+                   *, 
+                   add_to_board: bool=False, 
+                   role: BoardRole='viewer', 
+                   can_comment: bool=False) -> CardMembership:
         """Add a User to the Card
         
         Args:
-            add_to_board (bool): If set to True, the User will be added to the board as an editor
-                if they aren't aleady a Board member
+            add_to_board (bool): Add the User to the Board if they are not already a member
+            role (Literal['viewer', 'editor']): If User is added to board, set role (default: `viewer`)
+            can_comment (bool): If User is added as a `viewer`, set commenting status (default: `False`)
+        
+        Raises:
+            PermissionError: If the User is not a member of the Board and `add_to_board` is `False`
+        
+        Note:
+            Default options for adding to Board abide by least privilege so role and comment must be set 
         """
-        if user not in self.board.users and add_to_board:
+        # User is already a member
+        if user in self.members:
+            return [cm for cm in self.card_memberships if cm.user == user].pop()
+        
+        # User is not in the board
+        elif user not in self.board.users:
             # Add the user to the board
-            self.board.add_user(user, role='editor')
+            if add_to_board:
+                self.board.add_member(user, role=role, can_comment=can_comment if role == 'viewer' else True)
+            else:
+                raise PermissionError(f'User must be added to the Board to become a Card Member')        
         return CardMembership(self.endpoints.createCardMembership(self.id, userId=user.id)['item'], self.session)
+
+    def remove_member(self, user: User) -> None:
+        """Remove a User member from the Card"""
+        for cm in self.card_memberships:
+            if cm.user == user:
+                cm.delete()
 
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
