@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import datetime
 from typing import (
     Any,
     Literal,
@@ -138,8 +139,8 @@ class Request_createCard(TypedDict):
     """Name/title of the card"""
     description: NotRequired[str]
     """Detailed description of the card"""
-    dueDate: NotRequired[str]
-    """Due date for the card"""
+    dueDate: NotRequired[str | datetime]
+    """Due date for the card (`datetime` only allowed when using `Card.create_card`, otherwise use ISO string)"""
     isDueCompleted: NotRequired[bool]
     """Whether the due date is completed"""
     stopwatch: NotRequired[dict[str, Any]]
@@ -170,8 +171,8 @@ class Request_updateCard(TypedDict):
     """Name/title of the card"""
     description: NotRequired[str]
     """Detailed description of the card"""
-    dueDate: NotRequired[str]
-    """Due date for the card"""
+    dueDate: NotRequired[str | datetime]
+    """Due date for the card (`datetime` only allowed when using `Card.update`, otherwise use ISO string)"""
     isDueCompleted: NotRequired[bool]
     """Whether the due date is completed"""
     stopwatch: NotRequired[dict[str, Any]]
