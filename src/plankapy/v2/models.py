@@ -1697,11 +1697,19 @@ class NotificationService(PlankaModel[schemas.NotificationService]):
     def url(self) -> str:
         """URL endpoint for Notifications"""
         return self.schema['url']
+    @url.setter
+    def url(self, url: str) -> None:
+        """Set the NotificationService url"""
+        self.update(url=url)
     
     @property
     def format(self) -> NotificationServiceFormat: 
         """Format for notification messages"""
         return self.schema['format']
+    @format.setter
+    def format(self, format: NotificationServiceFormat) -> None:
+        """Set the NotificationService format"""
+        self.update(format=format)
     
     @property
     def created_at(self) -> datetime:
