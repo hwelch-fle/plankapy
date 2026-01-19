@@ -609,6 +609,14 @@ class Board(PlankaModel[schemas.Board]):
             bm = [bm for bm in self.board_memberships if bm.user == user].pop()
             self.endpoints.updateBoardMembership(bm.id, role='viewer', canComment=can_comment)
 
+    def remove_user(self, user: User) -> None:
+        """Remove a user from the Board
+        
+        Note:
+            If the User is not a member, no change will be made
+        """
+        if user in self.users:
+            [bm for bm in self.board_memberships if bm.user == user].pop().delete()
 
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
@@ -2380,37 +2388,118 @@ class User(PlankaModel[schemas.User]):
         """Delete the User"""
         return self.endpoints.deleteUser(self.id)
     
-    def update_email(self, email: str, *, password: str|None=None) -> None:
-        """Update the current User's email (requires password)"""
-        # Allow Admins to set user email directly or ignore password kwarg
-        if not password:
-            self.endpoints.updateUserEmail(self.id, email=email)
-        else:
-            self.endpoints.updateUserEmail(self.id, email=email, currentPassword=password)
+    def update_email(self, email: str, 
+                     *, 
+                     password: str|None=None) -> None:
+        """Update the current User's email
+        
+        Args:
+            password (str): The User's password (required if not admin)
 
-    def update_password(self, *, new_password: str, current_password: str|None=None) -> None:
-        """Update the current User's password (requires current password)"""
-        # Allow Admins to set user passwords by ignoring current password
-        # or setting password property directly
-        if not current_password:
+        Raises:
+            PermissionError: If the current user is not admin and attempts to set another user's password
+            ValueError: If the current user is not admin and the `password` arg is not set
+            HTTPStatusError: If the password is wrong or the update operation fails
+        """
+        
+        # Allow Admins to set user email directly or ignore password kwarg
+        if self.current_role == 'admin':
+            self.endpoints.updateUserEmail(self.id, email=email)
+            return
+        
+        if self.current_id != self.id:
+            raise PermissionError(f'Cannot set other User emails unless admin')
+        
+        if not password:
+            raise ValueError(f'User password required to update email!')
+        
+        self.endpoints.updateUserEmail(self.id, email=email, currentPassword=password)
+
+    def update_password(self, 
+                        *, 
+                        new_password: str, 
+                        current_password: str|None=None) -> None:
+        """Update the User's password
+        
+        Args:
+            new_password (str): The new password to use
+            current_password (str): The User's current password (required for non-admin)
+        
+        Raises:
+            PermissionError: If a non-admin attempts to update another user's password
+            ValueError: If a user attempts to update their own password without passing a `current_password`
+            HTTPStatusError: If the password is wrong or the update operation fails
+        """
+        # Admins can set any User password
+        if self.current_role == 'admin':
             self.endpoints.updateUserPassword(self.id, password=new_password)
-        else:
-            self.endpoints.updateUserPassword(self.id, password=new_password, currentPassword=current_password)
+            return
+        
+        # Users's cannot set other user's passwords
+        if self.current_id != self.id:
+            raise PermissionError(f"Cannot set another User's password! (must be admin)")
+        
+        # Password change required current password
+        if not current_password:
+            raise ValueError(f'Cannot set other User passwords unless admin')
+
+        self.endpoints.updateUserPassword(self.id, password=new_password, currentPassword=current_password)
 
     def add_to_card(self, card: Card) -> None:
-        """Add the User to a Card"""
-        self.endpoints.createCardMembership(card.id, userId=self.id)
+        """Add the User to a Card
+        
+        Args:
+            card (Card): The Card to add the user to (must be a member of the Card's Board)
+        
+        Raises:
+            PermissionError: If the User is not a member of the Card's Board
+        
+        Note:
+            If the User is already a Card member, no changes will be made
+        """
+        
+        if self not in card.board.users:
+            raise PermissionError(f'User is not a member of the Board')
+        
+        if self not in card.members:
+            self.endpoints.createCardMembership(card.id, userId=self.id)
     
-    def add_to_board(self, board: Board, role: BoardRole, *, can_comment: bool=False) -> None:
-        """Add the User to a board"""
-        if self not in board.users:
-            self.endpoints.createBoardMembership(board.id, userId=self.id, role=role, canComment=can_comment)
-        _existing_membership = [bm for bm in board.board_memberships if bm.user == self].pop()
-        if _existing_membership.role != role or _existing_membership.can_comment != can_comment:
-            if role == 'viewer':
-                _existing_membership.update(role=role, canComment=can_comment)
-            else:
-                _existing_membership.update(role=role)
+    def remove_from_card(self, card: Card) -> None:
+        """Remove the User from a Card
+        
+        Args:
+            card (Card): The Card to remove the User from
+        
+        Note:
+            if the User is not a member of the Card, no change will be made
+        """
+        if self in card.members:
+            card.remove_member(self)
+    
+    def add_to_board(self, board: Board, 
+                     *,
+                     role: BoardRole='viewer',
+                     can_comment: bool=False) -> None:
+        """Add the User to a board
+        
+        Args:
+            role (Literal['viewer', 'editor']): The role of the User in the Board (default: `viewer`)
+            can_comment (bool): The comment permission for the user if `role` is set to `viewer` (default: `False`)
+            
+        Note:
+            If the User is already a Board member, but the role or comment permission are different, 
+            the User role and comment permission will be updated
+        """
+        board.add_member(self, role=role, can_comment=can_comment)
+        
+    def remove_from_board(self, board: Board) -> None:
+        """Remove the User from a Board
+        
+        Note:
+            If the User is not a Board member, no change will be made
+        """
+        if self in board.users:
+            board.remove_user(self)
 
 
 WebhookEvent = Literal[
@@ -2458,10 +2547,24 @@ class Webhook(PlankaModel[schemas.Webhook]):
         return datetime.fromisoformat(self.schema['updatedAt'])
     
     # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
-
+    def sync(self):
+        """Sync the Webhook with the Planka server (admin only)"""
+        if self.current_role == 'admin':
+            self.schema = [
+                Webhook(w, self.session) 
+                for w in self.endpoints.getWebhooks()['items'] 
+                if w['id'] == self.id
+            ].pop().schema
+        
+    def update(self, **kwargs: Unpack[paths.Request_updateWebhook]):
+        """Update the Webhook (admin only)"""
+        if self.current_role == 'admin':
+            self.schema = self.endpoints.updateWebhook(self.id, **kwargs)['item']
+    
+    def delete(self):
+        """Delete the Webhook (admin only)"""
+        if self.current_role == 'admin':
+            self.endpoints.deleteWebhook(self.id)
   
 # Special Interfaces
 class Stopwatch:
