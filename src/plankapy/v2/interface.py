@@ -51,8 +51,11 @@ class Planka:
     @property
     def users(self) -> list[User]:
         """Get all Users on the current instance"""
-        return [User(u, self) for u in self.endpoints.getUsers()['items']]
-
+        if self.me.role in ('admin', 'projectOwner'): 
+            return [User(u, self) for u in self.endpoints.getUsers()['items']]
+        else:
+            raise PermissionError(f'Current user is not Admin or Project Owner!')
+    
     def create_project(self, **kwargs: Unpack[typ.Request_createProject]) -> Project:
         """Creates a project. The current user automatically becomes a project manager.
 
