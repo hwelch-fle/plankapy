@@ -47,6 +47,12 @@ class Planka:
         """Get all Users on the current instance"""
         return [User(u, self.endpoints) for u in self.endpoints.getUsers()['items']]
 
+
+    @property
+    def config(self) -> Config:
+        """Get the configuration info for the current Planka server"""
+        return Config(self.endpoints.getConfig()['item'], self.endpoints)
+
     def create_project(self, **kwargs: Unpack[typ.Request_createProject]) -> Project:
         """Creates a project. The current user automatically becomes a project manager.
 
