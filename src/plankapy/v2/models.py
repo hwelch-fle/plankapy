@@ -41,6 +41,20 @@ __all__ = (
     "TaskList",
     "User",
     "Webhook", #TODO
+    
+    # Literal tuples
+    "BoardViews",
+    "CardTypes",
+    "BoardRoles",
+    "LabelColors",
+    "ListColors",
+    "BackgroundGradients",
+    "Languages",
+    "EditorModes",
+    "HomeViews",
+    "ProjectOrderings",
+    "TermsTypes",
+    "LockableFields",
 )
 
 TYPE_CHECKING = False
@@ -291,8 +305,13 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
 
 
 BoardView = Literal['kanban', 'grid', 'list']
+BoardViews: tuple[BoardView] = BoardView.__args__
+
 CardType = Literal['project', 'story']
+CardTypes: tuple[CardType] = CardType.__args__
+
 BoardRole = Literal['editor', 'viewer']
+BoardRoles: tuple[BoardRole] = BoardRole.__args__
 
 class Board(PlankaModel[schemas.Board]):
     """Python interface for Planka Boards"""
@@ -1272,6 +1291,7 @@ LabelColor = Literal[
     'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 
     'red-burgundy', 'pirate-gold',
 ]
+LabelColors: tuple[LabelColor] = LabelColor.__args__
 
 class Label(PlankaModel[schemas.Label]):
     """Python interface for Planka Labels"""
@@ -1339,6 +1359,8 @@ ListColor = Literal[
     'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 
     'dark-granite', 'turquoise-sea',
 ]
+ListColors: tuple[ListColor] = ListColor.__args__
+
 class List(PlankaModel[schemas.List]):
     """Python interface for Planka Lists"""
     
@@ -1507,6 +1529,7 @@ BackgroundGradient = Literal[
     'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 
     'red-curtain'
 ]
+BackgroundGradients = BackgroundGradient.__args__
 
 class Project(PlankaModel[schemas.Project]):
     """Python interface for Planka Projects"""
@@ -1911,11 +1934,22 @@ Language = Literal[
     'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 
     'zh-CN', 'zh-TW',
 ]
+Languages: tuple[Language] = Language.__args__
+
 EditorMode = Literal['wysiwyg', 'markup']
+EditorModes: tuple[EditorMode] = EditorMode.__args__
+
 HomeView = Literal['gridProjects', 'groupedProjects']
+HomeViews: tuple[HomeView] = HomeView.__args__
+
 ProjectOrdering = Literal['byDefault', 'alphabetically', 'byCreationTime']
+ProjectOrderings: tuple[ProjectOrdering] = ProjectOrdering.__args__
+
 TermsType = Literal['general', 'extended']
+TermsTypes: tuple[TermsType] = TermsType.__args__
+
 LockableField = Literal['email', 'password', 'name']
+LockableFields: tuple[LockableField] = LockableField.__args__
 
 class User(PlankaModel[schemas.User]):
     """Python interface for Planka Users"""
