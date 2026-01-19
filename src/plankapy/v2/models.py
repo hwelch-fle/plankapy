@@ -922,6 +922,17 @@ class Card(PlankaModel[schemas.Card]):
                 for cfv in self.custom_field_values
             }
 
+    def add_member(self, user: User, *, add_to_board: bool=False) -> CardMembership:
+        """Add a User to the Card
+        
+        Args:
+            add_to_board (bool): If set to True, the User will be added to the board as an editor
+                if they aren't aleady a Board member
+        """
+        if user not in self.board.users and add_to_board:
+            # Add the user to the board
+            self.board.add_user(user, role='editor')
+        return CardMembership(self.endpoints.createCardMembership(self.id, userId=user.id)['item'], self.endpoints)
 
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
