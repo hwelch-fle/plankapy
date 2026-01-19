@@ -40,7 +40,7 @@ __all__ = (
     "Task",
     "TaskList",
     "User",
-    "Webhook", #TODO
+    "Webhook",
     
     # Literal tuples
     "BoardViews",
@@ -56,6 +56,7 @@ __all__ = (
     "TermsTypes",
     "LockableFields",
     "NotificationTypes",
+    "WebhookEvents",
 )
 
 TYPE_CHECKING = False
@@ -2410,8 +2411,49 @@ class User(PlankaModel[schemas.User]):
                 _existing_membership.update(role=role)
 
 
+WebhookEvent = Literal[
+    'cardCreate', 'cardUpdate', 'cardDelete',
+    'userCreate', 'userUpdate', 'userDelete',
+]
+WebhookEvents: tuple[WebhookEvent] = WebhookEvent.__args__
+
 class Webhook(PlankaModel[schemas.Webhook]):
     """Python interface for Planka Webhooks"""
+    
+    @property
+    def name(self) -> str:
+        """Name/title of the Webhook"""
+        return self.schema['name']
+    
+    @property
+    def url(self) -> str:
+        """URL endpoint for the Webhook"""
+        return self.schema['url']
+    
+    @property
+    def access_token(self) -> str:
+        """Access token for webhook authentication"""
+        return self.schema['accessToken']
+    
+    @property
+    def events(self) -> list[WebhookEvent]:
+        """List of events that trigger the Webhook"""
+        return self.schema['events']
+    
+    @property
+    def excluded_events(self) -> list[WebhookEvent]:
+        """List of events excluded from the Webhook"""
+        return self.schema['excludedEvents']
+    
+    @property
+    def created_at(self) -> datetime:
+        """When the Webhook was created"""
+        return datetime.fromisoformat(self.schema['createdAt'])
+        
+    @property
+    def updated_at(self) -> datetime:
+        """When the Webhook was last updated"""
+        return datetime.fromisoformat(self.schema['updatedAt'])
     
     # Special Methods
     def sync(self): ...
