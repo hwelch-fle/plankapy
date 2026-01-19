@@ -35,23 +35,23 @@ class Planka:
     @property
     def me(self) -> User:
         """Get the User object for the currently logged in user"""
-        return User(self.endpoints.getUser('me')['item'], self.endpoints)
+        return User(self.endpoints.getUser('me')['item'], self)
 
     @property
     def projects(self) -> list[Project]:
         """Get all Projects available to the current user"""
-        return [Project(p, self.endpoints) for p in self.endpoints.getProjects()['items']]
+        return [Project(p, self) for p in self.endpoints.getProjects()['items']]
 
     @property
     def users(self) -> list[User]:
         """Get all Users on the current instance"""
-        return [User(u, self.endpoints) for u in self.endpoints.getUsers()['items']]
+        return [User(u, self) for u in self.endpoints.getUsers()['items']]
 
 
     @property
     def config(self) -> Config:
         """Get the configuration info for the current Planka server"""
-        return Config(self.endpoints.getConfig()['item'], self.endpoints)
+        return Config(self.endpoints.getConfig()['item'], self)
 
     def create_project(self, **kwargs: Unpack[typ.Request_createProject]) -> Project:
         """Creates a project. The current user automatically becomes a project manager.
@@ -69,7 +69,7 @@ class Planka:
             ValidationError: 400 
             Unauthorized: 401 
         """
-        return Project(self.endpoints.createProject(**kwargs)['item'], self.endpoints)
+        return Project(self.endpoints.createProject(**kwargs)['item'], self)
     
     def create_user(self, **kwargs: Unpack[typ.Request_createUser]) -> User:
         """Creates a user account. Requires admin privileges.
@@ -99,6 +99,6 @@ class Planka:
             Forbidden: 403 
             Conflict: 409 
         """
-        return User(self.endpoints.createUser(**kwargs)['item'], self.endpoints)
+        return User(self.endpoints.createUser(**kwargs)['item'], self)
 
 

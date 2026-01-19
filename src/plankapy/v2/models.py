@@ -13,7 +13,6 @@ from typing import (
 
 from .api import (
     schemas,
-    PlankaEndpoints,
     paths,
 )
 
@@ -44,14 +43,21 @@ __all__ = (
     "Webhook", #TODO
 )
 
+TYPE_CHECKING = False
+
+if TYPE_CHECKING:
+    # Models take a Planka session to allow checking User permissions
+    from .interface import Planka
+
 _S = TypeVar('_S', bound=Mapping[str, Any])
 class PlankaModel(Generic[_S]):
     """Base Planka object interface"""
     
-    def __init__(self, schema: _S, endpoints: PlankaEndpoints) -> None:
+    def __init__(self, schema: _S, session: Planka) -> None:
         self._schema = schema
-        self.endpoints = endpoints
-        self.client = self.endpoints.client
+        self.session = session
+        self.endpoints = session.endpoints
+        self.client = self.session.client
     
     @property
     def schema(self) -> _S:
@@ -104,15 +110,15 @@ class Action(PlankaModel[schemas.Action]):
     @property
     def card(self) -> Card:
         """The Card where the Action occurred"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     @property
     def board(self) -> Board:
         """The Board where the Action occurred"""
-        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
     @property
     def user(self) -> User:
         """The User who performed the Action"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
     @property
     def data(self) -> dict[str, Any]:
         """The specific data associated with the Action (type dependant)"""
@@ -146,11 +152,11 @@ class Attachment(PlankaModel[schemas.Attachment]):
     @property
     def card(self) -> Card:
         """The Card the Attachment belongs to"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     @property
     def creator(self) -> User:
         """The User created the Attachment"""
-        return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.session)
     @property
     def data(self) -> dict[str, Any]:
         """The specific data associated with the action (type dependant)"""
@@ -199,7 +205,7 @@ class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
     @property
     def project(self) -> Project:
         """The Project the BackgroundImage belongs to"""
-        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
+        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
     
     @property
     def size_in_bytes(self) -> int:
@@ -247,7 +253,7 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
     @property
     def project(self) -> Project:
         """The Project that the BaseCustomFieldGroup is associated with"""
-        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
+        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
 
     @property
     def name(self) -> str:
@@ -303,37 +309,37 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def labels(self) -> list[Label]:
         """Get all Labels on the Board"""
-        return [Label(l, self.endpoints) for l in self._included['labels']]
+        return [Label(l, self.session) for l in self._included['labels']]
     
     @property
     def cards(self) -> list[Card]:
         """Get all active Cards on the Board (use archived_cards and trashed_cards for archived/trashed Card lists)"""
-        return [Card(c, self.endpoints) for c in self._included['cards']]
+        return [Card(c, self.session) for c in self._included['cards']]
     
     @property
     def trashed_cards(self) -> list[Card]:
         """Get all Cards in the Board trash list"""
-        return [Card(c, self.endpoints) for c in self.endpoints.getCards(self.trash_list.id)['items']]
+        return [Card(c, self.session) for c in self.endpoints.getCards(self.trash_list.id)['items']]
     
     @property
     def archived_cards(self) -> list[Card]:
         """Get all Cards in the Board archive list"""
-        return [Card(c, self.endpoints) for c in self.endpoints.getCards(self.archive_list.id)['items']]
+        return [Card(c, self.session) for c in self.endpoints.getCards(self.archive_list.id)['items']]
 
     @property
     def subscribed_cards(self) -> list[Card]:
         """Get all Cards on the Board that the current User is subscribed to"""
-        return [Card(sc, self.endpoints) for sc in self._included['cards'] if sc['isSubscribed']]
+        return [Card(sc, self.session) for sc in self._included['cards'] if sc['isSubscribed']]
     
     @property
     def projects(self) -> list[Project]:
         """Get all Projects that the Board is associated with (use `Board.Project` instead, this is always one item)"""
-        return [Project(p, self.endpoints) for p in self._included['projects']]
+        return [Project(p, self.session) for p in self._included['projects']]
     
     @property
     def board_memberships(self) -> list[BoardMembership]:
         """Get all BoardMemberships for the Board"""
-        return [BoardMembership(bm, self.endpoints) for bm in self._included['boardMemberships']]
+        return [BoardMembership(bm, self.session) for bm in self._included['boardMemberships']]
     
     @property
     def users(self) -> list[User]:
@@ -353,47 +359,47 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def all_lists(self) -> list[List]:
         """Get all Lists associated with the Board"""
-        return [List(l, self.endpoints) for l in self._included['lists']]
+        return [List(l, self.session) for l in self._included['lists']]
     
     @property
     def card_memberships(self) -> list[CardMembership]:
         """Get all CardMemberships associated with the Board"""
-        return [CardMembership(cm, self.endpoints) for cm in self._included['cardMemberships']]
+        return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
     def card_labels(self) -> list[CardLabel]:
         """Get all CardLabels associated with the Board"""
-        return [CardLabel(cl, self.endpoints) for cl in self._included['cardLabels']]
+        return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
     
     @property
     def task_lists(self) -> list[TaskList]:
         """Get all TaskLists associated with the Board"""
-        return [TaskList(tl, self.endpoints) for tl in self._included['taskLists']]
+        return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
     def tasks(self) -> list[Task]:
         """Get all Tasks associated with the Board"""
-        return [Task(t, self.endpoints) for t in self._included['tasks']]
+        return [Task(t, self.session) for t in self._included['tasks']]
     
     @property
     def attachments(self) -> list[Attachment]:
         """Get all Attachments associated with the Board"""
-        return [Attachment(a, self.endpoints) for a in self._included['attachments']]
+        return [Attachment(a, self.session) for a in self._included['attachments']]
     
     @property
     def custom_field_groups(self) -> list[CustomFieldGroup]:
         """Get all CustomFieldGroups associated with the Board"""
-        return [CustomFieldGroup(cfg, self.endpoints) for cfg in self._included['customFieldGroups']]
+        return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
     
     @property
     def custom_fields(self) -> list[CustomField]:
         """Get all CustomFields associated with the Board"""
-        return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+        return [CustomField(cf, self.session) for cf in self._included['customFields']]
     
     @property
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Board"""
-        return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
+        return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
     
     @property
     def archive_list(self) -> List:
@@ -424,7 +430,7 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def project(self) -> Project:
         """TheProject the Board belongs to"""
-        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
+        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
     
     @property
     def position(self) -> int:
@@ -513,11 +519,11 @@ class Board(PlankaModel[schemas.Board]):
 
     def create_list(self, **lst: Unpack[paths.Request_createList]) -> List:
         """Create a new List on the Board"""
-        return List(self.endpoints.createList(self.id, **lst)['item'], self.endpoints)
+        return List(self.endpoints.createList(self.id, **lst)['item'], self.session)
 
     def create_label(self, **lbl: Unpack[paths.Request_createLabel]) -> Label:
         """Create a new Label on the Board"""
-        return Label(self.endpoints.createLabel(self.id, **lbl)['item'], self.endpoints)
+        return Label(self.endpoints.createLabel(self.id, **lbl)['item'], self.session)
     
     def add_user(self, user: User, role: BoardRole) -> None:
         """Add a User to the Board"""
@@ -548,17 +554,17 @@ class BoardMembership(PlankaModel[schemas.BoardMembership]):
     @property
     def project(self) -> Project:
         """The Project the BoardMembership belongs to"""
-        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
+        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
     
     @property
     def board(self) -> Board:
         """The Board the BoardMembership is associated with"""
-        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
     
     @property
     def user(self) -> User:
         """The User the BoardMembership is associated with"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
 
     @property
     def role(self) -> BoardRole:
@@ -623,17 +629,17 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def attachments(self) -> list[Attachment]:
         """Get all Attachments associated with the Card"""
-        return [Attachment(a, self.endpoints) for a in self._included['attachments']]
+        return [Attachment(a, self.session) for a in self._included['attachments']]
     
     @property
     def card_memberships(self) -> list[CardMembership]:
         """Get all CardMemberships associated with the Card"""
-        return [CardMembership(cm, self.endpoints) for cm in self._included['cardMemberships']]
+        return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
     def members(self) -> list[User]:
         """Get all User members associated with the Card"""
-        return [User(u, self.endpoints) for u in self._included['users']]
+        return [User(u, self.session) for u in self._included['users']]
     
     @property
     def labels(self) -> list[Label]:
@@ -644,32 +650,32 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def tasks(self) -> list[Task]:
         """Get all Tasks associated with the card"""
-        return [Task(t, self.endpoints) for t in self._included['tasks']]
+        return [Task(t, self.session) for t in self._included['tasks']]
     
     @property
     def task_lists(self) -> list[TaskList]:
         """Get all TaskLists associated with the Card"""
-        return [TaskList(tl, self.endpoints) for tl in self._included['taskLists']]
+        return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
     def custom_field_groups(self) -> list[CustomFieldGroup]:
         """Get all CustomFieldGroups associated with the Card"""
-        return [CustomFieldGroup(cfg, self.endpoints) for cfg in self._included['customFieldGroups']]
+        return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
     
     @property
     def custom_fields(self) -> list[CustomField]:
          """Get all CustomFields associated with the Card"""
-         return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+         return [CustomField(cf, self.session) for cf in self._included['customFields']]
     
     @property
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Card"""
-        return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
+        return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
     
     @property
     def comments(self) -> list[Comment]:
         """Get all Comments on the Card"""
-        return [Comment(c, self.endpoints) for c in self.endpoints.getComments(self.id)['items']]
+        return [Comment(c, self.session) for c in self.endpoints.getComments(self.id)['items']]
 
     # Card props
     @property
@@ -684,12 +690,12 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def board(self) -> Board:
         """The Board the Card belongs to"""
-        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
     
     @property
     def list(self)-> List:
         """The List the Card belongs to"""
-        return List(self.endpoints.getList(self.schema['listId'])['item'], self.endpoints)
+        return List(self.endpoints.getList(self.schema['listId'])['item'], self.session)
     @list.setter
     def list(self, list: List) -> Self:
         """Set List the Card belongs to"""
@@ -699,13 +705,13 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def creator(self) -> User:
         """The User who Created the card"""
-        return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.session)
     
     @property
     def prev_list(self) -> List | None:
         """The previous List the card was in (available when in archive or trash)"""
         if self.schema['prevListId']:
-            return List(self.endpoints.getList(self.schema['prevListId'])['item'], self.endpoints)
+            return List(self.endpoints.getList(self.schema['prevListId'])['item'], self.session)
     
     @property
     def cover(self) -> Attachment | None:
@@ -885,7 +891,7 @@ class Card(PlankaModel[schemas.Card]):
                 url=attachment, 
                 name=name or str(hash(attachment))
             )
-            a = Attachment(r['item'], self.endpoints)
+            a = Attachment(r['item'], self.session)
         
         # Attach File
         elif isinstance(attachment, bytes):
@@ -895,7 +901,7 @@ class Card(PlankaModel[schemas.Card]):
                 file=str(attachment), 
                 name=name or str(hash(attachment))
             )
-            a =  Attachment(r['item'], self.endpoints)
+            a =  Attachment(r['item'], self.session)
         else:
             raise ValueError(f'Expected str or bytes for Attachment, got {type(attachment)}')
 
@@ -932,7 +938,7 @@ class Card(PlankaModel[schemas.Card]):
         if user not in self.board.users and add_to_board:
             # Add the user to the board
             self.board.add_user(user, role='editor')
-        return CardMembership(self.endpoints.createCardMembership(self.id, userId=user.id)['item'], self.endpoints)
+        return CardMembership(self.endpoints.createCardMembership(self.id, userId=user.id)['item'], self.session)
 
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
@@ -942,7 +948,7 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
     @property
     def card(self) -> Card:
         """The Card the Label is associated with"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
 
     @property
     def label(self) -> Label:
@@ -975,12 +981,12 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     @property
     def card(self) -> Card:
         """The Card the User is a member of"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
 
     @property
     def user(self) -> User:
         """The User who is a member of the Card"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
 
     @property
     def created_at(self) -> datetime:
@@ -1005,12 +1011,12 @@ class Comment(PlankaModel[schemas.Comment]):
     @property
     def card(self) -> Card:
         """The Card the Comment belongs to"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     
     @property
     def user(self) -> User:
         """The User who created the Comment"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
     
     @property
     def text(self) -> str:
@@ -1073,7 +1079,7 @@ class CustomField(PlankaModel[schemas.CustomField]):
     @property
     def custom_field_group(self) -> CustomFieldGroup:
         """The CustomFieldGroup the CustomField belongs to"""
-        return CustomFieldGroup(self.endpoints.getCustomFieldGroup(self.schema['customFieldGroupId'])['item'], self.endpoints)
+        return CustomFieldGroup(self.endpoints.getCustomFieldGroup(self.schema['customFieldGroupId'])['item'], self.session)
     
     @property
     def position(self) -> int:
@@ -1135,23 +1141,23 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
 
     @property
     def custom_fields(self) -> list[CustomField]:
-        return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+        return [CustomField(cf, self.session) for cf in self._included['customFields']]
 
     @property
     def custom_field_values(self) -> list[CustomFieldValue]:
-        return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
+        return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
 
     # CustomFieldGroup props
 
     @property
     def board(self) -> Board:
         """The Board the CustomFieldGroup belongs to"""
-        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
     
     @property
     def card(self) -> Card:
         """The Card the CustomFieldGroup belongs to"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     
     @property
     def base_custom_field_group(self) -> BaseCustomFieldGroup:
@@ -1209,12 +1215,12 @@ class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     @property
     def card(self) -> Card:
         """The Card the CustomFieldValue belongs to"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     
     @property
     def custom_field_group(self) -> CustomFieldGroup:
         """The CustomFieldGroup the CustomFieldValue belongs to"""
-        return CustomFieldGroup(self.endpoints.getCustomFieldGroup(self.schema['customFieldGroupId'])['item'], self.endpoints)
+        return CustomFieldGroup(self.endpoints.getCustomFieldGroup(self.schema['customFieldGroupId'])['item'], self.session)
 
     @property
     def custom_field(self) -> CustomField:
@@ -1283,7 +1289,7 @@ class Label(PlankaModel[schemas.Label]):
     @property
     def board(self) -> Board:
         """The Board the Label belongs to"""
-        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
     
     @property
     def position(self) -> int:
@@ -1353,58 +1359,58 @@ class List(PlankaModel[schemas.List]):
     @property
     def users(self) ->  list[User]:
         """Users associated with the List"""
-        return [User(u, self.endpoints) for u in self._included['users']]
+        return [User(u, self.session) for u in self._included['users']]
     
     @property
     def cards(self) -> list[Card]:
         """Cards associated with the List"""
-        return [Card(c, self.endpoints) for c in self._included['cards']]
+        return [Card(c, self.session) for c in self._included['cards']]
     
     @property
     def card_memberships(self) -> list[CardMembership]:
         """CardMemberships associated with the List"""
-        return [CardMembership(cm, self.endpoints) for cm in self._included['cardMemberships']]
+        return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
     def card_labels(self) -> list[CardLabel]:
         """CardLabels associated with the List"""
-        return [CardLabel(cl, self.endpoints) for cl in self._included['cardLabels']]
+        return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
     
     @property
     def task_lists(self) -> list[TaskList]:
         """TaskLists associated with the List"""
-        return [TaskList(tl, self.endpoints) for tl in self._included['taskLists']]
+        return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
     def tasks(self) ->  list[Task]:
         """Tasks associated with the List"""
-        return [Task(t, self.endpoints) for t in self._included['tasks']]
+        return [Task(t, self.session) for t in self._included['tasks']]
 
     @property
     def attachments(self) -> list[Attachment]:
         """Attachments associated with the List"""
-        return [Attachment(a, self.endpoints) for a in self._included['attachments']]
+        return [Attachment(a, self.session) for a in self._included['attachments']]
 
     @property
     def custom_field_groups(self) ->  list[CustomFieldGroup]:
         """CustomFieldGroups associated with the List"""
-        return [CustomFieldGroup(cfg, self.endpoints) for cfg in self._included['customFieldGroups']]
+        return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
 
     @property
     def custom_fields(self) ->  list[CustomField]:
         """CustomFields associated with the List"""
-        return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+        return [CustomField(cf, self.session) for cf in self._included['customFields']]
 
     @property
     def custom_field_values(self) -> list[CustomFieldValue]:
         """CustomFieldValues associated with the List"""
-        return [CustomFieldValue(cfv, self.endpoints) for cfv in self._included['customFieldValues']]
+        return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
 
     # List Properties
     @property
     def board(self) -> Board:
         """The Board the List belongs to"""
-        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.endpoints)
+        return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
     
     @property
     def type(self): 
@@ -1460,11 +1466,11 @@ class List(PlankaModel[schemas.List]):
 
     def create_card(self, **crd: Unpack[paths.Request_createCard]) -> Card:
         """Create a new card in the List"""
-        return Card(self.endpoints.createCard(self.id, **crd)['item'], self.endpoints)
+        return Card(self.endpoints.createCard(self.id, **crd)['item'], self.session)
     
     def sort_cards(self, **kwargs: Unpack[paths.Request_sortList]) -> list[Card]:
         """Sort all cards in the List and return the sorted Cards"""
-        return [Card(c, self.endpoints) for c in self.endpoints.sortList(self.id, **kwargs)['included']['cards']]
+        return [Card(c, self.session) for c in self.endpoints.sortList(self.id, **kwargs)['included']['cards']]
     
     def archive_cards(self) -> None:
         """Move all cards in the List to the Board archive"""
@@ -1523,35 +1529,35 @@ class Project(PlankaModel[schemas.Project]):
     @property
     def users(self) -> list[User]:
         """Get Users associated with the Project"""
-        return [User(u, self.endpoints) for u in self._included['users']]
+        return [User(u, self.session) for u in self._included['users']]
     @property
     def managers(self) -> list[ProjectManager]:
         """Get project manager Users associated with the Project"""
-        return [ProjectManager(pm, self.endpoints) for pm in self._included['projectManagers']]
+        return [ProjectManager(pm, self.session) for pm in self._included['projectManagers']]
     @property
     def background_images(self) -> list[BackgroundImage]:
         """Get BackgroundImages associated with the Project"""
-        return [BackgroundImage(bgi, self.endpoints) for bgi in self._included['backgroundImages']]
+        return [BackgroundImage(bgi, self.session) for bgi in self._included['backgroundImages']]
     @property
     def base_custom_field_groups(self) -> list[BaseCustomFieldGroup]:
         """Get BaseCustomFieldGroups associated with the Project"""
-        return [BaseCustomFieldGroup(bcfg, self.endpoints) for bcfg in self._included['baseCustomFieldGroups']]
+        return [BaseCustomFieldGroup(bcfg, self.session) for bcfg in self._included['baseCustomFieldGroups']]
     @property
     def boards(self) -> list[Board]:
         """Get Boards associated with the Project"""
-        return [Board(b, self.endpoints) for b in self._included['boards']]
+        return [Board(b, self.session) for b in self._included['boards']]
     @property
     def board_memberships(self) -> list[BoardMembership]:
         """Get BoardMemberships associated with the Project"""
-        return [BoardMembership(bm, self.endpoints) for bm in self._included['boardMemberships']]
+        return [BoardMembership(bm, self.session) for bm in self._included['boardMemberships']]
     @property
     def custom_fields(self) -> list[CustomField]:
         """Get CustomFields associated with the Project"""
-        return [CustomField(cf, self.endpoints) for cf in self._included['customFields']]
+        return [CustomField(cf, self.session) for cf in self._included['customFields']]
     @property
     def notification_services(self) -> list[NotificationService]:
         """Get NotificationServices associated with the Project"""
-        return [NotificationService(ns, self.endpoints) for ns in self._included['notificationServices']]
+        return [NotificationService(ns, self.session) for ns in self._included['notificationServices']]
     
     # Project Properties
     @property
@@ -1566,7 +1572,7 @@ class Project(PlankaModel[schemas.Project]):
     @property
     def owner(self) -> User:
         """The User who owns the project"""
-        return User(self.endpoints.getUser(self.schema['ownerProjectManagerId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['ownerProjectManagerId'])['item'], self.session)
 
     @property
     def background_image(self) -> BackgroundImage | None:
@@ -1655,7 +1661,7 @@ class Project(PlankaModel[schemas.Project]):
     
     def add_project_manager(self, user: User) -> ProjectManager:
         """Add a User to the Project as a ProjectManager"""
-        return ProjectManager(self.endpoints.createProjectManager(self.id, userId=user.id)['item'], self.endpoints)
+        return ProjectManager(self.endpoints.createProjectManager(self.id, userId=user.id)['item'], self.session)
     
     def remove_background(self) -> None:
         """Reset the Project background to the default grey"""
@@ -1680,11 +1686,11 @@ class Project(PlankaModel[schemas.Project]):
 
     def create_board(self, **board: Unpack[paths.Request_createBoard]) -> Board:
         """Create a new Board in the Project"""
-        return Board(self.endpoints.createBoard(self.id, **board)['item'], self.endpoints)
+        return Board(self.endpoints.createBoard(self.id, **board)['item'], self.session)
 
     def create_base_custom_field_group(self, **bcfg: Unpack[paths.Request_createBaseCustomFieldGroup]) -> BaseCustomFieldGroup:
         """Create a BaseCustomFieldGroup in the Project"""
-        return BaseCustomFieldGroup(self.endpoints.createBaseCustomFieldGroup(self.id, **bcfg)['item'], self.endpoints)
+        return BaseCustomFieldGroup(self.endpoints.createBaseCustomFieldGroup(self.id, **bcfg)['item'], self.session)
 
 
 class ProjectManager(PlankaModel[schemas.ProjectManager]):
@@ -1694,11 +1700,11 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
     @property
     def project(self) -> Project:
         """The Project associated with the ProjectManager"""
-        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.endpoints)
+        return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
     @property
     def user(self) -> User:
         """The User assigned as ProjectManager"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
     
     @property
     def created_at(self) -> datetime:
@@ -1730,7 +1736,7 @@ class Task(PlankaModel[schemas.Task]):
     @property
     def task_list(self) -> TaskList:
         """The TaskList the Task belongs to"""
-        return TaskList(self.endpoints.getTaskList(self.schema['taskListId'])['item'], self.endpoints)
+        return TaskList(self.endpoints.getTaskList(self.schema['taskListId'])['item'], self.session)
     @task_list.setter
     def task_list(self, task_list: TaskList) -> None:
         """Move the Task to a different TaskList"""
@@ -1739,12 +1745,12 @@ class Task(PlankaModel[schemas.Task]):
     @property
     def card(self) -> Card:
         """The Card the Task is linked to"""
-        return Card(self.endpoints.getCard(self.schema['linkedCardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['linkedCardId'])['item'], self.session)
 
     @property
     def assignee(self) -> User | None:
         """The User assigned to the Task if there is one"""
-        return User(self.endpoints.getUser(self.schema['assigneeUserId'])['item'], self.endpoints)
+        return User(self.endpoints.getUser(self.schema['assigneeUserId'])['item'], self.session)
     @assignee.setter
     def assignee(self, assignee: User | None) -> None:
         """Assign a User to the Task"""
@@ -1818,14 +1824,14 @@ class TaskList(PlankaModel[schemas.TaskList]):
     @property
     def tasks(self) -> list[Task]:
         """All Tasks associated with the TaskList"""
-        return [Task(t, self.endpoints) for t in self._included['tasks']]
+        return [Task(t, self.session) for t in self._included['tasks']]
 
     # TaskList props
 
     @property
     def card(self) -> Card:
         """The Card the TaskList belongs to"""
-        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.endpoints)
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     
     @property
     def position(self) -> int:
@@ -1903,7 +1909,7 @@ class TaskList(PlankaModel[schemas.TaskList]):
                 position=position, 
                 isCompleted=is_completed
             )['item'], 
-            self.endpoints
+            self.session
         )
 
 
