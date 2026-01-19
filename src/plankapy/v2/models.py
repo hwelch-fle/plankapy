@@ -117,26 +117,35 @@ class Action(PlankaModel[schemas.Action]):
     def created_at(self) -> datetime:
         """When the Action was created"""
         return datetime.fromisoformat(self.schema['createdAt'])
+    
     @property
     def updated_at(self) -> datetime:
         """When the Action was last updated"""
         return datetime.fromisoformat(self.schema['updatedAt'])
+    
     @property
     def card(self) -> Card:
         """The Card where the Action occurred"""
         return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
+    
     @property
     def board(self) -> Board:
         """The Board where the Action occurred"""
         return Board(self.endpoints.getBoard(self.schema['boardId'])['item'], self.session)
+    
     @property
     def user(self) -> User:
-        """The User who performed the Action"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
+        """The User who performed the Action (Raise LookupError if User is not found in Board)"""
+        _usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['userId']}")
+    
     @property
     def data(self) -> dict[str, Any]:
         """The specific data associated with the Action (type dependant)"""
         return self.schema['data']
+    
     @property
     def type(self):
         """The type of the Action"""
@@ -159,22 +168,30 @@ class Attachment(PlankaModel[schemas.Attachment]):
     def created_at(self) -> datetime:
         """When the Attachment was created"""
         return datetime.fromisoformat(self.schema['createdAt'])
+    
     @property
     def updated_at(self) -> datetime:
         """When the Attachment was last updated"""
         return datetime.fromisoformat(self.schema['updatedAt'])
+    
     @property
     def card(self) -> Card:
         """The Card the Attachment belongs to"""
         return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
+    
     @property
     def creator(self) -> User:
-        """The User created the Attachment"""
-        return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.session)
+        """The User created the Attachment (Raises LookupError if User is not found in Board)"""
+        _usrs = [u for u in self.card.board.users if self.schema['creatorUserId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['creatorUserId']}")
+    
     @property
     def data(self) -> dict[str, Any]:
         """The specific data associated with the action (type dependant)"""
         return self.schema['data']
+    
     @property
     def type(self):
         """The type of the action"""
@@ -363,7 +380,7 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def users(self) -> list[User]:
         """Get all Users on the Board"""
-        return [bm.user for bm in self.board_memberships]
+        return [User(u, self.session) for u in self._included['users']]
 
     @property
     def editors(self) -> list[User]:
@@ -582,8 +599,11 @@ class BoardMembership(PlankaModel[schemas.BoardMembership]):
     
     @property
     def user(self) -> User:
-        """The User the BoardMembership is associated with"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
+        """The User the BoardMembership is associated with (Raises LookupError if User no longer in the Board)"""
+        _usrs = [u for u in self.board.users if self.schema['userId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
     @property
     def role(self) -> BoardRole:
@@ -656,9 +676,14 @@ class Card(PlankaModel[schemas.Card]):
         return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
-    def members(self) -> list[User]:
-        """Get all User members associated with the Card"""
+    def users(self) -> list[User]:
+        """Get all Users associated with the Card (including Creator)"""
         return [User(u, self.session) for u in self._included['users']]
+    
+    @property
+    def members(self) -> list[User]:
+        """Get all Users Assigned to the card"""
+        return [cm.user for cm in self.card_memberships]
     
     @property
     def labels(self) -> list[Label]:
@@ -723,8 +748,11 @@ class Card(PlankaModel[schemas.Card]):
 
     @property
     def creator(self) -> User:
-        """The User who Created the card"""
-        return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.session)
+        """The User who Created the card (Raises LookupError if User is no longer a Board Member)"""
+        _usrs = [u for u in self.users if self.schema['creatorUserId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['creatorUserId']}")
     
     @property
     def prev_list(self) -> List | None:
@@ -994,8 +1022,11 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
 
     @property
     def user(self) -> User:
-        """The User who is a member of the Card"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
+        """The User who is a member of the Card (Raise LookupError if the User is no longer on the Board)"""
+        _usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
     @property
     def created_at(self) -> datetime:
@@ -1023,9 +1054,12 @@ class Comment(PlankaModel[schemas.Comment]):
         return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     
     @property
-    def user(self) -> User:
-        """The User who created the Comment"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
+    def user(self) -> User | None:
+        """The User who created the Comment (Raises LookupError if the User is not a BoardMember)"""
+        _usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['userId']}")
     
     @property
     def text(self) -> str:
@@ -1584,8 +1618,11 @@ class Project(PlankaModel[schemas.Project]):
         
     @property
     def owner(self) -> User:
-        """The User who owns the project"""
-        return User(self.endpoints.getUser(self.schema['ownerProjectManagerId'])['item'], self.session)
+        """The User who owns the project (Raises LookupError if the User cannot be found)"""
+        _usrs = [u for u in self.users if self.schema['ownerProjectManagerId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find user: {self.schema['ownerProjectManagerId']}")
 
     @property
     def background_image(self) -> BackgroundImage | None:
@@ -1716,8 +1753,11 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
     @property
     def user(self) -> User:
-        """The User assigned as ProjectManager"""
-        return User(self.endpoints.getUser(self.schema['userId'])['item'], self.session)
+        """The User assigned as ProjectManager (Raises LookupError if the User cannot be found)"""
+        _usrs = [u for u in self.project.users if self.schema['userId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['userId']}")
     
     @property
     def created_at(self) -> datetime:
@@ -1763,7 +1803,10 @@ class Task(PlankaModel[schemas.Task]):
     @property
     def assignee(self) -> User | None:
         """The User assigned to the Task if there is one"""
-        return User(self.endpoints.getUser(self.schema['assigneeUserId'])['item'], self.session)
+        _usrs = [u for u in self.card.board.users if self.schema['assigneeUserId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['assigneeUserId']}")
     @assignee.setter
     def assignee(self, assignee: User | None) -> None:
         """Assign a User to the Task"""
@@ -2139,8 +2182,9 @@ class User(PlankaModel[schemas.User]):
 
     # Special Methods
     def sync(self):
-        """Sync the User with the Planka server"""
-        self.schema = self.endpoints.getUser(self.id)['item']
+        """Sync the User with the Planka server (Can only sync your own User)"""
+        if self.id == self.session.me.id:
+            self.schema = self.session.me.schema
 
     def update(self, **kwargs: Unpack[paths.Request_updateUser]):
         """Update the User"""
