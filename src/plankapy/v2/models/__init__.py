@@ -5,19 +5,24 @@ from collections.abc import (
     Mapping, 
     Sequence,
 )
-from datetime import datetime, timezone
+from datetime import datetime
 import json
 from typing import (
     Any, 
     Generic, 
     Literal,
-    Protocol, 
     Self, 
     TypeVar, 
     Unpack,
 )
 
-from .api import (
+from .helpers import (
+    dtfromiso,
+    get_position,
+    Position,
+)
+
+from ..api import (
     schemas,
     paths,
 )
@@ -69,38 +74,7 @@ __all__ = (
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     # Models take a Planka session to allow checking User permissions
-    from .interface import Planka
-
-# Position Offset
-OFFSET = 16384
-
-def dtfromiso(iso: str, default_timezone: timezone=timezone.utc) -> datetime:
-    """Convert an ISO 8601 string to an ofset aware datetime
-    
-    Args:
-        iso (str): The ISO 8601 string to convert to a datetime
-        default_timezone (timezone): The timezone to interpret the ISO string in (default: timezone.utc)
-    
-    Note:
-        If the ISO 8601 timestamp contains tzinfo, that will be used. The `default_timezone` arg 
-        will only be used on ISO 8601 strings that don't contain timezone info 
-    """
-    dt = datetime.fromisoformat(iso)
-    if not dt.tzinfo:
-        return dt.replace(tzinfo=default_timezone)
-    return dt
-
-class HasPosition(Protocol):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.position: int
-
-def get_position(items: Sequence[HasPosition], position: Literal['top', 'bottom'] | int) -> int:
-    """Get a top/bottom position"""
-    if isinstance(position, int):
-        return position
-    if position != 'bottom':
-        return 0
-    return max((i.position for i in items), default=0) + OFFSET
+    from ..interface import Planka
 
 ############################ Model Format #####################################
 # 1) add_*: For creating an association between a model and another model     #
@@ -403,13 +377,13 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
 
     def add_field(self, field: CustomField, 
                   *, 
-                  position: Literal['top', 'bottom'] | int='top',
+                  position: Position='top',
                   show_on_card: bool|None=None) -> CustomField:
         """Add an existing CustomField to the BaseGroup
         
         Args:
             field (CustomField): The existing CustomField to add
-            position (Literal['top', 'bottom'] | int): The position of the CustomField in the BaseCustomFieldGroup (default: `top`)
+            position (Position): The position of the CustomField in the BaseCustomFieldGroup (default: `top`)
             show_on_card (bool): (default: field.show_on_front_of_card)
             
         Note:
@@ -1128,7 +1102,7 @@ class Card(PlankaModel[schemas.Card]):
         """Delete the Card"""
         return self.endpoints.deleteCard(self.id)
 
-    def move(self, list: List, position: Literal['top', 'bottom'] | int = 'top') -> Card:
+    def move(self, list: List, position: Position = 'top') -> Card:
         """Move the card to a new list (default to top of new list)"""
         self.update(
             listId=list.id, 
@@ -1137,7 +1111,7 @@ class Card(PlankaModel[schemas.Card]):
         )
         return self
 
-    def restore(self, position: Literal['top', 'bottom'] | int='top') -> Card:
+    def restore(self, position: Position='top') -> Card:
         """Restore the Card from arcive/trash to its previous list"""
         if self.prev_list is not None:
             self.move(self.prev_list, position)
@@ -1206,13 +1180,13 @@ class Card(PlankaModel[schemas.Card]):
 
     def add_card_fields(self, *fields: str, 
                         group: str='Fields', 
-                        position: Literal['top', 'bottom'] | int='top') -> CustomFieldGroup:
+                        position: Position='top') -> CustomFieldGroup:
         """Add fields directly to a Card
         
         Args:
             *fields (str): Varargs of the Fieldnames to add to the Card
             group (str): An optional FieldGroup name to add the fields to (default: `Fields`)
-            position (Literal['top', 'bottom'] | int): The position to add the Card field group at (default: `top`)
+            position (Position): The position to add the Card field group at (default: `top`)
         
         Returns:
             CustomFieldGroup
@@ -1650,13 +1624,13 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
     
     def add_field(self, name: str,
                   *,
-                  position: Literal['top', 'bottom'] | int='top',
+                  position: Position='top',
                   show_on_card: bool=False) -> CustomField:
         """Add a Field to the CustomFieldGroup
         
         Args:
             name (str): The name of the Field to add
-            position (Literal['top', 'bottom'] | int): The position of the field within the group (default: `top`)
+            position (Position): The position of the field within the group (default: `top`)
             show_on_card (bool): Show the field on the Card front (default: `False`)
         
         Returns:
@@ -1678,13 +1652,13 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
   
     def add_fields(self,
                    *names: str,
-                   position: Literal['top', 'bottom'] | int='top',
+                   position: Position='top',
                    show_on_card: bool=False) -> list[CustomField]:
         """Add fields to the CustomFieldGroup
         
         Args:
             *names (str): Varargs of the names to add
-            position (Literal['top', 'bottom'] | int): The position of the field within the group (default: `top`)
+            position (Position): The position of the field within the group (default: `top`)
             show_on_card (bool): Show the field on the Card front (default: `False`)
             
         Returns:
@@ -1847,13 +1821,13 @@ class Label(PlankaModel[schemas.Label]):
 
     def add_to_board(self, board: Board, 
                      *, 
-                     position: Literal['top', 'bottom'] | int='top',
+                     position: Position='top',
                      color: LabelColor|None=None) -> Label:
         """Add the Label to a Board or return a matching Label from the Board.
         
         Args:
             board (Board): The Board to add the Label to
-            position (Literal['top', 'bottom'] | int): The position of the Label within the Board (default: `top`)
+            position (Position): The position of the Label within the Board (default: `top`)
             color (LabelColor | None): Optionally change the LabelColor in the new Board
         
         Returns:
@@ -2034,7 +2008,7 @@ class List(PlankaModel[schemas.List]):
             raise TypeError(f'Only trash type lists can be deleted')
         self.endpoints.clearList(self.id)['item']
     
-    def move_cards(self, list: List, position: Literal['top', 'bottom'] | int='top') -> None:
+    def move_cards(self, list: List, position: Position='top') -> None:
         """Move all Cards in this List to another List"""
         for c in self.cards:
             c.move(list, position)
@@ -2581,7 +2555,7 @@ class TaskList(PlankaModel[schemas.TaskList]):
 
     def add_task(self, name: str, *, 
                  is_completed: bool=False, 
-                 position: Literal['top', 'bottom'] | int='top') -> Task:
+                 position: Position='top') -> Task:
         """Create a new Task in the TaskList"""
 
         return Task(self.endpoints.createTask(
