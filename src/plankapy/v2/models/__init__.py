@@ -81,26 +81,32 @@ from ._literals import *
 # 3) get_*: For associations that require 2+ requests to find                 #
 #   - label.get_cards()                                                       #
 #                                                                             #
-# 4) sync, update, delete: If possible allow GET, PATCH, DELETE passthroughs  #
+# 4) remove_*: Remove/Delete an associated object                             #
+#   - card.remove_label(label)                                                #
+#                                                                             #
+# 5) delete_*: Delete an associated object                                    #
+#   - board.delete_label(label)                                               #
+#                                                                             #
+# 6) sync, update, delete: If possible allow GET, PATCH, DELETE passthroughs  #
 #   - If sync required more than 2 requests, don't implement it               # 
 #                                                                             #
-# 4) @property: All attributes and includes that require 1 request            #
+# 7) @property: All attributes and includes that require 1 request            #
 #   - board.labels (in board['included'])                                     #
 #   - board.cards (has endpoint getCards(boardId))                            #
 #                                                                             #
-# 5) @field.setter: Allow setting properties available in Model patch request #
+# 8) @field.setter: Allow setting properties available in Model patch request #
 #   - These setters should implement the update() method of the model         #
 #                                                                             #
-# 6) datetimes: All ISO 8601 strings should be converted to datetime          #
+# 9) datetimes: All ISO 8601 strings should be converted to datetime          #
 #   - Use `timezone` property of session if no timezone in ISO string         #
 #                                                                             #
-# 7) Exceptions: Allow HTTPStatusError to be raised unless a necessary        #
+# 10) Exceptions: Allow HTTPStatusError to be raised unless a necessary       #
 #   - PermissionError: Use session.current_role and current_id for checks     #
 #   - LookupError: If the resource cannot be found (deleted on server)        #
 #   - ValueError: Reserved for file operations (see Attachment)               #
 #   - Any other Exception needs to be clearly documented                      #
 #                                                                             #
-# 8) property iteration: If a list property needs to be iterated, cache it    #
+# 11) property iteration: If a list property needs to be iterated, cache it   #
 #   - _list_cards = list.cards                                                #
 #   - This will prevent multiple requests to list._includes                   #
 #   - If your operation is slow, do not cache to prevent de-syncing           #
