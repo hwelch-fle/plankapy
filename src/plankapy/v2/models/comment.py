@@ -1,0 +1,61 @@
+from __future__ import annotations
+
+from datetime import datetime
+from ._base import PlankaModel
+from ._helpers import dtfromiso
+from ..api import schemas, paths
+
+TYPE_CHECKING = False
+if TYPE_CHECKING:
+    from typing import Unpack
+    from models import *
+ 
+class Comment(PlankaModel[schemas.Comment]):
+    """Python interface for Planka Comments"""
+    
+    # Comment properties
+
+    @property
+    def card(self) -> Card:
+        """The Card the Comment belongs to"""
+        return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
+    
+    @property
+    def user(self) -> User | None:
+        """The User who created the Comment (Raises LookupError if the User is not a BoardMember)"""
+        _usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
+        if _usrs:
+            return _usrs.pop()
+        raise LookupError(f"Cannot find User: {self.schema['userId']}")
+    
+    @property
+    def text(self) -> str:
+        """Content of the Comment"""
+        return self.schema['text']
+    
+    @property
+    def created_at(self) -> datetime:
+        """When the comment was created"""
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
+
+    @property
+    def updated_at(self) -> datetime:
+        """When the comment was last updated"""
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
+
+    # Special Methods
+    def sync(self):
+        """Sync the Comment with the Planka server"""
+        _cm = [cm for cm in self.card.comments if cm == self]
+        if _cm:
+            self.schema = _cm.pop().schema
+
+    def update(self, **kwargs: Unpack[paths.Request_updateComments]):
+        """Update the Comment (must be the comment Creator or an Admin)"""
+        self.endpoints.updateComments(self.id, **kwargs)
+
+    def delete(self):
+        """Delete the Comment"""
+        return self.endpoints.deleteComment(self.id)
+
+   

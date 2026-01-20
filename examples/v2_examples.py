@@ -8,7 +8,7 @@ from plankapy.v2 import Planka
 from plankapy.v2.models import *
 from plankapy.v2.models import UserRole
 from httpx import Client, HTTPStatusError
-from random import choice
+from random import choice, shuffle
 
 def reset_planka(planka: Planka):
     for project in planka.projects:
@@ -68,18 +68,32 @@ if __name__ == '__main__':
     lists = ['To Do', 'Doing', 'Review', 'Done']
     labels = ['Overdue', 'On Schedule']
     boards = ['Fontend', 'Backend']
-    cards = ['Task 1', 'Task 2', 'Task 3', 'Task 4']
+    cards = [f'Task {i}'for i in range(1,11)]
+    base_fields = {'Group 1': ['field a', 'field b'], 'Group 2': ['field c', 'field d']}
 
     reset_planka(planka)
 
     # Build a Framework
+    print('Creating Projects')
     create_projects(planka, *projects)
+    print('Creating Users')
+    create_users(*users)
     for project in planka.projects:
+        print(f'Creating Boards in {project.name}')
         create_boards(project, *boards)
+        for bcfg_name, bcfg_fields in base_fields.items():
+            bcfg = project.create_base_custom_field_group(name=bcfg_name)
+            for pos, field in enumerate(bcfg_fields, start=1):
+                bcfg.create_field(name=field, position=16636*pos, showOnFrontOfCard=True)
         for board in project.boards:
+            print(f'\tCreating Lists in {board.name}')
             create_lists(board, *lists)
+            print(f'\tCreating Labels in {board.name}')
             create_labels(board, *labels)
+            print(f'\tCreating Cards in {board.name}')
             create_cards(board.active_lists[0], *cards)
+            print(f'\tAdding Members to {board.name}')
+            board.add_members(planka.users, role='editor')
     
     # Just kinda move stuff around randomly
     while True:
@@ -90,13 +104,17 @@ if __name__ == '__main__':
                     overdue = [l for l in board.labels if l.name == 'Overdue'].pop()
                     on_schedule = [l for l in board.labels if l.name == 'On Schedule'].pop()
 
-                    # Move 5 cards per board
-                    for _ in range(5):
-                        card = choice(board.cards)
+                    cards = board.cards
+                    shuffle(cards)
+                    for card in cards:
+                        user = choice(board.users)
                         to_list = choice(board.active_lists)
                         print(f'{project.name}->{board.name}: Moving Card {card.name} from List {card.list.name} To List {to_list.name}')
                         card.move(to_list, position='bottom')
-
+                        for member in card.members:
+                            card.remove_member(member)
+                        user.add_to_card(card)
+                        
                         # Pick a Due Date then do datemath to warn user of overdue cards and set labels
                         card.due_date = datetime.now() + timedelta(days=choice([-3, -2, -1, 0, 1, 2, 3]))
                         due_in = card.due_date - datetime.now().replace(tzinfo=card.due_date.tzinfo)
