@@ -1020,7 +1020,7 @@ class Card(PlankaModel[schemas.Card]):
     def cover(self, attachment: Attachment) -> None:
         """Set the Card cover"""
         if attachment.card != self:
-            raise ValueError(f'Attachment ')
+            raise LookupError(f'Attachment is not a member of Card {self.id}')
         self.update(coverAttachmentId=attachment.id)
     
     @property
@@ -2833,7 +2833,7 @@ class User(PlankaModel[schemas.User]):
 
         Raises:
             PermissionError: If the current user is not admin and attempts to set another user's password
-            ValueError: If the current user is not admin and the `password` arg is not set
+            PermissionError: If the current user is not admin and the `password` arg is not set
             HTTPStatusError: If the password is wrong or the update operation fails
         """
         
@@ -2846,7 +2846,7 @@ class User(PlankaModel[schemas.User]):
             raise PermissionError(f'Cannot set other User emails unless admin')
         
         if not password:
-            raise ValueError(f'User password required to update email!')
+            raise PermissionError(f'User password required to update email!')
         
         self.endpoints.updateUserEmail(self.id, email=email, currentPassword=password)
 
@@ -2862,7 +2862,7 @@ class User(PlankaModel[schemas.User]):
         
         Raises:
             PermissionError: If a non-admin attempts to update another user's password
-            ValueError: If a user attempts to update their own password without passing a `current_password`
+            PermissionError: If a user attempts to update their own password without passing a `current_password`
             HTTPStatusError: If the password is wrong or the update operation fails
         """
         # Admins can set any User password
@@ -2876,7 +2876,7 @@ class User(PlankaModel[schemas.User]):
         
         # Password change required current password
         if not current_password:
-            raise ValueError(f'Cannot set other User passwords unless admin')
+            raise PermissionError(f'Cannot set other User passwords unless admin')
 
         self.endpoints.updateUserPassword(self.id, password=new_password, currentPassword=current_password)
 
