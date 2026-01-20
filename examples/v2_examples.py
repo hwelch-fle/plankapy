@@ -99,13 +99,13 @@ if __name__ == '__main__':
 
                         # Pick a Due Date then do datemath to warn user of overdue cards and set labels
                         card.due_date = datetime.now() + timedelta(days=choice([-3, -2, -1, 0, 1, 2, 3]))
-                        due_in_days = (card.due_date.replace(tzinfo=timezone.utc) - datetime.now().replace(tzinfo=timezone.utc)).days
-                        if card.due_date.timestamp() > datetime.now().timestamp():
-                            print(f'Card: {card.name} is due in {due_in_days} days')
+                        due_in = card.due_date - datetime.now().replace(tzinfo=card.due_date.tzinfo)
+                        if card.due_date.timestamp() > datetime.now(tz=timezone.utc).timestamp():
+                            print(f'Card: {card.name} is due in {due_in.days} days')
                             card.remove_label(overdue)
                             card.add_label(on_schedule)
                         else:
-                            print(f'WARNING Card: {card.name} is overdue by {due_in_days} days!')
+                            print(f'WARNING Card: {card.name} is overdue by {due_in.days} days!')
                             card.remove_label(on_schedule)
                             card.add_label(overdue)
         except HTTPStatusError as e:

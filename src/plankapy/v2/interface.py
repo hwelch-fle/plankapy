@@ -23,6 +23,7 @@ from __future__ import annotations
 from functools import cached_property
 from typing import Unpack
 from warnings import warn
+from datetime import timezone
 
 from httpx import Client
 from .api import (
@@ -38,13 +39,14 @@ DEFAULT_LANG = os.environ.get('PLANKA_LANG', 'en-US')
 del os
 
 class Planka:
-    def __init__(self, client: Client, lang: str=DEFAULT_LANG) -> None:
+    def __init__(self, client: Client, *, lang: str=DEFAULT_LANG, timezone: timezone = timezone.utc) -> None:
         self.client = client
         self.endpoints = PlankaEndpoints(client)
         if lang not in Languages:
             warn(f'{lang} is not currently supported by Planka, using {DEFAULT_LANG}', EncodingWarning)
             lang = DEFAULT_LANG
         self.lang = lang
+        self.timezone = timezone
         
         # Assigned after logon() is called
         self.current_role = None

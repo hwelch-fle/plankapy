@@ -5,7 +5,7 @@ from collections.abc import (
     Mapping, 
     Sequence,
 )
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from typing import (
     Any, 
@@ -70,6 +70,22 @@ if TYPE_CHECKING:
     # Models take a Planka session to allow checking User permissions
     from .interface import Planka
 
+def dtfromiso(iso: str, default_timezone: timezone=timezone.utc) -> datetime:
+    """Convert an ISO 8601 string to an ofset aware datetime
+    
+    Args:
+        iso (str): The ISO 8601 string to convert to a datetime
+        default_timezone (timezone): The timezone to interpret the ISO string in (default: timezone.utc)
+    
+    Note:
+        If the ISO 8601 timestamp contains tzinfo, that will be used. The `default_timezone` arg 
+        will only be used on ISO 8601 strings that don't contain timezone info 
+    """
+    dt = datetime.fromisoformat(iso)
+    if not dt.tzinfo:
+        return dt.replace(tzinfo=default_timezone)
+    return dt
+
 _S = TypeVar('_S', bound=Mapping[str, Any])
 class PlankaModel(Generic[_S]):
     """Base Planka object interface"""
@@ -125,12 +141,12 @@ class Action(PlankaModel[schemas.Action]):
     @property
     def created_at(self) -> datetime:
         """When the Action was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the Action was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     @property
     def card(self) -> Card:
@@ -176,12 +192,12 @@ class Attachment(PlankaModel[schemas.Attachment]):
     @property
     def created_at(self) -> datetime:
         """When the Attachment was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the Attachment was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     @property
     def card(self) -> Card:
@@ -235,12 +251,12 @@ class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
     @property
     def created_at(self) -> datetime:
         """When the BackgroundImage was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the BackgroundImage was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     @property
     def project(self) -> Project:
@@ -307,12 +323,12 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
     @property
     def created_at(self) -> datetime:
         """When the base custom field group was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the base custom field group was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -543,11 +559,11 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def created_at(self) -> datetime:
         """When the Board was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     @property
     def updated_at(self) -> datetime:
         """When the Board was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self) -> None:
@@ -753,12 +769,12 @@ class BoardMembership(PlankaModel[schemas.BoardMembership]):
     @property
     def created_at(self) -> datetime:
         """When the board membership was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the board membership was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -946,7 +962,7 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def due_date(self) -> datetime:
         """Due date for the card"""
-        return datetime.fromisoformat(self.schema['dueDate'])
+        return dtfromiso(self.schema['dueDate'], self.session.timezone)
     @due_date.setter
     def due_date(self, due_date: datetime) -> None:
         """Set the due date"""
@@ -978,17 +994,17 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def list_changed_at(self) -> datetime:
         """When the Card was last moved between Lists"""
-        return datetime.fromisoformat(self.schema['listChangedAt'])
+        return dtfromiso(self.schema['listChangedAt'], self.session.timezone)
     
     @property
     def created_at(self) -> datetime:
         """When the Card was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the Card was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -1275,12 +1291,12 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
     @property
     def created_at(self) -> datetime:
         """When the card-label association was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
 
     @property
     def updated_at(self) -> datetime:
         """When the card-label association was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     def delete(self):
         """Delete the CardLabel"""
@@ -1308,12 +1324,12 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     @property
     def created_at(self) -> datetime:
         """When the card membership was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
 
     @property
     def updated_at(self) -> datetime:
         """When the card membership was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     def delete(self):
         """Delete the CardMembership"""
@@ -1346,12 +1362,12 @@ class Comment(PlankaModel[schemas.Comment]):
     @property
     def created_at(self) -> datetime:
         """When the comment was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
 
     @property
     def updated_at(self) -> datetime:
         """When the comment was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -1431,12 +1447,12 @@ class CustomField(PlankaModel[schemas.CustomField]):
     @property
     def created_at(self) -> datetime:
         """When the custom field was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
 
     @property
     def updated_at(self) -> datetime:
         """When the custom field was last updated"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -1507,12 +1523,12 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
     @property
     def created_at(self) -> datetime:
         """When the CustomFieldGroup was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the CustomFieldGroup was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -1650,12 +1666,12 @@ class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     @property
     def created_at(self) -> datetime:
         """When the CustomFieldValue was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the CustomFieldValue was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -1732,12 +1748,12 @@ class Label(PlankaModel[schemas.Label]):
     @property
     def created_at(self) -> datetime:
         """When the label was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the label was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self):
@@ -1910,12 +1926,12 @@ class List(PlankaModel[schemas.List]):
     @property    
     def created_at(self) -> datetime:
         """When the List was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the List was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self):
@@ -2024,12 +2040,12 @@ class Notification(PlankaModel[schemas.Notification]):
     @property
     def created_at(self) -> datetime:
         """When the Notification was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the Notification was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self):
@@ -2079,12 +2095,12 @@ class NotificationService(PlankaModel[schemas.NotificationService]):
     @property
     def created_at(self) -> datetime:
         """When the NotificationService was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
 
     @property
     def updated_at(self) -> datetime:
         """When the NotificationService was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self):
@@ -2238,12 +2254,12 @@ class Project(PlankaModel[schemas.Project]):
     @property
     def created_at(self) -> datetime:
         """When the project was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the project was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self):
@@ -2310,12 +2326,12 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
     @property
     def created_at(self) -> datetime:
         """When the ProjectManager was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the ProjectManager was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self):
@@ -2393,12 +2409,12 @@ class Task(PlankaModel[schemas.Task]):
     @property
     def created_at(self) -> datetime:
         """When the Task was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
 
     @property
     def updated_at(self) -> datetime:
         """When the Task was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -2475,12 +2491,12 @@ class TaskList(PlankaModel[schemas.TaskList]):
     @property
     def created_at(self) -> datetime:
         """When the TaskList was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the TaskList was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -2724,12 +2740,12 @@ class User(PlankaModel[schemas.User]):
     @property
     def created_at(self) -> datetime:
         """When the user was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
     
     @property
     def updated_at(self) -> datetime:
         """When the user was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
     # Special Methods
     def sync(self):
@@ -2896,12 +2912,12 @@ class Webhook(PlankaModel[schemas.Webhook]):
     @property
     def created_at(self) -> datetime:
         """When the Webhook was created"""
-        return datetime.fromisoformat(self.schema['createdAt'])
+        return dtfromiso(self.schema['createdAt'], self.session.timezone)
         
     @property
     def updated_at(self) -> datetime:
         """When the Webhook was last updated"""
-        return datetime.fromisoformat(self.schema['updatedAt'])
+        return dtfromiso(self.schema['updatedAt'], self.session.timezone)
     
     # Special Methods
     def sync(self):
