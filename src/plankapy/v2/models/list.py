@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('List', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso
@@ -11,7 +13,6 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import UserListType, ListColor
 
-__all__ = ('List', )
 
 class List(PlankaModel[schemas.List]):
     """Python interface for Planka Lists"""

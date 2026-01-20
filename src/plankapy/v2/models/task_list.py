@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('TaskList', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
@@ -10,7 +12,6 @@ if TYPE_CHECKING:
     from typing import Unpack
     from models import *
 
-__all__ = ('TaskList', )
 
 class TaskList(PlankaModel[schemas.TaskList]):
     """Python interface for Planka TaskLists"""

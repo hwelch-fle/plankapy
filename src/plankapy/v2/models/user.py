@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('User', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -20,7 +22,6 @@ if TYPE_CHECKING:
         TermsType
     )
 
-__all__ = ('User', )
 
 class User(PlankaModel[schemas.User]):
     """Python interface for Planka Users"""

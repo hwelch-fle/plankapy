@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('Comment', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -10,7 +12,6 @@ if TYPE_CHECKING:
     from typing import Unpack
     from models import *
 
-__all__ = ('Comment', )
 
 class Comment(PlankaModel[schemas.Comment]):
     """Python interface for Planka Comments"""

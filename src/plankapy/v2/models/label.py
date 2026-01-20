@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('Label', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
@@ -11,7 +13,6 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import LabelColor
 
-__all__ = ('Label', )
 
 class Label(PlankaModel[schemas.Label]):
     """Python interface for Planka Labels"""

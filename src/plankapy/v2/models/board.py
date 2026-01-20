@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('Board', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -12,7 +14,6 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import CardType, BoardRole, BoardView
 
-__all__ = ('Board', )
 
 class Board(PlankaModel[schemas.Board]):
     """Python interface for Planka Boards"""
@@ -380,4 +381,3 @@ class Board(PlankaModel[schemas.Board]):
         for user in users:
             self.remove_user(user)
 
-   

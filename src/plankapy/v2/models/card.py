@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('Card', 'Stopwatch', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
@@ -12,7 +14,6 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import CardType, BoardRole
 
-__all__ = ('Card', 'Stopwatch', )
 
 class Card(PlankaModel[schemas.Card]):
     """Python interface for Planka Cards"""

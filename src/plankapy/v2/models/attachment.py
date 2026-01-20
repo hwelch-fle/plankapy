@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('Attachment', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -11,7 +13,6 @@ if TYPE_CHECKING:
     from typing import Any, Unpack
     from models import *
 
-__all__ = ('Attachment', )
 
 class Attachment(PlankaModel[schemas.Attachment]):
     """Python interface for Planka Attachments"""

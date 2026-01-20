@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('ProjectManager', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -9,7 +11,6 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from models import *
 
-__all__ = ('ProjectManager', )
 
 class ProjectManager(PlankaModel[schemas.ProjectManager]):
     """Python interface for Planka ProjectManagers"""

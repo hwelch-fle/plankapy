@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('CustomField', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -10,7 +12,6 @@ if TYPE_CHECKING:
     from typing import Unpack
     from models import *
 
-__all__ = ('CustomField', )
 
 class CustomField(PlankaModel[schemas.CustomField]):
     """Python interface for Planka CustomFields"""

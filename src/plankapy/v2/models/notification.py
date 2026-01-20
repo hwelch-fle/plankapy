@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('Notification', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -11,7 +13,6 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import NotificationType
 
-__all__ = ('Notification', )
 
 class Notification(PlankaModel[schemas.Notification]):
     """Python interface for Planka Notifications"""

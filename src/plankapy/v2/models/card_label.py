@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ('CardLabel', )
+
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -9,7 +11,6 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from models import *
 
-__all__ = ('CardLabel', )
  
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
