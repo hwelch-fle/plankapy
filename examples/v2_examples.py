@@ -1,8 +1,8 @@
 # Collection of sample scripts for plankapy.v2
 from datetime import datetime, timedelta, timezone
 import sys
-import time
 sys.path.append('../src')
+sys.path.append('src')
 
 from plankapy.v2 import Planka
 from plankapy.v2.models import *
