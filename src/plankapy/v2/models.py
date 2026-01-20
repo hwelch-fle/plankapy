@@ -1883,7 +1883,7 @@ class Label(PlankaModel[schemas.Label]):
             _schema['color'] = color
         return Label(self.endpoints.createLabel(**_schema)['item'], self.session)
 
-    def gather_cards(self) -> list[Card]:
+    def get_cards(self) -> list[Card]:
         """All Cards that have this Label in the Board"""
         return [
             cl.card
