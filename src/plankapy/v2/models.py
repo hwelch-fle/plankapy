@@ -62,6 +62,7 @@ __all__ = (
     "LockableFields",
     "NotificationTypes",
     "WebhookEvents",
+    "UserRoles",
 )
 
 TYPE_CHECKING = False
@@ -1236,6 +1237,11 @@ class Card(PlankaModel[schemas.Card]):
                     f'Label ({label.name}:{label.id}) not found in Board ({self.board.name}:{self.board.id})\n'
                     'run with `add_to_board` flag set to add this label to the board'
                 )
+        # Check if label is already on card
+        for card_label in self.card_labels:
+            if label.id == card_label.schema['labelId']:
+                return card_label
+        # Create new CardLabel relationship
         return CardLabel(self.endpoints.createCardLabel(self.id, labelId=label.id)['item'], self.session)
       
     def remove_label(self, label: Label) -> None:
@@ -1245,8 +1251,9 @@ class Card(PlankaModel[schemas.Card]):
             label (Label): The label to remove (must be associated with the Card)
         """
         for card_label in self.card_labels:
-            if card_label == label:
+            if card_label.label == label:
                 card_label.delete()
+                return
             
 
 class CardLabel(PlankaModel[schemas.CardLabel]):
@@ -1277,7 +1284,7 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
 
     def delete(self):
         """Delete the CardLabel"""
-        return self.endpoints.deleteCardLabel(cardId=self.card.id, labelId=self.label.id)
+        return self.endpoints.deleteCardLabel(cardId=self.schema['cardId'], labelId=self.schema['labelId'])
 
 
 class CardMembership(PlankaModel[schemas.CardMembership]):
@@ -2535,6 +2542,9 @@ TermsTypes: tuple[TermsType] = TermsType.__args__
 LockableField = Literal['email', 'password', 'name']
 LockableFields: tuple[LockableField] = LockableField.__args__
 
+UserRole = Literal['admin', 'projectOwner', 'boardUser']
+UserRoles: tuple[UserRole] = UserRole.__args__
+
 class User(PlankaModel[schemas.User]):
     """Python interface for Planka Users"""
 
@@ -2560,7 +2570,7 @@ class User(PlankaModel[schemas.User]):
         """User role defining access permissions"""
         return self.schema['role']
     @role.setter
-    def role(self, role: Literal['admin', 'projectOwner', 'boardUser']) -> None:
+    def role(self, role: UserRole) -> None:
         """Set the User role"""
         self.update(role=role)
 
