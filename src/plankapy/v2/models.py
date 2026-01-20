@@ -363,6 +363,11 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
 
     @property
+    def custom_fields(self) -> list[CustomField]:
+        """The CustomFields associated with the BaseCustomFieldGroup"""
+        return [cf for cf in self.project.custom_fields if cf.schema['baseCustomFieldGroupId'] == self.id]
+
+    @property
     def name(self) -> str:
         """Name/title of the base custom field group"""
         return self.schema['name']
