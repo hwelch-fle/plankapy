@@ -1,6 +1,25 @@
 from typing import Literal
 
 __all__ =   (
+    
+    # Literal Types for hinting
+    "BoardView",
+    "CardType",
+    "BoardRole",
+    "LabelColor",
+    "ListColor",
+    "BackgroundGradient",
+    "Language",
+    "EditorMode",
+    "HomeView",
+    "ProjectOrdering",
+    "TermsType",
+    "LockableField",
+    "NotificationType",
+    "WebhookEvent",
+    "UserRole",
+    
+    # String Tuples (for in/choice operations)
     "BoardViews",
     "CardTypes",
     "BoardRoles",
