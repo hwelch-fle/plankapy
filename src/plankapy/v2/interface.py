@@ -28,7 +28,7 @@ from datetime import timezone
 from httpx import Client
 from .api import (
     PlankaEndpoints, 
-    typ, # Response / Request typing
+    paths, # Response / Request typing
 )
 from .models import *
 
@@ -117,7 +117,7 @@ class Planka:
             if self.current_role in ('admin', 'projectOwner')
         ]
     
-    def create_project(self, **kwargs: Unpack[typ.Request_createProject]) -> Project:
+    def create_project(self, **kwargs: Unpack[paths.Request_createProject]) -> Project:
         """Creates a project. The current user automatically becomes a project manager.
 
         Args:
@@ -138,7 +138,7 @@ class Planka:
             raise PermissionError(f'Onlt Admins and Project Owners can create Projects')
         return Project(self.endpoints.createProject(**kwargs)['item'], self)
     
-    def create_user(self, **kwargs: Unpack[typ.Request_createUser]) -> User:
+    def create_user(self, **kwargs: Unpack[paths.Request_createUser]) -> User:
         """Creates a user account. Requires admin privileges.
 
         Args:
@@ -171,7 +171,7 @@ class Planka:
             raise PermissionError(f'Only Admins can create Users')
         return User(self.endpoints.createUser(**kwargs)['item'], self)
 
-    def create_webhook(self, **kwargs: Unpack[typ.Request_createWebhook]) -> Webhook:
+    def create_webhook(self, **kwargs: Unpack[paths.Request_createWebhook]) -> Webhook:
         """Create a Webhook (admin only)
         
         Args:
