@@ -280,8 +280,7 @@ class Attachment(PlankaModel[schemas.Attachment]):
         # No endpoint for attachments, need to get it through the associated Card
         _new = [a for a in self.card.attachments if a.id == self.id]
         if not _new:
-            raise ValueError(f'Attachment {self.id} No longer exists!')
-        self.schema = _new.pop().schema
+            self.schema = _new.pop().schema
 
     def update(self, **attachment: Unpack[paths.Request_updateAttachment]) -> None:
         """Update the Attachment with the provided values"""
