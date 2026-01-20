@@ -107,6 +107,5 @@ if __name__ == '__main__':
                             print(f'WARNING Card: {card.name} is overdue by {due_in_days} days!')
                             card.remove_label(on_schedule)
                             card.add_label(overdue)
-                        time.sleep(1)
         except HTTPStatusError as e:
             print(e.response.json())
