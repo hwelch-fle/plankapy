@@ -55,7 +55,8 @@ class Task(PlankaModel[schemas.Task]):
     @position.setter
     def position(self, position: int) -> None:
         """Set the position of the Task within the TaskList"""
-
+        self.update(position=position)
+        
     @property
     def name(self) -> str:
         """Name/title of the Task"""
