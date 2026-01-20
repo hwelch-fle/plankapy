@@ -8,6 +8,8 @@ if TYPE_CHECKING:
     from typing import Any
     from models import *
 
+__all__ = ('Config', )
+
 class Config(PlankaModel[schemas.Config]):
     """Python interface for Planka Config"""
     

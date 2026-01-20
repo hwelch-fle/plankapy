@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import WebhookEvent
 
+__all__ = ('Webhook', )
+
 class Webhook(PlankaModel[schemas.Webhook]):
     """Python interface for Planka Webhooks"""
     

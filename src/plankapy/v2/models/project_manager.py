@@ -9,6 +9,8 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from models import *
 
+__all__ = ('ProjectManager', )
+
 class ProjectManager(PlankaModel[schemas.ProjectManager]):
     """Python interface for Planka ProjectManagers"""
     

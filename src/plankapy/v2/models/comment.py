@@ -9,7 +9,9 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
     from models import *
- 
+
+__all__ = ('Comment', )
+
 class Comment(PlankaModel[schemas.Comment]):
     """Python interface for Planka Comments"""
     

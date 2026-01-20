@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from typing import Any
     from models import *
 
+__all__ = ('Action', )
+
 class Action(PlankaModel[schemas.Action]):
     """Python interface for Planka Actions"""
     

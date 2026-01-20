@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from typing import Any, Unpack
     from models import *
 
+__all__ = ('Attachment', )
+
 class Attachment(PlankaModel[schemas.Attachment]):
     """Python interface for Planka Attachments"""
     

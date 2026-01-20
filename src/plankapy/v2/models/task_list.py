@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from typing import Unpack
     from models import *
 
+__all__ = ('TaskList', )
+
 class TaskList(PlankaModel[schemas.TaskList]):
     """Python interface for Planka TaskLists"""
     

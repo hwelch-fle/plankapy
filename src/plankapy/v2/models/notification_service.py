@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import NotificationServiceFormat
 
+__all__ = ('NotificationService', )
+
 class NotificationService(PlankaModel[schemas.NotificationService]):
     """Python interface for Planka NotificationServices"""
         

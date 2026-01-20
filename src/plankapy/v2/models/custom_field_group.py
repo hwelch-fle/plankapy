@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from typing import Unpack
     from models import *
 
+__all__ = ('CustomFieldGroup', )
+
 class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
     """Python interface for Planka CustomFieldGroups"""
     

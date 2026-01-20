@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import LabelColor
 
+__all__ = ('Label', )
+
 class Label(PlankaModel[schemas.Label]):
     """Python interface for Planka Labels"""
     

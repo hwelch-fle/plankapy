@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from models import *
     from _literals import BoardRole
 
+__all__ = ('BoardMembership', )
+
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
     

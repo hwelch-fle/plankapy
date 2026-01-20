@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import CardType, BoardRole, BoardView
 
+__all__ = ('Board', )
+
 class Board(PlankaModel[schemas.Board]):
     """Python interface for Planka Boards"""
     

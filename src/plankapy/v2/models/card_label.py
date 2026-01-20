@@ -8,7 +8,9 @@ from ..api import schemas
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from models import *
-    
+
+__all__ = ('CardLabel', )
+ 
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
 

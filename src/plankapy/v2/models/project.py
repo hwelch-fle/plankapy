@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import BackgroundGradient, BackgroundType
 
+__all__ = ('Project', )
+
 class Project(PlankaModel[schemas.Project]):
     """Python interface for Planka Projects"""
     

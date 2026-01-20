@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import UserListType, ListColor
 
+__all__ = ('List', )
+
 class List(PlankaModel[schemas.List]):
     """Python interface for Planka Lists"""
     

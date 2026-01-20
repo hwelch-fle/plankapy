@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Iterator
     from models import *
 
+__all__ = ('BackgroundImage', )
+
 class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
     """Python interface for Planka Background Images"""
 

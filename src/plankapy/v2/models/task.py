@@ -9,7 +9,9 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
     from models import *
-    
+
+__all__ = ('Task', )
+
 class Task(PlankaModel[schemas.Task]):
     """Python interface for Planka Tasks"""
 

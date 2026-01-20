@@ -19,7 +19,9 @@ if TYPE_CHECKING:
         BoardRole, 
         TermsType
     )
-    
+
+__all__ = ('User', )
+
 class User(PlankaModel[schemas.User]):
     """Python interface for Planka Users"""
 

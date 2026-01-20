@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from models import *
     from ._literals import NotificationType
 
+__all__ = ('Notification', )
+
 class Notification(PlankaModel[schemas.Notification]):
     """Python interface for Planka Notifications"""
     
