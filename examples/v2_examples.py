@@ -10,12 +10,7 @@ from plankapy.v2.models import UserRole
 from httpx import Client, HTTPStatusError
 from random import choice
 
-# Initialize a Planka instance using Demo user
-client = Client(base_url='http://localhost:1337')
-planka = Planka(client)
-planka.logon('demo', 'demo')
-
-def reset_planka():
+def reset_planka(planka: Planka):
     for project in planka.projects:
         for board in project.boards:
             board.delete()
@@ -24,7 +19,7 @@ def reset_planka():
         if user != planka.me:
             user.delete()
 
-def create_projects(*prj_names: str):
+def create_projects(planka: Planka, *prj_names: str):
     return {
         name: planka.create_project(name=name, type='shared')
         for name in prj_names
@@ -62,23 +57,29 @@ def create_labels(board: Board, *label_names: str):
 
 if __name__ == '__main__':
     
-    PROJECTS = ['Project 1', 'Project 2', 'Project 3']
-    USERS = ['user1', 'user2', 'user3']
-    LISTS = ['To Do', 'Doing', 'Review', 'Done']
-    LABELS = ['Overdue', 'On Schedule']
-    BOARDS = ['Fontend', 'Backend']
-    CARDS = ['Task 1', 'Task 2', 'Task 3', 'Task 4']
+    # Initialize a Planka instance using Demo user
+    client = Client(base_url='http://localhost:1337')
+    planka = Planka(client)
+    planka.logon('demo', 'demo')
+    
+    # Objects to create
+    projects = ['Project 1', 'Project 2', 'Project 3']
+    users = ['user1', 'user2', 'user3']
+    lists = ['To Do', 'Doing', 'Review', 'Done']
+    labels = ['Overdue', 'On Schedule']
+    boards = ['Fontend', 'Backend']
+    cards = ['Task 1', 'Task 2', 'Task 3', 'Task 4']
 
-    reset_planka()
+    reset_planka(planka)
 
     # Build a Framework
-    create_projects(*PROJECTS)
+    create_projects(planka, *projects)
     for project in planka.projects:
-        create_boards(project, *BOARDS)
+        create_boards(project, *boards)
         for board in project.boards:
-            create_lists(board, *LISTS)
-            create_labels(board, *LABELS)
-            create_cards(board.active_lists[0], *CARDS)
+            create_lists(board, *lists)
+            create_labels(board, *labels)
+            create_cards(board.active_lists[0], *cards)
     
     # Just kinda move stuff around randomly
     while True:
