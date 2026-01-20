@@ -396,6 +396,50 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
         """Delete the BaseCustomFieldGroup"""
         return self.endpoints.deleteBaseCustomFieldGroup(self.id)
 
+    def add_field(self, field: CustomField, 
+                  *, 
+                  position: Literal['top', 'bottom'] | int='top',
+                  show_on_card: bool|None=None) -> CustomField:
+        """Add an existing CustomField to the BaseGroup
+        
+        Args:
+            field (CustomField): The existing CustomField to add
+            position (Literal['top', 'bottom'] | int): The position of the CustomField in the BaseCustomFieldGroup (default: `top`)
+            show_on_card (bool): (default: field.show_on_front_of_card)
+            
+        Note:
+            If a CustomField with a matching name already exists in the base group, it 
+            will be returned
+        """
+        # Set position and 
+        if show_on_card is None:
+            show_on_card = field.show_on_front_of_card
+        
+        position = get_position(self.custom_fields, position) 
+        
+        # Find existing and update
+        for cf in self.custom_fields:
+            if cf.name != field.name:
+                continue
+            if cf.position != position:
+                cf.position = position
+            if cf.show_on_front_of_card != show_on_card:
+                cf.show_on_front_of_card = show_on_card
+            return cf
+        
+        # Create New Field
+        return self.create_field(name=field.name, position=position, showOnFrontOfCard=show_on_card)
+
+    def create_field(self, **kwargs: Unpack[paths.Request_createCustomFieldInBaseGroup]) -> CustomField:
+        """Create a new CustomField in the BaseCustomFieldGroup
+        
+        Args:
+            name (str): Name/title of the custom field
+            position (int): Position of the custom field within the group
+            showOnFrontOfCard (bool): Whether to show the field on the front of cards 
+        """
+        return CustomField(self.endpoints.createCustomFieldInBaseGroup(self.id, **kwargs)['item'], self.session)
+        
 
 BoardView = Literal['kanban', 'grid', 'list']
 BoardViews: tuple[BoardView] = BoardView.__args__
