@@ -10,7 +10,8 @@ import json
 from typing import (
     Any, 
     Generic, 
-    Literal, 
+    Literal,
+    Protocol, 
     Self, 
     TypeVar, 
     Unpack,
@@ -70,6 +71,9 @@ if TYPE_CHECKING:
     # Models take a Planka session to allow checking User permissions
     from .interface import Planka
 
+# Position Offset
+OFFSET = 16384
+
 def dtfromiso(iso: str, default_timezone: timezone=timezone.utc) -> datetime:
     """Convert an ISO 8601 string to an ofset aware datetime
     
@@ -85,6 +89,18 @@ def dtfromiso(iso: str, default_timezone: timezone=timezone.utc) -> datetime:
     if not dt.tzinfo:
         return dt.replace(tzinfo=default_timezone)
     return dt
+
+class HasPosition(Protocol):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.position: int
+
+def get_position(items: Sequence[HasPosition], position: Literal['top', 'bottom'] | int) -> int:
+    """Get a top/bottom position"""
+    if isinstance(position, int):
+        return position
+    if position != 'bottom':
+        return 0
+    return max((i.position for i in items), default=0) + OFFSET
 
 _S = TypeVar('_S', bound=Mapping[str, Any])
 class PlankaModel(Generic[_S]):
@@ -1030,20 +1046,10 @@ class Card(PlankaModel[schemas.Card]):
 
     def move(self, list: List, position: Literal['top', 'bottom'] | int = 'top') -> Card:
         """Move the card to a new list (default to top of new list)"""
-
-        if isinstance(position, int):
-            pos = position
-        elif position == 'top':
-            pos = 0
-        elif position == 'bottom':
-            pos = max((c.position for c in list.cards), default=0)
-        else:
-            raise ValueError(f'position must be int or one of `top`/`bottom`')
-        
         self.update(
             listId=list.id, 
             boardId=list.board.id, 
-            position=pos,
+            position=get_position(list.cards, position),
         )
         return self
 
@@ -1128,17 +1134,10 @@ class Card(PlankaModel[schemas.Card]):
             CustomFieldGroup
         """
         _existing_cfgs = [cfg for cfg in self.custom_field_groups]
+        position = get_position(_existing_cfgs, position)
+        
         # Create a new CustomFieldGroup if it doesn't exist
         if group not in [cfg.name for cfg in _existing_cfgs]:
-            if isinstance(position, int):
-                pass
-            
-            if position == 'top':
-                position = 0
-            
-            elif position == 'bottom':
-                position = max((cfg.position for cfg in _existing_cfgs), default=-1) + 1
-            
             cfg = CustomFieldGroup(
                 self.endpoints.createCardCustomFieldGroup(
                     self.id, 
@@ -1584,19 +1583,11 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
         if _existing_field:
             return _existing_field.pop()
         
-        # Get position and create new Field
-        if isinstance(position, int):
-            pass
-        elif position == 'bottom':
-            position = max((cf.position for cf in self.custom_fields), default=-1) + 1
-        else:
-            position = 0
-        
         return CustomField(
             self.endpoints.createCustomFieldInGroup(
                 self.id,
                 name=name,
-                position=position,
+                position=get_position(self.custom_fields, position),
                 showOnFrontOfCard=show_on_card, 
             )['item'], self.session
         )
@@ -1774,7 +1765,7 @@ class Label(PlankaModel[schemas.Label]):
                      *, 
                      position: Literal['top', 'bottom'] | int='top',
                      color: LabelColor|None=None) -> Label:
-        """Add the label to another Board
+        """Add the Label to a Board or return a matching Label from the Board.
         
         Args:
             board (Board): The Board to add the Label to
@@ -1782,33 +1773,26 @@ class Label(PlankaModel[schemas.Label]):
             color (LabelColor | None): Optionally change the LabelColor in the new Board
         
         Returns:
-            Label: The new Label
-            
+            Label: The new Label or the matching Label (same color and name)
+        
         Note:
-            If you attempt to add a label to a Board with an existing Label that has both 
-            matching color and name properties, that label will be returned
+            Matching is determines by name and color, if a Label matches on the board, but a color 
+            override is set, a new label will be created. If the label is already on the board, the 
+            input label is returned
         """
         # Don't re-add label to same board
         if board == self.board:
             return self
         
-        _schema = self.schema.copy()
-        # Set new boardId
-        _schema['boardId'] = board.id
-        
-        # Set position
-        if isinstance(position, int):
-            pass
-        elif position == 'top':
-            position = 0
-        else:
-            position = max((l.position for l in board.labels), default=-1) + 1
-        _schema['position'] = position
-        
         # Don't add the Label if one with matching name and color exists
-        _existing_labels = board.labels
-        if (self.name, self.color) in [(lbl.name, lbl.color) for lbl in _existing_labels]:
-            return [lbl for lbl in _existing_labels if (self.name, self.color) == (lbl.name, lbl.color)].pop()
+        # If a color override is set, allow the creation of a new label
+        for lbl in board.labels:
+            if (lbl.name, lbl.color) == (self.name, self.color) and color == self.color:
+                return lbl
+        
+        _schema = self.schema.copy()
+        _schema['boardId'] = board.id
+        _schema['position'] = get_position(board.labels, position)
         
         # Update color
         if color:
@@ -1816,7 +1800,7 @@ class Label(PlankaModel[schemas.Label]):
         return Label(self.endpoints.createLabel(**_schema)['item'], self.session)
 
     def gather_cards(self) -> list[Card]:
-        """All Cards that have this Label"""
+        """All Cards that have this Label in the Board"""
         return [
             cl.card
             for cl in self.board.card_labels
@@ -2515,18 +2499,12 @@ class TaskList(PlankaModel[schemas.TaskList]):
                  is_completed: bool=False, 
                  position: Literal['top', 'bottom'] | int='top') -> Task:
         """Create a new Task in the TaskList"""
-        if not isinstance(position, int):
-            if position == 'top':
-                position = 0
-            else:
-                # Find nest slot for 'bottom' (or any other invalid option)
-                position = max((t.position for t in self.tasks), default=0) + 1
 
         return Task(self.endpoints.createTask(
                 self.id, 
                 linkedCardId=self.card.id, 
                 name=name, 
-                position=position, 
+                position=get_position(self.tasks, position), 
                 isCompleted=is_completed
             )['item'], 
             self.session
