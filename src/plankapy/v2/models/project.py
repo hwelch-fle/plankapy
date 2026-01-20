@@ -26,30 +26,37 @@ class Project(PlankaModel[schemas.Project]):
     def users(self) -> list[User]:
         """Get Users associated with the Project"""
         return [User(u, self.session) for u in self._included['users']]
+    
     @property
     def managers(self) -> list[ProjectManager]:
         """Get project manager Users associated with the Project"""
         return [ProjectManager(pm, self.session) for pm in self._included['projectManagers']]
+    
     @property
     def background_images(self) -> list[BackgroundImage]:
         """Get BackgroundImages associated with the Project"""
         return [BackgroundImage(bgi, self.session) for bgi in self._included['backgroundImages']]
+    
     @property
     def base_custom_field_groups(self) -> list[BaseCustomFieldGroup]:
         """Get BaseCustomFieldGroups associated with the Project"""
         return [BaseCustomFieldGroup(bcfg, self.session) for bcfg in self._included['baseCustomFieldGroups']]
+    
     @property
     def boards(self) -> list[Board]:
         """Get Boards associated with the Project"""
         return [Board(b, self.session) for b in self._included['boards']]
+    
     @property
     def board_memberships(self) -> list[BoardMembership]:
         """Get BoardMemberships associated with the Project"""
         return [BoardMembership(bm, self.session) for bm in self._included['boardMemberships']]
+    
     @property
     def custom_fields(self) -> list[CustomField]:
         """Get CustomFields associated with the Project"""
         return [CustomField(cf, self.session) for cf in self._included['customFields']]
+    
     @property
     def notification_services(self) -> list[NotificationService]:
         """Get NotificationServices associated with the Project"""
