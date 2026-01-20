@@ -1572,7 +1572,7 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
         return CustomField(
             self.endpoints.createCustomFieldInGroup(
                 self.id,
-                name=self.name,
+                name=name,
                 position=position,
                 showOnFrontOfCard=show_on_card, 
             )['item'], self.session
