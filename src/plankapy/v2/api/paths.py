@@ -220,7 +220,6 @@ class PlankaEndpoints:
         # Handle file attachment
         if kwargs.get('type') == 'file':
             file_data = kwargs.pop('file')
-            print(kwargs)
             resp = self.client.post(
                 "api/cards/{cardId}/attachments".format(**args), 
                 data=kwargs, 
