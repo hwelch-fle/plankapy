@@ -79,13 +79,13 @@ class Request_createBoardMembership(TypedDict):
     """ID of the user who is a member of the board"""
     role: Literal['editor', 'viewer']
     """Role of the user in the board"""
-    canComment: NotRequired[bool]
+    canComment: NotRequired[bool | None]
     """Whether the user can comment on cards (applies only to viewers)"""
 
 class Request_updateBoardMembership(TypedDict):
     role: NotRequired[Literal['editor', 'viewer']]
     """Role of the user in the board"""
-    canComment: NotRequired[bool]
+    canComment: NotRequired[bool | None]
     """Whether the user can comment on cards (applies only to viewers)"""
 
 class Request_createBoard(TypedDict):
@@ -133,17 +133,17 @@ class Request_createCardMembership(TypedDict):
 class Request_createCard(TypedDict):
     type: Literal['project', 'story']
     """Type of the card"""
-    position: NotRequired[int]
+    position: NotRequired[int | None]
     """Position of the card within the list"""
     name: str
     """Name/title of the card"""
-    description: NotRequired[str]
+    description: NotRequired[str | None]
     """Detailed description of the card"""
     dueDate: NotRequired[str | datetime]
     """Due date for the card (`datetime` only allowed when using `Card.create_card`, otherwise use ISO string)"""
     isDueCompleted: NotRequired[bool]
     """Whether the due date is completed"""
-    stopwatch: NotRequired[dict[str, Any]]
+    stopwatch: NotRequired[dict[str, Any] | None]
     """Stopwatch data for time tracking"""
 
 class Request_getCards(TypedDict):
@@ -161,21 +161,21 @@ class Request_updateCard(TypedDict):
     """ID of the board to move the card to"""
     listId: NotRequired[str]
     """ID of the list to move the card to"""
-    coverAttachmentId: NotRequired[str]
+    coverAttachmentId: NotRequired[str | None]
     """ID of the attachment used as cover"""
     type: NotRequired[Literal['project', 'story']]
     """Type of the card"""
-    position: NotRequired[int]
+    position: NotRequired[int | None]
     """Position of the card within the list"""
     name: NotRequired[str]
     """Name/title of the card"""
-    description: NotRequired[str]
+    description: NotRequired[str | None]
     """Detailed description of the card"""
-    dueDate: NotRequired[str | datetime]
-    """Due date for the card (`datetime` only allowed when using `Card.update`, otherwise use ISO string)"""
-    isDueCompleted: NotRequired[bool]
+    dueDate: NotRequired[str | None]
+    """Due date for the card"""
+    isDueCompleted: NotRequired[bool | None]
     """Whether the due date is completed"""
-    stopwatch: NotRequired[dict[str, Any]]
+    stopwatch: NotRequired[dict[str, Any] | None]
     """Stopwatch data for time tracking"""
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
@@ -203,7 +203,7 @@ class Request_createBoardCustomFieldGroup(TypedDict):
     """ID of the base custom field group used as a template"""
     position: int
     """Position of the custom field group within the board"""
-    name: NotRequired[str]
+    name: NotRequired[str | None]
     """Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)"""
 
 class Request_createCardCustomFieldGroup(TypedDict):
@@ -211,13 +211,13 @@ class Request_createCardCustomFieldGroup(TypedDict):
     """ID of the base custom field group used as a template"""
     position: int
     """Position of the custom field group within the card"""
-    name: NotRequired[str]
+    name: NotRequired[str | None]
     """Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)"""
 
 class Request_updateCustomFieldGroup(TypedDict):
     position: NotRequired[int]
     """Position of the custom field group within the board/card"""
-    name: NotRequired[str]
+    name: NotRequired[str | None]
     """Name/title of the custom field group"""
 
 class Request_updateCustomFieldValue(TypedDict):
@@ -251,7 +251,7 @@ class Request_updateCustomField(TypedDict):
 class Request_createLabel(TypedDict):
     position: int
     """Position of the label within the board"""
-    name: NotRequired[str]
+    name: NotRequired[str | None]
     """Name/title of the label"""
     color: Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']
     """Color of the label"""
@@ -259,7 +259,7 @@ class Request_createLabel(TypedDict):
 class Request_updateLabel(TypedDict):
     position: NotRequired[int]
     """Position of the label within the board"""
-    name: NotRequired[str]
+    name: NotRequired[str | None]
     """Name/title of the label"""
     color: NotRequired[Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']]
     """Color of the label"""
@@ -325,21 +325,21 @@ class Request_createProject(TypedDict):
     """Type of the project"""
     name: str
     """Name/title of the project"""
-    description: NotRequired[str]
+    description: NotRequired[str | None]
     """Detailed description of the project"""
 
 class Request_updateProject(TypedDict):
-    ownerProjectManagerId: NotRequired[str]
+    ownerProjectManagerId: NotRequired[str | None]
     """ID of the project manager who owns the project"""
-    backgroundImageId: NotRequired[str]
+    backgroundImageId: NotRequired[str | None]
     """ID of the background image used as background"""
     name: NotRequired[str]
     """Name/title of the project"""
-    description: NotRequired[str]
+    description: NotRequired[str | None]
     """Detailed description of the project"""
-    backgroundType: NotRequired[Literal['gradient', 'image']]
+    backgroundType: NotRequired[Literal['gradient', 'image'] | None]
     """Type of background for the project"""
-    backgroundGradient: NotRequired[Literal['old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange', 'sour-peel', 'green-ninja', 'algae-green', 'coral-reef', 'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain', 'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 'red-curtain']]
+    backgroundGradient: NotRequired[Literal['old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange', 'sour-peel', 'green-ninja', 'algae-green', 'coral-reef', 'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain', 'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 'red-curtain'] | None]
     """Gradient background for the project"""
     isHidden: NotRequired[bool]
     """Whether the project is hidden"""
@@ -371,7 +371,7 @@ class Request_createTask(TypedDict):
     """ID of the card linked to the task"""
     position: int
     """Position of the task within the task list"""
-    name: NotRequired[str]
+    name: NotRequired[str | None]
     """Name/title of the task (required if `linkedCardId` is not provided)"""
     isCompleted: NotRequired[bool]
     """Whether the task is completed"""
@@ -379,7 +379,7 @@ class Request_createTask(TypedDict):
 class Request_updateTask(TypedDict):
     taskListId: NotRequired[str]
     """ID of the task list to move the task to"""
-    assigneeUserId: NotRequired[str]
+    assigneeUserId: NotRequired[str | None]
     """ID of the user assigned to the task (null to unassign)"""
     position: NotRequired[int]
     """Position of the task within the task list"""
@@ -401,13 +401,13 @@ class Request_createUser(TypedDict):
     """User role defining access permissions"""
     name: str
     """Full display name of the user"""
-    username: NotRequired[str]
+    username: NotRequired[str | None]
     """Unique username for user identification"""
-    phone: NotRequired[str]
+    phone: NotRequired[str | None]
     """Contact phone number"""
-    organization: NotRequired[str]
+    organization: NotRequired[str | None]
     """Organization or company name"""
-    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']]
+    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None]
     """Preferred language for user interface and notifications"""
     subscribeToOwnCards: NotRequired[bool]
     """Whether the user subscribes to their own cards"""
@@ -425,13 +425,13 @@ class Request_updateUser(TypedDict):
     """User role defining access permissions"""
     name: NotRequired[str]
     """Full display name of the user"""
-    avatar: NotRequired[dict[str, Any]]
+    avatar: NotRequired[dict[str, Any] | None]
     """Avatar of the user (only null value to remove avatar)"""
-    phone: NotRequired[str]
+    phone: NotRequired[str | None]
     """Contact phone number"""
-    organization: NotRequired[str]
+    organization: NotRequired[str | None]
     """Organization or company name"""
-    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']]
+    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None]
     """Preferred language for user interface and notifications"""
     subscribeToOwnCards: NotRequired[bool]
     """Whether the user subscribes to their own cards"""
@@ -467,7 +467,7 @@ class Request_updateUserPassword(TypedDict):
     """Current password (required when updating own password)"""
 
 class Request_updateUserUsername(TypedDict):
-    username: NotRequired[str]
+    username: NotRequired[str | None]
     """Unique username for user identification"""
     currentPassword: NotRequired[str]
     """Current password (required when updating own username)"""
@@ -477,11 +477,11 @@ class Request_createWebhook(TypedDict):
     """Name/title of the webhook"""
     url: str
     """URL endpoint for the webhook"""
-    accessToken: NotRequired[str]
+    accessToken: NotRequired[str | None]
     """Access token for webhook authentication"""
-    events: NotRequired[str]
+    events: NotRequired[str | None]
     """Comma-separated list of events that trigger the webhook"""
-    excludedEvents: NotRequired[str]
+    excludedEvents: NotRequired[str | None]
     """Comma-separated list of events excluded from the webhook"""
 
 class Request_updateWebhook(TypedDict):
@@ -489,11 +489,11 @@ class Request_updateWebhook(TypedDict):
     """Name/title of the webhook"""
     url: NotRequired[str]
     """URL endpoint for the webhook"""
-    accessToken: NotRequired[str]
+    accessToken: NotRequired[str | None]
     """Access token for webhook authentication"""
-    events: NotRequired[str]
+    events: NotRequired[str | None]
     """Comma-separated list of events that trigger the webhook"""
-    excludedEvents: NotRequired[str]
+    excludedEvents: NotRequired[str | None]
     """Comma-separated list of events excluded from the webhook"""
 
 
@@ -521,7 +521,7 @@ class Response_exchangeForAccessTokenWithOidc(TypedDict):
 
 class Response_revokePendingToken(TypedDict):
     """Pending token revoked successfully"""
-    item: dict[str, Any]
+    item: dict[str, Any] | None
     """No data returned"""
 
 class Response_getBoardActions(TypedDict):

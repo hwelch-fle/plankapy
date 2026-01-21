@@ -374,7 +374,7 @@ class AsyncPlankaEndpoints:
             boardId (str): ID of the board to create the board membership in)
             userId (str): ID of the user who is a member of the board
             role (Literal['editor', 'viewer']): Role of the user in the board
-            canComment (bool): Whether the user can comment on cards (applies only to viewers)
+            canComment (bool | None): Whether the user can comment on cards (applies only to viewers)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -421,7 +421,7 @@ class AsyncPlankaEndpoints:
         Args:
             id (str): ID of the board membership to update)
             role (Literal['editor', 'viewer']): Role of the user in the board
-            canComment (bool): Whether the user can comment on cards (applies only to viewers)
+            canComment (bool | None): Whether the user can comment on cards (applies only to viewers)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -645,12 +645,12 @@ class AsyncPlankaEndpoints:
         Args:
             listId (str): ID of the list to create the card in)
             type (Literal['project', 'story']): Type of the card
-            position (int): Position of the card within the list
+            position (int | None): Position of the card within the list
             name (str): Name/title of the card
-            description (str): Detailed description of the card
+            description (str | None): Detailed description of the card
             dueDate (str): Due date for the card
-            isDueCompleted (bool): Whether the due date is completed
-            stopwatch (dict[str, Any]): Stopwatch data for time tracking
+            isDueCompleted (bool | None): Whether the due date is completed
+            stopwatch (dict[str, Any] | None): Stopwatch data for time tracking
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -748,14 +748,14 @@ class AsyncPlankaEndpoints:
             id (str): ID of the card to update)
             boardId (str): ID of the board to move the card to
             listId (str): ID of the list to move the card to
-            coverAttachmentId (str): ID of the attachment used as cover
+            coverAttachmentId (str | None): ID of the attachment used as cover
             type (Literal['project', 'story']): Type of the card
-            position (int): Position of the card within the list
+            position (int | None): Position of the card within the list
             name (str): Name/title of the card
-            description (str): Detailed description of the card
-            dueDate (str): Due date for the card
-            isDueCompleted (bool): Whether the due date is completed
-            stopwatch (dict[str, Any]): Stopwatch data for time tracking
+            description (str | None): Detailed description of the card
+            dueDate (str | None): Due date for the card
+            isDueCompleted (bool | None): Whether the due date is completed
+            stopwatch (dict[str, Any] | None): Stopwatch data for time tracking
             isSubscribed (bool): Whether the current user is subscribed to the card
 
         Note:
@@ -933,7 +933,7 @@ class AsyncPlankaEndpoints:
             boardId (str): ID of the board to create the custom field group in)
             baseCustomFieldGroupId (str): ID of the base custom field group used as a template
             position (int): Position of the custom field group within the board
-            name (str): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
+            name (str | None): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -960,7 +960,7 @@ class AsyncPlankaEndpoints:
             cardId (str): ID of the card to create the custom field group in)
             baseCustomFieldGroupId (str): ID of the base custom field group used as a template
             position (int): Position of the custom field group within the card
-            name (str): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
+            name (str | None): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -1029,7 +1029,7 @@ class AsyncPlankaEndpoints:
         Args:
             id (str): ID of the custom field group to update)
             position (int): Position of the custom field group within the board/card
-            name (str): Name/title of the custom field group
+            name (str | None): Name/title of the custom field group
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -1204,7 +1204,7 @@ class AsyncPlankaEndpoints:
         Args:
             boardId (str): ID of the board to create the label in)
             position (int): Position of the label within the board
-            name (str): Name/title of the label
+            name (str | None): Name/title of the label
             color (Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']): Color of the label
 
         Note:
@@ -1252,7 +1252,7 @@ class AsyncPlankaEndpoints:
         Args:
             id (str): ID of the label to update)
             position (int): Position of the label within the board
-            name (str): Name/title of the label
+            name (str | None): Name/title of the label
             color (Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']): Color of the label
 
         Note:
@@ -1372,7 +1372,7 @@ class AsyncPlankaEndpoints:
             type (Literal['active', 'closed']): Type/status of the list
             position (int): Position of the list within the board
             name (str): Name/title of the list
-            color (Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea']): Color for the list
+            color (Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea'] | None): Color for the list
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -1690,7 +1690,7 @@ class AsyncPlankaEndpoints:
         Args:
             type (Literal['public', 'private']): Type of the project
             name (str): Name/title of the project
-            description (str): Detailed description of the project
+            description (str | None): Detailed description of the project
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -1772,12 +1772,12 @@ class AsyncPlankaEndpoints:
 
         Args:
             id (str): ID of the project to update)
-            ownerProjectManagerId (str): ID of the project manager who owns the project
-            backgroundImageId (str): ID of the background image used as background
+            ownerProjectManagerId (str | None): ID of the project manager who owns the project
+            backgroundImageId (str | None): ID of the background image used as background
             name (str): Name/title of the project
-            description (str): Detailed description of the project
-            backgroundType (Literal['gradient', 'image']): Type of background for the project
-            backgroundGradient (Literal['old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange', 'sour-peel', 'green-ninja', 'algae-green', 'coral-reef', 'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain', 'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 'red-curtain']): Gradient background for the project
+            description (str | None): Detailed description of the project
+            backgroundType (Literal['gradient', 'image'] | None): Type of background for the project
+            backgroundGradient (Literal['old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange', 'sour-peel', 'green-ninja', 'algae-green', 'coral-reef', 'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain', 'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 'red-curtain'] | None): Gradient background for the project
             isHidden (bool): Whether the project is hidden
             isFavorite (bool): Whether the project is marked as favorite by the current user
 
@@ -1904,7 +1904,7 @@ class AsyncPlankaEndpoints:
             taskListId (str): ID of the task list to create task in)
             linkedCardId (str): ID of the card linked to the task
             position (int): Position of the task within the task list
-            name (str): Name/title of the task (required if `linkedCardId` is not provided)
+            name (str | None): Name/title of the task (required if `linkedCardId` is not provided)
             isCompleted (bool): Whether the task is completed
 
         Note:
@@ -1953,7 +1953,7 @@ class AsyncPlankaEndpoints:
         Args:
             id (str): ID of the task to update)
             taskListId (str): ID of the task list to move the task to
-            assigneeUserId (str): ID of the user assigned to the task (null to unassign)
+            assigneeUserId (str | None): ID of the user assigned to the task (null to unassign)
             position (int): Position of the task within the task list
             name (str): Name/title of the task
             isCompleted (bool): Whether the task is completed
@@ -2008,10 +2008,10 @@ class AsyncPlankaEndpoints:
             password (str): Password for user authentication (must meet password requirements)
             role (Literal['admin', 'projectOwner', 'boardUser']): User role defining access permissions
             name (str): Full display name of the user
-            username (str): Unique username for user identification
-            phone (str): Contact phone number
-            organization (str): Organization or company name
-            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']): Preferred language for user interface and notifications
+            username (str | None): Unique username for user identification
+            phone (str | None): Contact phone number
+            organization (str | None): Organization or company name
+            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None): Preferred language for user interface and notifications
             subscribeToOwnCards (bool): Whether the user subscribes to their own cards
             subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
             turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
@@ -2105,10 +2105,10 @@ class AsyncPlankaEndpoints:
             id (str): ID of the user to update)
             role (Literal['admin', 'projectOwner', 'boardUser']): User role defining access permissions
             name (str): Full display name of the user
-            avatar (dict[str, Any]): Avatar of the user (only null value to remove avatar)
-            phone (str): Contact phone number
-            organization (str): Organization or company name
-            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']): Preferred language for user interface and notifications
+            avatar (dict[str, Any] | None): Avatar of the user (only null value to remove avatar)
+            phone (str | None): Contact phone number
+            organization (str | None): Organization or company name
+            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None): Preferred language for user interface and notifications
             subscribeToOwnCards (bool): Whether the user subscribes to their own cards
             subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
             turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
@@ -2216,7 +2216,7 @@ class AsyncPlankaEndpoints:
 
         Args:
             id (str): ID of the user whose username to update)
-            username (str): Unique username for user identification
+            username (str | None): Unique username for user identification
             currentPassword (str): Current password (required when updating own username)
 
         Note:
@@ -2243,9 +2243,9 @@ class AsyncPlankaEndpoints:
         Args:
             name (str): Name/title of the webhook
             url (str): URL endpoint for the webhook
-            accessToken (str): Access token for webhook authentication
-            events (str): Comma-separated list of events that trigger the webhook
-            excludedEvents (str): Comma-separated list of events excluded from the webhook
+            accessToken (str | None): Access token for webhook authentication
+            events (str | None): Comma-separated list of events that trigger the webhook
+            excludedEvents (str | None): Comma-separated list of events excluded from the webhook
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -2308,9 +2308,9 @@ class AsyncPlankaEndpoints:
             id (str): ID of the webhook to update)
             name (str): Name/title of the webhook
             url (str): URL endpoint for the webhook
-            accessToken (str): Access token for webhook authentication
-            events (str): Comma-separated list of events that trigger the webhook
-            excludedEvents (str): Comma-separated list of events excluded from the webhook
+            accessToken (str | None): Access token for webhook authentication
+            events (str | None): Comma-separated list of events that trigger the webhook
+            excludedEvents (str | None): Comma-separated list of events excluded from the webhook
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
