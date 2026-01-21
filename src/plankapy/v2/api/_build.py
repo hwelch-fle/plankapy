@@ -148,20 +148,20 @@ def yield_paths() -> Generator[str]:
                         elif 'allOf' in prop['items']:
                             base_type = prop['items']['allOf'][0]['$ref'].split('/')[-1]
                             additional_keys = [
-                                f'{prop_name}: {TYPES.get(prop["type"])}\n\t"""{prop["description"]}"""'
+                                f'{prop_name}: {TYPES.get(prop["type"])}{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""'
                                 if prop["type"] != 'array'
                                 else
-                                f'{prop_name}: list[{TYPES.get(prop["items"]["type"])}]\n\t"""{prop["description"]}"""'
+                                f'{prop_name}: list[{TYPES.get(prop["items"]["type"])}]{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""'
                                 for obj in prop['items']['allOf'][1:]
                                 for prop_name, prop in obj['properties'].items()
                             ]
                             resps[f'Included_{oid}_all({base_type})'] = additional_keys
-                            resps[f'Included_{oid}'].append(f'{p_name}: list[Included_{oid}_all]\n\t"""{prop["description"]}"""')
+                            resps[f'Included_{oid}'].append(f'{p_name}: list[Included_{oid}_all]{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""')
                         else:
                             if prop['type'] == 'array':
-                                resps[f'Included_{oid}'].append(f'{p_name}: list[{TYPES.get(prop['items']['type'], 'Any')}]\n\t"""{prop['description']}"""')
+                                resps[f'Included_{oid}'].append(f'{p_name}: list[{TYPES.get(prop['items']['type'], 'Any')}]{' | None' if prop.get('nullable') else ''}\n\t"""{prop['description']}"""')
                             else:
-                                resps[f'Included_{oid}'].append(f'{p_name}: list[{TYPES.get(prop['type'], 'Any')}]\n\t"""{prop['description']}"""')
+                                resps[f'Included_{oid}'].append(f'{p_name}: list[{TYPES.get(prop['type'], 'Any')}]{' | None' if prop.get('nullable') else ''}\n\t"""{prop['description']}"""')
                                 
             if 'item' in r_props:
                 has_item = True
@@ -171,10 +171,10 @@ def yield_paths() -> Generator[str]:
                 if 'allOf' in r_item:
                     base_type = r_item['allOf'][0]['$ref'].split('/')[-1]
                     additional_keys = [
-                        f'{prop_name}: {TYPES.get(prop["type"])}\n\t"""{prop["description"]}"""'
+                        f'{prop_name}: {TYPES.get(prop["type"])}{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""'
                         if prop["type"] != 'array'
                         else
-                        f'{prop_name}: list[{TYPES.get(prop["items"]["type"])}]\n\t"""{prop["description"]}"""'
+                        f'{prop_name}: list[{TYPES.get(prop["items"]["type"])}]{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""'
                         for obj in r_item['allOf'][1:]
                         for prop_name, prop in obj['properties'].items()
                     ]
@@ -191,10 +191,10 @@ def yield_paths() -> Generator[str]:
                             t = f"Literal{prop['enum']}"
                         else:
                             t = TYPES.get(prop['type'], 'Any')
-                        resps[f'Item_{oid}'].append(f"{p_name}: {t}")
+                        resps[f'Item_{oid}'].append(f"{p_name}: {t}{' | None' if prop.get('nullable') else ''}")
                 else:
                     has_item = False
-                    resps[f'Response_{oid}'].append(f'item: {TYPES.get(r_item["type"])}\n\t"""{r_item['description']}"""')
+                    resps[f'Response_{oid}'].append(f'item: {TYPES.get(r_item["type"])}{' | None' if r_item.get('nullable') else ''}\n\t"""{r_item['description']}"""')
             
             if 'items' in r_props:
                 has_items = True
@@ -204,10 +204,10 @@ def yield_paths() -> Generator[str]:
                 if 'allOf' in r_items['items']:
                     base_type = r_items['items']['allOf'][0]['$ref'].split('/')[-1]
                     additional_keys = [
-                        f'{prop_name}: {TYPES.get(prop["type"])}\n\t"""{prop["description"]}"""'
+                        f'{prop_name}: {TYPES.get(prop["type"])}{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""'
                         if prop["type"] != 'array'
                         else
-                        f'{prop_name}: list[{TYPES.get(prop["items"]["type"])}]\n\t"""{prop["description"]}"""'
+                        f'{prop_name}: list[{TYPES.get(prop["items"]["type"])}]{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""'
                         for obj in r_items['items']['allOf'][1:]
                         for prop_name, prop in obj['properties'].items()
                     ]
@@ -245,9 +245,9 @@ def yield_paths() -> Generator[str]:
                     else:
                         t = p["schema"]["type"]
                     if p.get('required', False):
-                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}): {p['description']})"
+                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}{' | None' if p.get('nullable') else ''}): {p['description']})"
                     else:
-                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}): {p['description']}) (optional)"
+                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}{' | None' if p.get('nullable') else ''}): {p['description']}) (optional)"
                         
             if body or optional_params:
                 r_typing = f"Request_{oid}"
@@ -258,7 +258,7 @@ def yield_paths() -> Generator[str]:
                             t = f"Literal{p['enum']}"
                         else:
                             t = TYPES.get(p['schema']['type'], 'Any')
-                        kwarg_reqs[r_typing].append(f'{p["name"]}: NotRequired[{t}]\n\t"""{p["description"]}"""')
+                        kwarg_reqs[r_typing].append(f'{p["name"]}: NotRequired[{t}{' | None' if p.get('nullable') else ''}]\n\t"""{p["description"]}"""')
                 if body:
                     try:
                         schema = body["content"]["application/json"]["schema"]
@@ -267,18 +267,18 @@ def yield_paths() -> Generator[str]:
                     kwarg_required = schema.get('required', []) 
                     for name, prop in schema["properties"].items():
                         if "enum" in prop:
-                            yield f"\t\t\t{name} (Literal{prop['enum']}): {prop['description']}"
+                            yield f"\t\t\t{name} (Literal{prop['enum']}{' | None' if prop.get('nullable') else ''}): {prop['description']}"
                             if name in kwarg_required:
-                                kwarg_reqs[r_typing].append(f'{name}: Literal{prop['enum']}\n\t"""{prop['description']}"""')
+                                kwarg_reqs[r_typing].append(f'{name}: Literal{prop['enum']}{' | None' if prop.get('nullable') else ''}\n\t"""{prop['description']}"""')
                             else:
-                                kwarg_reqs[r_typing].append(f'{name}: NotRequired[Literal{prop['enum']}]\n\t"""{prop['description']}"""')
+                                kwarg_reqs[r_typing].append(f'{name}: NotRequired[Literal{prop['enum']}{' | None' if prop.get('nullable') else ''}]\n\t"""{prop['description']}"""')
                         else:
                             p_type = TYPES.get(prop['type'], 'Any')
-                            yield f"\t\t\t{name} ({p_type}): {prop['description']}"
+                            yield f"\t\t\t{name} ({p_type}{' | None' if prop.get('nullable') else ''}): {prop['description']}"
                             if name in kwarg_required:
-                                kwarg_reqs[r_typing].append(f'{name}: {p_type}\n\t"""{prop['description']}"""')
+                                kwarg_reqs[r_typing].append(f'{name}: {p_type}{' | None' if prop.get('nullable') else ''}\n\t"""{prop['description']}"""')
                             else:
-                                kwarg_reqs[r_typing].append(f'{name}: NotRequired[{p_type}]\n\t"""{prop['description']}"""')
+                                kwarg_reqs[r_typing].append(f'{name}: NotRequired[{p_type}{' | None' if prop.get('nullable') else ''}]\n\t"""{prop['description']}"""')
             
             errors = {code: r for code, r in info['responses'].items() if code != '200'}
             if errors:
