@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from httpx import HTTPStatusError
+
 __all__ = ('Card', 'Stopwatch', )
 
 from datetime import datetime, timedelta
@@ -291,46 +293,99 @@ class Card(PlankaModel[schemas.Card]):
             self.move(self.prev_list, position)
         return self
     
-    # TODO: Handle uploading files better. See v1 implementation, but use httpx `files` streaming
-    def add_attachment(self, attachment: str | bytes, *, cover: bool=False, name: str | None=None) -> Attachment:
+    def add_attachment(self, attachment: str | bytes, 
+                       *, 
+                       cover: bool=False, 
+                       download_url: bool=False,
+                       name: str | None=None) -> Attachment:
         """Add an Attachment to the card
         
         Args:
             attachment (str | bytes): The URL or raw bytes of the attachment
             cover (bool): Set the new attachment as the cover of the card
-            name (str | None): The optional name of the attachment (default is `hash()`)
+            download_url (bool): If a link is used, download the file from the link and attach it (default: `False`)
+            name (str | None): The optional name of the attachment (default is `hash() + mimetypes.guess_type(attachment)`)
             
         Returns:
             Attachment
-        
+            
         Raises:
-            ValueError: If the passed attachment isn't a string or bytes 
+            HTTPStatusError: If the url cannot be downloaded
+            OSError: If a local file cannot be opened and read
         """
-        # Attach URL
-        if isinstance(attachment, str) and attachment.startswith('http'):
-            r = self.endpoints.createAttachment(
-                self.id, 
-                type='link', 
-                url=attachment, 
-                name=name or str(hash(attachment))
-            )
-            a = Attachment(r['item'], self.session)
+        # Force a PermissionError early if the user isn't a board editor
+        if self.session.current_id not in [e.id for e in self.board.editors]:
+            return Attachment(
+                self.endpoints.createAttachment(
+                    self.id, 
+                    type='link', 
+                    url='nourl', 
+                    name='noname'
+                )['item'], 
+                self.session
+        )
         
-        # Attach File
-        elif isinstance(attachment, bytes):
-            r = self.endpoints.createAttachment(
+        # Deferred import of mimetypes that is only used here
+        # This function takes so long anyways so the import delay 
+        # isn't noticable
+        import mimetypes
+        
+        # Handle filepath or URL
+        mime_type = None
+        extension = '.bin'
+        if isinstance(attachment, str):
+            
+            # Guess URL file type
+            if attachment.startswith('http'):
+                mime_type, *_ = mimetypes.guess_type(attachment)
+                mime_type = mime_type or 'application/octet-stream'
+                extension = mimetypes.guess_extension(mime_type) or '.unknown'
+                
+                # Download the file if requested
+                if download_url:
+                    try:
+                        req = self.client.get(attachment)
+                        req.raise_for_status()
+                        attachment = req.content
+                    except HTTPStatusError as status_error:
+                        status_error.add_note('Unable to download attachment!')
+                        raise
+                
+                # Attach a link otherwise
+                else:
+                    return Attachment(
+                        self.endpoints.createAttachment(
+                            self.id, 
+                            type='link', 
+                            url=attachment, 
+                            name=name or f'{name or hash(attachment)}{extension}')['item'], 
+                        self.session
+                    )
+            
+            # Guess local file type
+            # And read Bytes
+            else:
+                mime_type, *_ = mimetypes.guess_file_type(attachment)
+                mime_type = mime_type or 'application/octet-stream'
+                attachment = open(attachment, 'rb').read()
+            
+        mime_type = mime_type or 'application/octet-stream'
+        extension = mimetypes.guess_extension(mime_type) or '.bin'
+        name = f'{name or hash(attachment)}'
+        if not name.endswith(extension):
+            name = f'{name}{extension}'        
+        a = Attachment(
+            self.endpoints.createAttachment(
                 self.id, 
-                type='file', 
-                file=str(attachment), 
-                name=name or str(hash(attachment))
-            )
-            a =  Attachment(r['item'], self.session)
-        else:
-            raise ValueError(f'Expected str or bytes for Attachment, got {type(attachment)}')
-
-        # Set cover if requested
-        if cover and a.type != 'link':
-            self.update(coverAttachmentId=a.id)
+                name=name,
+                type='file',
+                file=bytes(attachment),
+                requestId=str(hash(datetime.now().isoformat())),
+            )['item'], 
+            self.session
+        )
+        if cover:
+            self.cover = a
         return a
 
     def get_field_values(self, *, with_groups: bool=False) -> dict[str, Any]:
