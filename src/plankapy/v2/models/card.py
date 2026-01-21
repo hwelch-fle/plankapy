@@ -25,6 +25,11 @@ class Card(PlankaModel[schemas.Card]):
         """The URL to the card"""
         return str(self.client.base_url.join(f'/cards/{self.id}'))
     
+    @property
+    def formal_name(self)-> str:
+        """Get a formal name for the card `{Project}->{Board}->{List}->{Card}`"""
+        return f'{self.project.name}->{self.board.name}->{self.list.name}->{self.name}'
+        
     # Included objects
     @property
     def _included(self):
@@ -104,6 +109,11 @@ class Card(PlankaModel[schemas.Card]):
     def subscribed(self, subscribed: bool) -> None:
         """Set subscription status on the Card for the current User"""
         self.update(isSubscribed=subscribed)
+    
+    @property
+    def project(self) -> Project:
+        """Get the Project that the card is in"""
+        return self.board.project
 
     @property
     def board(self) -> Board:
