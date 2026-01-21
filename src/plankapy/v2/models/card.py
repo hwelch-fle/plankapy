@@ -348,16 +348,15 @@ class Card(PlankaModel[schemas.Card]):
             if attachment.startswith('http'):
                 mime_type, *_ = mimetypes.guess_type(attachment)
                 mime_type = mime_type or 'application/octet-stream'
-                extension = mimetypes.guess_extension(mime_type) or '.unknown'
+                extension = mimetypes.guess_extension(mime_type) or '.bin'
                 
                 # Download the file if requested
                 if download_url:
                     try:
                         req = self.client.get(attachment)
-                        req.raise_for_status()
-                        attachment = req.content
+                        attachment = req.raise_for_status().read()
                     except HTTPStatusError as status_error:
-                        status_error.add_note('Unable to download attachment!')
+                        status_error.add_note(f'Unable to download attachment from {attachment}')
                         raise
                 
                 # Attach a link otherwise
@@ -389,7 +388,8 @@ class Card(PlankaModel[schemas.Card]):
                 name=name,
                 type='file',
                 file=bytes(attachment),
-                requestId=str(hash(datetime.now().isoformat())),
+                requestId=str(abs(hash(datetime.now().isoformat()))),
+                mime_type=mime_type,
             )['item'], 
             self.session
         )
