@@ -31,7 +31,7 @@ def dttoiso(dt: datetime, default_timezone: timezone=timezone.utc) -> str:
     """
     if not dt.tzinfo:
         dt = dt.replace(tzinfo=default_timezone)
-    return dt.isoformat()
+    return str(dt)
 
 # Position Offset
 POSITION_GAP = 65536
