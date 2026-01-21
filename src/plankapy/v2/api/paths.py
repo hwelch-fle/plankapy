@@ -222,13 +222,9 @@ class PlankaEndpoints:
         if kwargs.get('type') == 'file':
             file_data = kwargs.pop('file')
             name = kwargs['name']
-            resp = self.client.post(
-                "api/cards/{cardId}/attachments".format(**args), 
-                params={'name': name, 'type': kwargs['type']},
+            resp = self.client.post("api/cards/{cardId}/attachments".format(**args), 
                 data=kwargs, 
-                json=kwargs,
                 files={'file': (name, file_data, mime_type)}, 
-                headers={'Content-Type': 'multipart/form-data'}
             )
             raise_planka_err(resp)
 
@@ -2251,11 +2247,12 @@ class PlankaEndpoints:
         raise_planka_err(resp)
         return resp.json()
 
-    def updateUserAvatar(self, id: str, **kwargs: Unpack[Request_updateUserAvatar]) -> Response_updateUserAvatar:
+    def updateUserAvatar(self, id: str, mime_type: str | None=None, **kwargs: Unpack[Request_updateUserAvatar]) -> Response_updateUserAvatar:
         """Updates a user's avatar image. Users can update their own avatar, admins can update any user's avatar.
 
         Args:
             id (str): ID of the user whose avatar to update)
+            mime_type (str | None): Optional mime_type to pass to the form-data
             file (str): Avatar image file (must be an image format)
 
         Note:
@@ -2272,7 +2269,9 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = self.client.post("api/users/{id}/avatar".format(**args), json=kwargs)
+        resp = self.client.post("api/users/{id}/avatar".format(**args), 
+            files={'file': ('avatar', kwargs['file'], mime_type)}, 
+        )
         raise_planka_err(resp)
         return resp.json()
 

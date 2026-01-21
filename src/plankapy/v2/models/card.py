@@ -324,15 +324,7 @@ class Card(PlankaModel[schemas.Card]):
         """
         # Force a PermissionError early if the user isn't a board editor
         if self.session.current_id not in [e.id for e in self.board.editors]:
-            return Attachment(
-                self.endpoints.createAttachment(
-                    self.id, 
-                    type='link', 
-                    url='nourl', 
-                    name='noname'
-                )['item'], 
-                self.session
-        )
+            self.endpoints.createAttachment(self.id, type='link', url='nourl', name='NO_PERMISSION')
         
         # Deferred import of mimetypes that is only used here
         # This function takes so long anyways so the import delay 

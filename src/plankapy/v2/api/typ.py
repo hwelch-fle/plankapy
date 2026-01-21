@@ -451,7 +451,7 @@ class Request_updateUser(TypedDict):
     """Whether the user account is deactivated and cannot log in (for admins)"""
 
 class Request_updateUserAvatar(TypedDict):
-    file: str
+    file: bytes
     """Avatar image file (must be an image format)"""
 
 class Request_updateUserEmail(TypedDict):

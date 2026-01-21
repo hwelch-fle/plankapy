@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from httpx import HTTPStatusError
+
 __all__ = ('User', )
 
 from datetime import datetime
@@ -224,6 +226,60 @@ class User(PlankaModel[schemas.User]):
     def delete(self):
         """Delete the User"""
         return self.endpoints.deleteUser(self.id)
+    
+    def update_avatar(self, avatar: str | bytes | None) -> User:
+        """Update the User avatar
+        
+        You can pass a filepath, URL, raw bytes, or None to the avatar argument. 
+        Only Admins can update other User's avatars
+        
+        Args:
+            avatar (str | bytes | None): filepath/URL or file bytes or None to clear
+        
+        Returns:
+            User: The updated User
+        """
+        # Force a PermissionError early if this user isn't the current user or an admin
+        if self.id != self.session.current_id and self.session.current_role != 'admin':
+            self.endpoints.updateUserAvatar(self.id, **{'file': b'NO_PERMISSION'})
+        
+        if avatar is None:
+            self.avatar = None
+            return self
+        
+        # Deferred import of mimetypes that is only used here
+        # This function takes so long anyways so the import delay 
+        # isn't noticable
+        import mimetypes
+        
+        # Handle filepath or URL
+        mime_type = None
+        if isinstance(avatar, str):
+            # Guess URL file type
+            if avatar.startswith('http'):
+                mime_type, *_ = mimetypes.guess_type(avatar)
+                mime_type = mime_type or 'application/octet-stream'
+                try:
+                    req = self.client.get(avatar)
+                    req.raise_for_status()
+                    avatar = req.content
+                except HTTPStatusError as status_error:
+                    status_error.add_note(f'Unable to download attachment from {avatar}')
+                    raise
+            # Guess local file type
+            # And read Bytes
+            else:
+                mime_type, *_ = mimetypes.guess_file_type(avatar)
+                mime_type = mime_type or 'application/octet-stream'
+                avatar = open(avatar, 'rb').read()
+        
+        mime_type = mime_type or 'application/octet-stream'
+        self.endpoints.updateUserAvatar(
+            self.id, 
+            file=bytes(avatar), 
+            mime_type=mime_type,
+        )
+        return self
     
     def update_email(self, email: str, 
                      *, 
