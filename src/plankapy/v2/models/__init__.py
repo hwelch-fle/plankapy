@@ -100,11 +100,13 @@ from ._literals import *
 # 9) datetimes: All ISO 8601 strings should be converted to datetime          #
 #   - Use `timezone` property of session if no timezone in ISO string         #
 #                                                                             #
-# 10) Exceptions: Allow HTTPStatusError to be raised unless a necessary       #
+# 10) Exceptions: Allow HTTPStatusError to be raised unless necessary         #
 #   - PermissionError: Use session.current_role and current_id for checks     #
 #   - LookupError: If the resource cannot be found (deleted on server)        #
 #   - ValueError: Reserved for file operations (see Attachment)               #
 #   - Any other Exception needs to be clearly documented                      #
+#   - NOTE: If an endpoint will raise an error, allow it to do so. Do not     #
+#       mask server exceptions with custom ones!                              #
 #                                                                             #
 # 11) property iteration: If a list property needs to be iterated, cache it   #
 #   - _list_cards = list.cards                                                #
