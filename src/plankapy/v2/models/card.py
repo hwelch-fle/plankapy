@@ -123,7 +123,7 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def creator(self) -> User:
         """The User who Created the card (Raises LookupError if User is no longer a Board Member)"""
-        _usrs = [u for u in self.users if self.schema['creatorUserId'] == u.id]
+        _usrs = [u for u in self.board.users if self.schema['creatorUserId'] == u.id]
         if _usrs:
             return _usrs.pop()
         raise LookupError(f"Cannot find User: {self.schema['creatorUserId']}")
@@ -144,8 +144,6 @@ class Card(PlankaModel[schemas.Card]):
     @cover.setter
     def cover(self, attachment: Attachment) -> None:
         """Set the Card cover"""
-        if attachment.card != self:
-            raise LookupError(f'Attachment is not a member of Card {self.id}')
         self.update(coverAttachmentId=attachment.id)
     
     @property
@@ -297,7 +295,6 @@ class Card(PlankaModel[schemas.Card]):
         
         Raises:
             ValueError: If the passed attachment isn't a string or bytes 
-            HTTPStatusError: If the request fails
         """
         # Attach URL
         if isinstance(attachment, str) and attachment.startswith('http'):
@@ -393,9 +390,6 @@ class Card(PlankaModel[schemas.Card]):
             role (BoardRole): If User is added to board, set role (default: `viewer`)
             can_comment (bool): If User is added as a `viewer`, set commenting status (default: `False`)
         
-        Raises:
-            PermissionError: If the User is not a member of the Board and `add_to_board` is `False`
-        
         Note:
             Default options for adding to Board abide by least privilege so role and comment must be set 
         """
@@ -404,13 +398,10 @@ class Card(PlankaModel[schemas.Card]):
             if membership.user == user:
                 return membership
         
-        # User is not in the board
-        if user not in self.board.users:
-            # Add the user to the board
-            if add_to_board:
-                self.board.add_member(user, role=role, can_comment=can_comment if role == 'viewer' else True)
-            else:
-                raise PermissionError(f'User must be added to the Board to become a Card Member')        
+        # Add the user to the board
+        if user not in self.board.users and add_to_board:
+            self.board.add_member(user, role=role, can_comment=can_comment if role == 'viewer' else True)
+        
         return CardMembership(self.endpoints.createCardMembership(self.id, userId=user.id)['item'], self.session)
 
     def add_members(self, users: Sequence[User], 
@@ -426,9 +417,6 @@ class Card(PlankaModel[schemas.Card]):
             role (Literal['viewer', 'editor']): If User is added to board, set role (default: `viewer`)
             can_comment (bool): If User is added as a `viewer`, set commenting status (default: `False`)
         
-        Raises:
-            PermissionError: If the User is not a member of the Board and `add_to_board` is `False`
-        
         Note:
             Default options for adding to Board abide by least privilege so role and comment must be set
 
@@ -443,11 +431,38 @@ class Card(PlankaModel[schemas.Card]):
             for user in users
         ]
 
-    def remove_member(self, user: User) -> None:
-        """Remove a User member from the Card"""
+    def remove_member(self, user: User) -> User | None:
+        """Remove a User member from the Card
+        
+        Args:
+            user (User): The User to remove
+        
+        Returns:
+            (User | None): The removed User or None if tha User was not a member
+        """
         for cm in self.card_memberships:
             if cm.user == user:
                 cm.delete()
+                return user
+
+    def remove_members(self, users: Sequence[User]) -> list[User]:
+        """Remove multiple members from a Card
+        
+        Args:
+            users (Sequence[User]): The Users to remove from the Card
+        
+        Returns:
+            list[User]: The Users that were removed from the card
+            
+        Note:
+            If a User in the `users` sequence is not a member of the card, 
+            They will be excluded from this list
+        """
+        return [
+            user
+            for user in users
+            if self.remove_member(user) is not None
+        ]
 
     def add_label(self, label: Label, 
                   *, 
@@ -461,28 +476,44 @@ class Card(PlankaModel[schemas.Card]):
         Returns:
             CardLabel: The CardLabel relationship
         
-        Raises:
-            LookupError: If the Label is not in the Board and `add_to_board` is not set
-        
         Note:
             When using `add_to_board` The label position will default to the top of the label list
         """
-        # Handle adding Label if it doesn't exist
-        if label not in self.board.labels:
-            if add_to_board:
-                label = label.add_to_board(self.board)
-            else:
-                raise LookupError(
-                    f'Label ({label.name}:{label.id}) not found in Board ({self.board.name}:{self.board.id})\n'
-                    'run with `add_to_board` flag set to add this label to the board'
-                )
         # Check if label is already on card
         for card_label in self.card_labels:
             if label.id == card_label.schema['labelId']:
                 return card_label
+
+        # Handle adding Label if it doesn't exist
+        if label not in self.board.labels and add_to_board:
+            label = label.add_to_board(self.board)
+        
         # Create new CardLabel relationship
         return CardLabel(self.endpoints.createCardLabel(self.id, labelId=label.id)['item'], self.session)
-      
+    
+    def add_labels(self, labels: Sequence[Label], 
+                   *,
+                   add_to_board: bool=False) -> list[CardLabel]:
+        """Add multiple Labels to the Card
+        
+        Args:
+            labels (Sequence[Label]): The Labels to add (must be associated with the card.board)
+            add_to_board (bool): If a Label is not in the board, add it (default: `False`)
+        
+        Returns:
+            list[CardLabel]: The added CardLabel relations
+            
+        Note:
+            Any labels that are not on the Card's Board will be skipped
+        """
+        return [
+            self.add_label(
+                label, 
+                add_to_board=add_to_board
+            )
+            for label in labels
+        ]
+    
     def remove_label(self, label: Label) -> None:
         """Remove the Label from the Card
         
