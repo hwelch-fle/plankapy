@@ -42,7 +42,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens/accept-terms", data=kwargs)
+        resp = await self.client.post("api/access-tokens/accept-terms", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -67,7 +67,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens", data=kwargs)
+        resp = await self.client.post("api/access-tokens", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -112,7 +112,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens/exchange-with-oidc", data=kwargs)
+        resp = await self.client.post("api/access-tokens/exchange-with-oidc", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -134,7 +134,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/access-tokens/revoke-pending-token", data=kwargs)
+        resp = await self.client.post("api/access-tokens/revoke-pending-token", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -216,7 +216,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/attachments".format(**args), data=kwargs)
+        resp = await self.client.post("api/cards/{cardId}/attachments".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -264,7 +264,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/attachments/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/attachments/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -291,7 +291,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/background-images".format(**args), data=kwargs)
+        resp = await self.client.post("api/projects/{projectId}/background-images".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -339,7 +339,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/base-custom-field-groups".format(**args), data=kwargs)
+        resp = await self.client.post("api/projects/{projectId}/base-custom-field-groups".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -387,7 +387,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/base-custom-field-groups/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/base-custom-field-groups/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -415,7 +415,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/board-memberships".format(**args), data=kwargs)
+        resp = await self.client.post("api/boards/{boardId}/board-memberships".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -462,7 +462,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/board-memberships/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/board-memberships/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -491,7 +491,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/boards".format(**args), data=kwargs)
+        resp = await self.client.post("api/projects/{projectId}/boards".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -570,7 +570,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/boards/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/boards/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -596,7 +596,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/card-labels".format(**args), data=kwargs)
+        resp = await self.client.post("api/cards/{cardId}/card-labels".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -646,7 +646,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/card-memberships".format(**args), data=kwargs)
+        resp = await self.client.post("api/cards/{cardId}/card-memberships".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -702,7 +702,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/lists/{listId}/cards".format(**args), data=kwargs)
+        resp = await self.client.post("api/lists/{listId}/cards".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -812,7 +812,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/cards/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/cards/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -838,7 +838,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{id}/duplicate".format(**args), data=kwargs)
+        resp = await self.client.post("api/cards/{id}/duplicate".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -885,7 +885,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/comments".format(**args), data=kwargs)
+        resp = await self.client.post("api/cards/{cardId}/comments".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -959,7 +959,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/comments/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/comments/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -996,7 +996,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/custom-field-groups".format(**args), data=kwargs)
+        resp = await self.client.post("api/boards/{boardId}/custom-field-groups".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1024,7 +1024,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/custom-field-groups".format(**args), data=kwargs)
+        resp = await self.client.post("api/cards/{cardId}/custom-field-groups".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1096,7 +1096,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/custom-field-groups/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/custom-field-groups/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1123,7 +1123,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1174,7 +1174,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields".format(**args), data=kwargs)
+        resp = await self.client.post("api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1201,7 +1201,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/custom-field-groups/{customFieldGroupId}/custom-fields".format(**args), data=kwargs)
+        resp = await self.client.post("api/custom-field-groups/{customFieldGroupId}/custom-fields".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1251,7 +1251,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/custom-fields/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/custom-fields/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1278,7 +1278,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/labels".format(**args), data=kwargs)
+        resp = await self.client.post("api/boards/{boardId}/labels".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1328,7 +1328,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/labels/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/labels/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1378,7 +1378,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/lists".format(**args), data=kwargs)
+        resp = await self.client.post("api/boards/{boardId}/lists".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1452,7 +1452,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/lists/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/lists/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1477,7 +1477,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/lists/{id}/move-cards".format(**args), data=kwargs)
+        resp = await self.client.post("api/lists/{id}/move-cards".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1504,7 +1504,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/lists/{id}/sort".format(**args), data=kwargs)
+        resp = await self.client.post("api/lists/{id}/sort".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1530,7 +1530,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/notification-services".format(**args), data=kwargs)
+        resp = await self.client.post("api/boards/{boardId}/notification-services".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1556,7 +1556,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/users/{userId}/notification-services".format(**args), data=kwargs)
+        resp = await self.client.post("api/users/{userId}/notification-services".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1603,7 +1603,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/notification-services/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/notification-services/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1707,7 +1707,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/notifications/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/notifications/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1734,7 +1734,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/project-managers".format(**args), data=kwargs)
+        resp = await self.client.post("api/projects/{projectId}/project-managers".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1782,7 +1782,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects", data=kwargs)
+        resp = await self.client.post("api/projects", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1879,7 +1879,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/projects/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/projects/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1907,7 +1907,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/task-lists".format(**args), data=kwargs)
+        resp = await self.client.post("api/cards/{cardId}/task-lists".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1980,7 +1980,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/task-lists/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/task-lists/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2009,7 +2009,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/task-lists/{taskListId}/tasks".format(**args), data=kwargs)
+        resp = await self.client.post("api/task-lists/{taskListId}/tasks".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2061,7 +2061,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/tasks/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/tasks/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2121,7 +2121,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/users", data=kwargs)
+        resp = await self.client.post("api/users", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2228,7 +2228,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/users/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2253,7 +2253,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/users/{id}/avatar".format(**args), data=kwargs)
+        resp = await self.client.post("api/users/{id}/avatar".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2280,7 +2280,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}/email".format(**args), data=kwargs)
+        resp = await self.client.patch("api/users/{id}/email".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2306,7 +2306,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}/password".format(**args), data=kwargs)
+        resp = await self.client.patch("api/users/{id}/password".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2333,7 +2333,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}/username".format(**args), data=kwargs)
+        resp = await self.client.patch("api/users/{id}/username".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2360,7 +2360,7 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/webhooks", data=kwargs)
+        resp = await self.client.post("api/webhooks", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2428,6 +2428,6 @@ class AsyncPlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/webhooks/{id}".format(**args), data=kwargs)
+        resp = await self.client.patch("api/webhooks/{id}".format(**args), json=kwargs)
         await raise_planka_err(resp)
         return resp.json()

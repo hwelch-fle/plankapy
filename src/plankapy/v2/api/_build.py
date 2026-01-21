@@ -312,9 +312,9 @@ def yield_paths() -> Generator[str]:
             elif body and not optional_params:
                 yield f"\t\tkwargs = args.pop('kwargs')"
                 if '{' in r:
-                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), data=kwargs)'
+                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), json=kwargs)'
                 else:
-                    yield f'\t\tresp = self.client.{typ}("api{r}", data=kwargs)'
+                    yield f'\t\tresp = self.client.{typ}("api{r}", json=kwargs)'
             elif optional_params or body:
                 yield f"\t\tkwargs = args.pop('kwargs')"
                 if optional_params:
@@ -322,9 +322,9 @@ def yield_paths() -> Generator[str]:
                     yield f'\t\tpassed_params = ''{k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}'
                 if optional_params and body:
                     if '{' in r:
-                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params, data=kwargs)'
+                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params, json=kwargs)'
                     else:
-                        yield f'\t\tresp = self.client.{typ}("api{r}", params=passed_params, data=kwargs)'
+                        yield f'\t\tresp = self.client.{typ}("api{r}", params=passed_params, json=kwargs)'
                 elif optional_params:
                     if '{' in r:
                         yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params)'
@@ -332,9 +332,9 @@ def yield_paths() -> Generator[str]:
                         yield f'\t\tresp = self.client.{typ}("api{r}", params=passed_params)'
                 elif body:
                     if '{' in r:
-                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), data=kwargs)'
+                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), json=kwargs)'
                     else:
-                        yield f'\t\tresp = self.client.{typ}("api{r}", data=kwargs)'
+                        yield f'\t\tresp = self.client.{typ}("api{r}", json=kwargs)'
             
             yield "\t\traise_planka_err(resp)"
             yield "\t\treturn resp.json()"
