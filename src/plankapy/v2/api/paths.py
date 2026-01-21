@@ -3,11 +3,20 @@ from typing import (
     Literal,
     Unpack,
 )
-from httpx import Client
+from httpx import Client, Response, HTTPStatusError
 from .schemas import *
 from .typ import *
+from .errors import *
 
 __all__ = ("PlankaEndpoints",)
+
+def raise_planka_err(resp: Response) -> None:
+    try:
+        resp.raise_for_status()
+    except HTTPStatusError as status_err:
+        planka_code = status_err.response.json().get('code')
+        planka_err = ERRORS.get(planka_code, PlankaError)
+        raise planka_err(status_err)
 
 class PlankaEndpoints:
     def __init__(self, client: Client) -> None:
@@ -22,7 +31,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -33,7 +43,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/access-tokens/accept-terms", data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createAccessToken(self, **kwargs: Unpack[Request_createAccessToken]) -> Response_createAccessToken:
@@ -46,7 +56,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -57,7 +68,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/access-tokens", data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteAccessToken(self) -> Response_deleteAccessToken:
@@ -65,7 +76,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             Unauthorized: 401 
@@ -73,7 +85,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/access-tokens/me")
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def exchangeForAccessTokenWithOidc(self, **kwargs: Unpack[Request_exchangeForAccessTokenWithOidc]) -> Response_exchangeForAccessTokenWithOidc:
@@ -86,7 +98,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -100,7 +113,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/access-tokens/exchange-with-oidc", data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def revokePendingToken(self, **kwargs: Unpack[Request_revokePendingToken]) -> Response_revokePendingToken:
@@ -111,7 +124,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -121,7 +135,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/access-tokens/revoke-pending-token", data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getBoardActions(self, boardId: str, **kwargs: Unpack[Request_getBoardActions]) -> Response_getBoardActions:
@@ -133,7 +147,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -146,7 +161,7 @@ class PlankaEndpoints:
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/boards/{boardId}/actions".format(**args), params=passed_params)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getCardActions(self, cardId: str, **kwargs: Unpack[Request_getCardActions]) -> Response_getCardActions:
@@ -158,7 +173,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -171,7 +187,7 @@ class PlankaEndpoints:
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/cards/{cardId}/actions".format(**args), params=passed_params)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createAttachment(self, cardId: str, **kwargs: Unpack[Request_createAttachment]) -> Response_createAttachment:
@@ -187,7 +203,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -200,7 +217,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/cards/{cardId}/attachments".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteAttachment(self, id: str) -> Response_deleteAttachment:
@@ -211,7 +228,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -222,7 +240,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/attachments/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateAttachment(self, id: str, **kwargs: Unpack[Request_updateAttachment]) -> Response_updateAttachment:
@@ -234,7 +252,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -246,7 +265,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/attachments/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createBackgroundImage(self, projectId: str, **kwargs: Unpack[Request_createBackgroundImage]) -> Response_createBackgroundImage:
@@ -259,7 +278,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -272,7 +292,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/projects/{projectId}/background-images".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteBackgroundImage(self, id: str) -> Response_deleteBackgroundImage:
@@ -283,7 +303,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -294,7 +315,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/background-images/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createBaseCustomFieldGroup(self, projectId: str, **kwargs: Unpack[Request_createBaseCustomFieldGroup]) -> Response_createBaseCustomFieldGroup:
@@ -306,7 +327,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -318,7 +340,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/projects/{projectId}/base-custom-field-groups".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteBaseCustomFieldGroup(self, id: str) -> Response_deleteBaseCustomFieldGroup:
@@ -329,7 +351,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -340,7 +363,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/base-custom-field-groups/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateBaseCustomFieldGroup(self, id: str, **kwargs: Unpack[Request_updateBaseCustomFieldGroup]) -> Response_updateBaseCustomFieldGroup:
@@ -352,7 +375,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -364,7 +388,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/base-custom-field-groups/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createBoardMembership(self, boardId: str, **kwargs: Unpack[Request_createBoardMembership]) -> Response_createBoardMembership:
@@ -378,7 +402,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -391,7 +416,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/boards/{boardId}/board-memberships".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteBoardMembership(self, id: str) -> Response_deleteBoardMembership:
@@ -402,7 +427,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -412,7 +438,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/board-memberships/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateBoardMembership(self, id: str, **kwargs: Unpack[Request_updateBoardMembership]) -> Response_updateBoardMembership:
@@ -425,7 +451,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -436,7 +463,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/board-memberships/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createBoard(self, projectId: str, **kwargs: Unpack[Request_createBoard]) -> Response_createBoard:
@@ -452,7 +479,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -464,7 +492,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/projects/{projectId}/boards".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteBoard(self, id: str) -> Response_deleteBoard:
@@ -475,7 +503,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -485,7 +514,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/boards/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getBoard(self, id: str, **kwargs: Unpack[Request_getBoard]) -> Response_getBoard:
@@ -497,7 +526,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -510,7 +540,7 @@ class PlankaEndpoints:
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/boards/{id}".format(**args), params=passed_params)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateBoard(self, id: str, **kwargs: Unpack[Request_updateBoard]) -> Response_updateBoard:
@@ -529,7 +559,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -540,7 +571,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/boards/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createCardLabel(self, cardId: str, **kwargs: Unpack[Request_createCardLabel]) -> Response_createCardLabel:
@@ -552,7 +583,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -565,7 +597,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/cards/{cardId}/card-labels".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteCardLabel(self, cardId: str, labelId: str) -> Response_deleteCardLabel:
@@ -577,7 +609,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -588,7 +621,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/cards/{cardId}/card-labels/labelId:{labelId}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createCardMembership(self, cardId: str, **kwargs: Unpack[Request_createCardMembership]) -> Response_createCardMembership:
@@ -600,7 +633,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -613,7 +647,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/cards/{cardId}/card-memberships".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteCardMembership(self, cardId: str, userId: str) -> Response_deleteCardMembership:
@@ -625,7 +659,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -636,7 +671,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/cards/{cardId}/card-memberships/userId:{userId}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createCard(self, listId: str, **kwargs: Unpack[Request_createCard]) -> Response_createCard:
@@ -654,7 +689,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -667,7 +703,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/lists/{listId}/cards".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getCards(self, listId: str, **kwargs: Unpack[Request_getCards]) -> Response_getCards:
@@ -682,7 +718,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -695,7 +732,7 @@ class PlankaEndpoints:
         valid_params = ('before', 'search', 'filterUserIds', 'filterLabelIds')
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/lists/{listId}/cards".format(**args), params=passed_params)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteCard(self, id: str) -> Response_deleteCard:
@@ -706,7 +743,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -717,7 +755,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/cards/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getCard(self, id: str) -> Response_getCard:
@@ -728,7 +766,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -738,7 +777,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/cards/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateCard(self, id: str, **kwargs: Unpack[Request_updateCard]) -> Response_updateCard:
@@ -760,7 +799,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -773,7 +813,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/cards/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def duplicateCard(self, id: str, **kwargs: Unpack[Request_duplicateCard]) -> Response_duplicateCard:
@@ -786,7 +826,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -798,7 +839,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/cards/{id}/duplicate".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def readCardNotifications(self, id: str) -> Response_readCardNotifications:
@@ -809,7 +850,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -819,7 +861,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.post("api/cards/{id}/read-notifications".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createComment(self, cardId: str, **kwargs: Unpack[Request_createComment]) -> Response_createComment:
@@ -831,7 +873,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -843,7 +886,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/cards/{cardId}/comments".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getComments(self, cardId: str, **kwargs: Unpack[Request_getComments]) -> Response_getComments:
@@ -855,7 +898,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -868,7 +912,7 @@ class PlankaEndpoints:
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/cards/{cardId}/comments".format(**args), params=passed_params)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteComment(self, id: str) -> Response_deleteComment:
@@ -879,7 +923,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -890,7 +935,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/comments/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateComments(self, id: str, **kwargs: Unpack[Request_updateComments]) -> Response_updateComments:
@@ -902,7 +947,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -914,7 +960,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/comments/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getConfig(self) -> Response_getConfig:
@@ -923,7 +969,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/config")
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createBoardCustomFieldGroup(self, boardId: str, **kwargs: Unpack[Request_createBoardCustomFieldGroup]) -> Response_createBoardCustomFieldGroup:
@@ -937,7 +983,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -950,7 +997,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/boards/{boardId}/custom-field-groups".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createCardCustomFieldGroup(self, cardId: str, **kwargs: Unpack[Request_createCardCustomFieldGroup]) -> Response_createCardCustomFieldGroup:
@@ -964,7 +1011,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -977,7 +1025,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/cards/{cardId}/custom-field-groups".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteCustomFieldGroup(self, id: str) -> Response_deleteCustomFieldGroup:
@@ -988,7 +1036,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -999,7 +1048,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/custom-field-groups/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getCustomFieldGroup(self, id: str) -> Response_getCustomFieldGroup:
@@ -1010,7 +1059,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1020,7 +1070,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/custom-field-groups/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateCustomFieldGroup(self, id: str, **kwargs: Unpack[Request_updateCustomFieldGroup]) -> Response_updateCustomFieldGroup:
@@ -1033,7 +1083,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1046,7 +1097,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/custom-field-groups/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str, **kwargs: Unpack[Request_updateCustomFieldValue]) -> Response_updateCustomFieldValue:
@@ -1060,7 +1111,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1072,7 +1124,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str) -> Response_deleteCustomFieldValue:
@@ -1085,7 +1137,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1096,7 +1149,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createCustomFieldInBaseGroup(self, baseCustomFieldGroupId: str, **kwargs: Unpack[Request_createCustomFieldInBaseGroup]) -> Response_createCustomFieldInBaseGroup:
@@ -1110,7 +1163,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1121,7 +1175,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createCustomFieldInGroup(self, customFieldGroupId: str, **kwargs: Unpack[Request_createCustomFieldInGroup]) -> Response_createCustomFieldInGroup:
@@ -1135,7 +1189,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1147,7 +1202,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/custom-field-groups/{customFieldGroupId}/custom-fields".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteCustomField(self, id: str) -> Response_deleteCustomField:
@@ -1158,7 +1213,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1169,7 +1225,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/custom-fields/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateCustomField(self, id: str, **kwargs: Unpack[Request_updateCustomField]) -> Response_updateCustomField:
@@ -1183,7 +1239,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1195,7 +1252,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/custom-fields/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createLabel(self, boardId: str, **kwargs: Unpack[Request_createLabel]) -> Response_createLabel:
@@ -1209,7 +1266,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1221,7 +1279,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/boards/{boardId}/labels".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteLabel(self, id: str) -> Response_deleteLabel:
@@ -1232,7 +1290,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1243,7 +1302,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/labels/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateLabel(self, id: str, **kwargs: Unpack[Request_updateLabel]) -> Response_updateLabel:
@@ -1257,7 +1316,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1269,7 +1329,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/labels/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def clearList(self, id: str) -> Response_clearList:
@@ -1280,7 +1340,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1291,7 +1352,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.post("api/lists/{id}/clear".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createList(self, boardId: str, **kwargs: Unpack[Request_createList]) -> Response_createList:
@@ -1305,7 +1366,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1317,7 +1379,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/boards/{boardId}/lists".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteList(self, id: str) -> Response_deleteList:
@@ -1328,7 +1390,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1339,7 +1402,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/lists/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getList(self, id: str) -> Response_getList:
@@ -1350,7 +1413,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1360,7 +1424,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/lists/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateList(self, id: str, **kwargs: Unpack[Request_updateList]) -> Response_updateList:
@@ -1376,7 +1440,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1388,7 +1453,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/lists/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def moveListCards(self, id: str, **kwargs: Unpack[Request_moveListCards]) -> Response_moveListCards:
@@ -1400,7 +1465,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1412,7 +1478,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/lists/{id}/move-cards".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def sortList(self, id: str, **kwargs: Unpack[Request_sortList]) -> Response_sortList:
@@ -1425,7 +1491,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1438,7 +1505,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/lists/{id}/sort".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createBoardNotificationService(self, boardId: str, **kwargs: Unpack[Request_createBoardNotificationService]) -> Response_createBoardNotificationService:
@@ -1451,7 +1518,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1463,7 +1531,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/boards/{boardId}/notification-services".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createUserNotificationService(self, userId: str, **kwargs: Unpack[Request_createUserNotificationService]) -> Response_createUserNotificationService:
@@ -1476,7 +1544,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1488,7 +1557,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/users/{userId}/notification-services".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteNotificationService(self, id: str) -> Response_deleteNotificationService:
@@ -1499,7 +1568,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1509,7 +1579,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/notification-services/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateNotificationService(self, id: str, **kwargs: Unpack[Request_updateNotificationService]) -> Response_updateNotificationService:
@@ -1522,7 +1592,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1533,7 +1604,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/notification-services/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def testNotificationService(self, id: str) -> Response_testNotificationService:
@@ -1544,7 +1615,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1554,7 +1626,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.post("api/notification-services/{id}/test".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getNotifications(self) -> Response_getNotifications:
@@ -1562,7 +1634,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1571,7 +1644,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/notifications")
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def readAllNotifications(self) -> Response_readAllNotifications:
@@ -1579,7 +1652,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1588,7 +1662,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.post("api/notifications/read-all")
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getNotification(self, id: str) -> Response_getNotification:
@@ -1599,7 +1673,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1609,7 +1684,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/notifications/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateNotification(self, id: str, **kwargs: Unpack[Request_updateNotification]) -> Response_updateNotification:
@@ -1621,7 +1696,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1632,7 +1708,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/notifications/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createProjectManager(self, projectId: str, **kwargs: Unpack[Request_createProjectManager]) -> Response_createProjectManager:
@@ -1644,7 +1720,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1658,7 +1735,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/projects/{projectId}/project-managers".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteProjectManager(self, id: str) -> Response_deleteProjectManager:
@@ -1669,7 +1746,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1681,7 +1759,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/project-managers/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createProject(self, **kwargs: Unpack[Request_createProject]) -> Response_createProject:
@@ -1694,7 +1772,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1704,7 +1783,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/projects", data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getProjects(self) -> Response_getProjects:
@@ -1712,7 +1791,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1721,7 +1801,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/projects")
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteProject(self, id: str) -> Response_deleteProject:
@@ -1732,7 +1812,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1743,7 +1824,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/projects/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getProject(self, id: str) -> Response_getProject:
@@ -1754,7 +1835,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1764,7 +1846,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/projects/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateProject(self, id: str, **kwargs: Unpack[Request_updateProject]) -> Response_updateProject:
@@ -1783,7 +1865,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1797,7 +1880,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/projects/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createTaskList(self, cardId: str, **kwargs: Unpack[Request_createTaskList]) -> Response_createTaskList:
@@ -1812,7 +1895,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1824,7 +1908,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/cards/{cardId}/task-lists".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteTaskList(self, id: str) -> Response_deleteTaskList:
@@ -1835,7 +1919,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1846,7 +1931,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/task-lists/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getTaskList(self, id: str) -> Response_getTaskList:
@@ -1857,7 +1942,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1867,7 +1953,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/task-lists/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateTaskList(self, id: str, **kwargs: Unpack[Request_updateTaskList]) -> Response_updateTaskList:
@@ -1882,7 +1968,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1894,7 +1981,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/task-lists/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createTask(self, taskListId: str, **kwargs: Unpack[Request_createTask]) -> Response_createTask:
@@ -1909,7 +1996,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1922,7 +2010,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/task-lists/{taskListId}/tasks".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteTask(self, id: str) -> Response_deleteTask:
@@ -1933,7 +2021,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1944,7 +2033,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/tasks/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateTask(self, id: str, **kwargs: Unpack[Request_updateTask]) -> Response_updateTask:
@@ -1960,7 +2049,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1972,7 +2062,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/tasks/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getTerms(self, type: Literal['general', 'extended'], **kwargs: Unpack[Request_getTerms]) -> Response_getTerms:
@@ -1984,7 +2074,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -1997,7 +2088,7 @@ class PlankaEndpoints:
         valid_params = ('language',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/terms/{type}".format(**args), params=passed_params)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createUser(self, **kwargs: Unpack[Request_createUser]) -> Response_createUser:
@@ -2018,7 +2109,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2030,7 +2122,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/users", data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getUsers(self) -> Response_getUsers:
@@ -2038,7 +2130,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2048,7 +2141,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/users")
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteUser(self, id: str) -> Response_deleteUser:
@@ -2059,7 +2152,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2070,7 +2164,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/users/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getUser(self, id: str, **kwargs: Unpack[Request_getUser]) -> Response_getUser:
@@ -2082,7 +2176,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2095,7 +2190,7 @@ class PlankaEndpoints:
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/users/{id}".format(**args), params=passed_params)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateUser(self, id: str, **kwargs: Unpack[Request_updateUser]) -> Response_updateUser:
@@ -2120,7 +2215,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2133,7 +2229,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/users/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateUserAvatar(self, id: str, **kwargs: Unpack[Request_updateUserAvatar]) -> Response_updateUserAvatar:
@@ -2145,7 +2241,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2157,7 +2254,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/users/{id}/avatar".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateUserEmail(self, id: str, **kwargs: Unpack[Request_updateUserEmail]) -> Response_updateUserEmail:
@@ -2170,7 +2267,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2183,7 +2281,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/users/{id}/email".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateUserPassword(self, id: str, **kwargs: Unpack[Request_updateUserPassword]) -> Response_updateUserPassword:
@@ -2196,7 +2294,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2208,7 +2307,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/users/{id}/password".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateUserUsername(self, id: str, **kwargs: Unpack[Request_updateUserUsername]) -> Response_updateUserUsername:
@@ -2221,7 +2320,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2234,7 +2334,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/users/{id}/username".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def createWebhook(self, **kwargs: Unpack[Request_createWebhook]) -> Response_createWebhook:
@@ -2249,7 +2349,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2260,7 +2361,7 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.post("api/webhooks", data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def getWebhooks(self) -> Response_getWebhooks:
@@ -2268,7 +2369,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2277,7 +2379,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.get("api/webhooks")
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def deleteWebhook(self, id: str) -> Response_deleteWebhook:
@@ -2288,7 +2390,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2298,7 +2401,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         resp = self.client.delete("api/webhooks/{id}".format(**args))
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
 
     def updateWebhook(self, id: str, **kwargs: Unpack[Request_updateWebhook]) -> Response_updateWebhook:
@@ -2314,7 +2417,8 @@ class PlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400 
@@ -2325,5 +2429,5 @@ class PlankaEndpoints:
         args.pop('self')
         kwargs = args.pop('kwargs')
         resp = self.client.patch("api/webhooks/{id}".format(**args), data=kwargs)
-        resp.raise_for_status()
+        raise_planka_err(resp)
         return resp.json()
