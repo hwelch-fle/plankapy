@@ -34,7 +34,7 @@ def dttoiso(dt: datetime, default_timezone: timezone=timezone.utc) -> str:
     return dt.isoformat()
 
 # Position Offset
-OFFSET = 16384
+POSITION_GAP = 65536
 
 class HasPosition(Protocol):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -48,4 +48,4 @@ def get_position(items: Sequence[HasPosition], position: Literal['top', 'bottom'
         return position
     if position != 'bottom':
         return 0
-    return max((i.position for i in items), default=0) + OFFSET
+    return max((i.position for i in items), default=0) + POSITION_GAP
