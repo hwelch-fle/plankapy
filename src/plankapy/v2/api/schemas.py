@@ -175,7 +175,7 @@ class Card(TypedDict):
 class Stopwatch(TypedDict):
     startedAt: NotRequired[str]
     """The time that a running stopwatch was started"""
-    duration: int
+    total: int
     """The number of seconds that the stopwatch has been running"""
 
 class CardLabel(TypedDict):
