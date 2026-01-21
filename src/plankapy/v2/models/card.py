@@ -2,9 +2,9 @@ from __future__ import annotations
 
 __all__ = ('Card', 'Stopwatch', )
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, get_position
+from ._helpers import Position, dtfromiso, dttoiso, get_position
 from ..api import schemas, paths
 
 # Deferred Model imports at bottom of file
@@ -500,19 +500,96 @@ class Stopwatch:
 
     def __init__(self, card: Card) -> None:
         self.card = card
-        if not card.schema['stopwatch']:
-            # Add a stopwatch
-            ...
+        self.tz = card.session.timezone
     
-    def start(self) -> datetime: ...
-    def stop(self) -> datetime: ...
-    def duration(self) -> int: ...
+    @property
+    def schema(self):
+        return self.card.schema['stopwatch'] or {'startedAt': None, 'total': 0}
     
-    # Special Methods
-    def sync(self): ...
-    def update(self): ...
-    def delete(self): ...
-
+    @property
+    def enabled(self):
+        """If the stopwatch is enabled for the card (visible on front)"""
+        self.sync()
+        return self.card.schema['stopwatch'] is not None
+    @enabled.setter
+    def enabled(self, enabled: bool):
+        """Enable/Disable the stopwatch"""
+        self.sync()
+        self.card.update(stopwatch=self.schema if enabled and not self.enabled else None)
+        return self.schema
+            
+    @property
+    def total(self) -> timedelta:
+        self.card.sync()
+        # Get the stored total seconds
+        total = self.schema['total']
+        
+        # If the stopwatch is running, 
+        # compute the time delta in seconds and add to total
+        # The `total` attribute is only incremented when `startedAt` 
+        # is set to None/null
+        if self.is_running:
+            now = datetime.now(tz=self.tz)
+            total += (now - (self.last_started or now)).total_seconds()
+            
+        return timedelta(seconds=total)
+    
+    @total.setter
+    def total(self, total: timedelta | int) -> None:
+        """Set the total of the stopwatch using seconds or a timedelta"""
+        self.update(total=total)
+    
+    @property
+    def last_started(self) -> datetime | None:
+        """The time a running stopwatch was started (None if the stopwatch is stopped)"""
+        self.card.sync()
+        if started := self.schema.get('startedAt'):
+            return dtfromiso(started, default_timezone=self.tz)
+    
+    @property
+    def is_running(self) -> bool:
+        """If the stopwatch is currently running"""
+        return self.last_started is not None
+    
+    def start(self) -> datetime | None:
+        """Start the stopwatch and return the current datetime (None if the stopwatch is started)"""
+        if self.is_running:
+           return None
+        return datetime.now(tz=self.card.session.timezone)
+    
+    def stop(self) -> datetime | None:
+        """Stop a running stopwatch and return the time it was last started"""
+        started = self.last_started
+        self.update(started_at=None)
+        return started
+    
+    def update(self, started_at: datetime | str | None=None, total: timedelta | int | None=None) -> None:
+        """Update the stopwatch"""        
+        current = self.schema
+        if started_at:
+            current['startedAt'] = str(
+                dttoiso(started_at, default_timezone=self.tz) 
+                if isinstance(started_at, datetime) 
+                else started_at
+            )
+        if total:
+            current['total'] = int(round( # Round seconds
+                total.total_seconds() 
+                if isinstance(total, timedelta) 
+                else total
+            ))
+        self.card.update(stopwatch=current)
+    
+    def sync(self):
+        self.card.sync()
+        
+    def __repr__(self) -> str:
+        return f'Stopwatch(Card({self.card.name}), total={self.total}, running={self.is_running})'
+    
+    def json(self) -> str:
+        import json
+        return json.dumps(self.schema)
+    
 
 from .action import Action
 from .attachment import Attachment
