@@ -5,7 +5,7 @@ from typing import Any, Literal, Protocol
 __all__ = ('dtfromiso', 'get_position', 'Position')
 
 def dtfromiso(iso: str, default_timezone: timezone=timezone.utc) -> datetime:
-    """Convert an ISO 8601 string to an ofset aware datetime
+    """Convert an ISO 8601 string to an offset aware datetime
 
     Args:
         iso (str): The ISO 8601 string to convert to a datetime
@@ -19,6 +19,19 @@ def dtfromiso(iso: str, default_timezone: timezone=timezone.utc) -> datetime:
     if not dt.tzinfo:
         return dt.replace(tzinfo=default_timezone)
     return dt
+
+def dttoiso(dt: datetime, default_timezone: timezone=timezone.utc) -> str:
+    """Convert an offset aware datetime to an ISO 8601 string. 
+    
+    timezone check is `dt.tzinfo` -> `default_timezone`
+
+    Args:
+        dt (datetime): The datetime to convert
+        default_timezone (timezone): The timezone to interpret the ISO string in (default: timezone.utc)
+    """
+    if not dt.tzinfo:
+        dt = dt.replace(tzinfo=default_timezone)
+    return dt.isoformat()
 
 # Position Offset
 OFFSET = 16384
