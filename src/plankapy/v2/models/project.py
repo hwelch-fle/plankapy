@@ -194,6 +194,7 @@ class Project(PlankaModel[schemas.Project]):
 
         if isinstance(background, BackgroundImage):
             self.background_image = background
+            return background
 
         # Deferred import of mimetypes that is only used here
         # This function takes so long anyways so the import delay 
