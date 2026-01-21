@@ -26,6 +26,7 @@ __all__ = (
     "TaskList",
     "User",
     "Webhook",
+    "Stopwatch",
 )
 
 class Action(TypedDict):

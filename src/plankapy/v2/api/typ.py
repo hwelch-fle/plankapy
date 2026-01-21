@@ -175,7 +175,7 @@ class Request_updateCard(TypedDict):
     """Due date for the card"""
     isDueCompleted: NotRequired[bool | None]
     """Whether the due date is completed"""
-    stopwatch: NotRequired[dict[str, Any] | None]
+    stopwatch: NotRequired[Stopwatch | None]
     """Stopwatch data for time tracking"""
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
