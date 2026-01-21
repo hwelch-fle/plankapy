@@ -643,6 +643,7 @@ from .custom_field_group import CustomFieldGroup
 from .custom_field_value import CustomFieldValue
 from .label import Label
 from .list import List
+from .project import Project
 from .task import Task
 from .task_list import TaskList
 from .user import User
