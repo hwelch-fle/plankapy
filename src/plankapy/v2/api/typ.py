@@ -141,7 +141,7 @@ class Request_createCard(TypedDict):
     """Detailed description of the card"""
     dueDate: NotRequired[str | datetime]
     """Due date for the card (`datetime` only allowed when using `Card.create_card`, otherwise use ISO string)"""
-    isDueCompleted: NotRequired[bool]
+    isDueCompleted: NotRequired[bool | None]
     """Whether the due date is completed"""
     stopwatch: NotRequired[dict[str, Any] | None]
     """Stopwatch data for time tracking"""
