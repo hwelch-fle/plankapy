@@ -1,4 +1,4 @@
-"""PLANKA API (2.0.0) - Generated on Sat Jan 17 2026"""
+"""PLANKA API (2.0.0) - Generated on Wed Jan 21 2026"""
 
 from .schemas import *
 from .paths import *

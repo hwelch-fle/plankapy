@@ -404,7 +404,7 @@ def yield_init() -> Generator[str]:
     yield "from .schemas import *"
     yield "from .paths import *"
     yield "from .async_paths import *"
-    yield "from .responses import *"
+    yield "from .errors import *"
     yield ""
     yield f'__version__ = "{_version}"'
     yield ""
