@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
     from ._literals import BackgroundGradient, BackgroundType
 
 
@@ -198,3 +200,12 @@ class Project(PlankaModel[schemas.Project]):
         """Create a BaseCustomFieldGroup in the Project"""
         return BaseCustomFieldGroup(self.endpoints.createBaseCustomFieldGroup(self.id, **bcfg)['item'], self.session)
 
+
+from .board import Board
+from .user import User
+from .project_manager import ProjectManager
+from .background_image import BackgroundImage
+from .base_custom_field_group import BaseCustomFieldGroup
+from .board_membership import BoardMembership
+from .custom_field import CustomField
+from .notification_service import NotificationService

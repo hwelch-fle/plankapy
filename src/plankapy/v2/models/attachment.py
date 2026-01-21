@@ -7,11 +7,13 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from typing import Any, Unpack
-    from models import *
+    #from models import *
 
 
 class Attachment(PlankaModel[schemas.Attachment]):
@@ -78,3 +80,6 @@ class Attachment(PlankaModel[schemas.Attachment]):
     def download(self) -> Iterator[bytes]:
         """Get a byte Iterator for stream downloading"""
         return self.client.get(self.schema['data']['url']).iter_bytes()
+    
+from .card import Card
+from .user import User

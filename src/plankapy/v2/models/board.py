@@ -7,11 +7,13 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Unpack
-    from models import *
+    #from models import *
     from ._literals import CardType, BoardRole, BoardView
 
 
@@ -381,3 +383,18 @@ class Board(PlankaModel[schemas.Board]):
         for user in users:
             self.remove_user(user)
 
+from .project import Project
+from .user import User
+from .card import Card
+from .board_membership import BoardMembership
+from .custom_field import CustomField
+from .list import List
+from .label import Label
+from .card_label import CardLabel
+from .card_membership import CardMembership
+from .custom_field import CustomField
+from .custom_field_group import CustomFieldGroup
+from .custom_field_value import CustomFieldValue
+from .task import Task
+from .task_list import TaskList
+from .attachment import Attachment
