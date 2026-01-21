@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import Position, dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
     from ._literals import UserListType, ListColor
 
 
@@ -153,3 +155,16 @@ class List(PlankaModel[schemas.List]):
         """Move all Cards in this List to another List"""
         for c in self.cards:
             c.move(list, position)
+
+
+from .attachment import Attachment
+from .board import Board
+from .card import Card
+from .card_label import CardLabel
+from .card_membership import CardMembership
+from .custom_field import CustomField
+from .custom_field_group import CustomFieldGroup
+from .custom_field_value import CustomFieldValue
+from .task import Task
+from .task_list import TaskList
+from .user import User

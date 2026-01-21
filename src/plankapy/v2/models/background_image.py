@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterator
-    from models import *
+    #from models import *
 
 
 class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
@@ -69,3 +71,6 @@ class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
     def delete(self):
         """Delete the BackgroundImage"""
         return self.endpoints.deleteBackgroundImage(self.id)
+
+
+from .project import Project

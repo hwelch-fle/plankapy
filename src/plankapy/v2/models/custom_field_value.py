@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
 
 
 class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
@@ -75,3 +77,8 @@ class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
             customFieldGroupId=self.schema['customFieldGroupId'],
             customFieldId=self.schema['customFieldId'],
         )
+
+
+from .card import Card
+from .custom_field import CustomField
+from .custom_field_group import CustomFieldGroup

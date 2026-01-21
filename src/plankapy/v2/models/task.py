@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
 
 
 class Task(PlankaModel[schemas.Task]):
@@ -99,3 +101,8 @@ class Task(PlankaModel[schemas.Task]):
     def delete(self):
         """Delete the Task"""
         self.endpoints.deleteTask(self.id)
+
+
+from .card import Card
+from .user import User
+from .task_list import TaskList

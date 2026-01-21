@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
 from ..api import paths, schemas
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
 
 
 class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
@@ -104,4 +106,7 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
             showOnFrontOfCard (bool): Whether to show the field on the front of cards 
         """
         return CustomField(self.endpoints.createCustomFieldInBaseGroup(self.id, **kwargs)['item'], self.session)
-    
+
+
+from .project import Project
+from .custom_field import CustomField

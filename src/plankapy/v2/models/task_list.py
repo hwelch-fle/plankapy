@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
 
 
 class TaskList(PlankaModel[schemas.TaskList]):
@@ -106,3 +108,7 @@ class TaskList(PlankaModel[schemas.TaskList]):
             )['item'], 
             self.session
         )
+
+
+from .card import Card
+from .task import Task

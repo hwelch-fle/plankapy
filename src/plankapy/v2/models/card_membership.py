@@ -7,9 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from models import *
+    ...
+    #from models import *
 
 
 class CardMembership(PlankaModel[schemas.CardMembership]):
@@ -43,3 +46,7 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     def delete(self):
         """Delete the CardMembership"""
         return self.endpoints.deleteCardMembership(userId=self.user.id, cardId=self.card.id)
+
+
+from .card import Card
+from .user import User

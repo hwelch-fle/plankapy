@@ -7,9 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from models import *
+    ...
+    #from models import *
 
  
 class CardLabel(PlankaModel[schemas.CardLabel]):
@@ -42,3 +45,6 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
         """Delete the CardLabel"""
         return self.endpoints.deleteCardLabel(cardId=self.schema['cardId'], labelId=self.schema['labelId'])
 
+
+from .card import Card
+from .label import Label

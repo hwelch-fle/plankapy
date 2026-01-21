@@ -8,7 +8,7 @@ from ..api import schemas
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Any
-    from models import *
+    #from models import *
 
 
 class Config(PlankaModel[schemas.Config]):

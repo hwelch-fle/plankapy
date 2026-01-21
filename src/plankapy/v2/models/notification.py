@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Any, Unpack
-    from models import *
+    #from models import *
     from ._literals import NotificationType
 
 
@@ -95,3 +97,10 @@ class Notification(PlankaModel[schemas.Notification]):
     def update(self, **kwargs: Unpack[paths.Request_updateNotification]) -> None:
         """Update the Notification"""
         self.schema = self.endpoints.updateNotification(self.id, **kwargs)['item']
+
+
+from .action import Action
+from .board import Board
+from .card import Card
+from .comment import Comment
+from .user import User

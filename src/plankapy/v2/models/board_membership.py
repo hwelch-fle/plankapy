@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
     from _literals import BoardRole
 
 
@@ -83,3 +85,7 @@ class BoardMembership(PlankaModel[schemas.BoardMembership]):
         """Delete the BoardMebership"""
         return self.endpoints.deleteBoardMembership(self.id)
 
+
+from .project import Project
+from .board import Board
+from .user import User

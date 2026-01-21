@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
     from ._literals import LabelColor
 
 
@@ -120,3 +122,7 @@ class Label(PlankaModel[schemas.Label]):
             # Avoid initializing another Label
             if cl.schema['labelId'] == self.schema['id']
         ]
+
+
+from .board import Board
+from .card import Card

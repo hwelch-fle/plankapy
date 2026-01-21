@@ -80,6 +80,7 @@ class Attachment(PlankaModel[schemas.Attachment]):
     def download(self) -> Iterator[bytes]:
         """Get a byte Iterator for stream downloading"""
         return self.client.get(self.schema['data']['url']).iter_bytes()
-    
+
+
 from .card import Card
 from .user import User

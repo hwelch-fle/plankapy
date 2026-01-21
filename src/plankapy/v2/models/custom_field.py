@@ -7,6 +7,8 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
@@ -75,4 +77,7 @@ class CustomField(PlankaModel[schemas.CustomField]):
         """Delete the CustomField"""
         self.endpoints.deleteCustomField(self.id)
 
-   
+
+from .base_custom_field_group import BaseCustomFieldGroup
+from .custom_field import CustomField
+from .custom_field_group import CustomFieldGroup

@@ -7,9 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from models import *
+    ...
+    #from models import *
 
 
 class ProjectManager(PlankaModel[schemas.ProjectManager]):
@@ -48,3 +51,7 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
                 
     def delete(self):
         self.endpoints.deleteProjectManager(self.id)
+
+
+from .project import Project
+from .user import User

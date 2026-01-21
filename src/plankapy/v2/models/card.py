@@ -7,11 +7,13 @@ from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Any, Unpack
-    from models import *
+    #from models import *
     from ._literals import CardType, BoardRole
 
 
@@ -495,3 +497,19 @@ class Stopwatch:
     def sync(self): ...
     def update(self): ...
     def delete(self): ...
+
+
+from .action import Action
+from .attachment import Attachment
+from .board import Board
+from .card_label import CardLabel
+from .card_membership import CardMembership
+from .comment import Comment
+from .custom_field import CustomField
+from .custom_field_group import CustomFieldGroup
+from .custom_field_value import CustomFieldValue
+from .label import Label
+from .list import List
+from .task import Task
+from .task_list import TaskList
+from .user import User

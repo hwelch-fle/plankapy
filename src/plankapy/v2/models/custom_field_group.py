@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
 
 
 class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
@@ -170,4 +172,10 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
         if field in self.custom_fields:
             field.delete()
 
- 
+
+from .base_custom_field_group import BaseCustomFieldGroup
+from .board import Board
+from .card import Card
+from .custom_field import CustomField
+from .custom_field_value import CustomFieldValue
+from .project import Project

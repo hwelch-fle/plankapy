@@ -7,10 +7,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas, paths
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from models import *
+    #from models import *
 
 
 class Comment(PlankaModel[schemas.Comment]):
@@ -61,4 +63,6 @@ class Comment(PlankaModel[schemas.Comment]):
         """Delete the Comment"""
         return self.endpoints.deleteComment(self.id)
 
-   
+
+from .card import Card
+from .user import User

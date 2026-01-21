@@ -8,10 +8,12 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 from ..api import schemas
 
+# Deferred Model imports at bottom of file
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Any
-    from models import *
+    #from models import *
 
 
 class Action(PlankaModel[schemas.Action]):
@@ -54,3 +56,8 @@ class Action(PlankaModel[schemas.Action]):
     def type(self):
         """The type of the Action"""
         return self.schema['type']
+    
+
+from .card import Card
+from .board import Board
+from .user import User
