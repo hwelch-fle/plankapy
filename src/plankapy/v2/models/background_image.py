@@ -35,10 +35,9 @@ class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
         return Project(self.endpoints.getProject(self.schema['projectId'])['item'], self.session)
     
     @property
-    def size_in_bytes(self) -> int:
+    def size(self) -> int:
         """The size of the BackgroundImage in bytes"""
-        # The Swagger schema says this is a string, but it's should be an int
-        return int(self.schema['sizeInBytes'])
+        return int(self.schema.get('size', self.schema.get('sizeInBytes')))
     
     @property
     def url(self) -> str:
