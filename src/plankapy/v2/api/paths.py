@@ -216,7 +216,22 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = self.client.post("api/cards/{cardId}/attachments".format(**args), json=kwargs)
+        
+        # Handle file attachment
+        if kwargs.get('type') == 'file':
+            file_data = kwargs.pop('file')
+            print(kwargs)
+            resp = self.client.post(
+                "api/cards/{cardId}/attachments".format(**args), 
+                data=kwargs, 
+                json=kwargs,
+                files={kwargs.get('name', f'{hash(file_data)}.bin'): file_data}, 
+                headers={'Content-Type': 'multipart/form-data'}
+            )
+        
+        # Handle link attachment 
+        else:
+            resp = self.client.post("api/cards/{cardId}/attachments".format(**args), json=kwargs)
         raise_planka_err(resp)
         return resp.json()
 
