@@ -173,12 +173,6 @@ class Card(TypedDict):
     updatedAt: str
     """When the card was last updated"""
 
-class Stopwatch(TypedDict):
-    startedAt: str | None
-    """The time that a running stopwatch was started"""
-    total: int
-    """The number of seconds that the stopwatch has been running"""
-
 class CardLabel(TypedDict):
     id: str
     """Unique identifier for the card-label association"""

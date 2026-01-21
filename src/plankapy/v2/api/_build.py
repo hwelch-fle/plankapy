@@ -359,6 +359,7 @@ def yield_async_paths() -> Generator[str]:
 
 def yield_types() -> Generator[str]:
     yield "from __future__ import annotations"
+    yield "from datetime import datetime"
     yield "from typing import ("
     yield "\tAny,"
     yield "\tLiteral,"
@@ -445,6 +446,7 @@ def yield_schema() -> Generator[str]:
     yield "__all__ = ("
     for c in get_schemas(SWG):
         yield f'\t"{c}",'
+    yield '\t"Stopwatch",'
     yield ")"
     for c, prop in get_schemas(SWG).items():
         yield f"\nclass {c}(TypedDict):"
@@ -467,6 +469,12 @@ def yield_schema() -> Generator[str]:
             yield f"    {p}: {t}"
             if "description" in ps:
                 yield f'    """{ps["description"]}"""'
+    yield ""
+    yield "class Stopwatch(TypedDict):"
+    yield "    startedAt: str | None"
+    yield '    """The time that a running stopwatch was started"""'
+    yield "    total: int"
+    yield '    """The number of seconds that the stopwatch has been running"""'
 
 
 INIT_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '), yield_init())))
