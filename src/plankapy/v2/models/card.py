@@ -133,13 +133,22 @@ class Card(PlankaModel[schemas.Card]):
         return self
 
     @property
-    def creator(self) -> User:
-        """The User who Created the card (Raises LookupError if User is no longer a Board Member)"""
-        _usrs = [u for u in self.board.users if self.schema['creatorUserId'] == u.id]
-        if _usrs:
-            return _usrs.pop()
-        raise LookupError(f"Cannot find User: {self.schema['creatorUserId']}")
-    
+    def creator(self) -> User | None:
+        """The User who Created the card
+        
+        Note: 
+            If the creator is no longer on the Board, only Admins and Project Owners 
+            can see them. Otherwise, None will be returned
+            
+            If the User has been deleted, Admins and Project Owners will get a Server error 
+        """
+        for u in self.board.users:
+            if u.id == self.schema['creatorUserId']:
+                return u
+        
+        if self.current_role in ('admin', 'projectOwner'):
+            return User(self.endpoints.getUser(self.schema['creatorUserId'])['item'], self.session) 
+        
     @property
     def prev_list(self) -> List | None:
         """The previous List the card was in (available when in archive or trash)"""
