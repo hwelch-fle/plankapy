@@ -159,7 +159,7 @@ class Card(TypedDict):
     """Due date for the card"""
     isDueCompleted: bool
     """Whether the due date is completed"""
-    stopwatch: Stopwatch
+    stopwatch: Stopwatch | None
     """Stopwatch data for time tracking"""
     commentsTotal: int
     """Total number of comments on the card"""
