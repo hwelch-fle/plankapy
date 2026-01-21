@@ -173,7 +173,7 @@ class Card(TypedDict):
     """When the card was last updated"""
 
 class Stopwatch(TypedDict):
-    startedAt: NotRequired[str]
+    startedAt: str | None
     """The time that a running stopwatch was started"""
     total: int
     """The number of seconds that the stopwatch has been running"""
