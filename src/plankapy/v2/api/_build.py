@@ -57,7 +57,7 @@ class ContentSchema(TypedDict): ...
 
 
 class Content(TypedDict):
-    schema: ContentSchema
+    schema: dict[str, Any]
 
 
 class Response(TypedDict):
@@ -80,7 +80,7 @@ def get_schemas(swg: dict[str, Any]) -> dict[str, Schema]:
     return swg["components"]["schemas"]
 
 
-def get_responses(swg: dict[str, Any]) -> dict[str, Response]:
+def get_errors(swg: dict[str, Any]) -> dict[str, Response]:
     return swg["components"]["responses"]
 
 requests: dict[str, Any] | None = None
@@ -93,11 +93,20 @@ def yield_paths() -> Generator[str]:
     yield "\tLiteral,"
     yield "\tUnpack,"
     yield ")"
-    yield "from httpx import Client"
+    yield "from httpx import Client, Response, HTTPStatusError"
     yield "from .schemas import *"
     yield "from .typ import *"
+    yield "from .errors import *"
     yield ""
     yield '__all__ = ("PlankaEndpoints",)'
+    yield ""
+    yield "def raise_planka_err(resp: Response) -> None:"
+    yield "\ttry:"
+    yield "\t\tresp.raise_for_status()"
+    yield "\texcept HTTPStatusError as status_err:"
+    yield "\t\tplanka_code = status_err.response.json().get('code')"
+    yield "\t\tplanka_err = ERRORS.get(planka_code, PlankaError)"
+    yield "\t\traise planka_err(status_err)"
     yield ""
     yield "class PlankaEndpoints:"
     yield "\tdef __init__(self, client: Client) -> None:"
@@ -285,7 +294,8 @@ def yield_paths() -> Generator[str]:
                 yield ""
                 yield "\t\tNote:"
                 yield "\t\t\tAll status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). "
-                yield "\t\t\tPlanka internal status errors are included here for disambiguation"
+                yield "\t\t\tIf a matching PlankaError exists, it will be raised (see `api.errors`) "
+                yield "\t\t\tPlanka internal status codes and names are included here for disambiguation"
                 yield ""
                 yield "\t\tRaises:"
                 for e_code, e in errors.items():
@@ -326,7 +336,7 @@ def yield_paths() -> Generator[str]:
                     else:
                         yield f'\t\tresp = self.client.{typ}("api{r}", data=kwargs)'
             
-            yield "\t\tresp.raise_for_status()"
+            yield "\t\traise_planka_err(resp)"
             yield "\t\treturn resp.json()"
             yield ""
 
@@ -344,6 +354,7 @@ def yield_async_paths() -> Generator[str]:
         line = line.replace(': Client', ': AsyncClient')
         line = line.replace('import Client', 'import AsyncClient')
         line = line.replace('resp = ', 'resp = await ')
+        line = line.replace('raise_planka_err(resp)', 'await raise_planka_err(resp)')
         yield line
 
 def yield_types() -> Generator[str]:
@@ -384,18 +395,35 @@ def yield_types() -> Generator[str]:
 
 def yield_errors() -> Generator[str]:
     yield "from __future__ import annotations"
+    yield "from typing import Any"
     yield "from httpx import HTTPStatusError"
     yield ""
     yield "__all__ = ("
     yield '\t"PlankaError",'
-    for i in get_responses(SWG):
+    yield '\t"ERRORS",'
+    for i in get_errors(SWG):
         yield f'\t"{i}",'
-    yield ")\n"
-    yield "class PlankaError(HTTPStatusError): ..."
-    for r, rs in get_responses(SWG).items():
+    yield ")"
+    yield ""
+    yield "class PlankaError(HTTPStatusError):"
+    yield "    def __init__(self, parent: HTTPStatusError, *args: Any, **kwargs: Any) -> None:"
+    yield "        response_json: dict[str, str] = parent.response.json()"
+    yield "        message = response_json.get('message', 'NO_MESSAGE')"
+    yield "        super().__init__(message, request=parent.request, response=parent.response)"
+    yield "        for problem in response_json.get('problems', []):"
+    yield "            self.add_note(problem)"
+    yield ""
+    errors: dict[str, str] = {}
+    for r, rs in get_errors(SWG).items():
         yield f"\nclass {r}(PlankaError): ..."
         yield f'"""{rs["description"]}"""'
-
+        errors[rs['content']['application/json']['schema']['properties']['code']['example']] = r
+    yield ""
+    yield "ERRORS: dict[str, type[PlankaError]] = {"
+    for e_name, e_class in errors.items():
+        yield f"\t'{e_name}': {e_class},"
+    yield "}"
+    yield ""
 
 def yield_init() -> Generator[str]:
     _version: str = SWG["info"]["version"]
