@@ -47,7 +47,7 @@ class Request_getCardActions(TypedDict):
 class Request_createAttachment(TypedDict):
     type: Literal['file', 'link']
     """Type of the attachment"""
-    file: NotRequired[str]
+    file: NotRequired[str | bytes]
     """File to upload"""
     url: NotRequired[str]
     """URL for the link attachment"""
