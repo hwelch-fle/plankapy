@@ -159,7 +159,7 @@ class Card(TypedDict):
     """Due date for the card"""
     isDueCompleted: bool
     """Whether the due date is completed"""
-    stopwatch: dict[str, Any]
+    stopwatch: Stopwatch
     """Stopwatch data for time tracking"""
     commentsTotal: int
     """Total number of comments on the card"""
@@ -171,6 +171,12 @@ class Card(TypedDict):
     """When the card was created"""
     updatedAt: str
     """When the card was last updated"""
+
+class Stopwatch(TypedDict):
+    startedAt: NotRequired[str]
+    """The time that a running stopwatch was started"""
+    duration: int
+    """The number of seconds that the stopwatch has been running"""
 
 class CardLabel(TypedDict):
     id: str
