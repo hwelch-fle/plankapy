@@ -190,11 +190,12 @@ class PlankaEndpoints:
         raise_planka_err(resp)
         return resp.json()
 
-    def createAttachment(self, cardId: str, **kwargs: Unpack[Request_createAttachment]) -> Response_createAttachment:
+    def createAttachment(self, cardId: str, mime_type: str|None=None, **kwargs: Unpack[Request_createAttachment]) -> Response_createAttachment:
         """Creates an attachment on a card. Requires board editor permissions.
 
         Args:
             cardId (str): ID of the card to create the attachment on)
+            mime_type (str | None): Optional mime type for file uploads
             type (Literal['file', 'link']): Type of the attachment
             file (str): File to upload
             url (str): URL for the link attachment
@@ -220,18 +221,22 @@ class PlankaEndpoints:
         # Handle file attachment
         if kwargs.get('type') == 'file':
             file_data = kwargs.pop('file')
+            name = kwargs['name']
             resp = self.client.post(
                 "api/cards/{cardId}/attachments".format(**args), 
+                params={'name': name, 'type': kwargs['type']},
                 data=kwargs, 
                 json=kwargs,
-                files={kwargs.get('name', f'{hash(file_data)}.bin'): file_data}, 
+                files={'file': (name, file_data, mime_type)}, 
                 headers={'Content-Type': 'multipart/form-data'}
             )
-        
+            raise_planka_err(resp)
+
         # Handle link attachment 
         else:
             resp = self.client.post("api/cards/{cardId}/attachments".format(**args), json=kwargs)
-        raise_planka_err(resp)
+            raise_planka_err(resp)
+        
         return resp.json()
 
     def deleteAttachment(self, id: str) -> Response_deleteAttachment:
