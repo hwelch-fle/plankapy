@@ -262,6 +262,23 @@ class Card(PlankaModel[schemas.Card]):
         )
         return self
 
+    def duplicate(self, position: Position = 'top', *, name: str|None=None) -> Card:
+        """Duplicate the card in the current List
+        
+        Args:
+            position (Position): The position to place the new Card in (default: `top`)
+            name (str|None): An optional name to give the new Card (default `{name} (copy)`)
+        """
+        position = get_position(self.list.cards, position)
+        return Card(
+            self.endpoints.duplicateCard(
+                self.id, 
+                position=position, 
+                name=name or f'{self.name} (copy)'
+            )['item'], 
+            self.session
+        )
+
     def restore(self, position: Position='top') -> Card:
         """Restore the Card from arcive/trash to its previous list"""
         if self.prev_list is not None:
