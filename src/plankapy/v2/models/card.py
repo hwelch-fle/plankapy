@@ -189,9 +189,9 @@ class Card(PlankaModel[schemas.Card]):
         """Due date for the card"""
         return dtfromiso(self.schema['dueDate'], self.session.timezone)
     @due_date.setter
-    def due_date(self, due_date: datetime) -> None:
-        """Set the due date"""
-        self.update(dueDate=due_date.isoformat())
+    def due_date(self, due_date: datetime | str) -> None:
+        """Set the due date (If using a string, a valid ISO 8601 string is required)"""
+        self.update(dueDate=str(due_date))
     
     @property
     def due_date_completed(self) -> bool:
@@ -236,18 +236,16 @@ class Card(PlankaModel[schemas.Card]):
         """Sync the Card with the Planka server"""
         self.schema = self.endpoints.getCard(self.id)['item']
         
-    def update(self, **card: Unpack[paths.Request_updateCard]):
+    def update(self, **kwargs: Unpack[paths.Request_updateCard]):
         """Update the Card
 
         Note:
-            dueDate can be set using iso string or datetime object
+            dueDate can be set using ISO 8601 string or datetime object
         """
         # Convert the dueDate to a iso string if a datetime is passed
-        if 'dueDate' in card and isinstance(card['dueDate'], datetime):
-            card['dueDate'] = card['dueDate'].isoformat()
-        if 'type' not in card:
-            card['type'] = self.schema['type']
-        self.schema = self.endpoints.updateCard(self.id, **card)['item']
+        if 'dueDate' in kwargs:
+            kwargs['dueDate'] = str(kwargs['dueDate'])
+        self.schema = self.endpoints.updateCard(self.id, **kwargs)['item']
  
     def delete(self):
         """Delete the Card"""
