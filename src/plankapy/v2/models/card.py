@@ -390,7 +390,7 @@ class Card(PlankaModel[schemas.Card]):
         Args:
             user (User): The User to add to the Card
             add_to_board (bool): Add the User to the Board if they are not already a member
-            role (Literal['viewer', 'editor']): If User is added to board, set role (default: `viewer`)
+            role (BoardRole): If User is added to board, set role (default: `viewer`)
             can_comment (bool): If User is added as a `viewer`, set commenting status (default: `False`)
         
         Raises:
