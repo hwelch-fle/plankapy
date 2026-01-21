@@ -283,11 +283,12 @@ class PlankaEndpoints:
         raise_planka_err(resp)
         return resp.json()
 
-    def createBackgroundImage(self, projectId: str, **kwargs: Unpack[Request_createBackgroundImage]) -> Response_createBackgroundImage:
+    def createBackgroundImage(self, projectId: str, mime_type: str | None=None, **kwargs: Unpack[Request_createBackgroundImage]) -> Response_createBackgroundImage:
         """Uploads a background image for a project. Requires project manager permissions.
 
         Args:
             projectId (str): ID of the project to upload background image for)
+            mime_type (str | None): Optional mime type for the file upload
             file (str): Background image file (must be an image format)
             requestId (str): Request ID for tracking
 
@@ -306,7 +307,9 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = self.client.post("api/projects/{projectId}/background-images".format(**args), json=kwargs)
+        resp = self.client.post("api/projects/{projectId}/background-images".format(**args), 
+            files={'file': ('background', kwargs['file'], mime_type)}, 
+        )
         raise_planka_err(resp)
         return resp.json()
 

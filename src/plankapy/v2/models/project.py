@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from httpx import HTTPStatusError
+
 __all__ = ('Project', )
 
 from datetime import datetime
@@ -171,9 +173,67 @@ class Project(PlankaModel[schemas.Project]):
         """Add a User to the Project as a ProjectManager"""
         return ProjectManager(self.endpoints.createProjectManager(self.id, userId=user.id)['item'], self.session)
     
+    def update_background_image(self, background: BackgroundImage | str | bytes | None) -> BackgroundImage | None:
+        """Update the Project Background Image,
+        
+        Only Admins and ProjectManagers can update the Background Image
+        
+        Args:
+            background (BackgroundImage | str | bytes | None): Existing Image or filepath/url or raw bytes or None to unset
+            
+        Returns:
+            (BackgroundImage | None): If a backround image was set or created
+        """
+        # Force a PermissionError early if this user isn't the current user or an admin
+        if self.id != self.session.current_id and self.session.current_role != 'admin':
+            self.endpoints.createBackgroundImage(self.id, **{'file': b'NO_PERMISSION'})
+        
+        if background is None:
+            self.remove_background()
+            return
+
+        if isinstance(background, BackgroundImage):
+            self.background_image = background
+
+        # Deferred import of mimetypes that is only used here
+        # This function takes so long anyways so the import delay 
+        # isn't noticable
+        import mimetypes
+        
+        # Handle filepath or URL
+        mime_type = None
+        if isinstance(background, str):
+            # Guess URL file type
+            if background.startswith('http'):
+                mime_type, *_ = mimetypes.guess_type(background)
+                mime_type = mime_type or 'application/octet-stream'
+                try:
+                    req = self.client.get(background)
+                    req.raise_for_status()
+                    background = req.content
+                except HTTPStatusError as status_error:
+                    status_error.add_note(f'Unable to download attachment from {background}')
+                    raise
+            # Guess local file type
+            # And read Bytes
+            else:
+                mime_type, *_ = mimetypes.guess_file_type(background)
+                mime_type = mime_type or 'application/octet-stream'
+                background = open(background, 'rb').read()
+        
+        mime_type = mime_type or 'application/octet-stream'
+        return BackgroundImage(
+            self.endpoints.createBackgroundImage(
+                self.id, 
+                file=bytes(background), 
+                mime_type=mime_type,
+            )['item'],
+            self.session
+        )
+    
     def remove_background(self) -> None:
         """Reset the Project background to the default grey"""
-        self.update(backgroundType=None) # type: ignore
+        self.update(backgroundType=None)
 
     def remove_project_manager(self, project_manager: ProjectManager | User) -> None:
         """Remove a ProjectManager from the Project"""

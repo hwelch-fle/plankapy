@@ -61,7 +61,7 @@ class Request_updateAttachment(TypedDict):
     """Name/title of the attachment"""
 
 class Request_createBackgroundImage(TypedDict):
-    file: str
+    file: bytes
     """Background image file (must be an image format)"""
     requestId: NotRequired[str]
     """Request ID for tracking"""
