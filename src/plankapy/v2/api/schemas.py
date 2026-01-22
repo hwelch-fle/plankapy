@@ -470,6 +470,8 @@ class User(TypedDict):
     """When the user was created"""
     updatedAt: str
     """When the user was last updated"""
+    apiKeyPrefix: str | None
+    """The prefix for the user's API key if one is active"""
 
 class Webhook(TypedDict):
     id: str
