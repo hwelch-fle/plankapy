@@ -21,7 +21,7 @@ Note:
 
 from __future__ import annotations
 from functools import cached_property
-from typing import Literal, Unpack
+from typing import Unpack
 from warnings import warn
 from datetime import timezone
 
@@ -31,6 +31,7 @@ from .api import (
     paths, # Response / Request typing
 )
 from .models import *
+from .models._literals import TermsType
 
 # Allow Users to set `PLANKA_LANG` environment variable with their language
 # Default to en-US if not set
@@ -52,7 +53,7 @@ class Planka:
         self.current_role = None
         self.current_id = None
     
-    def accept_terms(self, pending_token: str, terms_type: Literal['general', 'extended']='general'):
+    def accept_terms(self, pending_token: str, terms_type: TermsType='general'):
         """If the User has never logged on, or is required to accept new terms, allow them to do so"""
         terms = self.endpoints.getTerms(type=terms_type, language=self.lang)['item']
         print(terms['content'])
@@ -63,7 +64,7 @@ class Planka:
               username: str|None=None, 
               password: str|None=None, 
               api_key: str|None=None, 
-              accept_terms: Literal['general', 'extended'] | None=None) -> None:
+              accept_terms: TermsType | None=None) -> None:
         
         """Authenticate with the planka instance
         
@@ -71,7 +72,7 @@ class Planka:
             username (str | None): User username/email 
             password (str | None): User password
             api_key (str | None): User API Key
-            accept_terms (Literal['general', 'extended'] | None): If you user has not accepted the terms, run the term acceptance flow
+            accept_terms (TermsType | None): If you user has not accepted the terms, run the term acceptance flow
             
         Note:
             After accepting the terms, please get an API key from the Planka server. If you need to accept extended terms, please 
@@ -153,7 +154,7 @@ class Planka:
         """Creates a project. The current user automatically becomes a project manager.
 
         Args:
-            type (Literal['shared', 'private']): Type of the project
+            type (ProjectType): Type of the project
             name (str): Name/title of the project
             description (str): Detailed description of the project
 
@@ -176,7 +177,7 @@ class Planka:
         Args:
             email (str): Email address for login and notifications
             password (str): Password for user authentication (must meet password requirements)
-            role (Literal['admin', 'projectOwner', 'boardUser']): User role defining access permissions
+            role (UserRole): User role defining access permissions
             name (str): Full display name of the user
         
         Optional:
