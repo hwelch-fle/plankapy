@@ -55,18 +55,20 @@ class Planka:
     def logon(self, *, username: str|None=None, password: str|None=None, api_key: str|None=None, accept_terms: bool=False):
         """Authenticate with the planka instance"""
         if not api_key and (username and password):
-            warn('user/pass authentication is being deprecated in favor of API keys in Planka 2.0+')
             token = self.endpoints.createAccessToken(
                 emailOrUsername=username, 
                 password=password,
                 withHttpOnlyToken=True,
             )['item']
             self.client.headers['Authorization'] = f'Bearer {token}'
+            if accept_terms:
+                sig = self.endpoints.getTerms(type='general', language=self.lang)['item']['signature']
+                self.endpoints.acceptTerms(pendingToken=token, signature=sig)
+            else:
+                # User/Password login should only be done if accepting terms, then an API key should be generated
+                warn('user/pass authentication is being deprecated in favor of API keys in Planka 2.0+')
         elif api_key:
             self.client.headers['X-Api-Key'] = api_key
-        if accept_terms:
-            sig = self.endpoints.getTerms(type='general', language=self.lang)['item']['signature']
-            self.endpoints.acceptTerms(pendingToken=token, signature=sig)
         self.current_role = self.me.role
         self.current_id = self.me.id
     
