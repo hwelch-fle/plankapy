@@ -64,6 +64,7 @@ class Planka:
             if accept_terms:
                 sig = self.endpoints.getTerms(type='general', language=self.lang)['item']['signature']
                 self.endpoints.acceptTerms(pendingToken=token, signature=sig)
+                warn('After accepting the terms, please get an API-Key for your user account and use that for further connections')
             else:
                 # User/Password login should only be done if accepting terms, then an API key should be generated
                 warn('user/pass authentication is being deprecated in favor of API keys in Planka 2.0+')
