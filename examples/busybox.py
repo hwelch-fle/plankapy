@@ -59,7 +59,7 @@ if __name__ == '__main__':
     # Initialize a Planka instance using Demo user
     client = Client(base_url='http://localhost:1337')
     planka = Planka(client)
-    planka.logon('demo', 'demo')
+    planka.logon(username='demo', password='demo')
     
     # Objects to create
     projects = ['Project 1', 'Project 2', 'Project 3']
