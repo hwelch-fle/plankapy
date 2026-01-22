@@ -41,7 +41,6 @@ __all__ = (
     "TermsTypes",
     "LockableFields",
     "NotificationTypes",
-    "WebhookEvents",
     "UserRoles",
 )
 
