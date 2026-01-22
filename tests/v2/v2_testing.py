@@ -29,10 +29,7 @@ from time import sleep
 #         attach.delete()
 #
 while True:
-    for p in planka.projects:
-        new = p.update_background_image('https://random-d.uk/api/randomimg?t=1769031485189')
-        for bg in p.background_images:
-            if bg == new:
-                continue
-            bg.delete()
-        sleep(5)
+    p = choice(planka.projects)
+    new = p.update_background_image('https://random-d.uk/api/randomimg?t=1769031485189')
+    [bg.delete() for bg in p.background_images if bg != new]
+    sleep(5)
