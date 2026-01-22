@@ -7,7 +7,7 @@ __all__ = ('Project', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -21,7 +21,10 @@ if TYPE_CHECKING:
 class Project(PlankaModel[schemas.Project]):
     """Python interface for Planka Projects"""
     
+    __events__ = events.ProjectEvents
+
     # Project Included
+    
     @property
     def _included(self):
         return self.endpoints.getProject(self.id)['included']

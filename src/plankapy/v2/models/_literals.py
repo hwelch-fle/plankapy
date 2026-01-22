@@ -16,7 +16,6 @@ __all__ =   (
     "TermsType",
     "LockableField",
     "NotificationType",
-    "WebhookEvent",
     "UserRole",
     
     # String Tuples (for in/choice operations)
@@ -33,7 +32,6 @@ __all__ =   (
     "TermsTypes",
     "LockableFields",
     "NotificationTypes",
-    "WebhookEvents",
     "UserRoles",
 )
 
@@ -118,9 +116,3 @@ LockableFields: tuple[LockableField] = LockableField.__args__
 
 UserRole = Literal['admin', 'projectOwner', 'boardUser']
 UserRoles: tuple[UserRole] = UserRole.__args__
-
-WebhookEvent = Literal[
-    'cardCreate', 'cardUpdate', 'cardDelete',
-    'userCreate', 'userUpdate', 'userDelete',
-]
-WebhookEvents: tuple[WebhookEvent] = WebhookEvent.__args__

@@ -5,7 +5,7 @@ __all__ = ('Webhook', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events as _events
 
 # Deferred Model imports at bottom of file
 
@@ -13,12 +13,13 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
     #from models import *
-    from ._literals import WebhookEvent
 
 
 class Webhook(PlankaModel[schemas.Webhook]):
     """Python interface for Planka Webhooks"""
     
+    __events__ = _events.WebhookEvents
+
     @property
     def name(self) -> str:
         """Name/title of the Webhook"""
@@ -35,12 +36,12 @@ class Webhook(PlankaModel[schemas.Webhook]):
         return self.schema['accessToken']
     
     @property
-    def events(self) -> list[WebhookEvent]:
+    def events(self) -> list[_events.WebhookEvent]:
         """List of events that trigger the Webhook"""
         return self.schema['events']
     
     @property
-    def excluded_events(self) -> list[WebhookEvent]:
+    def excluded_events(self) -> list[_events.WebhookEvent]:
         """List of events excluded from the Webhook"""
         return self.schema['excludedEvents']
     

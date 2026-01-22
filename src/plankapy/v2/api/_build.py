@@ -443,6 +443,8 @@ def yield_schema() -> Generator[str]:
     yield "from __future__ import annotations"
     yield "from typing import TypedDict, NotRequired, Any, Literal"
     yield ""
+    yield "from .events import WebhookEvent"
+    yield ""
     yield "__all__ = ("
     for c in get_schemas(SWG):
         yield f'\t"{c}",'

@@ -5,7 +5,7 @@ __all__ = ('List', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 class List(PlankaModel[schemas.List]):
     """Python interface for Planka Lists"""
     
+    __events__ = events.ListEvents
+
     # List Included
     @property
     def _included(self):

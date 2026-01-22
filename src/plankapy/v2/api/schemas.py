@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TypedDict, NotRequired, Any, Literal
 
+from .events import WebhookEvent
+
 __all__ = (
     "Action",
     "Attachment",
@@ -478,9 +480,9 @@ class Webhook(TypedDict):
     """URL endpoint for the webhook"""
     accessToken: str
     """Access token for webhook authentication"""
-    events: list[Literal['cardCreate', 'cardUpdate', 'cardDelete', 'userCreate', 'userUpdate', 'userDelete']]
+    events: list[WebhookEvent]
     """List of events that trigger the webhook"""
-    excludedEvents: list[Literal['cardCreate', 'cardUpdate', 'cardDelete', 'userCreate', 'userUpdate', 'userDelete']]
+    excludedEvents: list[WebhookEvent]
     """List of events excluded from the webhook"""
     createdAt: str
     """When the webhook was created"""

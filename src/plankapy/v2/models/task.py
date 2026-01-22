@@ -5,7 +5,7 @@ __all__ = ('Task', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 class Task(PlankaModel[schemas.Task]):
     """Python interface for Planka Tasks"""
+
+    __events__ = events.TaskEvents
 
     # Task props
 

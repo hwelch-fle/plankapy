@@ -5,7 +5,7 @@ __all__ = ('ProjectManager', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas
+from ..api import schemas, events
 
 # Deferred Model imports at bottom of file
 
@@ -18,7 +18,10 @@ if TYPE_CHECKING:
 class ProjectManager(PlankaModel[schemas.ProjectManager]):
     """Python interface for Planka ProjectManagers"""
     
+    __events__ = events.ProjectManagerEvents
+
     # ProjectManager Properties
+    
     @property
     def project(self) -> Project:
         """The Project associated with the ProjectManager"""

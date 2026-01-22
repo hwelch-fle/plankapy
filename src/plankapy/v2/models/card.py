@@ -7,7 +7,7 @@ __all__ = ('Card', 'Stopwatch', )
 from datetime import datetime, timedelta
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, dttoiso, get_position
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -22,6 +22,8 @@ if TYPE_CHECKING:
 class Card(PlankaModel[schemas.Card]):
     """Python interface for Planka Cards"""
     
+    __events__ = events.CardEvents
+
     @property
     def url(self) -> str:
         """The URL to the card"""

@@ -3,7 +3,7 @@ from __future__ import annotations
 __all__ = ('Config', )
 
 from ._base import PlankaModel
-from ..api import schemas
+from ..api import schemas, events
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 class Config(PlankaModel[schemas.Config]):
     """Python interface for Planka Config"""
     
+    __events__ = events.ConfigEvents
+
     @property
     def version(self) -> str:
         """Current version of the PLANKA application"""

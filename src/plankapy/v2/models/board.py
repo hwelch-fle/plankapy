@@ -5,7 +5,7 @@ __all__ = ('Board', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -20,6 +20,8 @@ if TYPE_CHECKING:
 class Board(PlankaModel[schemas.Board]):
     """Python interface for Planka Boards"""
     
+    __events__ = events.BoardEvent
+
     @property
     def url(self) -> str:
         return str(self.client.base_url.join(f'/boards/{self.id}'))

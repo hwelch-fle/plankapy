@@ -5,7 +5,7 @@ __all__ = ('BaseCustomFieldGroup', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
-from ..api import paths, schemas
+from ..api import paths, schemas, events
 
 # Deferred Model imports at bottom of file
 
@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
     """Python interface for Planka BaseCustomFieldGroups"""
+
+    __events__ = events.BaseCustomFieldGroupEvents
 
     # BaseCustomFieldGroup Properties
     @property

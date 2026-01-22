@@ -5,7 +5,7 @@ __all__ = ('Label', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 class Label(PlankaModel[schemas.Label]):
     """Python interface for Planka Labels"""
     
+    __events__ = events.LabelEvents
+
     @property
     def board(self) -> Board:
         """The Board the Label belongs to"""

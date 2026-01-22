@@ -5,7 +5,7 @@ __all__ = ('BackgroundImage', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas
+from ..api import schemas, events
 
 # Deferred Model imports at bottom of file
 
@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
     """Python interface for Planka Background Images"""
+
+    __events__ = events.BackgroundImageEvents
 
     # BackgroundImage Properties
     @property

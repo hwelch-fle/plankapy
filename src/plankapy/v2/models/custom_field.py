@@ -5,7 +5,7 @@ __all__ = ('CustomField', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -18,7 +18,10 @@ if TYPE_CHECKING:
 class CustomField(PlankaModel[schemas.CustomField]):
     """Python interface for Planka CustomFields"""
     
+    __events__ = events.CustomFieldEvents
+
     # CustomField props
+    
     @property
     def base_custom_field_group(self) -> BaseCustomFieldGroup:
         """The BaseCustomFieldGroup the custom field belongs to"""

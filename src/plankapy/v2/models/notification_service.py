@@ -5,7 +5,7 @@ __all__ = ('NotificationService', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -18,7 +18,9 @@ if TYPE_CHECKING:
 
 class NotificationService(PlankaModel[schemas.NotificationService]):
     """Python interface for Planka NotificationServices"""
-        
+    
+    __events__ = events.NotificationServiceEvents
+
     # NotificationService props
     
     @property

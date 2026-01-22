@@ -5,7 +5,7 @@ __all__ = ('BoardMembership', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 class BoardMembership(PlankaModel[schemas.BoardMembership]):
     """Python interface for Planka BoardMemberships"""
     
+    __events__ = events.BoardMembershipEvents
+
     # BoardMembership properties
 
     @property

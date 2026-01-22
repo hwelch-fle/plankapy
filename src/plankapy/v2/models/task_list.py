@@ -5,7 +5,7 @@ __all__ = ('TaskList', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 class TaskList(PlankaModel[schemas.TaskList]):
     """Python interface for Planka TaskLists"""
     
+    __events__ = events.TaskListEvents
+
     # TaskList included
 
     @property

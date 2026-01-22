@@ -7,7 +7,7 @@ __all__ = ('User', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -29,6 +29,8 @@ if TYPE_CHECKING:
 
 class User(PlankaModel[schemas.User]):
     """Python interface for Planka Users"""
+
+    __events__ = events.UserEvents
 
     @property
     def email(self) -> str | None:

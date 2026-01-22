@@ -5,7 +5,7 @@ __all__ = ('Comment', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 class Comment(PlankaModel[schemas.Comment]):
     """Python interface for Planka Comments"""
     
+    __events__ = events.CommentEvent
+
     # Comment properties
 
     @property

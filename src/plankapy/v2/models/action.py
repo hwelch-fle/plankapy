@@ -6,7 +6,8 @@ from datetime import datetime
 
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas
+from ..api import schemas, events
+
 
 # Deferred Model imports at bottom of file
 
@@ -19,6 +20,8 @@ if TYPE_CHECKING:
 class Action(PlankaModel[schemas.Action]):
     """Python interface for Planka Actions"""
     
+    __events__ = events.ActionEvents
+
     @property
     def created_at(self) -> datetime:
         """When the Action was created"""

@@ -5,7 +5,7 @@ __all__ = ('Attachment', )
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, paths
+from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
 
@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 class Attachment(PlankaModel[schemas.Attachment]):
     """Python interface for Planka Attachments"""
     
+    __events__ = events.AttachmentEvents
+
     @property
     def name(self) -> str:
         """The name of the Attachment"""
