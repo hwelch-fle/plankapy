@@ -31,7 +31,7 @@ from .api import (
     paths, # Response / Request typing
 )
 from .models import *
-from .models._literals import TermsType
+from .models._literals import TermsType, UserRole
 
 # Allow Users to set `PLANKA_LANG` environment variable with their language
 # Default to en-US if not set
@@ -50,7 +50,7 @@ class Planka:
         self.timezone = timezone
         
         # Assigned after logon() is called
-        self.current_role = None
+        self.current_role: UserRole | None = None
         self.current_id = None
     
     def accept_terms(self, pending_token: str, terms_type: TermsType='general'):
