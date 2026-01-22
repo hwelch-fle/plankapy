@@ -1,6 +1,6 @@
 # TODO: A Server class that can be bound to a webhook and dispatch functions
 
-from collections.abc import Callable, Generator
+from collections.abc import Callable
 from datetime import datetime
 from typing import Any
 from .interface import Planka
