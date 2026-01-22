@@ -1,4 +1,3 @@
-# Collection of sample scripts for plankapy.v2
 from datetime import datetime, timedelta, timezone
 import sys
 sys.path.append('../src')
