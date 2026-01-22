@@ -64,10 +64,13 @@ ListColor = Literal[
     'dark-granite', 'turquoise-sea',
 ]
 ListColors: tuple[ListColor, ...] = ListColor.__args__
+
 ListType = Literal['active', 'closed', 'archive', 'trash']
 ListTypes: tuple[ListType, ...] = ListType.__args__
+
 UserListType = Literal['active', 'closed']
 UserListTypes: tuple[UserListType, ...] = UserListType.__args__
+
 SystemListType = Literal['archive', 'trash']
 SystemListTypes: tuple[SystemListType, ...] = SystemListType.__args__
 
@@ -79,6 +82,7 @@ NotificationServiceFormats: tuple[NotificationServiceFormat, ...] = Notification
 
 BackgroundType = Literal['gradient', 'image']
 BackgroundTypes: tuple[BackgroundType, ...] = BackgroundType.__args__
+
 BackgroundGradient = Literal[
     'old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 
     'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 
