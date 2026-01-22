@@ -8,20 +8,20 @@ __all__ = (
 )
 
 class Card(schemas.Card):
-    isDraft: NotRequired[bool]
-    locationName: NotRequired[str]
-    locationCoordinates: NotRequired[tuple[float, float]]
-    recurrence: NotRequired[Recurrence]
-    recurrenceDestination: NotRequired[Literal['firstActiveList', 'firstList', 'inbox']]
-    recurrenceDueDateOffset: NotRequired[str]
-    skipDuplicateRecurrence: NotRequired[bool]
-    recurrenceStartedAt: NotRequired[str]
-    lastRecurredAt: NotRequired[str]
-    startDate: NotRequired[str]
-    sourceList: NotRequired[str]
-    sourceLabels: NotRequired[list[str]]
-    sourceId: NotRequired[str]
-    coverLinkAttachmentId: NotRequired[str]
+    isDraft: bool
+    locationName: str
+    locationCoordinates: tuple[float, float]
+    recurrence: Recurrence
+    recurrenceDestination: Literal['firstActiveList', 'firstList', 'inbox']
+    recurrenceDueDateOffset: str
+    skipDuplicateRecurrence: bool
+    recurrenceStartedAt: str
+    lastRecurredAt: str
+    startDate: str
+    sourceList: str
+    sourceLabels: list[str]
+    sourceId: str
+    coverLinkAttachmentId: str
     
 class Recurrence(TypedDict):
     time: str
