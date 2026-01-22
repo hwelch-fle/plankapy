@@ -21,11 +21,11 @@ Note:
 
 from __future__ import annotations
 from functools import cached_property
-from typing import Unpack
+from typing import Literal, Unpack
 from warnings import warn
 from datetime import timezone
 
-from httpx import Client
+from httpx import Client, HTTPStatusError
 from .api import (
     PlankaEndpoints, 
     paths, # Response / Request typing
@@ -51,25 +51,52 @@ class Planka:
         # Assigned after logon() is called
         self.current_role = None
         self.current_id = None
+    
+    def accept_terms(self, pending_token: str, terms_type: Literal['general', 'extended']='general'):
+        """If the User has never logged on, or is required to accept new terms, allow them to do so"""
+        terms = self.endpoints.getTerms(type=terms_type, language=self.lang)['item']
+        print(terms['content'])
+        sig = terms['signature']
+        self.endpoints.acceptTerms(pendingToken=pending_token, signature=sig)
+    
+    def logon(self, *, 
+              username: str|None=None, 
+              password: str|None=None, 
+              api_key: str|None=None, 
+              accept_terms: Literal['general', 'extended'] | None=None) -> None:
         
-    def logon(self, *, username: str|None=None, password: str|None=None, api_key: str|None=None, accept_terms: bool=False):
-        """Authenticate with the planka instance"""
-        if not api_key and (username and password):
-            token = self.endpoints.createAccessToken(
-                emailOrUsername=username, 
-                password=password,
-                withHttpOnlyToken=True,
-            )['item']
-            self.client.headers['Authorization'] = f'Bearer {token}'
-            if accept_terms:
-                sig = self.endpoints.getTerms(type='general', language=self.lang)['item']['signature']
-                self.endpoints.acceptTerms(pendingToken=token, signature=sig)
-                warn('After accepting the terms, please get an API-Key for your user account and use that for further connections')
-            else:
-                # User/Password login should only be done if accepting terms, then an API key should be generated
-                warn('user/pass authentication is being deprecated in favor of API keys in Planka 2.0+')
-        elif api_key:
+        """Authenticate with the planka instance
+        
+        Args:
+            username (str | None): User username/email 
+            password (str | None): User password
+            api_key (str | None): User API Key
+            accept_terms (Literal['general', 'extended'] | None): If you user has not accepted the terms, run the term acceptance flow
+            
+        Note:
+            After accepting the terms, please get an API key from the Planka server. If you need to accept extended terms, please 
+            set the `terms` flag to the terms you are accepting. These terms will be printed to `stdout` during the flow.
+        """
+        # API Key
+        if api_key:
             self.client.headers['X-Api-Key'] = api_key
+        
+        # User/Pass with term acceptance flow
+        elif username and password:
+            try:
+                # Get Bearer Auth
+                token = self.endpoints.createAccessToken(emailOrUsername=username, password=password, withHttpOnlyToken=True)['item']
+                self.client.headers['Authorization'] = f'Bearer {token}'
+            except HTTPStatusError as e:
+                if accept_terms is None:
+                    raise PermissionError(f'Please logon again with `accept_terms` set to the terms you must accept')
+                self.accept_terms(e.response.json()['pendingToken'], terms_type=accept_terms)
+                self.logon(username=username, password=password)
+        
+        # Invalid Creds
+        else:
+            raise PermissionError(f'No credentials supplied! Must provide a user/password or an api_key')
+            
         self.current_role = self.me.role
         self.current_id = self.me.id
     
