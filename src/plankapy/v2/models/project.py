@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from httpx import HTTPStatusError
-
 __all__ = ('Project', )
 
+from pathlib import Path
+from httpx import HTTPStatusError
 from datetime import datetime
 from ._base import PlankaModel
 from ._helpers import dtfromiso
@@ -14,7 +14,6 @@ from ..api import schemas, paths, events
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
-    from pathlib import Path
     #from models import *
     from ._literals import BackgroundGradient, BackgroundType
 
