@@ -110,6 +110,16 @@ class Planka:
         """Get the User object for the currently logged in user"""
         return User(self.endpoints.getUser('me')['item'], self)
 
+    @property
+    def notifications(self) -> list[Notification]:
+        """Get all notifications for the current User"""
+        return [Notification(n, self) for n in self.endpoints.getNotifications()['items']]
+
+    @property
+    def unread_notifications(self) -> list[Notification]:
+        """Get all unread Notifications for the current user"""
+        return [n for n in self.notifications if not n.is_read]
+
     @cached_property
     def config(self) -> Config:
         """Get the configuration info for the current Planka server"""
@@ -149,6 +159,10 @@ class Planka:
             for u in self.endpoints.getUsers()['items']
             if self.current_role in ('admin', 'projectOwner')
         ]
+    
+    def read_notification(self) -> list[Notification]:
+        """Read all Notifications for the current User"""
+        return [Notification(n, self) for n in self.endpoints.readAllNotifications()['items']]
     
     def create_project(self, **kwargs: Unpack[paths.Request_createProject]) -> Project:
         """Creates a project. The current user automatically becomes a project manager.

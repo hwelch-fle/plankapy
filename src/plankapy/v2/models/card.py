@@ -272,6 +272,10 @@ class Card(PlankaModel[schemas.Card]):
         """Delete the Card"""
         return self.endpoints.deleteCard(self.id)
 
+    def read_notifications(self) -> list[Notification]:
+        """Read all the current User's Notifications for the Card"""
+        return [Notification(n, self.session) for n in self.endpoints.readCardNotifications(self.id)['included']['notifications']]
+
     def move(self, list: List, position: Position = 'top') -> Card:
         """Move the card to a new list (default to top of new list)"""
         self.update(
@@ -780,6 +784,7 @@ from .custom_field_group import CustomFieldGroup
 from .custom_field_value import CustomFieldValue
 from .label import Label
 from .list import List
+from .notification import Notification
 from .project import Project
 from .task import Task
 from .task_list import TaskList

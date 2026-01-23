@@ -33,6 +33,10 @@ class User(PlankaModel[schemas.User]):
     __events__ = events.UserEvents
 
     @property
+    def notification_services(self) -> list[NotificationService]: ...
+    """Get all User NotificationServices"""
+    
+    @property
     def email(self) -> str | None:
         """Email address for login and notifications (private field)"""
         return self.schema.get('email')
@@ -395,3 +399,9 @@ class User(PlankaModel[schemas.User]):
         """
         if self in board.users:
             board.remove_user(self)
+
+    def add_notification_service(self) -> NotificationService: ...
+    def create_notification_service(self, ) -> NotificationService: ...
+    def delete_notification_service(self, notification_service: NotificationService): ...
+    
+from .notification_service import NotificationService
