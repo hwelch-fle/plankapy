@@ -1,5 +1,3 @@
-import pytest
-
 import sys
 sys.path.append('../../src')
 
@@ -10,7 +8,6 @@ if TYPE_CHECKING:
     from typing import (
         Any, 
         TypeVar,
-        ForwardRef, 
         _Generic, # type: ignore
         _TypedDict, # type: ignore
     )
@@ -49,7 +46,8 @@ def _get_optional(typed_dict: _TypedDict) -> set[str]:
         if typed_dict.__annotations__[k].__forward_arg__.startswith('NotRequired')
     }
 
-def test_schema(model: _M,  # type: ignore
+
+def _test_schema(model: _M,  # type: ignore
                 *, 
                 sys_keys: set[str]|None=None) -> None:
     """Test a plankapy model schema against a Planka server
@@ -90,30 +88,28 @@ def test_schema(model: _M,  # type: ignore
 
 def find_and_test_model(models: list[_M], name: str='Unknown') -> _M | None:
     for model in models:
-        test_schema(model)
+        _test_schema(model)
         return model
     print(f'!! Unable to find {name} for testing !!')
 
-def test_all():
-    
+
+def test_schemas():
+
     find_and_test_model([planka.me], 'User (current)')
     find_and_test_model(planka.webhooks, 'Webhook')
     find_and_test_model([planka.config], 'Config')
+    find_and_test_model(planka.notifications, 'Notification')
     
-    project = find_and_test_model(planka.projects, 'Project')
-    if not project:
-        return 1
-    
+    # Require A Project
+    assert (project := find_and_test_model(planka.projects, 'Project'))
     find_and_test_model(project.notification_services, 'NotificationServices')
     find_and_test_model(project.base_custom_field_groups, 'BaseCustomFieldGroup')
-    find_and_test_model(project.users, 'User')
+    find_and_test_model(project.users, 'User (other)')
     find_and_test_model(project.background_images, 'BackgroundImage')
     find_and_test_model(project.board_memberships, 'BoardMembership')
     
-    board = find_and_test_model(project.boards, 'Board')
-    if not board:
-        return 1
-    
+    # Require a Board
+    assert (board := find_and_test_model(project.boards, 'Board'))
     find_and_test_model(board.active_lists, 'List (active)')
     find_and_test_model(board.closed_lists, 'List (closed)')
     find_and_test_model([board.archive_list], 'List (archive)')
@@ -129,12 +125,10 @@ def test_all():
     find_and_test_model(board.custom_fields, 'CustomField')
     find_and_test_model(board.custom_field_values, 'CustomFieldValue')
     
-    card = find_and_test_model(board.cards, 'Card')
-    if not card:
-        return 1
-    
+    # Require a Card
+    assert (card := find_and_test_model(board.cards, 'Card'))
     find_and_test_model(card.comments, 'Comment')
     find_and_test_model(card.actions, 'Action')
-    # TODO: Notifications are not accessible by any model currently
 
-test_all()
+if __name__ == '__main__':
+    test_schemas()
