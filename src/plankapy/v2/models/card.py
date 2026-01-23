@@ -655,7 +655,24 @@ class Card(PlankaModel[schemas.Card]):
             hide_completed=hide_completed or task_list.hide_completed_tasks, 
         )
     
-    
+    def add_location(self, lat: float, lon: float, name: str, position: Position | int) -> CustomFieldGroup:
+        """Add a point location to a card as a FieldGroup
+        
+        Args:
+            lat (float): Latitude of the location
+            lon (float): Longitude of the location
+            name (str): Name of the location (FieldGroup name)
+            position (Position | int): Position of the FieldGroup within the Card (default: `top`)
+        """
+        loc_group = self.add_card_fields('latitude', 'longitude', group=name, position=position)
+        for field in loc_group.custom_field_values:
+            if field.custom_field.name == 'latitude':
+                field.content = str(lat)
+            elif field.custom_field.name == 'longitude':
+                field.content = str(lon)
+        return loc_group
+
+
 class Stopwatch:
     """Python interface for Planka Stopwatches"""
 
