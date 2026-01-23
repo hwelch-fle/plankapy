@@ -35,6 +35,7 @@ def dttoiso(dt: datetime, default_timezone: timezone=timezone.utc) -> str:
 
 # Position Offset
 POSITION_GAP = 65536
+"""Base position gap for all `positon` fields `(1 == POSITION_GAP*1, 2 == POSITON_GAP*2, ...)`"""
 
 class HasPosition(Protocol):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
