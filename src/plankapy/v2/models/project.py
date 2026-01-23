@@ -197,7 +197,13 @@ class Project(PlankaModel[schemas.Project]):
             return
 
         if isinstance(background, BackgroundImage):
-            self.background_image = background
+            # Assign the image if it is in this project
+            if background in self.background_images:
+                self.background_image = background
+            
+            # Re-Upload to this project
+            else:
+                self.update_background_image(background.url)
             return background
 
         # Deferred import of mimetypes that is only used here
