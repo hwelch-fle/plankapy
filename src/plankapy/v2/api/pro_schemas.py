@@ -85,3 +85,8 @@ class Comment(schemas.Comment):
     userRoleSummary: str
     isIdentityHiddenFromGuests: bool | None
     isPinned: bool
+
+class TaskList(schemas.TaskList):
+    canBeEditedByWorkers: bool
+    isVisibleToGuests: bool
+    
