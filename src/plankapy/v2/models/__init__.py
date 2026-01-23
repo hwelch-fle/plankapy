@@ -1,6 +1,7 @@
 """All Object Models for Plankapy v2.5+ (Planka 2.0.0+)"""
 
 __all__ = (
+    "PlankaModel",
     "Action",
     "Attachment",
     "BackgroundImage",
@@ -44,6 +45,7 @@ __all__ = (
     "UserRoles",
 )
 
+from ._base import PlankaModel
 from .action import Action
 from .attachment import Attachment
 from .background_image import BackgroundImage

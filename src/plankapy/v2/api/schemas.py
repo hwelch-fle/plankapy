@@ -476,6 +476,8 @@ class User(TypedDict):
 class Webhook(TypedDict):
     id: str
     """Unique identifier for the webhook"""
+    boardId: str
+    """The board that the webhook is associated with"""
     name: str
     """Name/title of the webhook"""
     url: str
