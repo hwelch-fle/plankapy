@@ -593,7 +593,69 @@ class Card(PlankaModel[schemas.Card]):
                 card_label.delete()
                 return
 
+    def remove_labels(self, labels: Sequence[Label]) -> None:
+        """Remove the Label from the Card
+        
+        Args:
+            labels (Sequence[Label]): The labels to remove (must be associated with the Card)
+        """
+        for label in labels:
+            self.remove_label(label)
 
+    def create_task_list(self, 
+                      *, 
+                      name: str,
+                      position: Position | int='top',
+                      show_on_card: bool=False,
+                      hide_completed: bool=False) -> TaskList:
+        """Create a NEW TaskList to the Card
+        
+        Args:
+            name str: Name for the TaskList
+            postion (Position | int): The position of the TaskList in the Card (default: `top`)
+            show_on_card: bool: Show TaskList on the front of the card (default: `False`)
+            hide_completed: bool: Hide completed tasks (default: `False`)
+
+        Returns:
+            The TaskList 
+        """
+        return TaskList(
+            self.endpoints.createTaskList(
+                self.id, 
+                position=get_position(self.task_lists, position), 
+                name=name, 
+                showOnFrontOfCard=show_on_card, 
+                hideCompletedTasks=hide_completed,
+            )['item'], 
+            self.session
+        )
+
+    def add_task_list(self, task_list: TaskList, 
+                      *, 
+                      name: str | None=None,
+                      position: Position | int='top',
+                      show_on_card: bool | None=None,
+                      hide_completed: bool | None=None) -> TaskList:
+        """Add a TaskList to the Card
+        
+        Args:
+            task_list (TaskList): The TaskList to add
+            name (str | None): Name override, None will use input name (default: `None`)
+            postion (Position | int): The position of the TaskList in the Card (default: `top`)
+            show_on_card: bool | None): Show On Card override, None will use input show (default: `None`)
+            hide_completed: bool | None): Hide Completed override , None will use input hide (default: `None`)
+
+        Returns:
+            The TaskList 
+        """
+        return self.create_task_list(
+            name=name or task_list.name,
+            position=get_position(self.task_lists, position),
+            show_on_card=show_on_card or task_list.show_on_front_of_card,
+            hide_completed=hide_completed or task_list.hide_completed_tasks, 
+        )
+    
+    
 class Stopwatch:
     """Python interface for Planka Stopwatches"""
 
