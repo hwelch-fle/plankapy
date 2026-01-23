@@ -14,6 +14,7 @@ from ..api import schemas, paths, events
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
+    from pathlib import Path
     #from models import *
     from ._literals import BackgroundGradient, BackgroundType
 
@@ -177,13 +178,13 @@ class Project(PlankaModel[schemas.Project]):
         """Add a User to the Project as a ProjectManager"""
         return ProjectManager(self.endpoints.createProjectManager(self.id, userId=user.id)['item'], self.session)
     
-    def update_background_image(self, background: BackgroundImage | str | bytes | None) -> BackgroundImage | None:
+    def update_background_image(self, background: BackgroundImage | Path | str | bytes | None) -> BackgroundImage | None:
         """Update the Project Background Image,
         
         Only Admins and ProjectManagers can update the Background Image
         
         Args:
-            background (BackgroundImage | str | bytes | None): Existing Image or filepath/url or raw bytes or None to unset
+            background (BackgroundImage | Path | str | bytes | None): Existing Image or filepath/url or raw bytes or None to unset
             
         Returns:
             (BackgroundImage | None): If a backround image was set or created
@@ -205,6 +206,10 @@ class Project(PlankaModel[schemas.Project]):
             else:
                 self.update_background_image(background.url)
             return background
+
+        if isinstance(background, Path):
+            # Convert Path to a string so it can be handled normally
+            background = str(background.resolve())
 
         # Deferred import of mimetypes that is only used here
         # This function takes so long anyways so the import delay 
