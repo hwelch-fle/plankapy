@@ -98,16 +98,29 @@ class TaskList(PlankaModel[schemas.TaskList]):
 
     def add_task(self, name: str, *, 
                  is_completed: bool=False, 
-                 position: Position='top') -> Task:
-        """Create a new Task in the TaskList"""
+                 position: Position='top',
+                 linked_card: Card|None=None) -> Task:
+        """Create a new Task in the TaskList
+        
+        Args:
+            name (str): The name of the task
+            is_completed (bool): Is the task completed or not (default: `False`)
+            position (Position | int): Position of the task in the TaskList (default: `top`)
+            linked_card (Card|None): Optional Card to link the Task to (default: `None`)
+        """
+        args = { # type: ignore
+            'name': name,
+            'position': get_position(self.tasks, position),
+            'isCompleted': is_completed
+        }
+        if linked_card is not None:
+            args['linkedCardId'] = linked_card.id
 
-        return Task(self.endpoints.createTask(
+        return Task(
+            self.endpoints.createTask(
                 self.id, 
-                linkedCardId=self.card.id, 
-                name=name, 
-                position=get_position(self.tasks, position), 
-                isCompleted=is_completed
-            )['item'], 
+                **args, # type: ignore
+                )['item'],  
             self.session
         )
 
