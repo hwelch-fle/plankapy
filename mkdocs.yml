@@ -98,47 +98,9 @@ markdown_extensions:
   pymdownx.blocks.tab:
     alternate_style: True
 
-extra:
-  mkdocstrings:
-    default_handler: python
-    handlers:
-      python:
-        docstring_style: google
-        options:
-          docstring_section_style: table
-          allow_inspection: true
-          modernize_annotations: true
-          backlinks: tree
-
-          # parameter_headings: true
-          # show_root_heading: true
-          # show_if_no_docstring: true
-
-          # inherited_members: true
-          # members_order: source
-
-          # separate_signature: true
-          # signature_crossrefs: true
-          # show_signature_type_parameters: true
-          # show_signature_annotations: true
-
-          filters:
-            - "public"
-
-          # merge_init_into_class: true
-          # show_symbol_type_heading: true
-          # show_symbol_type_toc: true
-          # summary: true
-
-          # rendering:
-          #   show_source: false
-
-          # selection:
-          #   docstring_style: google
-
 nav:
   - Home: index.md
-  - Version 1 Docs:
+  - Plankapy v1:
       - QueryableList: v1/models/QueryableList.md
       - Planka: v1/interfaces/Planka.md
       - Authentication Interfaces:
@@ -172,12 +134,13 @@ nav:
           - IdentityProviderUser: interfaces/IdentityProviderUser.md
           - Archive: interfaces/Archive.md
 
-  - Version 2 Docs:
+  - Plankapy v2:
       - interface:
           - Planka: v2/interface.md
       - api:
           - Paths: v2/api/paths.md
           - Schemas: v2/api/schemas.md
+          - REST Types: v2/api/rest-typing.md
           - Errors: v2/api/errors.md
       - models:
           - PlankaModel: v2/models/_planka-model.md
@@ -206,7 +169,6 @@ nav:
           - User: v2/models/user.md
           - Webhook: v2/models/webhook.md
 
-  #- CLI: cli/cli.md
   - Examples: examples.md
 
 plugins:
@@ -214,5 +176,26 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          inventories:
+            - https://docs.python.org/3/objects.inv
           paths: [src]
+          options:
+            backlinks: tree
+            docstring_section_style: spacy
+            modernize_annotations: true
+            #heading_level: 1
+            inherited_members: true
+            merge_init_into_class: true
+            parameter_headings: true
+            separate_signature: true
+            show_root_toc_entry: false
+            show_root_heading: false
+            show_root_full_path: false
+            show_signature_annotations: true
+            show_source: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            summary: true
+            allow_inspection: true
   - autorefs
