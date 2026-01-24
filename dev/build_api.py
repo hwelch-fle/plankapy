@@ -1,9 +1,5 @@
 """This private module will pull the latest swagger file from plankanban and build out
 a typing module using it
-
-Note:
-This will all happen on import, so This should only be run either by intentional importing
-e.g. `from typing import _build` to re-build the typing module on initialization or on a schedule
 """
 
 import json
@@ -16,16 +12,20 @@ import httpx
 
 import os
 
+HERE = Path(__file__)
+
+API = HERE / "../src/plankapy/v2/api"
+
 SWAGGER_URL = "https://plankanban.github.io/planka/swagger-ui/swagger.json"
-SWAGGER_FILE = Path("swagger.json")
+SWAGGER_FILE = HERE / "swagger.json"
 
-INIT_MOD = Path("__init__.py")
-SCHEMA_MOD = Path("schemas.py") # Schema for each planka object
+INIT_MOD = API / "__init__.py"
+SCHEMA_MOD = API / "schemas.py" # Schema for each planka object
 
-PATH_MOD = Path("paths.py") # Endpoints
-ASYNC_PATH_MOD = Path("async_paths.py") # Async Endpoints
-TYP_MOD = Path("typ.py") # Typing for response/request json
-ERRORS_MOD = Path("errors.py") # Error implementations
+PATH_MOD = API / "paths.py" # Endpoints
+ASYNC_PATH_MOD = API / "async_paths.py" # Async Endpoints
+TYP_MOD = API / "typ.py" # Typing for response/request json
+ERRORS_MOD = API / "errors.py" # Error implementations
 
 TYPES = {
     "string": "str",
