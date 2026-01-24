@@ -1,3 +1,3 @@
-# Attachment.Md
+# Attachment
 
 ::: plankapy.v2.models.attachment

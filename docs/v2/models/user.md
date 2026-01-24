@@ -1,3 +1,3 @@
-# User.Md
+# User
 
 ::: plankapy.v2.models.user

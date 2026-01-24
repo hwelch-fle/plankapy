@@ -127,7 +127,6 @@ extra:
           merge_init_into_class: true
           show_symbol_type_heading: true
           show_symbol_type_toc: true
-          show_inheritance_diagram: true
           summary: true
 
           rendering:
@@ -138,39 +137,39 @@ extra:
 
 nav:
   - Home: index.md
-  #- Version 1 Docs:
-  #    - QueryableList: v1/models/QueryableList.md
-  #    - Planka: v1/interfaces/Planka.md
-  #    - Authentication Interfaces:
-  #        - PasswordAuth: v1/auth/PasswordAuth.md
-  #        - TokenAuth: v1/auth/TokenAuth.md
-  #    - User Interfaces:
-  #        - User: v1/interfaces/User.md
-  #        - Notification: v1/interfaces/Notification.md
-  #    - Project Interfaces:
-  #        - Project: v1/interfaces/Project.md
-  #        - ProjectManager: v1/interfaces/ProjectManager.md
-  #    - Board Interfaces:
-  #        - Board: v1/interfaces/Board.md
-  #        - BoardMembership: v1/interfaces/BoardMembership.md
-  #        - Label: v1/interfaces/Label.md
-  #        - List: v1/interfaces/List.md
-  #    - Card Interfaces:
-  #        - Card: v1/interfaces/Card.md
-  #        - CardLabel: v1/interfaces/CardLabel.md
-  #        - CardMembership: v1/interfaces/CardMembership.md
-  #        - CardSubscription: v1/interfaces/CardSubscription.md
-  #        - Attachment: v1/interfaces/Attachment.md
-  #        - Action: v1/interfaces/Action.md
-  #        - Task: v1/interfaces/Task.md
-  #        - Stopwatch: v1/interfaces/Stopwatch.md
-  #    - Constants: v1/constants/constants.md
-  #    - Helpers: v1/helpers/helpers.md
-  #    - Models: v1/models/models.md
-  #
-  #    - Unused:
-  #        - IdentityProviderUser: interfaces/IdentityProviderUser.md
-  #        - Archive: interfaces/Archive.md
+  - Version 1 Docs:
+      - QueryableList: v1/models/QueryableList.md
+      - Planka: v1/interfaces/Planka.md
+      - Authentication Interfaces:
+          - PasswordAuth: v1/auth/PasswordAuth.md
+          - TokenAuth: v1/auth/TokenAuth.md
+      - User Interfaces:
+          - User: v1/interfaces/User.md
+          - Notification: v1/interfaces/Notification.md
+      - Project Interfaces:
+          - Project: v1/interfaces/Project.md
+          - ProjectManager: v1/interfaces/ProjectManager.md
+      - Board Interfaces:
+          - Board: v1/interfaces/Board.md
+          - BoardMembership: v1/interfaces/BoardMembership.md
+          - Label: v1/interfaces/Label.md
+          - List: v1/interfaces/List.md
+      - Card Interfaces:
+          - Card: v1/interfaces/Card.md
+          - CardLabel: v1/interfaces/CardLabel.md
+          - CardMembership: v1/interfaces/CardMembership.md
+          - CardSubscription: v1/interfaces/CardSubscription.md
+          - Attachment: v1/interfaces/Attachment.md
+          - Action: v1/interfaces/Action.md
+          - Task: v1/interfaces/Task.md
+          - Stopwatch: v1/interfaces/Stopwatch.md
+      - Constants: v1/constants/constants.md
+      - Helpers: v1/helpers/helpers.md
+      - Models: v1/models/models.md
+
+      - Unused:
+          - IdentityProviderUser: interfaces/IdentityProviderUser.md
+          - Archive: interfaces/Archive.md
 
   - Version 2 Docs:
       - interface:

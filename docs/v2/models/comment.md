@@ -1,3 +1,3 @@
-# Comment.Md
+# Comment
 
 ::: plankapy.v2.models.comment
