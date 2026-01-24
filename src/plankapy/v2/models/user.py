@@ -23,7 +23,8 @@ if TYPE_CHECKING:
         LockableField, 
         ProjectOrdering, 
         BoardRole, 
-        TermsType
+        TermsType,
+        NotificationServiceFormat,
     )
 
 
@@ -400,8 +401,40 @@ class User(PlankaModel[schemas.User]):
         if self in board.users:
             board.remove_user(self)
 
-    def add_notification_service(self) -> NotificationService: ...
-    def create_notification_service(self, ) -> NotificationService: ...
-    def delete_notification_service(self, notification_service: NotificationService): ...
+    def add_notification_service(self, notification_service: NotificationService, 
+                                 *, 
+                                 url: str|None=None, 
+                                 format: NotificationServiceFormat|None=None) -> NotificationService:
+        """Add/Copy an existing NotificationService to this User
+        
+        Args:
+            notificaiton_service (NotificaitonService): The NotificaitonService to add
+            url (str | None): Optional url override (default: from notification_service)
+            format (NotificationServiceFormat | None): Optional format override (default: from notification_service)
+        """
+        if notification_service not in self.notification_services:
+            return self.create_notification_service(
+                url=url or notification_service.url,
+                format=format or notification_service.format
+            )
+        return notification_service
+
+    def create_notification_service(self, **kwargs: Unpack[paths.Request_createUserNotificationService]) -> NotificationService:
+        """Create a NEW Notification Service
+        
+        Args:
+            url (str): The webhook URL for the NotificationService
+            format (NotificationServiceFormat): The format of the NotificationService (default: `text`)
+        """
+        return NotificationService(self.endpoints.createUserNotificationService(self.id, **kwargs)['item'], self.session)
+
+    def delete_notification_service(self, notification_service: NotificationService) -> None:
+        """Deletes a NotificationService for a User
+        
+        Args:
+            notificaiton_service (NotificaitonService): The NotificaitonService to delete
+        """
+        if notification_service in self.notification_services:
+            notification_service.delete()
     
 from .notification_service import NotificationService
