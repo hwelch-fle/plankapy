@@ -12,7 +12,7 @@ import httpx
 
 import os
 
-HERE = Path(__file__)
+HERE = Path(__file__).parent
 
 API = HERE / "../src/plankapy/v2/api"
 
