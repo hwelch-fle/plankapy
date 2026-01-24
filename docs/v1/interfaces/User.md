@@ -1,2 +1,3 @@
 # User
-::: plankapy.interfaces.User
+
+::: plankapy.v1.interfaces.User

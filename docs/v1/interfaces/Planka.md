@@ -1,2 +1,3 @@
 # Planka
-::: plankapy.interfaces.Planka
+
+::: plankapy.v1.interfaces.Planka

@@ -1,2 +1,3 @@
 # QueryableList
-::: plankapy.models.QueryableList
+
+::: plankapy.v1.models.QueryableList

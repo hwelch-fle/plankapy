@@ -1,2 +1,3 @@
 # Base Auth
-::: plankapy.handlers.BaseAuth
+
+::: plankapy.v1.handlers.BaseAuth

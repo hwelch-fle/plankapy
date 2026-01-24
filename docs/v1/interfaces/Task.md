@@ -1,2 +1,3 @@
 # Task
-::: plankapy.interfaces.Task
+
+::: plankapy.v1.interfaces.Task

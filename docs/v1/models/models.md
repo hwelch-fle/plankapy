@@ -1,2 +1,3 @@
 # Models
-::: plankapy.models
+
+::: plankapy.v1.models

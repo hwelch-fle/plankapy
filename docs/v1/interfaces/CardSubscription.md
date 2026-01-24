@@ -1,2 +1,3 @@
 # CardSubscription
-::: plankapy.interfaces.CardSubscription
+
+::: plankapy.v1.interfaces.CardSubscription

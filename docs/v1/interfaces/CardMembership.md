@@ -1,2 +1,3 @@
 # CardMembership
-::: plankapy.interfaces.CardMembership
+
+::: plankapy.v1.interfaces.CardMembership

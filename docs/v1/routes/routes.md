@@ -1,2 +1,3 @@
 # Routes
-::: plankapy.routes
+
+::: plankapy.v1.routes
