@@ -4,7 +4,7 @@ __all__ = ('Board', )
 
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import dtfromiso
+from ._helpers import dtfromiso, queryable
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -32,96 +32,115 @@ class Board(PlankaModel[schemas.Board]):
         return self.endpoints.getBoard(self.id)['included']
     
     @property
+    @queryable
     def labels(self) -> list[Label]:
         """Get all Labels on the Board"""
         return [Label(l, self.session) for l in self._included['labels']]
     
     @property
+    @queryable
     def cards(self) -> list[Card]:
         """Get all active Cards on the Board (use archived_cards and trashed_cards for archived/trashed Card lists)"""
         return [Card(c, self.session) for c in self._included['cards']]
     
     @property
+    @queryable
     def trashed_cards(self) -> list[Card]:
         """Get all Cards in the Board trash list"""
         return [Card(c, self.session) for c in self.endpoints.getCards(self.trash_list.id)['items']]
     
     @property
+    @queryable
     def archived_cards(self) -> list[Card]:
         """Get all Cards in the Board archive list"""
         return [Card(c, self.session) for c in self.endpoints.getCards(self.archive_list.id)['items']]
 
     @property
+    @queryable
     def subscribed_cards(self) -> list[Card]:
         """Get all Cards on the Board that the current User is subscribed to"""
         return [Card(sc, self.session) for sc in self._included['cards'] if sc['isSubscribed']]
     
     @property
+    @queryable
     def projects(self) -> list[Project]:
         """Get all Projects that the Board is associated with (use `Board.Project` instead, this is always one item)"""
         return [Project(p, self.session) for p in self._included['projects']]
     
     @property
+    @queryable
     def board_memberships(self) -> list[BoardMembership]:
         """Get all BoardMemberships for the Board"""
         return [BoardMembership(bm, self.session) for bm in self._included['boardMemberships']]
     
     @property
+    @queryable
     def users(self) -> list[User]:
         """Get all Users on the Board"""
         return [User(u, self.session) for u in self._included['users']]
 
     @property
+    @queryable
     def editors(self) -> list[User]:
         """Get all editor Users for the Board"""
         return [bm.user for bm in self.board_memberships if bm.role == 'editor']
     
     @property
+    @queryable
     def viewers(self) -> list[User]:
         """Get all viewer Users for the Board"""
         return [bm.user for bm in self.board_memberships if bm.role == 'editor']
 
     @property
+    @queryable
     def all_lists(self) -> list[List]:
         """Get all Lists associated with the Board"""
         return [List(l, self.session) for l in self._included['lists']]
     
     @property
+    @queryable
     def card_memberships(self) -> list[CardMembership]:
         """Get all CardMemberships associated with the Board"""
         return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
+    @queryable
     def card_labels(self) -> list[CardLabel]:
         """Get all CardLabels associated with the Board"""
         return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
     
     @property
+    @queryable
     def task_lists(self) -> list[TaskList]:
         """Get all TaskLists associated with the Board"""
         return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
+    @queryable
     def tasks(self) -> list[Task]:
         """Get all Tasks associated with the Board"""
         return [Task(t, self.session) for t in self._included['tasks']]
     
     @property
+    @queryable
     def attachments(self) -> list[Attachment]:
         """Get all Attachments associated with the Board"""
         return [Attachment(a, self.session) for a in self._included['attachments']]
     
     @property
+    @queryable
     def custom_field_groups(self) -> list[CustomFieldGroup]:
         """Get all CustomFieldGroups associated with the Board"""
         return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
     
     @property
+    @queryable
     def custom_fields(self) -> list[CustomField]:
         """Get all CustomFields associated with the Board"""
         return [CustomField(cf, self.session) for cf in self._included['customFields']]
     
     @property
+    @queryable
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Board"""
         return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]

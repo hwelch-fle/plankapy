@@ -1,6 +1,16 @@
 from datetime import datetime, timezone
 from collections.abc import Sequence
-from typing import Any, Literal, Protocol
+from functools import wraps
+from typing import (
+    Any, 
+    Callable, 
+    Literal, 
+    Protocol, 
+    SupportsIndex, 
+    overload,
+)
+
+from ._base import PlankaModel
 
 __all__ = ('dtfromiso', 'get_position', 'Position')
 
@@ -50,3 +60,48 @@ def get_position(items: Sequence[HasPosition], position: Literal['top', 'bottom'
     if position != 'bottom':
         return 0
     return max((i.position for i in items), default=0) + POSITION_GAP
+
+class QueryList[M](list[M]):
+    @overload
+    def __getitem__(self, key: SupportsIndex) -> M: ...
+    """Index the list normally"""
+    @overload
+    def __getitem__(self, key: slice[Any, Any, Any]) -> list[M]: ...
+    """Slice the list normally"""
+    @overload
+    def __getitem__(self, key: dict[str, Any]) -> list[M]: ...
+    """Filter the list using a schema filter"""
+    @overload
+    def __getitem__(self, key: Callable[[M], bool]) -> list[M]: ...
+    """Filter the list using a functional filter"""
+    def __getitem__(self, key: Any) -> M | list[M]:
+        match key:
+            case SupportsIndex():
+                return self[key]
+            case slice():
+                return self[key]
+            case dict():
+                return [
+                    i for i in self 
+                    if i.schema.keys() <= key.keys() 
+                    and all(i.schema[k] == key[k] for k in key) # type: ignore
+                ]
+            case Callable():
+                return [i for i in self if key(i)]
+            case _:
+                raise ValueError(f'{type(key)} not supported for indexing')
+
+    def dpop[D](self, index: SupportsIndex=-1, *, default: D=None) -> M | D:
+        """pop but accept a `default` argument"""
+        try:
+            return super().pop()
+        except IndexError:
+            return default
+        
+
+def queryable[T](func: Callable[[Any], list[T]]):
+    """Wrapper that turns a list property into a QueryList"""
+    @wraps(func)
+    def _wrapper(self: Any) -> QueryList[T]:
+        return QueryList(func(self))
+    return _wrapper
