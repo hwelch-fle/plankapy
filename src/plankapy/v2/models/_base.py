@@ -3,11 +3,7 @@ from __future__ import annotations
 __all__ = ("PlankaModel", )
 
 import json
-from typing import (
-    Any, 
-    Generic, 
-    TypeVar, 
-)
+from typing import Any
 from collections.abc import Mapping
 
 TYPE_CHECKING = False
@@ -15,11 +11,10 @@ if TYPE_CHECKING:
     # Models take a Planka session to allow checking User permissions
     from ..interface import Planka
 
-_S = TypeVar('_S', bound=Mapping[str, Any])
-class PlankaModel(Generic[_S]):
+class PlankaModel[Schema: Mapping[str, Any]]:
     """Base Planka object interface"""
     
-    def __init__(self, schema: _S, session: Planka) -> None:
+    def __init__(self, schema: Schema, session: Planka) -> None:
         self._schema = schema
         self.session = session
         self.endpoints = session.endpoints
@@ -28,10 +23,10 @@ class PlankaModel(Generic[_S]):
         self.current_id = session.current_id
     
     @property
-    def schema(self) -> _S:
+    def schema(self) -> Schema:
         return self._schema
     @schema.setter
-    def schema(self, schema: _S) -> None:
+    def schema(self, schema: Schema) -> None:
         self._schema = schema
     
     @property
