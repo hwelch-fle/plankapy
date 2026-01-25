@@ -14,6 +14,7 @@ from .api import (
     paths, # Response / Request typing
 )
 from .models import *
+from .models._helpers import queryable
 from .models._literals import TermsType, UserRole
 
 # Allow Users to set `PLANKA_LANG` environment variable with their language
@@ -94,11 +95,13 @@ class Planka:
         return User(self.endpoints.getUser('me')['item'], self)
 
     @property
+    @queryable
     def notifications(self) -> list[Notification]:
         """Get all notifications for the current User"""
         return [Notification(n, self) for n in self.endpoints.getNotifications()['items']]
 
     @property
+    @queryable
     def unread_notifications(self) -> list[Notification]:
         """Get all unread Notifications for the current user"""
         return [n for n in self.notifications if not n.is_read]
@@ -109,6 +112,7 @@ class Planka:
         return Config(self.endpoints.getConfig()['item'], self)
 
     @property
+    @queryable
     def webhooks(self) -> list[Webhook]:
         """Get all configured Webhooks (requires admin)"""
         return [
@@ -118,6 +122,7 @@ class Planka:
         ]
 
     @property
+    @queryable
     def projects(self) -> list[Project]:
         """Get all Projects available to the current user
         
@@ -129,6 +134,7 @@ class Planka:
         return [Project(p, self) for p in self.endpoints.getProjects()['items']]
 
     @property
+    @queryable
     def users(self) -> list[User]:
         """Get all Users on the current instance (requires admin or projectOwner role)
         

@@ -156,11 +156,13 @@ class Board(PlankaModel[schemas.Board]):
         return self.all_lists[{'type': 'trash'}].pop()
     
     @property
+    @queryable
     def active_lists(self) -> list[List]:
         """Get all active Lists for the Board"""
         return self.all_lists[{'type': 'active'}]
     
     @property
+    @queryable
     def closed_lists(self) -> list[List]:
         """Get all closed Lists for the Board"""
         return self.all_lists[{'type': 'closed'}]
