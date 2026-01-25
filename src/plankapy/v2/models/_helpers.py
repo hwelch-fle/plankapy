@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
-from collections.abc import Sequence, Callable
+from collections.abc import Sequence, Callable, Mapping
 from functools import wraps
 from typing import (
     Any, 
-    Literal, 
+    Literal,
     Protocol, 
     SupportsIndex, 
     overload,
@@ -60,7 +60,7 @@ def get_position(items: Sequence[HasPosition], position: Literal['top', 'bottom'
         return 0
     return max((i.position for i in items), default=0) + POSITION_GAP
 
-def match[M](item: M, pred: Callable[[M], bool] | M) -> bool:
+def match[M: PlankaModel[Any]](item: M, pred: Callable[[M], bool] | M) -> bool:
     """Evaluate a Callable on the item if provided, else evaluate equality
     
     Note:
@@ -68,11 +68,11 @@ def match[M](item: M, pred: Callable[[M], bool] | M) -> bool:
         directly and exceptions will be raised if the predicate raises one
     """
     if isinstance(pred, Callable):
-        return pred(item) # type: ignore
+        return pred(item)
     return item == pred
 
 
-class QueryList[M](list[M]):
+class QueryList[M: PlankaModel[Mapping[str, Any]]](list[M]):
     @overload
     def __getitem__(self, key: SupportsIndex) -> M: ...
     """Index the list normally"""
@@ -80,7 +80,7 @@ class QueryList[M](list[M]):
     def __getitem__(self, key: slice) -> list[M]: ...
     """Slice the list normally"""
     @overload
-    def __getitem__(self, key: dict[str, Callable[[Any], bool] | Any]) -> list[M]: ...
+    def __getitem__(self, key: dict[str, Callable[[Any], bool]]) -> list[M]: ...
     """Filter the list using a schema filter (allows function evaluation of schema value)"""
     @overload
     def __getitem__(self, key: Callable[[M], bool]) -> list[M]: ...
@@ -92,14 +92,10 @@ class QueryList[M](list[M]):
             case slice():
                 return super().__getitem__(key) # type: ignore
             case dict():
-                # Generic technically allows non-PlankaModel types in QLs
-                # So an instance check is used to guard the schema access
-                # non-PlankaModels will return an empty list
                 return [
-                    i for i in self 
-                    if isinstance(i, PlankaModel)
-                    and key.keys() <= i.schema.keys() # type: ignore
-                    and all(match(i.schema[k], key[k]) for k in key) # type: ignore
+                    i for i in self
+                    if key.keys() <= i.schema.keys()
+                    and all(match(i.schema[k], key[k]) for k in key)
                 ]
             case func if callable(key):
                 return [i for i in self if func(i)]
@@ -112,9 +108,16 @@ class QueryList[M](list[M]):
             return super().pop(index)
         except IndexError:
             return default
+    
+    def extract(self, key: str) -> list[Any]:
+        """Extract values from the items in the QueryList
         
+        Args:
+            key (str): The schema key to extract
+        """
+        return [i.schema[key] for i in self]
 
-def queryable[T](func: Callable[[Any], list[T]]):
+def queryable[T: PlankaModel[Any]](func: Callable[[Any], list[T]]):
     """Wrapper that turns a list property into a QueryList"""
     @wraps(func)
     def _wrapper(self: Any) -> QueryList[T]:
