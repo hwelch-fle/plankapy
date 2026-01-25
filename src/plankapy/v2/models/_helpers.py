@@ -81,9 +81,13 @@ class QueryList[M](list[M]):
             case slice():
                 return self[key]
             case dict():
+                # Generic technically allows non-PlankaModel types in QLs
+                # So an instance check is used to guard the schema access
+                # non-PlankaModels will return an empty list
                 return [
                     i for i in self 
-                    if i.schema.keys() <= key.keys() 
+                    if isinstance(i, PlankaModel)
+                    and i.schema.keys() <= key.keys() # type: ignore
                     and all(i.schema[k] == key[k] for k in key) # type: ignore
                 ]
             case Callable():
