@@ -49,11 +49,7 @@ class PlankaModel[Schema: Mapping[str, Any]]:
             return super().__eq__(other)
     
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(schema={self.__dict__})'
-    
-    #def __getattribute__(self, name: str) -> Any:
-    #    # TODO: use `_live_mode` to force a `sync` call on attribute acces
-    #    return super().__getattribute__(name)           
+        return f'{self.__class__.__name__}({self.schema})'          
     
     def json(self, **kwargs: Any) -> str:
         return json.dumps(self.schema, **kwargs)
