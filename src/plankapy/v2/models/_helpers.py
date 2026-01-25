@@ -1,9 +1,8 @@
 from datetime import datetime, timezone
-from collections.abc import Sequence
+from collections.abc import Sequence, Callable
 from functools import wraps
 from typing import (
     Any, 
-    Callable, 
     Literal, 
     Protocol, 
     SupportsIndex, 
@@ -62,7 +61,12 @@ def get_position(items: Sequence[HasPosition], position: Literal['top', 'bottom'
     return max((i.position for i in items), default=0) + POSITION_GAP
 
 def match[M](item: M, pred: Callable[[M], bool] | M) -> bool:
-    """Evaluate a Callable on the item if provided, else evaluate equality"""
+    """Evaluate a Callable on the item if provided, else evaluate equality
+    
+    Note:
+        predicate functions are not checked for validity, the value will be passed 
+        directly and exceptions will be raised if the predicate raises one
+    """
     if isinstance(pred, Callable):
         return pred(item) # type: ignore
     return item == pred
@@ -73,20 +77,20 @@ class QueryList[M](list[M]):
     def __getitem__(self, key: SupportsIndex) -> M: ...
     """Index the list normally"""
     @overload
-    def __getitem__(self, key: slice[Any, Any, Any]) -> list[M]: ...
+    def __getitem__(self, key: slice) -> list[M]: ...
     """Slice the list normally"""
     @overload
-    def __getitem__(self, key: dict[str, Any]) -> list[M]: ...
-    """Filter the list using a schema filter"""
+    def __getitem__(self, key: dict[str, Callable[[Any], bool] | Any]) -> list[M]: ...
+    """Filter the list using a schema filter (allows function evaluation of schema value)"""
     @overload
     def __getitem__(self, key: Callable[[M], bool]) -> list[M]: ...
     """Filter the list using a functional filter"""
     def __getitem__(self, key: Any) -> M | list[M]:
         match key:
             case SupportsIndex():
-                return self[key]
+                return super().__getitem__(key)
             case slice():
-                return self[key]
+                return super().__getitem__(key) # type: ignore
             case dict():
                 # Generic technically allows non-PlankaModel types in QLs
                 # So an instance check is used to guard the schema access
@@ -94,18 +98,18 @@ class QueryList[M](list[M]):
                 return [
                     i for i in self 
                     if isinstance(i, PlankaModel)
-                    and i.schema.keys() <= key.keys() # type: ignore
+                    and key.keys() <= i.schema.keys() # type: ignore
                     and all(match(i.schema[k], key[k]) for k in key) # type: ignore
                 ]
-            case Callable():
-                return [i for i in self if key(i)]
+            case func if callable(key):
+                return [i for i in self if func(i)]
             case _:
                 raise ValueError(f'{type(key)} not supported for indexing')
 
     def dpop[D](self, index: SupportsIndex=-1, *, default: D=None) -> M | D:
         """pop but accept a `default` argument"""
         try:
-            return super().pop()
+            return super().pop(index)
         except IndexError:
             return default
         
