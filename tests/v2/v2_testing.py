@@ -18,7 +18,15 @@ planka = Planka(client)
 planka.logon(api_key=KEY)
 prj = planka.projects[0]
 
+from datetime import datetime
 cards = prj.boards[0].cards
+filtered = cards[
+    {
+        'dueDate': lambda dd: (dd and datetime.fromisoformat(dd).day == 31),
+        'name': lambda n: ('project 1' in n),
+    }
+]
+
 from random import choice
 from time import sleep
 # while True:
@@ -28,8 +36,8 @@ from time import sleep
 #     for attach in card.attachments:
 #         attach.delete()
 #
-while True:
-    p = choice(planka.projects)
-    new = p.update_background_image('https://random-d.uk/api/randomimg?t=1769031485189')
-    [bg.delete() for bg in p.background_images if bg != new]
-    sleep(5)
+#while True:
+#    p = choice(planka.projects)
+#    new = p.update_background_image('https://random-d.uk/api/randomimg?t=1769031485189')
+#    [bg.delete() for bg in p.background_images if bg != new]
+#    sleep(5)
