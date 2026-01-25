@@ -61,6 +61,13 @@ def get_position(items: Sequence[HasPosition], position: Literal['top', 'bottom'
         return 0
     return max((i.position for i in items), default=0) + POSITION_GAP
 
+def match[M](item: M, pred: Callable[[M], bool] | M) -> bool:
+    """Evaluate a Callable on the item if provided, else evaluate equality"""
+    if isinstance(pred, Callable):
+        return pred(item) # type: ignore
+    return item == pred
+
+
 class QueryList[M](list[M]):
     @overload
     def __getitem__(self, key: SupportsIndex) -> M: ...
@@ -88,7 +95,7 @@ class QueryList[M](list[M]):
                     i for i in self 
                     if isinstance(i, PlankaModel)
                     and i.schema.keys() <= key.keys() # type: ignore
-                    and all(i.schema[k] == key[k] for k in key) # type: ignore
+                    and all(match(i.schema[k], key[k]) for k in key) # type: ignore
                 ]
             case Callable():
                 return [i for i in self if key(i)]
