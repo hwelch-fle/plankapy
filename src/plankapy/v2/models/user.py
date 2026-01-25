@@ -37,7 +37,7 @@ class User(PlankaModel[schemas.User]):
     @queryable
     def notification_services(self) -> list[NotificationService]:
         """Get all User NotificationServices"""
-        return [NotificationService(ns, self.session) for ns in self.endpoints.getUser('me')['included']['notificationServices']]
+        return [NotificationService(ns, self.session) for ns in self.endpoints.getUser(self.id)['included']['notificationServices']]
 
     @property
     def email(self) -> str | None:
