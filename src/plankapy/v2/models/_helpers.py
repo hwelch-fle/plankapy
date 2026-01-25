@@ -3,7 +3,7 @@ Helper objects for implemented model classes
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from collections.abc import Sequence, Callable, Mapping
 from functools import wraps
 from typing import (
@@ -146,3 +146,19 @@ def queryable[T: PlankaModel[Any]](func: Callable[... , list[T]]):
     def _wrapper(self: Any, *args: Any, **kwargs: Any) -> ModelList[T]:
         return ModelList(func(self, *args, **kwargs))
     return _wrapper
+
+
+# QueryList filters
+
+class HasDueDate(Protocol):
+    @property
+    def due_date(self) -> datetime | None: ...
+    
+def due_in(hours: float=0, days: float=0, weeks: float=0):
+    """Decorated function for use with """
+    def _inner(m: HasDueDate):
+        if not m.due_date:
+            return False
+        by = timedelta(days=days, hours=hours, weeks=weeks)
+        return (m.due_date - by) <= datetime.now(tz=timezone.utc)
+    return _inner

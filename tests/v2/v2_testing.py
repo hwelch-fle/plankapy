@@ -1,42 +1,34 @@
 import sys
-from typing import Any, Protocol
 
 sys.path.append('../../src')
 
 from plankapy.v2 import Planka
 from httpx import Client
 
-URL = 'http://localhost:1337'
-USER = 'demo'
-PASS = 'demo'
+URL = 'https://pro.demo.planka.cloud/'
+USER = 'chef@demo.com'
+PASS = 'DemoPass123!'
 KEY = '3gBptWe7_THy8fN4qzrvcgu6u7w8yZquDeHwQNMDc'
 
 client = Client(base_url=URL)
 planka = Planka(client)
 
 # Will log a warning if used
-#planka.logon(username=USER, password=PASS)
+planka.logon(username=USER, password=PASS)
 
-planka.logon(api_key=KEY)
+#planka.logon(api_key=KEY)
 prj = planka.projects[0]
 
-from datetime import datetime, timedelta
-from functools import wraps
+from plankapy.v2 import due_in
 
-class HasDueDate(Protocol):
-    @property
-    def due_date(self) -> datetime: ...
-
-def due_in(hours: float=0, days: float=0, weeks: float=0):
-    def _inner(m: HasDueDate):
-        if not m.due_date:
-            return False
-        by = timedelta(days=days, hours=hours, weeks=weeks)
-        return (m.due_date - by) <= datetime.now()
-    return _inner
-
-cards = prj.boards[0].cards
-filtered = cards[due_in(days=5)]
+# Get all cards in project 1's 
+planka.projects[
+    {'name': '🏗️ Engineering Office - Project Alpha'}
+].pop().boards[
+    {'name': 'Software Development Sprint'}
+].pop().active_lists[
+    {'name': '🔄 In Progress'}
+].pop().cards[due_in(days=5)]
 
 from random import choice
 from time import sleep
