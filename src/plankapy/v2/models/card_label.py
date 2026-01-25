@@ -30,8 +30,7 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
     @property
     def label(self) -> Label:
         """The Label associated with the card"""
-        _cls = [l for l in self.card.board.labels if l.id == self.schema['labelId']]
-        return _cls.pop()
+        return self.card.board.labels[self.schema['labelId']]
 
     @property
     def created_at(self) -> datetime:

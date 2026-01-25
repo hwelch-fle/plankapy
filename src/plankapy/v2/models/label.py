@@ -4,7 +4,7 @@ __all__ = ('Label', )
 
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, get_position
+from ._helpers import Position, dtfromiso, get_position, queryable
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -116,6 +116,7 @@ class Label(PlankaModel[schemas.Label]):
             _schema['color'] = color
         return Label(self.endpoints.createLabel(**_schema)['item'], self.session)
 
+    @queryable
     def get_cards(self) -> list[Card]:
         """All Cards that have this Label in the Board"""
         return [

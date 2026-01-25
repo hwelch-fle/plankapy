@@ -1,22 +1,5 @@
 """
 Base interface for Planka
-
-Note:
-    If you would like to use a different language with Planka, either set the `lang` parameter 
-    on initialization, or set the `PLANKA_LANG` environment variable with yout preferred language
-    ```python
-    >>> planka = Planka(..., lang='zh-CN')
-    >>> planka.lang
-    zh-CN
-    ```
-    Or
-    ```
-    declare -x PLANKA_LANG="zh-CN"
-    ```
-    ```python
-    >>> planka = Planka(...)
-    >>> planka.lang
-    zh-CN
 """
 
 from __future__ import annotations

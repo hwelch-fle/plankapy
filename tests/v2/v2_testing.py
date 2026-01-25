@@ -1,4 +1,6 @@
 import sys
+from typing import Any, Protocol
+
 sys.path.append('../../src')
 
 from plankapy.v2 import Planka
@@ -18,14 +20,23 @@ planka = Planka(client)
 planka.logon(api_key=KEY)
 prj = planka.projects[0]
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import wraps
+
+class HasDueDate(Protocol):
+    @property
+    def due_date(self) -> datetime: ...
+
+def due_in(hours: float=0, days: float=0, weeks: float=0):
+    def _inner(m: HasDueDate):
+        if not m.due_date:
+            return False
+        by = timedelta(days=days, hours=hours, weeks=weeks)
+        return (m.due_date - by) <= datetime.now()
+    return _inner
+
 cards = prj.boards[0].cards
-filtered = cards[
-    {
-        'dueDate': lambda dd: (dd and datetime.fromisoformat(dd).day == 31),
-        'name': lambda n: ('project 1' in n),
-    }
-]
+filtered = cards[due_in(days=5)]
 
 from random import choice
 from time import sleep

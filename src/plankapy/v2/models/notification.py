@@ -4,7 +4,7 @@ __all__ = ('Notification', )
 
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import dtfromiso
+from ._helpers import dtfromiso, queryable
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -27,6 +27,7 @@ class Notification(PlankaModel[schemas.Notification]):
         return self.endpoints.getNotification(self.id)['included']
     
     @property
+    @queryable
     def users(self) -> list[User]:
         """All Users associated with the Notification"""
         return [User(u, self.session) for u in self._included['users']]

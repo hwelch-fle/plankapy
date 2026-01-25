@@ -6,7 +6,7 @@ from pathlib import Path
 from httpx import HTTPStatusError
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import dtfromiso
+from ._helpers import dtfromiso, queryable
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -30,41 +30,49 @@ class Project(PlankaModel[schemas.Project]):
         return self.endpoints.getProject(self.id)['included']
     
     @property
+    @queryable
     def users(self) -> list[User]:
         """Get Users associated with the Project"""
         return [User(u, self.session) for u in self._included['users']]
     
     @property
+    @queryable
     def managers(self) -> list[ProjectManager]:
         """Get project manager Users associated with the Project"""
         return [ProjectManager(pm, self.session) for pm in self._included['projectManagers']]
     
     @property
+    @queryable
     def background_images(self) -> list[BackgroundImage]:
         """Get BackgroundImages associated with the Project"""
         return [BackgroundImage(bgi, self.session) for bgi in self._included['backgroundImages']]
     
     @property
+    @queryable
     def base_custom_field_groups(self) -> list[BaseCustomFieldGroup]:
         """Get BaseCustomFieldGroups associated with the Project"""
         return [BaseCustomFieldGroup(bcfg, self.session) for bcfg in self._included['baseCustomFieldGroups']]
     
     @property
+    @queryable
     def boards(self) -> list[Board]:
         """Get Boards associated with the Project"""
         return [Board(b, self.session) for b in self._included['boards']]
     
     @property
+    @queryable
     def board_memberships(self) -> list[BoardMembership]:
         """Get BoardMemberships associated with the Project"""
         return [BoardMembership(bm, self.session) for bm in self._included['boardMemberships']]
     
     @property
+    @queryable
     def custom_fields(self) -> list[CustomField]:
         """Get CustomFields associated with the Project"""
         return [CustomField(cf, self.session) for cf in self._included['customFields']]
     
     @property
+    @queryable
     def notification_services(self) -> list[NotificationService]:
         """Get NotificationServices associated with the Project"""
         return [NotificationService(ns, self.session) for ns in self._included['notificationServices']]

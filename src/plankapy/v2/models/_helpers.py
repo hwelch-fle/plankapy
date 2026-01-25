@@ -1,3 +1,8 @@
+"""
+Helper objects for implemented model classes
+"""
+from __future__ import annotations
+
 from datetime import datetime, timezone
 from collections.abc import Sequence, Callable, Mapping
 from functools import wraps
@@ -72,33 +77,43 @@ def match[M: PlankaModel[Any]](item: M, pred: Callable[[M], bool] | M) -> bool:
     return item == pred
 
 
-class QueryList[M: PlankaModel[Mapping[str, Any]]](list[M]):
+type FilterFunc[T] = Callable[[T], bool]
+type KeyFilter[T] = dict[str, Callable[[T], bool]]
+type Id = str
+
+class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
     @overload
     def __getitem__(self, key: SupportsIndex) -> M: ...
     """Index the list normally"""
     @overload
-    def __getitem__(self, key: slice) -> list[M]: ...
+    def __getitem__(self, key: slice) -> ModelList[M]: ...
     """Slice the list normally"""
     @overload
-    def __getitem__(self, key: dict[str, Callable[[Any], bool]]) -> list[M]: ...
+    def __getitem__[T](self, key: KeyFilter[T]) -> ModelList[M]: ...
     """Filter the list using a schema filter (allows function evaluation of schema value)"""
     @overload
-    def __getitem__(self, key: Callable[[M], bool]) -> list[M]: ...
+    def __getitem__(self, key: dict[str, Any]) -> ModelList[M]: ...
+    @overload
+    def __getitem__(self, key: Id) -> M: ...
+    @overload
+    def __getitem__(self, key: FilterFunc[M]) -> ModelList[M]: ...
     """Filter the list using a functional filter"""
-    def __getitem__(self, key: Any) -> M | list[M]:
+    def __getitem__[T](self, key: SupportsIndex | slice | KeyFilter[T] | dict[str, Any] | Id | FilterFunc[M]) -> M | ModelList[M]:
         match key:
             case SupportsIndex():
                 return super().__getitem__(key)
             case slice():
-                return super().__getitem__(key) # type: ignore
+                return ModelList(super().__getitem__(key))
+            case str():
+                return [i for i in self if i.id == key].pop()
             case dict():
-                return [
+                return ModelList(
                     i for i in self
                     if key.keys() <= i.schema.keys()
                     and all(match(i.schema[k], key[k]) for k in key)
-                ]
+                )
             case func if callable(key):
-                return [i for i in self if func(i)]
+                return ModelList(i for i in self if func(i))
             case _:
                 raise ValueError(f'{type(key)} not supported for indexing')
 
@@ -109,17 +124,25 @@ class QueryList[M: PlankaModel[Mapping[str, Any]]](list[M]):
         except IndexError:
             return default
     
-    def extract(self, key: str) -> list[Any]:
+    def extract(self, *keys: str) -> list[tuple[Any, ...]]:
         """Extract values from the items in the QueryList
         
         Args:
             key (str): The schema key to extract
+        
+        Returns:
+            A list of key values requested from the model schema
         """
-        return [i.schema[key] for i in self]
+        return [tuple(i.schema[key] for key in keys) for i in self]
 
-def queryable[T: PlankaModel[Any]](func: Callable[[Any], list[T]]):
+    def ids(self) -> list[str]:
+        """A list of model ids"""
+        return [i.id for i in self]
+
+
+def queryable[T: PlankaModel[Any]](func: Callable[... , list[T]]):
     """Wrapper that turns a list property into a QueryList"""
     @wraps(func)
-    def _wrapper(self: Any) -> QueryList[T]:
-        return QueryList(func(self))
+    def _wrapper(self: Any, *args: Any, **kwargs: Any) -> ModelList[T]:
+        return ModelList(func(self, *args, **kwargs))
     return _wrapper

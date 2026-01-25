@@ -4,7 +4,7 @@ __all__ = ('List', )
 
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso
+from ._helpers import Position, dtfromiso, queryable
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -25,52 +25,63 @@ class List(PlankaModel[schemas.List]):
     @property
     def _included(self):
         return self.endpoints.getList(self.id)['included']
+    
     @property
+    @queryable
     def users(self) ->  list[User]:
         """Users associated with the List"""
         return [User(u, self.session) for u in self._included['users']]
     
     @property
+    @queryable
     def cards(self) -> list[Card]:
         """Cards associated with the List"""
         return [Card(c, self.session) for c in self._included['cards']]
     
     @property
+    @queryable
     def card_memberships(self) -> list[CardMembership]:
         """CardMemberships associated with the List"""
         return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
+    @queryable
     def card_labels(self) -> list[CardLabel]:
         """CardLabels associated with the List"""
         return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
     
     @property
+    @queryable
     def task_lists(self) -> list[TaskList]:
         """TaskLists associated with the List"""
         return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
+    @queryable
     def tasks(self) ->  list[Task]:
         """Tasks associated with the List"""
         return [Task(t, self.session) for t in self._included['tasks']]
 
     @property
+    @queryable
     def attachments(self) -> list[Attachment]:
         """Attachments associated with the List"""
         return [Attachment(a, self.session) for a in self._included['attachments']]
 
     @property
+    @queryable
     def custom_field_groups(self) ->  list[CustomFieldGroup]:
         """CustomFieldGroups associated with the List"""
         return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
 
     @property
+    @queryable
     def custom_fields(self) ->  list[CustomField]:
         """CustomFields associated with the List"""
         return [CustomField(cf, self.session) for cf in self._included['customFields']]
 
     @property
+    @queryable
     def custom_field_values(self) -> list[CustomFieldValue]:
         """CustomFieldValues associated with the List"""
         return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
@@ -137,6 +148,7 @@ class List(PlankaModel[schemas.List]):
         """Create a new card in the List"""
         return Card(self.endpoints.createCard(self.id, **crd)['item'], self.session)
     
+    @queryable
     def sort_cards(self, **kwargs: Unpack[paths.Request_sortList]) -> list[Card]:
         """Sort all cards in the List and return the sorted Cards"""
         return [Card(c, self.session) for c in self.endpoints.sortList(self.id, **kwargs)['included']['cards']]

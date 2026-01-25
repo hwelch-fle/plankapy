@@ -148,22 +148,22 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def archive_list(self) -> List:
         """Get the archive List for the Board (archive List is not a normal List!)"""
-        return [l for l in self.all_lists if l.type == 'archive'].pop()
+        return self.all_lists[{'type': 'archive'}].pop()
     
     @property
     def trash_list(self) -> List:
         """Get the trash List for the Board (trash List is not a normal List!)"""
-        return [l for l in self.all_lists if l.type == 'trash'].pop()
+        return self.all_lists[{'type': 'trash'}].pop()
     
     @property
     def active_lists(self) -> list[List]:
         """Get all active Lists for the Board"""
-        return [l for l in self.all_lists if l.type == 'active']
+        return self.all_lists[{'type': 'active'}]
     
     @property
     def closed_lists(self) -> list[List]:
         """Get all closed Lists for the Board"""
-        return [l for l in self.all_lists if l.type == 'closed']
+        return self.all_lists[{'type': 'closed'}]
 
     # Board props
     @property
@@ -317,6 +317,7 @@ class Board(PlankaModel[schemas.Board]):
             membership.can_comment = can_comment
         return membership
     
+    @queryable
     def add_members(self, users: Sequence[User], 
                     *,
                     role: BoardRole='viewer',
@@ -351,6 +352,7 @@ class Board(PlankaModel[schemas.Board]):
         """
         return self.add_member(user, role='editor', can_comment=True)
 
+    @queryable
     def add_editors(self, users: Sequence[User]) -> list[BoardMembership]:
         """Add Board editors
         
@@ -368,21 +370,16 @@ class Board(PlankaModel[schemas.Board]):
         Args:
             user (User): The User to add as a viewer
             can_comment (bool): Whether the viewer User can comment on cards
-            
-        Returns:
-            BoardMembership
         """
         return self.add_member(user, role='viewer', can_comment=can_comment)
 
+    @queryable
     def add_viewers(self, users: Sequence[User], *, can_comment: bool=False) -> list[BoardMembership]:
         """Add a Board viewer
         
         Args:
             users (Sequence[User]): The Users to add as viewers
             can_comment (bool): Whether the viewer Users can comment on cards
-            
-        Returns:
-            list[BoardMembership]
         """
         return [self.add_viewer(user, can_comment=can_comment) for user in users]
 

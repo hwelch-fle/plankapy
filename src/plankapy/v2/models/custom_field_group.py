@@ -4,7 +4,7 @@ __all__ = ('CustomFieldGroup', )
 
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, get_position
+from ._helpers import Position, dtfromiso, get_position, queryable
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -27,10 +27,12 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
         return self.endpoints.getCustomFieldGroup(self.id)['included']
 
     @property
+    @queryable
     def custom_fields(self) -> list[CustomField]:
         return [CustomField(cf, self.session) for cf in self._included['customFields']]
 
     @property
+    @queryable
     def custom_field_values(self) -> list[CustomFieldValue]:
         return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
 

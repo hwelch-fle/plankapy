@@ -28,12 +28,9 @@ class Comment(PlankaModel[schemas.Comment]):
         return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
     
     @property
-    def user(self) -> User | None:
-        """The User who created the Comment (Raises LookupError if the User is not a BoardMember)"""
-        _usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
-        if _usrs:
-            return _usrs.pop()
-        raise LookupError(f"Cannot find User: {self.schema['userId']}")
+    def user(self) -> User:
+        """The User who created the Comment"""
+        return self.card.board.users[self.schema['userId']]
     
     @property
     def text(self) -> str:
