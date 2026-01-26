@@ -802,7 +802,7 @@ from .custom_field import CustomField
 from .custom_field_group import CustomFieldGroup
 from .custom_field_value import CustomFieldValue
 from .label import Label
-from .list import List
+from .list_ import List
 from .notification import Notification
 from .project import Project
 from .task import Task
