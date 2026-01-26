@@ -71,9 +71,9 @@ class Attachment(PlankaModel[schemas.Attachment]):
         if not _new:
             self.schema = _new.pop().schema
 
-    def update(self, **attachment: Unpack[paths.Request_updateAttachment]) -> None:
+    def update(self, **kwargs: Unpack[paths.Request_updateAttachment]) -> None:
         """Update the Attachment with the provided values"""
-        self.schema = self.endpoints.updateAttachment(self.id, **attachment)['item']
+        self.schema = self.endpoints.updateAttachment(self.id, **kwargs)['item']
 
     def delete(self):
         """Delete the Attachment"""
