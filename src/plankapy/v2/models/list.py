@@ -2,18 +2,20 @@ from __future__ import annotations
 
 __all__ = ('List', )
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from random import choice, shuffle
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, queryable
+from ._helpers import Position, dtfromiso, dttoiso, get_position, queryable, POSITION_GAP
 from ..api import schemas, paths, events
+from ._literals import ListColors
 
 # Deferred Model imports at bottom of file
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from typing import Unpack
+    from typing import Unpack, Literal, Any, Callable
     #from models import *
-    from ._literals import UserListType, ListColor
+    from ._literals import UserListType, ListColor, CardType
 
 
 class List(PlankaModel[schemas.List]):
@@ -117,8 +119,10 @@ class List(PlankaModel[schemas.List]):
         """Color for the List"""
         return self.schema['color']
     @color.setter
-    def color(self, color: ListColor | None) -> None:
+    def color(self, color: ListColor | Literal['random'] | None) -> None:
         """Set the List color"""
+        if color == 'random':
+            color = choice(ListColors)
         self.update(color=color)
 
     @property    
@@ -144,32 +148,126 @@ class List(PlankaModel[schemas.List]):
         """Delete the List"""
         return self.endpoints.deleteList(self.id)
 
-    def create_card(self, **crd: Unpack[paths.Request_createCard]) -> Card:
-        """Create a new card in the List"""
-        return Card(self.endpoints.createCard(self.id, **crd)['item'], self.session)
+    def create_card(self, 
+                    *,
+                    name: str,
+                    position: Position='bottom',
+                    type: CardType='project',
+                    description: str|None=None,
+                    due_date: datetime|None=None,
+                    due_date_completed: bool=False,
+                    stopwatch_duration: timedelta|None=None,
+                    stopwatch_started: datetime|Literal['now']|None=None) -> Card:
+        """Create a new card in the List
+        
+        Args:
+            name: The name of the Card
+            position: The position of the card within the List
+            type: The type of the card
+            description: An optional description to include
+            due_date: A due date for the card
+            due_date_completed: If the card has been completed
+            stopwatch_duration: The duration to include with the stopwatch
+            stopwatch_started: The start time for the runnung stopwatch (None is paused)
+
+        """
+        args: paths.Request_createCard = {
+            'name': name,
+            'position': get_position(self.cards, position),
+            'type': type
+        }
+        # Apply optionals
+        if description:
+            args['description'] = description
+        if due_date:
+            args['dueDate'] = dttoiso(due_date, default_timezone=self.session.timezone)
+        if due_date_completed:
+            args['isDueCompleted'] = True
+
+        if stopwatch_duration or stopwatch_started:
+            args['stopwatch'] = {}
+            if stopwatch_duration:
+                args['stopwatch']['total'] = int(stopwatch_duration.total_seconds())
+            if stopwatch_started:
+                if stopwatch_started == 'now':
+                    t = datetime.now(self.session.timezone).isoformat()
+                else:
+                    t = dttoiso(stopwatch_started, default_timezone=self.session.timezone)
+                args['stopwatch']['startedAt'] = t
+        
+        return Card(
+            self.endpoints.createCard(\
+                self.id, 
+                **args)['item'], 
+                self.session
+            )
     
     @queryable
     def sort_cards(self, **kwargs: Unpack[paths.Request_sortList]) -> list[Card]:
         """Sort all cards in the List and return the sorted Cards"""
         return [Card(c, self.session) for c in self.endpoints.sortList(self.id, **kwargs)['included']['cards']]
     
-    def archive_cards(self) -> None:
+    @queryable
+    def archive_cards(self) -> list[Card]:
         """Move all cards in the List to the Board archive"""
-        if self.type != 'closed':
-            raise TypeError(f'List {self.name} in Board {self.board.name} is type: {self.type}, must be a `closed` type')
-        self.endpoints.moveListCards(self.id, listId=self.board.archive_list.id)['item']
+        return [
+            Card(c, self.session)
+            for c in self.endpoints.moveListCards(
+                self.id, 
+                listId=self.board.archive_list.id
+                )['included']['cards']
+        ]
 
     def delete_cards(self) -> None:
         """Delete all Cards in the List (must be a trash list)"""
-        if self.type != 'trash':
-            raise TypeError(f'Only trash type lists can be deleted')
         self.endpoints.clearList(self.id)['item']
     
-    def move_cards(self, list: List, position: Position='top') -> None:
+    @queryable
+    def move_cards(self, list: List, position: Position='top') -> list[Card]:
         """Move all Cards in this List to another List"""
+        cards = self.cards
         for c in self.cards:
             c.move(list, position)
+        return cards
 
+    @queryable
+    def shuffle(self) -> list[Card]:
+        """Shuffle the cards in the List (randomize position)"""
+        cards = self.cards
+        shuffle(cards)
+        for pos, card in enumerate(cards, start=1):
+            card.position = pos*POSITION_GAP
+        return cards
+
+    @queryable
+    def sort(self, key: Callable[[Card], Any]|None=None, reverse: bool=False) -> list[Card]:
+        """Sort the list using a sort function
+        
+        Args:
+            key: The sorting function to use (default is `card.name`)
+            reverse: Reverse the sort order
+        
+        Note:
+            If sorting on fields that may have comparison errors (e.g. `due_date`) 
+            make sure your sort key properly accounts for that: 
+            ```python
+            >>> lst.sort(lambda c: c.due_date)
+            Exception ... # Can't compare NoneType and datetime
+            >>> lst.sort(lambda c: c.due_date or c.created_at+timedelta(days=10000))
+            [
+                Card(dueDate='2026-01-20...'),
+                Card(dueDate='2026-01-26...'),
+                ...
+            ]
+            ```
+        """
+        if key is None:
+            key = lambda c: c.name
+        cards = self.cards
+        cards.sort(key=key, reverse=reverse)
+        for pos, card in enumerate(cards, start=1):
+            card.position = pos*POSITION_GAP
+        return cards
 
 from .attachment import Attachment
 from .board import Board

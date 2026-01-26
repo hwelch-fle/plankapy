@@ -3,18 +3,20 @@ from __future__ import annotations
 __all__ = ('Board', )
 
 from datetime import datetime
+from random import choice
 from ._base import PlankaModel
-from ._helpers import dtfromiso, queryable
+from ._helpers import Position, dtfromiso, get_position, queryable
 from ..api import schemas, paths, events
+from ._literals import LabelColors
 
 # Deferred Model imports at bottom of file
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from typing import Unpack
+    from typing import Unpack, Literal
     #from models import *
-    from ._literals import CardType, BoardRole, BoardView
+    from ._literals import CardType, BoardRole, BoardView, ListColor, LabelColor
 
 
 class Board(PlankaModel[schemas.Board]):
@@ -263,9 +265,31 @@ class Board(PlankaModel[schemas.Board]):
         """Delete the Board"""
         return self.endpoints.deleteBoard(self.id)
 
-    def create_list(self, **lst: Unpack[paths.Request_createList]) -> List:
-        """Create a new List on the Board"""
-        return List(self.endpoints.createList(self.id, **lst)['item'], self.session)
+    def create_list(self, 
+                    *, 
+                    name: str,
+                    type: Literal['active', 'closed']='active',
+                    position: Position = 'top',
+                    color: ListColor|None=None) -> List:
+        """Create a new List on the Board
+        
+        Args:
+            name: Name/title of the List
+            type: Type/status of the List
+            position: Position of the List within the Board
+            color: An optional color to set the list to
+        """
+        l = List(
+            self.endpoints.createList(
+                self.id, 
+                name=name,
+                type=type,
+                position=get_position(self.active_lists + self.closed_lists, position))['item'], 
+            self.session
+        )
+        if color:
+            l.color = color
+        return l
 
     def remove_list(self, list: List) -> None:
         """Remove a List from the Board
@@ -276,9 +300,27 @@ class Board(PlankaModel[schemas.Board]):
         if list in self.active_lists:
             list.delete()
 
-    def create_label(self, **lbl: Unpack[paths.Request_createLabel]) -> Label:
-        """Create a new Label on the Board"""
-        return Label(self.endpoints.createLabel(self.id, **lbl)['item'], self.session)
+    def create_label(self, 
+                     *,
+                     name: str,
+                     position: Position='top',
+                     color: LabelColor|Literal['random']='random') -> Label:
+        """Create a new Label on the Board
+        
+        Args:
+            name: The name of the Label
+            positon: The position of the label in the label list
+            color: An optional color for the label (a random unused color by default)
+        """
+        l = Label(
+            self.endpoints.createLabel(
+                self.id, 
+                name=name,
+                position=get_position(self.labels, position),
+                color=color if color != 'random' else choice(LabelColors))['item'], 
+                self.session
+            )
+        return l
     
     def remove_label(self, label: Label) -> None:
         """Remove a Label from the Board

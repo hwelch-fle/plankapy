@@ -3,15 +3,17 @@ from __future__ import annotations
 __all__ = ('Label', )
 
 from datetime import datetime
+from random import choice
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position, queryable
 from ..api import schemas, paths, events
+from ._literals import LabelColors
 
 # Deferred Model imports at bottom of file
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from typing import Unpack
+    from typing import Unpack, Literal
     #from models import *
     from ._literals import LabelColor
 
@@ -49,9 +51,9 @@ class Label(PlankaModel[schemas.Label]):
         """Color of the label"""
         return self.schema['color']
     @color.setter
-    def color(self, color: LabelColor) -> None:
+    def color(self, color: LabelColor|Literal['random']) -> None:
         """Set the Label color"""
-        self.update(color=color)
+        self.update(color=color if color != 'random' else choice(LabelColors))
 
     @property
     def created_at(self) -> datetime:
