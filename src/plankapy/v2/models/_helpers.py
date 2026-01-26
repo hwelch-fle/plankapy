@@ -126,16 +126,19 @@ class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
         except IndexError:
             return default
     
-    def extract(self, *keys: str) -> list[tuple[Any, ...]]:
+    @overload
+    def extract(self, key: str, /) -> list[Any]: ...
+    @overload
+    def extract(self, *keys: str) -> list[tuple[Any, ...]]: ...
+    def extract(self, *keys: str) -> list[tuple[Any, ...] | Any]:
         """Extract values from the items in the QueryList
         
         Args:
-            key (str): The schema key to extract
-        
-        Returns:
-            A list of key values requested from the model schema
+            keys: The schema key to extract
         """
-        return [tuple(i.schema[key] for key in keys) for i in self]
+        if len(keys) == 1:
+            return [i[keys[0]] for i in self]
+        return [tuple(i[key] for key in keys) for i in self]
 
     def ids(self) -> list[str]:
         """A list of model ids"""
