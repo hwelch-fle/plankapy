@@ -1,3 +1,3 @@
 # List
 
-::: plankapy.v2.models.list
+::: plankapy.v2.models.list_

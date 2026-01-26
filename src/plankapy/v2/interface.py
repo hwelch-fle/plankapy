@@ -71,18 +71,16 @@ class Planka:
     the url passed to the `base_url` argument
 
     Example:
-
-        Using the default Client with a base_url
         ```python
+        # Using the default client
         >>> planka = Planka('https://planka.example.com')
         ... planka.client
         <httpx.Client object at 0x...>
 
         >>> planka.client.base_url
         URL('https://planka.example.com')
-        ```
-        Client based initialization
-        ```python
+
+        # Using a pre-configured client
         >>> hooks = {'request': [hook1, hook2], 'response': [hook3, hook4]}
         ... client = Client(event_hooks=hooks)
         ... planka = Planka('https://planka.example.com', client=client)
