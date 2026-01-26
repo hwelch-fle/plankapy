@@ -3,6 +3,7 @@ import sys
 sys.path.append('../../src')
 
 from plankapy.v2 import Planka
+from plankapy.v2.utils import board_to_csv
 from httpx import Client
 
 URL = 'http://localhost:1337/'
