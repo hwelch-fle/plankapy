@@ -73,42 +73,48 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
         """Add an existing CustomField to the BaseGroup
         
         Args:
-            field (CustomField): The existing CustomField to add
-            position (Position): The position of the CustomField in the BaseCustomFieldGroup (default: `top`)
-            show_on_card (bool): (default: field.show_on_front_of_card)
+            field: The existing CustomField to add
+            position: The position of the new Field
+            show_on_card: Override the input Field's show state
             
         Note:
             If a CustomField with a matching name already exists in the base group, it 
             will be returned
         """
-        # Set position and 
-        if show_on_card is None:
-            show_on_card = field.show_on_front_of_card
-        
-        position = get_position(self.custom_fields, position) 
-        
-        # Find existing and update
-        for cf in self.custom_fields:
-            if cf.name != field.name:
-                continue
-            if cf.position != position:
-                cf.position = position
-            if cf.show_on_front_of_card != show_on_card:
-                cf.show_on_front_of_card = show_on_card
+
+        if (cf := self.custom_fields[field].dpop()):
+            flds = ('name', 'position', 'showOnFrontOfCard')
+            cf.update(**{k: field[k] for k in flds if cf[k] != field[k]})
             return cf
         
-        # Create New Field
-        return self.create_field(name=field.name, position=position, showOnFrontOfCard=show_on_card)
-
-    def create_field(self, **kwargs: Unpack[paths.Request_createCustomFieldInBaseGroup]) -> CustomField:
+        return self.create_field(
+            field.name, 
+            position=position, 
+            show_on_card=show_on_card or field.show_on_front_of_card
+        )
+        
+        
+    def create_field(self, 
+                     name: str, 
+                     *,
+                     position: Position='top', 
+                     show_on_card: bool=False) -> CustomField:
         """Create a new CustomField in the BaseCustomFieldGroup
         
         Args:
-            name (str): Name/title of the custom field
-            position (int): Position of the custom field within the group
-            showOnFrontOfCard (bool): Whether to show the field on the front of cards 
+            name: Name/title of the custom field
+            position: Position of the custom field within the group
+            show_on_card: Whether to show the field on the front of cards 
         """
-        return CustomField(self.endpoints.createCustomFieldInBaseGroup(self.id, **kwargs)['item'], self.session)
+        return CustomField(
+            self.endpoints.createCustomFieldInBaseGroup(
+                self.id, 
+                name=name,
+                position=get_position(self.custom_fields, position),
+                showOnFrontOfCard=show_on_card,
+                )['item'], 
+            self.session
+        )
 
 
 from .project import Project
