@@ -1,2 +1,0 @@
-# Action
-::: plankapy.interfaces.Action

@@ -1,2 +1,0 @@
-# BoardMembership
-::: plankapy.interfaces.BoardMembership

@@ -11,24 +11,24 @@ theme:
   name: material
   #custom_dir: overrides
   palette:
-  - media: "(prefers-color-scheme)"
-    toggle:
-      icon: material/lightbulb-auto
-      name: Switch to light mode
-  - media: '(prefers-color-scheme: light)'
-    scheme: default
-    primary: teal
-    accent: amber
-    toggle:
-      icon: material/lightbulb
-      name: Switch to dark mode
-  - media: '(prefers-color-scheme: dark)'
-    scheme: slate
-    primary: teal
-    accent: amber
-    toggle:
-      icon: material/lightbulb-outline
-      name: Switch to system preference
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/lightbulb-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to system preference
   features:
     - announce.dismiss
     - content.code.annotate
@@ -75,89 +75,100 @@ markdown_extensions:
   pymdownx.snippets:
   pymdownx.superfences:
     custom_fences:
-    - name: mermaid
-      class: mermaid
-      format: !!python/name:pymdownx.superfences.fence_code_format
+      - name: mermaid
+        class: mermaid
+        format: !!python/name:pymdownx.superfences.fence_code_format
   pymdownx.tilde:
 
   # pymdownx blocks
   pymdownx.blocks.admonition:
     types:
-    - note
-    - attention
-    - caution
-    - danger
-    - error
-    - tip
-    - hint
-    - warning
-    # Custom types
-    - info
-    - check
+      - note
+      - attention
+      - caution
+      - danger
+      - error
+      - tip
+      - hint
+      - warning
+      # Custom types
+      - info
+      - check
   pymdownx.blocks.details:
   pymdownx.blocks.tab:
     alternate_style: True
 
-extra:
-  mkdocstrings:
-    default_handler: python
-    handlers:
-      python:
-        docstring_style: google
-        options:
-          show_root_heading: true
-          show_if_no_docstring: true
-          inherited_members: true
-          members_order: source
-          separate_signature: true
-          filters:
-          - '!^_'
-          merge_init_into_class: true
-          signature_crossrefs: true
-          show_symbol_type_heading: true
-          show_symbol_type_toc: true
-          rendering:
-            show_source: false
-          selection:
-            docstring_style: google
-
 nav:
   - Home: index.md
-  - API: 
-    - QueryableList: models/QueryableList.md
-    - Planka: interfaces/Planka.md
-    - Authentication Interfaces:
-      - PasswordAuth: auth/PasswordAuth.md
-      - TokenAuth: auth/TokenAuth.md
-    - User Interfaces:
-      - User: interfaces/User.md
-      - Notification: interfaces/Notification.md
-    - Project Interfaces: 
-      - Project: interfaces/Project.md
-      - ProjectManager: interfaces/ProjectManager.md
-    - Board Interfaces: 
-      - Board: interfaces/Board.md
-      - BoardMembership: interfaces/BoardMembership.md
-      - Label: interfaces/Label.md
-      - List: interfaces/List.md
-    - Card Interfaces:
-      - Card: interfaces/Card.md
-      - CardLabel: interfaces/CardLabel.md
-      - CardMembership: interfaces/CardMembership.md
-      - CardSubscription: interfaces/CardSubscription.md
-      - Attachment: interfaces/Attachment.md
-      - Action: interfaces/Action.md
-      - Task: interfaces/Task.md
-      - Stopwatch: interfaces/Stopwatch.md
-    - Constants: constants/constants.md
-    - Helpers: helpers/helpers.md
-    #- Models: models/models.md
+  - Plankapy v1:
+      - QueryableList: v1/models/QueryableList.md
+      - Planka: v1/interfaces/Planka.md
+      - Authentication Interfaces:
+          - PasswordAuth: v1/auth/PasswordAuth.md
+          - TokenAuth: v1/auth/TokenAuth.md
+      - User Interfaces:
+          - User: v1/interfaces/User.md
+          - Notification: v1/interfaces/Notification.md
+      - Project Interfaces:
+          - Project: v1/interfaces/Project.md
+          - ProjectManager: v1/interfaces/ProjectManager.md
+      - Board Interfaces:
+          - Board: v1/interfaces/Board.md
+          - BoardMembership: v1/interfaces/BoardMembership.md
+          - Label: v1/interfaces/Label.md
+          - List: v1/interfaces/List.md
+      - Card Interfaces:
+          - Card: v1/interfaces/Card.md
+          - CardLabel: v1/interfaces/CardLabel.md
+          - CardMembership: v1/interfaces/CardMembership.md
+          - CardSubscription: v1/interfaces/CardSubscription.md
+          - Attachment: v1/interfaces/Attachment.md
+          - Action: v1/interfaces/Action.md
+          - Task: v1/interfaces/Task.md
+          - Stopwatch: v1/interfaces/Stopwatch.md
+      - Constants: v1/constants/constants.md
+      - Helpers: v1/helpers/helpers.md
+      - Models: v1/models/models.md
 
-    - Unused:
-      - IdentityProviderUser: interfaces/IdentityProviderUser.md
-      - Archive: interfaces/Archive.md
+      - Unused:
+          - IdentityProviderUser: interfaces/IdentityProviderUser.md
+          - Archive: interfaces/Archive.md
 
-  #- CLI: cli/cli.md
+  - Plankapy v2:
+      - interface:
+          - Planka: v2/interface.md
+      - api:
+          - Paths: v2/api/paths.md
+          - Schemas: v2/api/schemas.md
+          - REST Types: v2/api/rest-typing.md
+          - Errors: v2/api/errors.md
+      - models:
+          - PlankaModel: v2/models/_planka-model.md
+          - Action: v2/models/action.md
+          - Attachment: v2/models/attachment.md
+          - BackgroundImage: v2/models/background-image.md
+          - BaseCustomFieldGroup: v2/models/base-custom-field-group.md
+          - Board: v2/models/board.md
+          - BoardMembership: v2/models/board-membership.md
+          - Card: v2/models/card.md
+          - CardLabel: v2/models/card-label.md
+          - CardMembership: v2/models/card-membership.md
+          - Comment: v2/models/comment.md
+          - Config: v2/models/config.md
+          - CustomField: v2/models/custom-field.md
+          - CustomFieldGroup: v2/models/custom-field-group.md
+          - CustomFieldValue: v2/models/custom-field-value.md
+          - Label: v2/models/label.md
+          - List: v2/models/list.md
+          - Notification: v2/models/notification.md
+          - NotificationService: v2/models/notification-service.md
+          - Project: v2/models/project.md
+          - ProjectManager: v2/models/project-manager.md
+          - Task: v2/models/task.md
+          - TaskList: v2/models/task-list.md
+          - User: v2/models/user.md
+          - Webhook: v2/models/webhook.md
+
   - Examples: examples.md
 
 plugins:
@@ -165,5 +176,26 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          inventories:
+            - https://docs.python.org/3/objects.inv
           paths: [src]
+          options:
+            backlinks: tree
+            docstring_section_style: spacy
+            modernize_annotations: true
+            #heading_level: 1
+            inherited_members: true
+            merge_init_into_class: true
+            parameter_headings: true
+            separate_signature: true
+            show_root_toc_entry: false
+            show_root_heading: false
+            show_root_full_path: false
+            show_signature_annotations: true
+            show_source: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            summary: true
+            allow_inspection: true
   - autorefs

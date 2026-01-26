@@ -1,2 +1,0 @@
-# List
-::: plankapy.interfaces.List

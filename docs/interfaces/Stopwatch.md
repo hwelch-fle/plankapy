@@ -1,2 +1,0 @@
-# Stopwatch
-::: plankapy.models.Stopwatch

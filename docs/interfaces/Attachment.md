@@ -1,2 +1,0 @@
-# Attachment
-::: plankapy.interfaces.Attachment

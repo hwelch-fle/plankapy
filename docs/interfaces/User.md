@@ -1,2 +1,0 @@
-# User
-::: plankapy.interfaces.User

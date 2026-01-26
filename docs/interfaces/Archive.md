@@ -1,2 +1,0 @@
-# Archive
-::: plankapy.interfaces.Archive

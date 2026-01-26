@@ -1,2 +1,0 @@
-# QueryableList
-::: plankapy.models.QueryableList

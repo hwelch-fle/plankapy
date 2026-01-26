@@ -1,2 +1,0 @@
-# Task
-::: plankapy.interfaces.Task

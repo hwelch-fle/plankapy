@@ -1,47 +1,15 @@
-"""Pythonic wrapper for Plankanban API"""
-
-__version__ = "2.2.2"
-
-# flake8: noqa 
-# imports elevate these objects to the root module
-
-from .interfaces import (
-    Planka,
-    Project,
-    User,
-    Notification,
-    Board,
-    Label,
-    Action,
-    Archive,
-    Attachment,
-    Card,
-    CardLabel,
-    CardMembership,
-    CardSubscription,
-    IdentityUserProvider,
-    List,
-    ProjectManager,
-    Task,
-    QueryableList,
+from .v1 import (
+    Planka as Planka, 
+    PasswordAuth as PasswordAuth
 )
+from warnings import warn
 
-from .handlers import (
-    BaseAuth,
-    PasswordAuth,
-    TokenAuth,
-    HTTPOnlyAuth,
-)
+def warn_version(func):
+    def inner(*args, **kwargs):
+        warn('If using v1 Planka, please use from plankapy.v1 import Planka')
+        return func(*args, **kwargs)
+    return inner
 
-from .constants import (
-    LabelColor,
-    Gradient,
-    ListSorts,
-    SortOption,
-    Background,
-    BackgroundImage,
-    BoardRole,
-)
-
-# Allow access to submodules
-from . import helpers, constants, handlers, interfaces, models, routes
+# TODO: Make this not warn when importing using `plankapy.v1`
+Planka.__init__ = warn_version(Planka.__init__)
+PasswordAuth.__init__ = warn_version(PasswordAuth.__init__)

@@ -1,2 +1,0 @@
-# Project
-::: plankapy.interfaces.Project

@@ -1,2 +1,0 @@
-# Card
-::: plankapy.interfaces.Card

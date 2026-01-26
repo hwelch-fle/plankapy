@@ -1,77 +1,59 @@
-import sys
-sys.path.append('../src')
-
-import time
+from itertools import batched
+from typing import Any
+from plankapy.v2.api import AsyncPlankaEndpoints, PlankaEndpoints
+from httpx import AsyncClient, Client, Limits
 import asyncio
-from pathlib import Path
-from plankapy import Planka, PasswordAuth, QueryableList, List, Board
 
-planka = Planka('http://localhost:3000', PasswordAuth('demo', 'demo'))
+from time import perf_counter
 
-def setup_board_sync(attachment: Path) -> Board:
-    project = planka.create_project("Async Test")
-    board = project.create_board("Async Board")
+sync_client = Client(base_url='http://localhost:3000', limits=Limits(max_connections=100))
+sync_planka = PlankaEndpoints(sync_client)
 
-    lists: QueryableList[List] = QueryableList()
-    for list_name in ("To Do", "Doing", "Done"):
-        lists.append(board.create_list(list_name))
+
+async_client = AsyncClient(base_url='http://localhost:3000', limits=Limits(max_connections=100))
+async_planka = AsyncPlankaEndpoints(async_client)
+
+def sync_auth():
+    tok = sync_planka.createAccessToken(emailOrUsername='demo', password='demo')['item']
+    sync_planka.client.headers['Authorization'] = f'Bearer {tok}'
+     
+async def async_auth():
+    r = await async_planka.createAccessToken(emailOrUsername='demo', password='demo')
+    tok = r['item']
+    async_planka.client.headers['Authorization'] = f'Bearer {tok}'
+
+async def get_projects():
+    await async_auth()
+    results: list[Any] = []
     
-    for list in lists:
-        for i in range(1, 101):
-            c = list.create_card(f"Card {i} - {list.name}")
-            if attachment:
-                c.add_attachment(attachment)
-        print(f"Created 100 cards in list {list.name}")
-    return board
+    try:
+        tasks = [async_planka.getProjects() for _ in range(1000)]
+        for batch in batched(tasks, n=20):
+            results.extend(await asyncio.gather(*batch, return_exceptions=True))
+        return results
+    finally:
+        await async_planka.deleteAccessToken()
 
-async def create_cards_async(count: int, lists: list[List], attachment: Path):
-    for list in lists:
-        tasks = [asyncio.to_thread(list.create_card, f"Card {i} - {list.name}") for i in range(1, count+1)]
-        cards = await asyncio.gather(*tasks)
-        print(f"Created {len(cards)} cards in list {list.name}")
-
-        if attachment:
-            print(f"Attaching {attachment.name} to cards in list {list.name}")
-            tasks = (asyncio.to_thread(card.add_attachment, attachment) for card in cards)
-            await asyncio.gather(*tasks)
-
-async def setup_board_async(attachment: Path) -> Board:
-    project = planka.create_project("Async Test")
-    board = project.create_board("Async Board")
-
-    lists: QueryableList[List] = QueryableList()
-    for list_name in ("To Do", "Doing", "Done"):
-        lists.append(board.create_list(list_name))
+if __name__ == '__main__':
+    # Dispatch 100 async requests
+    s = perf_counter()
+    vals = asyncio.run(get_projects())
+    e = perf_counter()
+    print(f'Async: {e-s:.2f}s')
+    print(len([v for v in vals if not isinstance(v, Exception)]), ' Successful')
+    if isinstance(vals[0], Exception):
+        print(vals[0])
     
-    await create_cards_async(100, lists, attachment)
-    return board
-
-def cleanup_project():
-    planka.projects.pop_where(name="Async Test").delete()
-
-if __name__ == "__main__":
-    #attachment = Path('https://upload.wikimedia.org/wikipedia/commons/d/dc/RCA_Indian_Head_test_pattern.png')
-    attachment = None
-    test_type = 'both'
-
-    if test_type == 'async' or 'both':
+    # Dispatch 100 sync requests
+    s = perf_counter()
+    sync_auth()
+    vals: list[Any] = []
+    for i in range(1000):
         try:
-            print('Started Async Test')
-            t1 = time.time()
-            board = asyncio.run(setup_board_async(attachment))
-            t2 = time.time()
-            print(f"Finished async in {t2-t1:.2f} seconds")
-        finally:
-            cleanup_project()
-    
-    if test_type == 'sync' or 'both':
-        try:
-            print('Started Sync Test')
-            t1 = time.time()
-            board = setup_board_sync(attachment)
-            t2 = time.time()
-            print(f"Finished sync in {t2-t1:.2f} seconds")
-        finally:
-            cleanup_project()
-
-
+            vals.append(sync_planka.getProjects())
+        except Exception:
+            pass
+    sync_planka.deleteAccessToken()
+    e = perf_counter()
+    print(f'Sync: {e-s:.2f}s')
+    print(len(vals), ' Successful')
