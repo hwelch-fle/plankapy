@@ -48,6 +48,11 @@ class PlankaModel[Schema: Mapping[str, Any]]:
         else:
             return super().__eq__(other)
     
+    def __hash__(self) -> int:
+        if 'id' not in self.schema:
+            raise AttributeError(f'{self.__class__.__name__} does not have a hashable id attribute')
+        return int(self.id)
+
     def __getitem__(self, key: str) -> Any:
         return self.schema[key]
 
