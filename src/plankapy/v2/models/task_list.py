@@ -4,7 +4,7 @@ __all__ = ('TaskList', )
 
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, get_position, queryable
+from ._helpers import Position, dtfromiso, get_position, model_list
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -27,7 +27,7 @@ class TaskList(PlankaModel[schemas.TaskList]):
         return self.endpoints.getTaskList(self.id)['included']
     
     @property
-    @queryable
+    @model_list
     def tasks(self) -> list[Task]:
         """All Tasks associated with the TaskList"""
         return [Task(t, self.session) for t in self._included['tasks']]

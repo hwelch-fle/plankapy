@@ -5,7 +5,7 @@ __all__ = ('Label', )
 from datetime import datetime
 from random import choice
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, get_position, queryable
+from ._helpers import Position, dtfromiso, get_position, model_list
 from ..api import schemas, paths, events
 from ._literals import LabelColors
 
@@ -118,7 +118,7 @@ class Label(PlankaModel[schemas.Label]):
             _schema['color'] = color
         return Label(self.endpoints.createLabel(**_schema)['item'], self.session)
 
-    @queryable
+    @model_list
     def get_cards(self) -> list[Card]:
         """All Cards that have this Label in the Board"""
         return [

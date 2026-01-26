@@ -6,7 +6,7 @@ __all__ = ('User', )
 
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import dtfromiso, queryable
+from ._helpers import dtfromiso, model_list
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -34,7 +34,7 @@ class User(PlankaModel[schemas.User]):
     __events__ = events.UserEvents
 
     @property
-    @queryable
+    @model_list
     def notification_services(self) -> list[NotificationService]:
         """Get all User NotificationServices"""
         return [NotificationService(ns, self.session) for ns in self.endpoints.getUser(self.id)['included']['notificationServices']]

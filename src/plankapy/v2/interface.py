@@ -54,7 +54,7 @@ from .api import (
     events,
 )
 from .models import *
-from .models._helpers import queryable
+from .models._helpers import model_list
 from .models._literals import Language, TermsType, UserRole, ProjectType
 
 # Allow Users to set `PLANKA_LANG` environment variable with their language
@@ -212,13 +212,13 @@ class Planka:
         return User(self.endpoints.getUser('me')['item'], self)
 
     @property
-    @queryable
+    @model_list
     def notifications(self) -> list[Notification]:
         """Get all notifications for the current User"""
         return [Notification(n, self) for n in self.endpoints.getNotifications()['items']]
 
     @property
-    @queryable
+    @model_list
     def unread_notifications(self) -> list[Notification]:
         """Get all unread Notifications for the current user"""
         return [n for n in self.notifications if not n.is_read]
@@ -229,7 +229,7 @@ class Planka:
         return Config(self.endpoints.getConfig()['item'], self)
 
     @property
-    @queryable
+    @model_list
     def webhooks(self) -> list[Webhook]:
         """Get all configured Webhooks (requires admin)"""
         return [
@@ -239,7 +239,7 @@ class Planka:
         ]
 
     @property
-    @queryable
+    @model_list
     def projects(self) -> list[Project]:
         """Get all Projects available to the current user
         
@@ -251,7 +251,7 @@ class Planka:
         return [Project(p, self) for p in self.endpoints.getProjects()['items']]
 
     @property
-    @queryable
+    @model_list
     def users(self) -> list[User]:
         """Get all Users on the current instance (requires admin or projectOwner role)
         
@@ -266,7 +266,7 @@ class Planka:
             if self.current_role in ('admin', 'projectOwner')
         ]
     
-    @queryable
+    @model_list
     def read_notifications(self) -> list[Notification]:
         """Read all Notifications for the current User"""
         return [Notification(n, self) for n in self.endpoints.readAllNotifications()['items']]

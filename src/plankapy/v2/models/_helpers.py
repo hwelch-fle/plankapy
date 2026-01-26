@@ -162,7 +162,7 @@ class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
 
 P = ParamSpec('P')
 T = TypeVar('T', bound=PlankaModel[Any])
-def queryable(func: Callable[P, list[T]]) -> Callable[P, ModelList[T]]:
+def model_list(func: Callable[P, list[T]]) -> Callable[P, ModelList[T]]:
     """Wrapper that turns a list property into a ModelList"""
     @wraps(func)
     def _wrapper(*args: Any, **kwargs: Any) -> ModelList[T]:

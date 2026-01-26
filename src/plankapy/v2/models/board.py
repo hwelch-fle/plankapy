@@ -5,7 +5,7 @@ __all__ = ('Board', )
 from datetime import datetime
 from random import choice
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, get_position, queryable
+from ._helpers import Position, dtfromiso, get_position, model_list
 from ..api import schemas, paths, events
 from ._literals import LabelColors
 
@@ -34,121 +34,121 @@ class Board(PlankaModel[schemas.Board]):
         return self.endpoints.getBoard(self.id)['included']
     
     @property
-    @queryable
+    @model_list
     def labels(self) -> list[Label]:
         """Get all Labels on the Board"""
         return [Label(l, self.session) for l in self._included['labels']]
     
     @property
-    @queryable
+    @model_list
     def cards(self) -> list[Card]:
         """Get all active Cards on the Board (use archived_cards and trashed_cards for archived/trashed Card lists)"""
         return [Card(c, self.session) for c in self._included['cards']]
     
     @property
-    @queryable
+    @model_list
     def trashed_cards(self) -> list[Card]:
         """Get all Cards in the Board trash list"""
         return [Card(c, self.session) for c in self.endpoints.getCards(self.trash_list.id)['items']]
     
     @property
-    @queryable
+    @model_list
     def archived_cards(self) -> list[Card]:
         """Get all Cards in the Board archive list"""
         return [Card(c, self.session) for c in self.endpoints.getCards(self.archive_list.id)['items']]
 
     @property
-    @queryable
+    @model_list
     def subscribed_cards(self) -> list[Card]:
         """Get all Cards on the Board that the current User is subscribed to"""
         return [Card(sc, self.session) for sc in self._included['cards'] if sc['isSubscribed']]
     
     @property
-    @queryable
+    @model_list
     def projects(self) -> list[Project]:
         """Get all Projects that the Board is associated with (use `Board.Project` instead, this is always one item)"""
         return [Project(p, self.session) for p in self._included['projects']]
     
     @property
-    @queryable
+    @model_list
     def board_memberships(self) -> list[BoardMembership]:
         """Get all BoardMemberships for the Board"""
         return [BoardMembership(bm, self.session) for bm in self._included['boardMemberships']]
     
     @property
-    @queryable
+    @model_list
     def users(self) -> list[User]:
         """Get all Users on the Board"""
         return [User(u, self.session) for u in self._included['users']]
 
     @property
-    @queryable
+    @model_list
     def editors(self) -> list[User]:
         """Get all editor Users for the Board"""
         return [bm.user for bm in self.board_memberships if bm.role == 'editor']
     
     @property
-    @queryable
+    @model_list
     def viewers(self) -> list[User]:
         """Get all viewer Users for the Board"""
         return [bm.user for bm in self.board_memberships if bm.role == 'editor']
 
     @property
-    @queryable
+    @model_list
     def all_lists(self) -> list[List]:
         """Get all Lists associated with the Board (including archive and trash)"""
         return [List(l, self.session) for l in self._included['lists']]
     
     @property
-    @queryable
+    @model_list
     def lists(self) -> list[List]:
         """Get all active/closed lists in the board (this is the one you most likely want)"""
         return self.active_lists + self.closed_lists
 
     @property
-    @queryable
+    @model_list
     def card_memberships(self) -> list[CardMembership]:
         """Get all CardMemberships associated with the Board"""
         return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
-    @queryable
+    @model_list
     def card_labels(self) -> list[CardLabel]:
         """Get all CardLabels associated with the Board"""
         return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
     
     @property
-    @queryable
+    @model_list
     def task_lists(self) -> list[TaskList]:
         """Get all TaskLists associated with the Board"""
         return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
-    @queryable
+    @model_list
     def tasks(self) -> list[Task]:
         """Get all Tasks associated with the Board"""
         return [Task(t, self.session) for t in self._included['tasks']]
     
     @property
-    @queryable
+    @model_list
     def attachments(self) -> list[Attachment]:
         """Get all Attachments associated with the Board"""
         return [Attachment(a, self.session) for a in self._included['attachments']]
     
     @property
-    @queryable
+    @model_list
     def custom_field_groups(self) -> list[CustomFieldGroup]:
         """Get all CustomFieldGroups associated with the Board"""
         return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
     
     @property
-    @queryable
+    @model_list
     def custom_fields(self) -> list[CustomField]:
         """Get all CustomFields associated with the Board"""
         return [CustomField(cf, self.session) for cf in self._included['customFields']]
     
     @property
-    @queryable
+    @model_list
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Board"""
         return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
@@ -164,13 +164,13 @@ class Board(PlankaModel[schemas.Board]):
         return self.all_lists[{'type': 'trash'}].pop()
     
     @property
-    @queryable
+    @model_list
     def active_lists(self) -> list[List]:
         """Get all active Lists for the Board"""
         return self.all_lists[{'type': 'active'}]
     
     @property
-    @queryable
+    @model_list
     def closed_lists(self) -> list[List]:
         """Get all closed Lists for the Board"""
         return self.all_lists[{'type': 'closed'}]
@@ -367,7 +367,7 @@ class Board(PlankaModel[schemas.Board]):
             membership.can_comment = can_comment
         return membership
     
-    @queryable
+    @model_list
     def add_members(self, users: Sequence[User], 
                     *,
                     role: BoardRole='viewer',
@@ -402,7 +402,7 @@ class Board(PlankaModel[schemas.Board]):
         """
         return self.add_member(user, role='editor', can_comment=True)
 
-    @queryable
+    @model_list
     def add_editors(self, users: Sequence[User]) -> list[BoardMembership]:
         """Add Board editors
         
@@ -423,7 +423,7 @@ class Board(PlankaModel[schemas.Board]):
         """
         return self.add_member(user, role='viewer', can_comment=can_comment)
 
-    @queryable
+    @model_list
     def add_viewers(self, users: Sequence[User], *, can_comment: bool=False) -> list[BoardMembership]:
         """Add a Board viewer
         

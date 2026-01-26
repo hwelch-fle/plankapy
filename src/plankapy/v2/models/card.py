@@ -6,7 +6,7 @@ __all__ = ('Card', 'Stopwatch', )
 
 from datetime import datetime, timedelta
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, dttoiso, get_position, queryable
+from ._helpers import Position, dtfromiso, dttoiso, get_position, model_list
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -40,79 +40,79 @@ class Card(PlankaModel[schemas.Card]):
         return self.endpoints.getCard(self.id)['included']
     
     @property
-    @queryable
+    @model_list
     def attachments(self) -> list[Attachment]:
         """Get all Attachments associated with the Card"""
         return [Attachment(a, self.session) for a in self._included['attachments']]
     
     @property
-    @queryable
+    @model_list
     def card_memberships(self) -> list[CardMembership]:
         """Get all CardMemberships associated with the Card"""
         return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
-    @queryable
+    @model_list
     def users(self) -> list[User]:
         """Get all Users associated with the Card (including Creator)"""
         return [User(u, self.session) for u in self._included['users']]
     
     @property
-    @queryable
+    @model_list
     def members(self) -> list[User]:
         """Get all Users Assigned to the card"""
         return [cm.user for cm in self.card_memberships]
     
     @property
-    @queryable
+    @model_list
     def card_labels(self) -> list[CardLabel]:
         """Get all CardLabel associations for the Card"""
         return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
     
     @property
-    @queryable
+    @model_list
     def labels(self) -> list[Label]:
         """Get all Labels associated with the Card"""
         return [cl.label for cl in self.card_labels]
     
     @property
-    @queryable
+    @model_list
     def tasks(self) -> list[Task]:
         """Get all Tasks associated with the card"""
         return [Task(t, self.session) for t in self._included['tasks']]
     
     @property
-    @queryable
+    @model_list
     def task_lists(self) -> list[TaskList]:
         """Get all TaskLists associated with the Card"""
         return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
-    @queryable
+    @model_list
     def custom_field_groups(self) -> list[CustomFieldGroup]:
         """Get all CustomFieldGroups associated with the Card"""
         return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
     
     @property
-    @queryable
+    @model_list
     def custom_fields(self) -> list[CustomField]:
          """Get all CustomFields associated with the Card"""
          return [CustomField(cf, self.session) for cf in self._included['customFields']]
     
     @property
-    @queryable
+    @model_list
     def custom_field_values(self) -> list[CustomFieldValue]:
         """Get all CustomFieldValues associated with the Card"""
         return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
     
     @property
-    @queryable
+    @model_list
     def comments(self) -> list[Comment]:
         """Get all Comments on the Card"""
         return [Comment(c, self.session) for c in self.endpoints.getComments(self.id)['items']]
 
     @property
-    @queryable
+    @model_list
     def actions(self) -> list[Action]:
         """Get all Actions associated with the Card"""
         return [Action(a, self.session) for a in self.endpoints.getCardActions(self.id)['items']]
@@ -287,7 +287,7 @@ class Card(PlankaModel[schemas.Card]):
         """Delete the Card"""
         return self.endpoints.deleteCard(self.id)
 
-    @queryable
+    @model_list
     def read_notifications(self) -> list[Notification]:
         """Read all the current User's Notifications for the Card"""
         return [Notification(n, self.session) for n in self.endpoints.readCardNotifications(self.id)['included']['notifications']]
@@ -492,7 +492,7 @@ class Card(PlankaModel[schemas.Card]):
         
         return CardMembership(self.endpoints.createCardMembership(self.id, userId=user.id)['item'], self.session)
 
-    @queryable
+    @model_list
     def add_members(self, users: Sequence[User], 
                     *, 
                     add_to_board: bool=False, 
@@ -534,7 +534,7 @@ class Card(PlankaModel[schemas.Card]):
                 cm.delete()
                 return user
 
-    @queryable
+    @model_list
     def remove_members(self, users: Sequence[User]) -> list[User]:
         """Remove multiple members from a Card
         
@@ -581,7 +581,7 @@ class Card(PlankaModel[schemas.Card]):
         # Create new CardLabel relationship
         return CardLabel(self.endpoints.createCardLabel(self.id, labelId=label.id)['item'], self.session)
     
-    @queryable
+    @model_list
     def add_labels(self, labels: Sequence[Label], 
                    *,
                    add_to_board: bool=False) -> list[CardLabel]:
@@ -616,7 +616,7 @@ class Card(PlankaModel[schemas.Card]):
                 card_label.delete()
                 return label
 
-    @queryable
+    @model_list
     def remove_labels(self, labels: Sequence[Label]) -> list[Label]:
         """Remove the Label from the Card
         

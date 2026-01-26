@@ -9,7 +9,7 @@ from . import (
 )
 from .models._helpers import (
     POSITION_GAP as POSITION_GAP,
-    queryable as queryable,
+    model_list as model_list,
     ModelList as ModelList,
     due_in as due_in,
 )

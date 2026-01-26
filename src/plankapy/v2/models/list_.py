@@ -5,7 +5,7 @@ __all__ = ('List', )
 from datetime import datetime, timedelta
 from random import choice, shuffle
 from ._base import PlankaModel
-from ._helpers import Position, dtfromiso, dttoiso, get_position, queryable, POSITION_GAP
+from ._helpers import Position, dtfromiso, dttoiso, get_position, model_list, POSITION_GAP
 from ..api import schemas, paths, events
 from ._literals import ListColors
 
@@ -29,61 +29,61 @@ class List(PlankaModel[schemas.List]):
         return self.endpoints.getList(self.id)['included']
     
     @property
-    @queryable
+    @model_list
     def users(self) ->  list[User]:
         """Users associated with the List"""
         return [User(u, self.session) for u in self._included['users']]
     
     @property
-    @queryable
+    @model_list
     def cards(self) -> list[Card]:
         """Cards associated with the List"""
         return [Card(c, self.session) for c in self._included['cards']]
     
     @property
-    @queryable
+    @model_list
     def card_memberships(self) -> list[CardMembership]:
         """CardMemberships associated with the List"""
         return [CardMembership(cm, self.session) for cm in self._included['cardMemberships']]
     
     @property
-    @queryable
+    @model_list
     def card_labels(self) -> list[CardLabel]:
         """CardLabels associated with the List"""
         return [CardLabel(cl, self.session) for cl in self._included['cardLabels']]
     
     @property
-    @queryable
+    @model_list
     def task_lists(self) -> list[TaskList]:
         """TaskLists associated with the List"""
         return [TaskList(tl, self.session) for tl in self._included['taskLists']]
     
     @property
-    @queryable
+    @model_list
     def tasks(self) ->  list[Task]:
         """Tasks associated with the List"""
         return [Task(t, self.session) for t in self._included['tasks']]
 
     @property
-    @queryable
+    @model_list
     def attachments(self) -> list[Attachment]:
         """Attachments associated with the List"""
         return [Attachment(a, self.session) for a in self._included['attachments']]
 
     @property
-    @queryable
+    @model_list
     def custom_field_groups(self) ->  list[CustomFieldGroup]:
         """CustomFieldGroups associated with the List"""
         return [CustomFieldGroup(cfg, self.session) for cfg in self._included['customFieldGroups']]
 
     @property
-    @queryable
+    @model_list
     def custom_fields(self) ->  list[CustomField]:
         """CustomFields associated with the List"""
         return [CustomField(cf, self.session) for cf in self._included['customFields']]
 
     @property
-    @queryable
+    @model_list
     def custom_field_values(self) -> list[CustomFieldValue]:
         """CustomFieldValues associated with the List"""
         return [CustomFieldValue(cfv, self.session) for cfv in self._included['customFieldValues']]
@@ -202,12 +202,12 @@ class List(PlankaModel[schemas.List]):
                 self.session
             )
     
-    @queryable
+    @model_list
     def sort_cards(self, **kwargs: Unpack[paths.Request_sortList]) -> list[Card]:
         """Sort all cards in the List and return the sorted Cards"""
         return [Card(c, self.session) for c in self.endpoints.sortList(self.id, **kwargs)['included']['cards']]
     
-    @queryable
+    @model_list
     def archive_cards(self) -> list[Card]:
         """Move all cards in the List to the Board archive"""
         return [
@@ -222,7 +222,7 @@ class List(PlankaModel[schemas.List]):
         """Delete all Cards in the List (must be a trash list)"""
         self.endpoints.clearList(self.id)['item']
     
-    @queryable
+    @model_list
     def move_cards(self, list: List, position: Position='top') -> list[Card]:
         """Move all Cards in this List to another List"""
         cards = self.cards
@@ -230,7 +230,7 @@ class List(PlankaModel[schemas.List]):
             c.move(list, position)
         return cards
 
-    @queryable
+    @model_list
     def shuffle(self) -> list[Card]:
         """Shuffle the cards in the List (randomize position)"""
         cards = self.cards
@@ -239,7 +239,7 @@ class List(PlankaModel[schemas.List]):
             card.position = pos*POSITION_GAP
         return cards
 
-    @queryable
+    @model_list
     def sort(self, key: Callable[[Card], Any]|None=None, reverse: bool=False) -> list[Card]:
         """Sort the list using a sort function
         
