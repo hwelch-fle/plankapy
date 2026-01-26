@@ -9,8 +9,10 @@ from functools import wraps
 from typing import (
     Any, 
     Literal,
+    ParamSpec,
     Protocol, 
-    SupportsIndex, 
+    SupportsIndex,
+    TypeVar, 
     overload,
 )
 
@@ -139,12 +141,13 @@ class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
         """A list of model ids"""
         return [i.id for i in self]
 
-
-def queryable[T: PlankaModel[Any]](func: Callable[... , list[T]]):
+P = ParamSpec('P')
+T = TypeVar('T', bound=PlankaModel[Any])
+def queryable(func: Callable[P, list[T]]) -> Callable[P, ModelList[T]]:
     """Wrapper that turns a list property into a QueryList"""
     @wraps(func)
-    def _wrapper(self: Any, *args: Any, **kwargs: Any) -> ModelList[T]:
-        return ModelList(func(self, *args, **kwargs))
+    def _wrapper(*args: Any, **kwargs: Any) -> ModelList[T]:
+        return ModelList(func(*args, **kwargs))
     return _wrapper
 
 
