@@ -88,13 +88,12 @@ class Project(PlankaModel[schemas.Project]):
         self.update(isFavorite=is_favorite)
         
     @property
-    def owner(self) -> User:
+    def owner(self) -> User | None:
         """The User who owns the project (Raises LookupError if the User cannot be found)"""
-        if self.session.current_role not in ('admin', 'projectOwner'):
-            _usrs = [pm for pm in self.project_managers if self.schema['ownerProjectManagerId'] == pm.id]
-            if _usrs:
-                return _usrs.pop().user
-        return User(self.endpoints.getUser(self.schema['ownerProjectManagerId'])['item'], self.session)
+        _usrs = [pm for pm in self.project_managers if self.schema['ownerProjectManagerId'] == pm.id]
+        if _usrs:
+            return _usrs.pop().user
+        #return User(self.endpoints.getUser(self.schema['ownerProjectManagerId'])['item'], self.session)
 
     @property
     def background_image(self) -> BackgroundImage | None:
