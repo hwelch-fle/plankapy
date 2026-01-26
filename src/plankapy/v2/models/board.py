@@ -96,9 +96,15 @@ class Board(PlankaModel[schemas.Board]):
     @property
     @queryable
     def all_lists(self) -> list[List]:
-        """Get all Lists associated with the Board"""
+        """Get all Lists associated with the Board (including archive and trash)"""
         return [List(l, self.session) for l in self._included['lists']]
     
+    @property
+    @queryable
+    def lists(self) -> list[List]:
+        """Get all active/closed lists in the board (this is the one you most likely want)"""
+        return self.active_lists + self.closed_lists
+
     @property
     @queryable
     def card_memberships(self) -> list[CardMembership]:
