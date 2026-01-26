@@ -95,7 +95,7 @@ class Request_createBoard(TypedDict):
     """Name/title of the board"""
     importType: NotRequired[Literal['trello']]
     """Type of import"""
-    importFile: NotRequired[str]
+    importFile: NotRequired[bytes]
     """Import file"""
     requestId: NotRequired[str]
     """Request ID for tracking"""

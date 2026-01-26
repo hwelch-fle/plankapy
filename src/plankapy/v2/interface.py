@@ -4,18 +4,19 @@ Base interface for Planka
 
 from __future__ import annotations
 from functools import cached_property
-from typing import Unpack
+from typing import Sequence
 from warnings import warn
 from datetime import timezone
 
 from httpx import Client, HTTPStatusError
+
 from .api import (
     PlankaEndpoints, 
-    paths, # Response / Request typing
+    events,
 )
 from .models import *
 from .models._helpers import queryable
-from .models._literals import TermsType, UserRole
+from .models._literals import Language, TermsType, UserRole, ProjectType
 
 # Allow Users to set `PLANKA_LANG` environment variable with their language
 # Default to en-US if not set
@@ -44,7 +45,8 @@ class Planka:
         sig = terms['signature']
         self.endpoints.acceptTerms(pendingToken=pending_token, signature=sig)
     
-    def logon(self, *, 
+    def login(self, 
+              *, 
               username: str|None=None, 
               password: str|None=None, 
               api_key: str|None=None, 
@@ -149,81 +151,107 @@ class Planka:
             if self.current_role in ('admin', 'projectOwner')
         ]
     
-    def read_notification(self) -> list[Notification]:
+    @queryable
+    def read_notifications(self) -> list[Notification]:
         """Read all Notifications for the current User"""
         return [Notification(n, self) for n in self.endpoints.readAllNotifications()['items']]
     
-    def create_project(self, **kwargs: Unpack[paths.Request_createProject]) -> Project:
+    def create_project(self, 
+                       *,
+                       name: str,
+                       type: ProjectType,
+                       description: str|None=None) -> Project:
         """Creates a project. The current user automatically becomes a project manager.
 
+        Must be a Project Owner or an Admin
+        
         Args:
-            type (ProjectType): Type of the project
-            name (str): Name/title of the project
-            description (str): Detailed description of the project
-
-        Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
-
-        Raises:
-            PermissionError: If User is not an admin or projectOwner
-            ValidationError: 400 
-            Unauthorized: 401 
+            type: Type of the project
+            name: Name/title of the project
+            description: Detailed description of the project
         """
-        if self.current_role not in ('admin', 'projectOwner'):
-            raise PermissionError(f'Onlt Admins and Project Owners can create Projects')
-        return Project(self.endpoints.createProject(**kwargs)['item'], self)
+        return Project(
+            self.endpoints.createProject(
+                name=name, 
+                type=type, 
+                description=description,
+            )['item'], 
+            self
+        )
     
-    def create_user(self, **kwargs: Unpack[paths.Request_createUser]) -> User:
+    def create_user(self, 
+                    *,
+                    email: str,
+                    password: str,
+                    role: UserRole,
+                    name: str,
+                    username: str|None=None,
+                    phone: str|None=None,
+                    organization: str|None=None,
+                    language: Language|None=None,
+                    subscribe_to_own_cards: bool=False,
+                    subscribe_to_cards_when_commenting: bool=True,
+                    turn_off_recent_card_highlighting: bool=False) -> User:
         """Creates a user account. Requires admin privileges.
+
+        Only `email`, `password`, `role`, and `name` are required
 
         Args:
             email (str): Email address for login and notifications
             password (str): Password for user authentication (must meet password requirements)
             role (UserRole): User role defining access permissions
             name (str): Full display name of the user
-        
-        Optional:
             username (str): Unique username for user identification
             phone (str): Contact phone number
             organization (str): Organization or company name
-            language (LanguageCode): Preferred language for user interface and notifications (example: 'en-US')
-            subscribeToOwnCards (bool): Whether the user subscribes to their own cards
-            subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
-            turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
-
-        Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            Planka internal status errors are included here for disambiguation
-
-        Raises:
-            PermissionError: If the current user is not an admin
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            Conflict: 409 
+            language (LanguageCode): Preferred language for user interface and notifications (example: `en-US`)
+            subscribe_to_own_cards (bool): Whether the user subscribes to their own cards
+            subscribe_to_cards_when_commenting (bool): Whether the user subscribes to cards when commenting
+            turn_off_recent_card_highlighting (bool): Whether recent card highlighting is disabled
         """
-        if self.current_role != 'admin':
-            raise PermissionError(f'Only Admins can create Users')
-        return User(self.endpoints.createUser(**kwargs)['item'], self)
 
-    def create_webhook(self, **kwargs: Unpack[paths.Request_createWebhook]) -> Webhook:
-        """Create a Webhook (admin only)
+        return User(
+            self.endpoints.createUser(
+                email=email,
+                password=password,
+                role=role,
+                name=name,
+                username=username,
+                phone=phone,
+                organization=organization,
+                language=language,
+                subscribeToOwnCards=subscribe_to_own_cards,
+                subscribeToCardWhenCommenting=subscribe_to_cards_when_commenting,
+                turnOffRecentCardHighlighting=turn_off_recent_card_highlighting,
+            )['item'], 
+            self
+        )
+
+    def create_webhook(self, 
+                       *,
+                       name: str,
+                       url: str,
+                       access_token: str|None=None,
+                       events: Sequence[events.PlankaEvent]|None=None,
+                       excluded_events: Sequence[events.PlankaEvent]|None=None) -> Webhook:
+        """Create a Webhook. Requires admin
         
         Args:
-            name (str) : Name/title of the webhook
-            url (str): URL endpoint for the webhook
-            accessToken (NotRequired[str]): Access token for webhook authentication
-            events (NotRequired[WebhookEvent]): list of events that trigger the webhook
-            excludedEvents (NotRequired[WebhookEvent]): Comma-separated list of events excluded from the webhook
-        
-        Returns:
-            Webhook
-        
-        Raises:
-            PermissionError: If the current user is not an admin
+            name: Name/title of the webhook
+            url: URL endpoint for the webhook
+            access_token: Access token for webhook authentication
+            events: list of events that trigger the webhook
+            excluded_events: Comma-separated list of events excluded from the webhook
         """
-        if self.current_role != 'admin':
-            raise PermissionError(f'Only admins can create Webhooks')
-        return Webhook(self.endpoints.createWebhook(**kwargs)['item'], self)
+        args = {
+            'name': name,
+            'url': url
+        }
+        if events:
+            args['events'] = ','.join(events)
+        if excluded_events:
+            args['excludedEvents'] = ','.join(excluded_events)
+        if access_token:
+            args['accessToken'] = access_token
+        return Webhook(self.endpoints.createWebhook(**args)['item'], self)
         

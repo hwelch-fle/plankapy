@@ -6,7 +6,7 @@ from pathlib import Path
 from httpx import HTTPStatusError
 from datetime import datetime
 from ._base import PlankaModel
-from ._helpers import dtfromiso, queryable
+from ._helpers import Position, dtfromiso, get_position, queryable
 from ..api import schemas, paths, events
 
 # Deferred Model imports at bottom of file
@@ -15,7 +15,7 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Unpack
     #from models import *
-    from ._literals import BackgroundGradient, BackgroundType
+    from ._literals import BackgroundGradient, BackgroundType, BoardImportType
 
 
 class Project(PlankaModel[schemas.Project]):
@@ -275,13 +275,67 @@ class Project(PlankaModel[schemas.Project]):
             # Defer deletion to the ProjectManager object
             project_manager.delete()
 
-    def create_board(self, **board: Unpack[paths.Request_createBoard]) -> Board:
-        """Create a new Board in the Project"""
-        return Board(self.endpoints.createBoard(self.id, **board)['item'], self.session)
+    def create_board(self, 
+                     *, 
+                     name: str, 
+                     position: Position | int ='top') -> Board:
+        """Create a new Board in the Project
+        
+        Args:
+            name: The name of the Board
+            position: The position of the board within the project
+        """
+        return Board(
+            self.endpoints.createBoard(
+                self.id, 
+                name=name, 
+                position=get_position(self.boards, position)
+            )['item'], 
+            self.session
+        )
 
-    def create_base_custom_field_group(self, **bcfg: Unpack[paths.Request_createBaseCustomFieldGroup]) -> BaseCustomFieldGroup:
-        """Create a BaseCustomFieldGroup in the Project"""
-        return BaseCustomFieldGroup(self.endpoints.createBaseCustomFieldGroup(self.id, **bcfg)['item'], self.session)
+    def import_board(self, 
+                     *, 
+                     name: str, 
+                     import_file: bytes, 
+                     position: Position | int='top', 
+                     import_type: BoardImportType='trello',
+                     request_id: str|None=None) -> Board:
+        """Import a board from a file (currently supports trello imports only)
+        
+        Args:
+            name: The name of the imported Board
+            position: The position of the imported Board within the Project
+            import_type: The type of the Bord import (currently `trello` only)
+            request_id: An optional request ID for tracking upload progress (default: `now in iso8601`)
+        """
+        return Board(
+            self.endpoints.createBoard(
+                self.id,
+                name=name,
+                position=get_position(self.boards, position),
+                importType=import_type,
+                importFile=import_file,
+                requestId=request_id or datetime.now().isoformat(),
+            )['item'],
+            self.session
+        )
+
+    def create_base_custom_field_group(self, 
+                                       *, 
+                                       name: str) -> BaseCustomFieldGroup:
+        """Create a BaseCustomFieldGroup in the Project
+        
+        Args:
+            name: The name of the new BaseCustomFieldGroup
+        """
+        return BaseCustomFieldGroup(
+            self.endpoints.createBaseCustomFieldGroup(
+                self.id, 
+                name=name,
+            )['item'], 
+            self.session
+        )
 
 
 from .board import Board

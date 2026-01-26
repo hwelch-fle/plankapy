@@ -13,6 +13,7 @@ __all__ =   (
     "EditorMode",
     "HomeView",
     "ProjectOrdering",
+    "ProjectType",
     "TermsType",
     "LockableField",
     "NotificationType",
@@ -29,6 +30,7 @@ __all__ =   (
     "EditorModes",
     "HomeViews",
     "ProjectOrderings",
+    "ProjectTypes",
     "TermsTypes",
     "LockableFields",
     "NotificationTypes",
@@ -37,6 +39,10 @@ __all__ =   (
 
 BoardView = Literal['kanban', 'grid', 'list']
 BoardViews: tuple[BoardView, ...] = BoardView.__args__
+
+# Single element literals throw warnings on __args__ access
+BoardImportType = Literal['trello']
+BoardImportTypes: tuple[BoardImportType, ...] = BoardImportType.__args__ # type: ignore
 
 CardType = Literal['project', 'story']
 CardTypes: tuple[CardType, ...] = CardType.__args__
@@ -111,6 +117,9 @@ HomeViews: tuple[HomeView, ...] = HomeView.__args__
 
 ProjectOrdering = Literal['byDefault', 'alphabetically', 'byCreationTime']
 ProjectOrderings: tuple[ProjectOrdering, ...] = ProjectOrdering.__args__
+
+ProjectType = Literal['shared', 'private']
+ProjectTypes: tuple[ProjectType] = ProjectType.__args__
 
 TermsType = Literal['general', 'extended']
 TermsTypes: tuple[TermsType, ...] = TermsType.__args__

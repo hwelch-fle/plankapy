@@ -5,30 +5,30 @@ sys.path.append('../../src')
 from plankapy.v2 import Planka
 from httpx import Client
 
-URL = 'https://pro.demo.planka.cloud/'
+URL = 'http://localhost:1337/'
 USER = 'chef@demo.com'
 PASS = 'DemoPass123!'
-KEY = '3gBptWe7_THy8fN4qzrvcgu6u7w8yZquDeHwQNMDc'
+KEY = 'G3EqlGi7_Qk5IS567PBIsz3ohkBQKNX2AxuaqkLGz'
 
 client = Client(base_url=URL)
 planka = Planka(client)
 
 # Will log a warning if used
-planka.logon(username=USER, password=PASS)
+#planka.logon(username=USER, password=PASS)
 
-#planka.logon(api_key=KEY)
+planka.login(api_key=KEY)
 prj = planka.projects[0]
 
 from plankapy.v2 import due_in
 
 # Get all cards in project 1's 
-planka.projects[
-    {'name': '🏗️ Engineering Office - Project Alpha'}
-].pop().boards[
-    {'name': 'Software Development Sprint'}
-].pop().active_lists[
-    {'name': '🔄 In Progress'}
-].pop().cards[due_in(days=5)]
+#planka.projects[
+#    {'name': '🏗️ Engineering Office - Project Alpha'}
+#].pop().boards[
+#    {'name': 'Software Development Sprint'}
+#].pop().active_lists[
+#    {'name': '🔄 In Progress'}
+#].pop().cards[due_in(days=5)]
 
 from random import choice
 from time import sleep

@@ -48,6 +48,9 @@ class PlankaModel[Schema: Mapping[str, Any]]:
         else:
             return super().__eq__(other)
     
+    def __getitem__(self, key: str) -> Any:
+        return self.schema[key]
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.schema})'          
     
