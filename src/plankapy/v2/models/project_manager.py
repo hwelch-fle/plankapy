@@ -47,7 +47,7 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
     # Special Methods
     def sync(self):
         """Sync the ProjectManager with the Planka server"""
-        pms = self.project.managers
+        pms = self.project.project_managers
         for pm in pms:
             if pm.id == self.id:
                 self.schema = pm.schema

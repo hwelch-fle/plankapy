@@ -37,7 +37,7 @@ class Project(PlankaModel[schemas.Project]):
     
     @property
     @queryable
-    def managers(self) -> list[ProjectManager]:
+    def project_managers(self) -> list[ProjectManager]:
         """Get project manager Users associated with the Project"""
         return [ProjectManager(pm, self.session) for pm in self._included['projectManagers']]
     
@@ -91,9 +91,9 @@ class Project(PlankaModel[schemas.Project]):
     def owner(self) -> User:
         """The User who owns the project (Raises LookupError if the User cannot be found)"""
         if self.session.current_role not in ('admin', 'projectOwner'):
-            _usrs = [u for u in self.users if self.schema['ownerProjectManagerId'] == u.id]
+            _usrs = [pm for pm in self.project_managers if self.schema['ownerProjectManagerId'] == pm.id]
             if _usrs:
-                return _usrs.pop()
+                return _usrs.pop().user
         return User(self.endpoints.getUser(self.schema['ownerProjectManagerId'])['item'], self.session)
 
     @property
@@ -262,7 +262,7 @@ class Project(PlankaModel[schemas.Project]):
         """Remove a ProjectManager from the Project"""
         if isinstance(project_manager, User):
             # Get the ProjectManager object for the User
-            for pm in self.managers:
+            for pm in self.project_managers:
                 if pm.user == project_manager:
                     project_manager = pm
                     break
