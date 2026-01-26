@@ -54,7 +54,18 @@ class PlankaModel[Schema: Mapping[str, Any]]:
         return int(self.id)
 
     def __getitem__(self, key: str) -> Any:
+        # Allow direct access to model schema cache
         return self.schema[key]
+
+    def __setitem__(self, key: Any, val: Any) -> Any:
+        # Don't allow writes to the cached values
+        raise TypeError(
+            f'Model attributes are read only. '
+            'To update use associated property'
+        )
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({getattr(self, 'name', getattr(self, 'id', 'Unknown'))})"
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.schema})'          
