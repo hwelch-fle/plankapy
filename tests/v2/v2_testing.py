@@ -10,8 +10,7 @@ USER = 'chef@demo.com'
 PASS = 'DemoPass123!'
 KEY = 'G3EqlGi7_Qk5IS567PBIsz3ohkBQKNX2AxuaqkLGz'
 
-client = Client(base_url=URL)
-planka = Planka(client=client)
+planka = Planka(URL)
 
 # Will log a warning if used
 #planka.logon(username=USER, password=PASS)
