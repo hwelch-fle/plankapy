@@ -28,6 +28,11 @@ class Board(PlankaModel[schemas.Board]):
     def url(self) -> str:
         return str(self.client.base_url.join(f'/boards/{self.id}'))
     
+    @property
+    def formal_name(self) -> str:
+        """Get the formal name of the board in the format `{Project}->{Board}`"""
+        return f'{self.project.name}->{self.name}'
+    
     # Included objects
     @property
     def _included(self):
@@ -433,23 +438,25 @@ class Board(PlankaModel[schemas.Board]):
         """
         return [self.add_viewer(user, can_comment=can_comment) for user in users]
 
-    def remove_user(self, user: User) -> None:
+    def remove_user(self, user: User) -> User | None:
         """Remove a User from the Board
         
         Note:
-            If the User is not a member, no change will be made
+            If the User is not a member, no change will be made and None will be returned
         """
-        if user in self.users:
-            [bm for bm in self.board_memberships if bm.user == user].pop().delete()
+        if (membership := self.board_memberships[{'userId': user.id}].dpop()):
+            membership.delete()
+            return user
     
-    def remove_users(self, users: Sequence[User]) -> None:
+    @model_list
+    def remove_users(self, users: Sequence[User]) -> list[User]:
         """Remove Users from the Board
         
         Note:
-            If a User is not a member, no change will be made
+            If a User is not a member, no change will be made and they will 
+            be excluded from the returned user list
         """
-        for user in users:
-            self.remove_user(user)
+        return [removed for u in users if (removed := self.remove_user(u))]
 
 
 from .attachment import Attachment
