@@ -492,7 +492,7 @@ class PlankaEndpoints:
             position (int): Position of the board within the project
             name (str): Name/title of the board
             importType (Literal['trello']): Type of import
-            importFile (str): Import file
+            importFile (bytes): Import file
             requestId (str): Request ID for tracking
 
         Note:
@@ -509,7 +509,13 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        resp = self.client.post("api/projects/{projectId}/boards".format(**args), json=kwargs)
+        if imp_file := kwargs.pop('importFile', None):
+            resp = self.client.post(
+                "api/projects/{projectId}/boards".format(**args), 
+                files={'file': (f'import', imp_file, None)}, 
+                data=kwargs)
+        else:
+            resp = self.client.post("api/projects/{projectId}/boards".format(**args), json=kwargs)
         raise_planka_err(resp)
         return resp.json()
 
