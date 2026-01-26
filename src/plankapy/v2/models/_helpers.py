@@ -3,7 +3,7 @@ Helper objects for implemented model classes
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from collections.abc import Sequence, Callable, Mapping
 from functools import wraps
 from typing import (
@@ -79,9 +79,11 @@ def match[M: PlankaModel[Any]](item: M, pred: Callable[[M], bool] | M) -> bool:
     return item == pred
 
 
-type FilterFunc[T] = Callable[[T], bool]
-type KeyFilter[T] = dict[str, Callable[[T], bool]]
+# Type declarations for the filter indexing options available to a ModelList
+type FilterFunc[M, *P] = Callable[[M,*P], bool]
+type KeyFilter[T, *P] = dict[str, Callable[[T, *P], bool]]
 type Id = str
+type ModelListIndexable[T, M] = SupportsIndex | slice | KeyFilter[T] | dict[str, Any] | Id | FilterFunc[M] | M
 
 class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
     @overload
@@ -100,7 +102,10 @@ class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
     @overload
     def __getitem__(self, key: FilterFunc[M]) -> ModelList[M]: ...
     """Filter the list using a functional filter"""
-    def __getitem__[T](self, key: SupportsIndex | slice | KeyFilter[T] | dict[str, Any] | Id | FilterFunc[M]) -> M | ModelList[M]:
+    @overload
+    def __getitem__(self, key: M) -> ModelList[M]: ...
+    """Allow getting all models in the ModelList that match the input model"""
+    def __getitem__[T](self, key: ModelListIndexable[T, M]) -> M | ModelList[M]:
         match key:
             case SupportsIndex():
                 return super().__getitem__(key)
@@ -114,8 +119,10 @@ class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
                     if key.keys() <= i.schema.keys()
                     and all(match(i.schema[k], key[k]) for k in key)
                 )
-            case func if callable(key):
-                return ModelList(i for i in self if func(i))
+            case PlankaModel():
+                return ModelList(i for i in self if i == key)
+            case Callable():
+                return ModelList(i for i in self if key(i))
             case _:
                 raise ValueError(f'{type(key)} not supported for indexing')
 
@@ -131,7 +138,7 @@ class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
     @overload
     def extract(self, *keys: str) -> list[tuple[Any, ...]]: ...
     def extract(self, *keys: str) -> list[tuple[Any, ...] | Any]:
-        """Extract values from the items in the QueryList
+        """Extract values from the items in the ModelList
         
         Args:
             keys: The schema key to extract
@@ -143,28 +150,21 @@ class ModelList[M: PlankaModel[Mapping[str, Any]]](list[M]):
     def ids(self) -> list[str]:
         """A list of model ids"""
         return [i.id for i in self]
+    
+    def format(self, func: Callable[[M], str]) -> list[str]:
+        """Apply a format function to all items in the ModelList
+        
+        Args:
+            func: A function that takes a model and returns a string
+        """
+        return [func(i) for i in self]
+    
 
 P = ParamSpec('P')
 T = TypeVar('T', bound=PlankaModel[Any])
 def queryable(func: Callable[P, list[T]]) -> Callable[P, ModelList[T]]:
-    """Wrapper that turns a list property into a QueryList"""
+    """Wrapper that turns a list property into a ModelList"""
     @wraps(func)
     def _wrapper(*args: Any, **kwargs: Any) -> ModelList[T]:
         return ModelList(func(*args, **kwargs))
     return _wrapper
-
-
-# QueryList filters
-
-class HasDueDate(Protocol):
-    @property
-    def due_date(self) -> datetime | None: ...
-    
-def due_in(hours: float=0, days: float=0, weeks: float=0):
-    """Decorated function for use with """
-    def _inner(m: HasDueDate):
-        if not m.due_date:
-            return False
-        by = timedelta(days=days, hours=hours, weeks=weeks)
-        return (m.due_date - by) <= datetime.now(tz=timezone.utc)
-    return _inner
