@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import uuid4
 from mimetypes import guess_type
 from io import BytesIO
-from . import __version__ # Used for User-Agent header
+from .. import __version__ # Used for User-Agent header
 
 from typing import (
     Optional, 
