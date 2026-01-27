@@ -462,8 +462,8 @@ class Board(PlankaModel[schemas.Board]):
     def filter(self, 
                *,
                search: str|None=None,
-               users: list[User]|None=None,
-               labels: list[Label]|None=None,
+               users: User|Sequence[User]|None=None,
+               labels: Label|Sequence[Label]|None=None,
                card_before: Card|None=None,
                changed_before: datetime|None=None) -> list[Card]:
         """Apply a card filter to the board (apply the filter to all lists and agregate the cards)

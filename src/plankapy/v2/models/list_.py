@@ -13,7 +13,7 @@ from ._literals import ListColors
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from typing import Unpack, Literal, Any
     #from models import *
     from ._literals import UserListType, ListColor, CardType
@@ -274,8 +274,8 @@ class List(PlankaModel[schemas.List]):
     def filter(self, 
                *,
                search: str|None=None,
-               users: User|list[User]|None=None,
-               labels: Label|list[Label]|None=None,
+               users: User|Sequence[User]|None=None,
+               labels: Label|Sequence[Label]|None=None,
                card_before: Card|None=None,
                changed_before: datetime|None=None) -> list[Card]:
         """Apply a filter to the list
