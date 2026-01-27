@@ -274,8 +274,8 @@ class List(PlankaModel[schemas.List]):
     def filter(self, 
                *,
                search: str|None=None,
-               users: list[User]|None=None,
-               labels: list[Label]|None=None,
+               users: User|list[User]|None=None,
+               labels: Label|list[Label]|None=None,
                card_before: Card|None=None,
                changed_before: datetime|None=None) -> list[Card]:
         """Apply a filter to the list
@@ -292,8 +292,12 @@ class List(PlankaModel[schemas.List]):
         if search:
             kwargs['search'] = search
         if users:
+            if isinstance(users, User):
+                users = [users]
             kwargs['filterUserIds'] = ','.join(u.id for u in users)
         if labels:
+            if isinstance(labels, Label):
+                labels = [labels]
             kwargs['filterLabelIds '] = ','.join(l.id for l in labels)
         if card_before or changed_before:
             kwargs['before'] = {}
