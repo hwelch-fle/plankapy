@@ -13,7 +13,8 @@ from ._literals import ListColors
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from typing import Unpack, Literal, Any, Callable
+    from collections.abc import Callable
+    from typing import Unpack, Literal, Any
     #from models import *
     from ._literals import UserListType, ListColor, CardType
 
