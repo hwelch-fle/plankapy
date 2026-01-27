@@ -473,7 +473,7 @@ class Board(PlankaModel[schemas.Board]):
             users: A list of Users to filter the cards by
             labels: A list of Labels to filter the cards by
             card_before: Limit filter to only cards before this card
-            changed_before: A time filter that filters on `last_changed`
+            changed_before: A time filter that filters on `list_changed_at`
         """
         return [
             card
