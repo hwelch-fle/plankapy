@@ -458,6 +458,34 @@ class Board(PlankaModel[schemas.Board]):
         """
         return [removed for u in users if (removed := self.remove_user(u))]
 
+    @model_list
+    def filter(self, 
+               *,
+               search: str|None=None,
+               users: list[User]|None=None,
+               labels: list[Label]|None=None,
+               card_before: Card|None=None,
+               changed_before: datetime|None=None) -> list[Card]:
+        """Apply a card filter to the board (apply the filter to all lists and agregate the cards)
+        
+        Args:
+            search: A search term to apply to the cards
+            users: A list of Users to filter the cards by
+            labels: A list of Labels to filter the cards by
+            card_before: Limit filter to only cards before this card
+            changed_before: A time filter that filters on `last_changed`
+        """
+        return [
+            card
+            for l in self.lists
+            for card in l.filter(
+                search=search, 
+                users=users, 
+                labels=labels, 
+                card_before=card_before, 
+                changed_before=changed_before
+            ) 
+        ]
 
 from .attachment import Attachment
 from .board_membership import BoardMembership
