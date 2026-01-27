@@ -271,37 +271,44 @@ class List(PlankaModel[schemas.List]):
         return cards
 
     @model_list
-    def filter(self, **kwargs: Unpack[paths.Request_getCards]) -> list[Card]:
-        """Apply a filter to the list"""
-        return [Card(c, self.session) for c in self.endpoints.getCards(self.id, **kwargs)['items']]
-
-    @model_list
-    def filter_term(self, term: str) -> list[Card]:
-        """Get cards in the list using a search filter
+    def filter(self, 
+               *,
+               search: str|None=None,
+               users: list[User]|None=None,
+               labels: list[Label]|None=None,
+               card_before: Card|None=None,
+               changed_before: datetime|None=None) -> list[Card]:
+        """Apply a filter to the list
         
         Args:
-            term: The search term to apply to the list
+            search: A search term to apply to the cards
+            users: A list of Users to filter the cards by
+            labels: A list of Labels to filter the cards by
+            card_before: Limit filter to only cards before this card
+            changed_before: A time filter that filters on `last_changed`
         """
-        return self.filter(search=term)
-    
-    @model_list
-    def filter_users(self, *users: User) -> list[Card]:
-        """Get all cards in a list with chosen members
         
-        Args:
-            users: Varargs of Users to filter on
-        """
-        return self.filter(filterUserIds=','.join(u.id for u in users))
-        
-    @model_list
-    def filter_labels(self, *labels: Label) -> list[Card]:
-        """Get all cards in a list with chosen members
-        
-        Args:
-            users: Varargs of Users to filter on
-        """
-        return self.filter(filterLabelIds=','.join(l.id for l in labels))
-        
+        kwargs: dict[str, Any] = {}
+        if search:
+            kwargs['search'] = search
+        if users:
+            kwargs['filterUserIds'] = ','.join(u.id for u in users)
+        if labels:
+            kwargs['filterLabelIds '] = ','.join(l.id for l in labels)
+        if card_before or changed_before:
+            kwargs['before'] = {}
+        if card_before:
+            kwargs['before']['id'] = card_before.id
+        if changed_before:
+            kwargs['before']['listChangedAt'] = dttoiso(changed_before, default_timezone=self.session.timezone)
+            
+        return [
+            Card(c, self.session) 
+            for c in self.endpoints.getCards(
+                self.id, 
+                **kwargs,
+            )['items']
+        ]
     
         
 from .attachment import Attachment
