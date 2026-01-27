@@ -1,7 +1,5 @@
 """Pythonic wrapper for Plankanban API"""
 
-__version__ = "2.2.2"
-
 # flake8: noqa 
 # imports elevate these objects to the root module
 

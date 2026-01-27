@@ -1,8 +1,22 @@
+"""
+A Python Interface for Planka
+"""
+
+__version__ = "2.3.0"
+__author__ = "Hayden Welch"
+
+# Allow accessing the v1 interface from root mod
+# this will be depricated after next major version bump
 from .v1 import (
     Planka as Planka, 
     PasswordAuth as PasswordAuth
 )
 from warnings import warn
+
+from . import (
+    v1 as v1,
+    v2 as v2
+)
 
 def warn_version(func):
     def inner(*args, **kwargs):
