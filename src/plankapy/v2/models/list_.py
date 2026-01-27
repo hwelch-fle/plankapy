@@ -269,6 +269,40 @@ class List(PlankaModel[schemas.List]):
             card.position = pos*POSITION_GAP
         return cards
 
+    @model_list
+    def filter(self, **kwargs: Unpack[paths.Request_getCards]) -> list[Card]:
+        """Apply a filter to the list"""
+        return [Card(c, self.session) for c in self.endpoints.getCards(self.id, **kwargs)['items']]
+
+    @model_list
+    def filter_term(self, term: str) -> list[Card]:
+        """Get cards in the list using a search filter
+        
+        Args:
+            term: The search term to apply to the list
+        """
+        return self.filter(search=term)
+    
+    @model_list
+    def filter_users(self, *users: User) -> list[Card]:
+        """Get all cards in a list with chosen members
+        
+        Args:
+            users: Varargs of Users to filter on
+        """
+        return self.filter(filterUserIds=','.join(u.id for u in users))
+        
+    @model_list
+    def filter_labels(self, *labels: Label) -> list[Card]:
+        """Get all cards in a list with chosen members
+        
+        Args:
+            users: Varargs of Users to filter on
+        """
+        return self.filter(filterLabelIds=','.join(l.id for l in labels))
+        
+    
+        
 from .attachment import Attachment
 from .board import Board
 from .card import Card
@@ -277,6 +311,7 @@ from .card_membership import CardMembership
 from .custom_field import CustomField
 from .custom_field_group import CustomFieldGroup
 from .custom_field_value import CustomFieldValue
+from .label import Label
 from .task import Task
 from .task_list import TaskList
 from .user import User
