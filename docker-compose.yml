@@ -1,0 +1,3 @@
+# TODO: Publish container and allow runnng scripts.
+# End goal is to have a dispatch server that listens 
+# for webhooks then runs scripts in the `scripts` directory
