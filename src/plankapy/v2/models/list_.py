@@ -294,11 +294,11 @@ class List(PlankaModel[schemas.List]):
         if users:
             if isinstance(users, User):
                 users = [users]
-            kwargs['filterUserIds'] = ','.join(u.id for u in users)
+            kwargs['userIds'] = ','.join(u.id for u in users)
         if labels:
             if isinstance(labels, Label):
                 labels = [labels]
-            kwargs['filterLabelIds '] = ','.join(l.id for l in labels)
+            kwargs['labelIds '] = ','.join(l.id for l in labels)
         if card_before or changed_before:
             kwargs['before'] = {}
         if card_before:
