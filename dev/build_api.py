@@ -302,37 +302,33 @@ def yield_paths() -> Generator[str]:
                     yield f"\t\t\t{e.get('$ref', 'Error').split('/')[-1]}: {int(e_code)} " + e.get('description', '')
                     
             yield '\t\t"""'
-            yield "\t\targs = locals().copy()"
-            yield "\t\targs.pop('self')"
             if not body and not optional_params:
                 if '{' in r:
-                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args))'
+                    yield f'\t\tresp = self.client.{typ}(f"api{r}")'
                 else:
                     yield f'\t\tresp = self.client.{typ}("api{r}")'
             elif body and not optional_params:
-                yield f"\t\tkwargs = args.pop('kwargs')"
                 if '{' in r:
-                    yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), json=kwargs)'
+                    yield f'\t\tresp = self.client.{typ}(f"api{r}", json=kwargs)'
                 else:
                     yield f'\t\tresp = self.client.{typ}("api{r}", json=kwargs)'
             elif optional_params or body:
-                yield f"\t\tkwargs = args.pop('kwargs')"
                 if optional_params:
                     yield f'\t\tvalid_params = {tuple([p['name'] for p in optional_params])}'
                     yield f'\t\tpassed_params = ''{k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}'
                 if optional_params and body:
                     if '{' in r:
-                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params, json=kwargs)'
+                        yield f'\t\tresp = self.client.{typ}(f"api{r}", params=passed_params, json=kwargs)'
                     else:
                         yield f'\t\tresp = self.client.{typ}("api{r}", params=passed_params, json=kwargs)'
                 elif optional_params:
                     if '{' in r:
-                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), params=passed_params)'
+                        yield f'\t\tresp = self.client.{typ}(f"api{r}", params=passed_params)'
                     else:
                         yield f'\t\tresp = self.client.{typ}("api{r}", params=passed_params)'
                 elif body:
                     if '{' in r:
-                        yield f'\t\tresp = self.client.{typ}("api{r}".format(**args), json=kwargs)'
+                        yield f'\t\tresp = self.client.{typ}(f"api{r}", json=kwargs)'
                     else:
                         yield f'\t\tresp = self.client.{typ}("api{r}", json=kwargs)'
             
@@ -479,12 +475,12 @@ def yield_schema() -> Generator[str]:
     yield '    """The number of seconds that the stopwatch has been running"""'
 
 
-INIT_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '), yield_init())))
-SCHEMA_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_schema())))
+#INIT_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '), yield_init())))
+#SCHEMA_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_schema())))
 PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_paths())))
 ASYNC_PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_async_paths())))
-ERRORS_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_errors())))
-TYP_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_types())))
+#ERRORS_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_errors())))
+#TYP_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_types())))
 # Delete the file after it is used
 # this ensures that the api typing module
 # is always up to date

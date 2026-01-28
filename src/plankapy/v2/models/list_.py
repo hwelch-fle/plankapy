@@ -13,7 +13,8 @@ from ._literals import ListColors
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from typing import Unpack, Literal, Any, Callable
+    from collections.abc import Callable, Sequence
+    from typing import Unpack, Literal, Any
     #from models import *
     from ._literals import UserListType, ListColor, CardType
 
@@ -269,6 +270,51 @@ class List(PlankaModel[schemas.List]):
             card.position = pos*POSITION_GAP
         return cards
 
+    @model_list
+    def filter(self, 
+               *,
+               search: str|None=None,
+               users: User|Sequence[User]|None=None,
+               labels: Label|Sequence[Label]|None=None,
+               card_before: Card|None=None,
+               changed_before: datetime|None=None) -> list[Card]:
+        """Apply a filter to the list
+        
+        Args:
+            search: A search term to apply to the cards
+            users: A list of Users to filter the cards by
+            labels: A list of Labels to filter the cards by
+            card_before: Limit filter to only cards before this card
+            changed_before: A time filter that filters on `list_changed_at`
+        """
+        
+        kwargs: dict[str, Any] = {}
+        if search:
+            kwargs['search'] = search
+        if users:
+            if isinstance(users, User):
+                users = [users]
+            kwargs['userIds'] = ','.join(u.id for u in users)
+        if labels:
+            if isinstance(labels, Label):
+                labels = [labels]
+            kwargs['labelIds '] = ','.join(l.id for l in labels)
+        if card_before or changed_before:
+            kwargs['before'] = {}
+        if card_before:
+            kwargs['before']['id'] = card_before.id
+        if changed_before:
+            kwargs['before']['listChangedAt'] = dttoiso(changed_before, default_timezone=self.session.timezone)
+            
+        return [
+            Card(c, self.session) 
+            for c in self.endpoints.getCards(
+                self.id, 
+                **kwargs,
+            )['items']
+        ]
+    
+        
 from .attachment import Attachment
 from .board import Board
 from .card import Card
@@ -277,6 +323,7 @@ from .card_membership import CardMembership
 from .custom_field import CustomField
 from .custom_field_group import CustomFieldGroup
 from .custom_field_value import CustomFieldValue
+from .label import Label
 from .task import Task
 from .task_list import TaskList
 from .user import User

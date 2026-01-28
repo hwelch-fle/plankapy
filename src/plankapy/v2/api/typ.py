@@ -151,9 +151,9 @@ class Request_getCards(TypedDict):
     """Pagination cursor (JSON object with id and listChangedAt)"""
     search: NotRequired[str]
     """Search term to filter cards"""
-    filterUserIds: NotRequired[str]
+    userIds: NotRequired[str]
     """Comma-separated user IDs to filter by members"""
-    filterLabelIds: NotRequired[str]
+    labelIds: NotRequired[str]
     """Comma-separated label IDs to filter by labels"""
 
 class Request_updateCard(TypedDict):
