@@ -177,7 +177,7 @@ class PlankaEndpoints:
             cardId (str): ID of the card to create the attachment on)
             mime_type (str | None): Optional mime type for file uploads
             type (Literal['file', 'link']): Type of the attachment
-            file (str): File to upload
+            file (bytes): File to upload
             url (str): URL for the link attachment
             name (str): Name/title of the attachment
             requestId (str): Request ID for tracking
@@ -260,7 +260,7 @@ class PlankaEndpoints:
         Args:
             projectId (str): ID of the project to upload background image for)
             mime_type (str | None): Optional mime type for the file upload
-            file (str): Background image file (must be an image format)
+            file (bytes): Background image file (must be an image format)
             requestId (str): Request ID for tracking
 
         Note:
@@ -442,7 +442,7 @@ class PlankaEndpoints:
             position (int): Position of the board within the project
             name (str): Name/title of the board
             importType (Literal['trello']): Type of import
-            importFile (str): Import file
+            importFile (bytes): Import file
             requestId (str): Request ID for tracking
 
         Note:
@@ -2031,7 +2031,7 @@ class PlankaEndpoints:
 
         Args:
             id (str): ID of the user whose avatar to update)
-            file (str): Avatar image file (must be an image format)
+            file (bytes): Avatar image file (must be an image format)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
