@@ -39,9 +39,6 @@ class AsyncPlankaEndpoints:
             Error: 401 Invalid pending token
             Error: 403 Authentication restriction
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         resp = await self.client.post("api/access-tokens/accept-terms", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
@@ -64,9 +61,6 @@ class AsyncPlankaEndpoints:
             Error: 401 Invalid credentials
             Error: 403 Authentication restriction
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         resp = await self.client.post("api/access-tokens", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
@@ -82,8 +76,6 @@ class AsyncPlankaEndpoints:
         Raises:
             Unauthorized: 401 
         """
-        args = locals().copy()
-        args.pop('self')
         resp = await self.client.delete("api/access-tokens/me")
         await raise_planka_err(resp)
         return resp.json()
@@ -109,9 +101,6 @@ class AsyncPlankaEndpoints:
             Error: 422 Missing required values
             Error: 500 OIDC configuration error
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         resp = await self.client.post("api/access-tokens/exchange-with-oidc", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
@@ -131,9 +120,6 @@ class AsyncPlankaEndpoints:
             ValidationError: 400 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         resp = await self.client.post("api/access-tokens/revoke-pending-token", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
@@ -155,12 +141,9 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get("api/boards/{boardId}/actions".format(**args), params=passed_params)
+        resp = await self.client.get(f"api/boards/{boardId}/actions", params=passed_params)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -181,12 +164,9 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get("api/cards/{cardId}/actions".format(**args), params=passed_params)
+        resp = await self.client.get(f"api/cards/{cardId}/actions", params=passed_params)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -213,10 +193,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Error: 422 Upload or validation error
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/attachments".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/cards/{cardId}/attachments", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -237,9 +214,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/attachments/{id}".format(**args))
+        resp = await self.client.delete(f"api/attachments/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -261,10 +236,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/attachments/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/attachments/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -288,10 +260,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Error: 422 File upload error
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/background-images".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/projects/{projectId}/background-images", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -312,9 +281,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/background-images/{id}".format(**args))
+        resp = await self.client.delete(f"api/background-images/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -336,10 +303,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/base-custom-field-groups".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/projects/{projectId}/base-custom-field-groups", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -360,9 +324,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/base-custom-field-groups/{id}".format(**args))
+        resp = await self.client.delete(f"api/base-custom-field-groups/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -384,10 +346,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/base-custom-field-groups/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/base-custom-field-groups/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -412,10 +371,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/board-memberships".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/boards/{boardId}/board-memberships", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -435,9 +391,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/board-memberships/{id}".format(**args))
+        resp = await self.client.delete(f"api/board-memberships/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -459,10 +413,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/board-memberships/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/board-memberships/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -488,10 +439,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Error: 422 Import file upload error
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/boards".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/projects/{projectId}/boards", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -511,9 +459,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/boards/{id}".format(**args))
+        resp = await self.client.delete(f"api/boards/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -534,12 +480,9 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get("api/boards/{id}".format(**args), params=passed_params)
+        resp = await self.client.get(f"api/boards/{id}", params=passed_params)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -567,10 +510,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/boards/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/boards/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -593,10 +533,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/card-labels".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/cards/{cardId}/card-labels", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -618,9 +555,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/cards/{cardId}/card-labels/labelId:{labelId}".format(**args))
+        resp = await self.client.delete(f"api/cards/{cardId}/card-labels/labelId:{labelId}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -643,10 +578,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/card-memberships".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/cards/{cardId}/card-memberships", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -668,9 +600,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/cards/{cardId}/card-memberships/userId:{userId}".format(**args))
+        resp = await self.client.delete(f"api/cards/{cardId}/card-memberships/userId:{userId}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -699,10 +629,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/lists/{listId}/cards".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/lists/{listId}/cards", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -726,12 +653,9 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         valid_params = ('before', 'search', 'filterUserIds', 'filterLabelIds')
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get("api/lists/{listId}/cards".format(**args), params=passed_params)
+        resp = await self.client.get(f"api/lists/{listId}/cards", params=passed_params)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -752,9 +676,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/cards/{id}".format(**args))
+        resp = await self.client.delete(f"api/cards/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -774,9 +696,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.get("api/cards/{id}".format(**args))
+        resp = await self.client.get(f"api/cards/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -809,10 +729,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/cards/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/cards/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -835,10 +752,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{id}/duplicate".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/cards/{id}/duplicate", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -858,9 +772,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.post("api/cards/{id}/read-notifications".format(**args))
+        resp = await self.client.post(f"api/cards/{id}/read-notifications")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -882,10 +794,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/comments".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/cards/{cardId}/comments", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -906,12 +815,9 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get("api/cards/{cardId}/comments".format(**args), params=passed_params)
+        resp = await self.client.get(f"api/cards/{cardId}/comments", params=passed_params)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -932,9 +838,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/comments/{id}".format(**args))
+        resp = await self.client.delete(f"api/comments/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -956,18 +860,13 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/comments/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/comments/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
     async def getConfig(self) -> Response_getConfig:
         """Retrieves the application configuration.
         """
-        args = locals().copy()
-        args.pop('self')
         resp = await self.client.get("api/config")
         await raise_planka_err(resp)
         return resp.json()
@@ -993,10 +892,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/custom-field-groups".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/boards/{boardId}/custom-field-groups", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1021,10 +917,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/custom-field-groups".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/cards/{cardId}/custom-field-groups", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1045,9 +938,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/custom-field-groups/{id}".format(**args))
+        resp = await self.client.delete(f"api/custom-field-groups/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1067,9 +958,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.get("api/custom-field-groups/{id}".format(**args))
+        resp = await self.client.get(f"api/custom-field-groups/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1093,10 +982,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/custom-field-groups/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/custom-field-groups/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1120,10 +1006,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1146,9 +1029,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}".format(**args))
+        resp = await self.client.delete(f"api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1171,10 +1052,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1198,10 +1076,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/custom-field-groups/{customFieldGroupId}/custom-fields".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/custom-field-groups/{customFieldGroupId}/custom-fields", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1222,9 +1097,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/custom-fields/{id}".format(**args))
+        resp = await self.client.delete(f"api/custom-fields/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1248,10 +1121,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/custom-fields/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/custom-fields/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1275,10 +1145,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/labels".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/boards/{boardId}/labels", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1299,9 +1166,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/labels/{id}".format(**args))
+        resp = await self.client.delete(f"api/labels/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1325,10 +1190,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/labels/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/labels/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1349,9 +1211,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.post("api/lists/{id}/clear".format(**args))
+        resp = await self.client.post(f"api/lists/{id}/clear")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1375,10 +1235,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/lists".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/boards/{boardId}/lists", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1399,9 +1256,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/lists/{id}".format(**args))
+        resp = await self.client.delete(f"api/lists/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1421,9 +1276,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.get("api/lists/{id}".format(**args))
+        resp = await self.client.get(f"api/lists/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1449,10 +1302,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/lists/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/lists/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1474,10 +1324,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/lists/{id}/move-cards".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/lists/{id}/move-cards", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1501,10 +1348,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/lists/{id}/sort".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/lists/{id}/sort", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1527,10 +1371,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/boards/{boardId}/notification-services".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/boards/{boardId}/notification-services", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1553,10 +1394,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/users/{userId}/notification-services".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/users/{userId}/notification-services", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1576,9 +1414,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/notification-services/{id}".format(**args))
+        resp = await self.client.delete(f"api/notification-services/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1600,10 +1436,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/notification-services/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/notification-services/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1623,9 +1456,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.post("api/notification-services/{id}/test".format(**args))
+        resp = await self.client.post(f"api/notification-services/{id}/test")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1641,8 +1472,6 @@ class AsyncPlankaEndpoints:
             ValidationError: 400 
             Unauthorized: 401 
         """
-        args = locals().copy()
-        args.pop('self')
         resp = await self.client.get("api/notifications")
         await raise_planka_err(resp)
         return resp.json()
@@ -1659,8 +1488,6 @@ class AsyncPlankaEndpoints:
             ValidationError: 400 
             Unauthorized: 401 
         """
-        args = locals().copy()
-        args.pop('self')
         resp = await self.client.post("api/notifications/read-all")
         await raise_planka_err(resp)
         return resp.json()
@@ -1681,9 +1508,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.get("api/notifications/{id}".format(**args))
+        resp = await self.client.get(f"api/notifications/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1704,10 +1529,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/notifications/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/notifications/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1731,10 +1553,7 @@ class AsyncPlankaEndpoints:
             Conflict: 409 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/projects/{projectId}/project-managers".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/projects/{projectId}/project-managers", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1756,9 +1575,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/project-managers/{id}".format(**args))
+        resp = await self.client.delete(f"api/project-managers/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1779,9 +1596,6 @@ class AsyncPlankaEndpoints:
             ValidationError: 400 
             Unauthorized: 401 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         resp = await self.client.post("api/projects", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
@@ -1798,8 +1612,6 @@ class AsyncPlankaEndpoints:
             ValidationError: 400 
             Unauthorized: 401 
         """
-        args = locals().copy()
-        args.pop('self')
         resp = await self.client.get("api/projects")
         await raise_planka_err(resp)
         return resp.json()
@@ -1821,9 +1633,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/projects/{id}".format(**args))
+        resp = await self.client.delete(f"api/projects/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1843,9 +1653,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.get("api/projects/{id}".format(**args))
+        resp = await self.client.get(f"api/projects/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1876,10 +1684,7 @@ class AsyncPlankaEndpoints:
             Conflict: 409 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/projects/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/projects/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1904,10 +1709,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/cards/{cardId}/task-lists".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/cards/{cardId}/task-lists", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1928,9 +1730,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/task-lists/{id}".format(**args))
+        resp = await self.client.delete(f"api/task-lists/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1950,9 +1750,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.get("api/task-lists/{id}".format(**args))
+        resp = await self.client.get(f"api/task-lists/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1977,10 +1775,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/task-lists/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/task-lists/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2006,10 +1801,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/task-lists/{taskListId}/tasks".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/task-lists/{taskListId}/tasks", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2030,9 +1822,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/tasks/{id}".format(**args))
+        resp = await self.client.delete(f"api/tasks/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2058,10 +1848,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/tasks/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/tasks/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2082,12 +1869,9 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         valid_params = ('language',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get("api/terms/{type}".format(**args), params=passed_params)
+        resp = await self.client.get(f"api/terms/{type}", params=passed_params)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2118,9 +1902,6 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         resp = await self.client.post("api/users", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
@@ -2138,8 +1919,6 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             Forbidden: 403 
         """
-        args = locals().copy()
-        args.pop('self')
         resp = await self.client.get("api/users")
         await raise_planka_err(resp)
         return resp.json()
@@ -2161,9 +1940,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/users/{id}".format(**args))
+        resp = await self.client.delete(f"api/users/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2184,12 +1961,9 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get("api/users/{id}".format(**args), params=passed_params)
+        resp = await self.client.get(f"api/users/{id}", params=passed_params)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2225,10 +1999,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/users/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2250,10 +2021,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.post("api/users/{id}/avatar".format(**args), json=kwargs)
+        resp = await self.client.post(f"api/users/{id}/avatar", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2277,10 +2045,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}/email".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/users/{id}/email", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2303,10 +2068,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}/password".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/users/{id}/password", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2330,10 +2092,7 @@ class AsyncPlankaEndpoints:
             NotFound: 404 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/users/{id}/username".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/users/{id}/username", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2357,9 +2116,6 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             Conflict: 409 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
         resp = await self.client.post("api/webhooks", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
@@ -2376,8 +2132,6 @@ class AsyncPlankaEndpoints:
             ValidationError: 400 
             Unauthorized: 401 
         """
-        args = locals().copy()
-        args.pop('self')
         resp = await self.client.get("api/webhooks")
         await raise_planka_err(resp)
         return resp.json()
@@ -2398,9 +2152,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        resp = await self.client.delete("api/webhooks/{id}".format(**args))
+        resp = await self.client.delete(f"api/webhooks/{id}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -2425,9 +2177,6 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        args = locals().copy()
-        args.pop('self')
-        kwargs = args.pop('kwargs')
-        resp = await self.client.patch("api/webhooks/{id}".format(**args), json=kwargs)
+        resp = await self.client.patch(f"api/webhooks/{id}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
