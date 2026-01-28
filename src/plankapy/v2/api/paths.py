@@ -737,8 +737,8 @@ class PlankaEndpoints:
             listId (str): ID of the list to get cards from (must be an endless list))
             before (str): Pagination cursor (JSON object with id and listChangedAt)) (optional)
             search (str): Search term to filter cards) (optional)
-            filterUserIds (str): Comma-separated user IDs to filter by members) (optional)
-            filterLabelIds (str): Comma-separated label IDs to filter by labels) (optional)
+            userIds (str): Comma-separated user IDs to filter by members) (optional)
+            labelIds (str): Comma-separated label IDs to filter by labels) (optional)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -753,7 +753,7 @@ class PlankaEndpoints:
         args = locals().copy()
         args.pop('self')
         kwargs = args.pop('kwargs')
-        valid_params = ('before', 'search', 'filterUserIds', 'filterLabelIds')
+        valid_params = ('before', 'search', 'userIds', 'labelIds')
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/lists/{listId}/cards".format(**args), params=passed_params)
         raise_planka_err(resp)
