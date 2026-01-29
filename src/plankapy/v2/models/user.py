@@ -14,7 +14,7 @@ from ..api import schemas, paths, events
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Any, Unpack
-    from models import *
+    #from models import *
     from ._literals import (
         UserRole, 
         EditorMode, 
