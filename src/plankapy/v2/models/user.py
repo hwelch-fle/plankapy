@@ -59,7 +59,7 @@ class User(PlankaModel[schemas.User]):
     @property
     def role(self):
         """User role defining access permissions"""
-        return self.schema['role']
+        return self.schema.get('role', 'boardUser')
     @role.setter
     def role(self, role: UserRole) -> None:
         """Set the User role"""
@@ -78,10 +78,6 @@ class User(PlankaModel[schemas.User]):
     def username(self) -> str:
         """Unique username for user identification"""
         return self.schema['username']
-    @name.setter
-    def name(self, name: str) -> None:
-        """Set the User's username"""
-        self.update(name=name)
 
     @property
     def avatar(self) -> dict[str, Any]:
