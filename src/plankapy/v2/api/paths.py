@@ -2026,11 +2026,12 @@ class PlankaEndpoints:
         raise_planka_err(resp)
         return resp.json()
 
-    def updateUserAvatar(self, id: str, **kwargs: Unpack[Request_updateUserAvatar]) -> Response_updateUserAvatar:
+    def updateUserAvatar(self, id: str, mime_type: str | None=None ,**kwargs: Unpack[Request_updateUserAvatar]) -> Response_updateUserAvatar:
         """Updates a user's avatar image. Users can update their own avatar, admins can update any user's avatar.
 
         Args:
             id (str): ID of the user whose avatar to update)
+            mime_type (str): Optional mime type for file upload
             file (bytes): Avatar image file (must be an image format)
 
         Note:
@@ -2044,9 +2045,12 @@ class PlankaEndpoints:
             NotFound: 404 
             UnprocessableEntity: 422 
         """
-        resp = self.client.post(f"api/users/{id}/avatar", json=kwargs)
+        resp = self.client.post(f"api/users/{id}/avatar", 
+            files={'file': ('avatar', kwargs['file'], mime_type)}, 
+        )
         raise_planka_err(resp)
         return resp.json()
+
 
     def updateUserEmail(self, id: str, **kwargs: Unpack[Request_updateUserEmail]) -> Response_updateUserEmail:
         """Updates a user's email address. Users must provide current password when updating their own email. Admins can update any user's email without a password.
