@@ -1,76 +1,76 @@
-from typing import Literal
+from typing import Literal, get_args
 
 ActionEvent = Literal['actionCreate']
-ActionEvents: tuple[ActionEvent] = ('actionCreate', )
+ActionEvents: tuple[ActionEvent, ...] = get_args(ActionEvent)
 
 AttachmentEvent = Literal['attachmentCreate', 'attachmentUpdate', 'attachmentDelete'] 
-AttachmentEvents: tuple[AttachmentEvent] = AttachmentEvent.__args__
+AttachmentEvents: tuple[AttachmentEvent, ...] = get_args(AttachmentEvent)
 
 BackgroundImageEvent = Literal['backgroundImageCreate', 'backgroundImageDelete'] 
-BackgroundImageEvents: tuple[BackgroundImageEvent] = BackgroundImageEvent.__args__
+BackgroundImageEvents: tuple[BackgroundImageEvent, ...] = get_args(BackgroundImageEvent)
 
 BaseCustomFieldGroupEvent = Literal['baseCustomFieldGroupCreate', 'baseCustomFieldGroupUpdate', 'baseCustomFieldGroupDelete'] 
-BaseCustomFieldGroupEvents: tuple[BaseCustomFieldGroupEvent] = BaseCustomFieldGroupEvent.__args__
+BaseCustomFieldGroupEvents: tuple[BaseCustomFieldGroupEvent, ...] = get_args(BaseCustomFieldGroupEvent)
 
 BoardEvent = Literal['boardCreate', 'boardUpdate', 'boardDelete']
-BoardEvents: tuple[BoardEvent] = BoardEvent.__args__
+BoardEvents: tuple[BoardEvent, ...] = get_args(BoardEvent)
 
 BoardMembershipEvent = Literal['boardMembershipCreate', 'boardMembershipUpdate', 'boardMembershipDelete'] 
-BoardMembershipEvents: tuple[BoardMembershipEvent] = BoardMembershipEvent.__args__
+BoardMembershipEvents: tuple[BoardMembershipEvent, ...] = get_args(BoardMembershipEvent)
 
 CardEvent = Literal['cardCreate', 'cardUpdate', 'cardDelete'] 
-CardEvents: tuple[CardEvent] = CardEvent.__args__
+CardEvents: tuple[CardEvent, ...] = get_args(CardEvent)
 
 CardLabelEvent = Literal['cardLabelCreate', 'cardLabelDelete']
-CardLabelEvents: tuple[CardLabelEvent] = CardLabelEvent.__args__
+CardLabelEvents: tuple[CardLabelEvent, ...] = get_args(CardLabelEvent)
 
 CardMembershipEvent = Literal['cardMembershipCreate', 'cardMembershipDelete'] 
-CardMembershipEvents: tuple[CardMembershipEvent] = CardMembershipEvent.__args__
+CardMembershipEvents: tuple[CardMembershipEvent, ...] = get_args(CardMembershipEvent)
 
 CommentEvent = Literal['commentCreate', 'commentUpdate', 'commentDelete'] 
-CommentEvents: tuple[CommentEvent] = CommentEvent.__args__
+CommentEvents: tuple[CommentEvent, ...] = get_args(CommentEvent)
 
 ConfigEvent = Literal['configUpdate']
-ConfigEvents: tuple[ConfigEvent] = ('configUpdate', )
+ConfigEvents: tuple[ConfigEvent, ...] = get_args(ConfigEvent)
 
 CustomFieldEvent = Literal['customFieldCreate', 'customFieldUpdate', 'customFieldDelete'] 
-CustomFieldEvents: tuple[CustomFieldEvent] = CustomFieldEvent.__args__
+CustomFieldEvents: tuple[CustomFieldEvent, ...] = get_args(CustomFieldEvent)
 
 CustomFieldGroupEvent = Literal['customFieldGroupCreate', 'customFieldGroupUpdate', 'customFieldGroupDelete'] 
-CustomFieldGroupEvents: tuple[CustomFieldGroupEvent] = CustomFieldGroupEvent.__args__ 
+CustomFieldGroupEvents: tuple[CustomFieldGroupEvent, ...] = get_args(CustomFieldGroupEvent) 
 
 CustomFieldValueEvent = Literal['customFieldValueUpdate', 'customFieldValueDelete']
-CustomFieldValueEvents: tuple[CustomFieldValueEvent] = CustomFieldValueEvent.__args__
+CustomFieldValueEvents: tuple[CustomFieldValueEvent, ...] = get_args(CustomFieldValueEvent)
 
 LabelEvent = Literal['labelCreate', 'labelUpdate', 'labelDelete'] 
-LabelEvents: tuple[LabelEvent] = LabelEvent.__args__
+LabelEvents: tuple[LabelEvent, ...] = get_args(LabelEvent)
 
 ListEvent = Literal['listCreate', 'listUpdate', 'listClear', 'listDelete'] 
-ListEvents: tuple[ListEvent] = ListEvent.__args__
+ListEvents: tuple[ListEvent, ...] = get_args(ListEvent)
 
 NotificationEvent = Literal['notificationCreate', 'notificationUpdate'] 
-NotificationEvents: tuple[NotificationEvent] = NotificationEvent.__args__
+NotificationEvents: tuple[NotificationEvent, ...] = get_args(NotificationEvent)
 
 NotificationServiceEvent = Literal['notificationServiceCreate', 'notificationServiceUpdate', 'notificationServiceDelete'] 
-NotificationServiceEvents: tuple[NotificationServiceEvent] = NotificationServiceEvent.__args__
+NotificationServiceEvents: tuple[NotificationServiceEvent, ...] = get_args(NotificationServiceEvent)
 
 ProjectEvent = Literal['projectCreate', 'projectUpdate', 'projectDelete']
-ProjectEvents: tuple[ProjectEvent] = ProjectEvent.__args__
+ProjectEvents: tuple[ProjectEvent, ...] = get_args(ProjectEvent)
 
 ProjectManagerEvent =  Literal['projectManagerCreate', 'projectManagerDelete'] 
-ProjectManagerEvents: tuple[ProjectManagerEvent] = ProjectManagerEvent.__args__
+ProjectManagerEvents: tuple[ProjectManagerEvent, ...] = get_args(ProjectManagerEvent)
 
 TaskEvent = Literal['taskCreate', 'taskUpdate', 'taskDelete'] 
-TaskEvents: tuple[TaskEvent] = TaskEvent.__args__
+TaskEvents: tuple[TaskEvent, ...] = get_args(TaskEvent)
 
 TaskListEvent = Literal['taskListCreate', 'taskListUpdate', 'taskListDelete'] 
-TaskListEvents: tuple[TaskListEvent] = TaskListEvent.__args__
+TaskListEvents: tuple[TaskListEvent, ...] = get_args(TaskListEvent)
 
 UserEvent = Literal['userCreate', 'userUpdate', 'userDelete'] 
-UserEvents: tuple[UserEvent] = UserEvent.__args__
+UserEvents: tuple[UserEvent, ...] = get_args(UserEvent)
 
 WebhookEvent =  Literal['webhookCreate', 'webhookUpdate', 'webhookDelete']
-WebhookEvents: tuple[WebhookEvent] = WebhookEvent.__args__
+WebhookEvents: tuple[WebhookEvent, ...] = get_args(WebhookEvent)
 
 PlankaEvent = (
     ActionEvent | AttachmentEvent | BackgroundImageEvent | BaseCustomFieldGroupEvent |
@@ -80,10 +80,4 @@ PlankaEvent = (
     ProjectEvent | ProjectManagerEvent | TaskEvent | TaskListEvent | UserEvent | WebhookEvent
 )
 
-PlankaEvents: tuple[PlankaEvent, ...] = (
-    ActionEvents + AttachmentEvents +  BackgroundImageEvents + BaseCustomFieldGroupEvents + 
-    BoardEvents + BoardMembershipEvents + CardEvents + CardLabelEvents + CardMembershipEvents + 
-    CommentEvents + ConfigEvents + CustomFieldEvents + CustomFieldGroupEvents + 
-    CustomFieldValueEvents + LabelEvents + ListEvents + NotificationEvents + NotificationServiceEvents + 
-    ProjectEvents + ProjectManagerEvents + TaskEvents + TaskListEvents + UserEvents + WebhookEvents
-)
+PlankaEvents: tuple[PlankaEvent, ...] = tuple(e for et in get_args(PlankaEvent) for e in get_args(et))
