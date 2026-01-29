@@ -44,10 +44,10 @@ No results
 
 from __future__ import annotations
 from functools import cached_property
-from typing import Sequence
+from collections.abc import Sequence
 from datetime import timezone
 
-from httpx import Client, HTTPStatusError
+from httpx import Client, HTTPStatusError, URL
 
 from .api import (
     PlankaEndpoints, 
@@ -116,7 +116,7 @@ class Planka:
     """
 
     def __init__(self, 
-                 base_url: str|None=None, 
+                 base_url: str|URL|None=None, 
                  *, 
                  client: Client|None=None, 
                  timezone: timezone = timezone.utc) -> None:
@@ -149,7 +149,7 @@ class Planka:
         
         # Assigned after login() is called
         self.current_role: UserRole | None = None
-        self.current_id = None
+        self.current_id : str | None = None
     
     def accept_terms(self, pending_token: str, terms_type: TermsType='general', lang: Language='en-US'):
         """If the User has never logged on, or is required to accept new terms, allow them to do so"""
