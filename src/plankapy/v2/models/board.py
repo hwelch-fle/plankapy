@@ -281,14 +281,14 @@ class Board(PlankaModel[schemas.Board]):
                     name: str,
                     type: Literal['active', 'closed']='active',
                     position: Position = 'top',
-                    color: ListColor|None=None) -> List:
+                    color: ListColor|Literal['random']|None=None) -> List:
         """Create a new List on the Board
         
         Args:
             name: Name/title of the List
             type: Type/status of the List
             position: Position of the List within the Board
-            color: An optional color to set the list to
+            color: An optional color to set the list to (`random` to randomize)
         """
         l = List(
             self.endpoints.createList(
