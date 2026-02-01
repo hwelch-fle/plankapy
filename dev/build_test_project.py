@@ -132,6 +132,7 @@ def main():
     planka.login(username='demo', password='demo')
 
     project = create_test_project(planka, test_project_name)
+    project.update_background_image(test_attachments[0])
     users = create_test_users(planka, *test_users)
     boards = create_test_boards(project, *test_boards)
     for board in boards:
@@ -142,7 +143,8 @@ def main():
     cards = create_test_cards(lists, *test_cards)
     for card in cards:
         card.add_label(choice(card.board.labels))
-    attach = create_test_attachments(choices(cards, k=10), *test_attachments)
+        card.add_members(users)
+    attach = create_test_attachments(cards, *test_attachments)
     tasks = create_test_tasks(cards, *test_tasks)
     for task in tasks:
         task.assignee = choice(users)
