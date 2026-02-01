@@ -5,7 +5,7 @@ __all__ = ("PlankaModel", )
 import json
 import copy
 
-from typing import Any, Self
+from typing import Any, Self, Callable
 from collections.abc import Mapping
 
 TYPE_CHECKING = False
@@ -14,10 +14,19 @@ if TYPE_CHECKING:
     from ..interface import Planka
 
 type Diff = dict[str, tuple[Any, Any]]
+type ModelFormatter[M: PlankaModel[Any]] = Callable[[M], str]
+
+DEFAULT_FORMATTER: ModelFormatter[PlankaModel[Any]] = (
+    lambda m: f"{m.__class__.__name__}({getattr(m, 'name', getattr(m, 'id', 'Unknown'))})"
+)
+"""Default Model Formatter: `Model(name/id/'Unknown')`"""
 
 class PlankaModel[Schema: Mapping[str, Any]]:
     """Base Planka object interface"""
     
+    __formatter__: ModelFormatter[Self] = DEFAULT_FORMATTER
+    """Formatter func that allows overriding __str__ behavior for models"""
+
     def __init__(self, schema: Schema, session: Planka) -> None:
         self._schema = schema
         self.session = session
@@ -108,7 +117,7 @@ class PlankaModel[Schema: Mapping[str, Any]]:
         }
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({getattr(self, 'name', getattr(self, 'id', 'Unknown'))})"
+        return self.__class__.__formatter__(self)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.schema})'          
