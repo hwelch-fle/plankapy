@@ -1,10 +1,11 @@
 import sys
-sys.path.append('../../src')
+
+sys.path.append('../src')
 sys.path.append('src')
 
-from random import choices
+from random import choices, choice
 
-from plankapy.v2.models import Project, Board, User, List, Task, Comment, Label, Attachment, Card, CustomField
+from plankapy.v2.models import Project, Board, List, Task, Comment, Label, Attachment, Card, CustomField
 from plankapy.v2 import Planka
 
 def create_test_project(planka: Planka, name: str = 'plankapy Test Project') -> Project:
@@ -64,13 +65,12 @@ def create_test_attachments(cards: list[Card], *attachments: str) -> list[Attach
         for a in attachments
     ]
 
-def create_test_fields(cards: list[Card], *fields: dict[str, list[str]]) -> list[CustomField]:
+def create_test_fields_on_boards(boards: list[Board], *fields: str) -> list[CustomField]:
     return [
-        cf
-        for c in cards
-        for cfg in fields
-        for k, v in cfg.items()
-        for cf in c.add_card_fields(*v, group=k).custom_fields
+        cfg.add_field(f)
+        for b in boards
+        if (cfg := b.create_field_group('Fields'))
+        for f in fields
     ]
 
 def create_test_tasks(cards: list[Card], *tasks: dict[str, list[str]]) -> list[Task]:
@@ -83,7 +83,12 @@ def create_test_tasks(cards: list[Card], *tasks: dict[str, list[str]]) -> list[T
         for v in tl_tasks
     ]
 
-def create_test_comments(users: list[User], cards: list[Card], *comments: str) -> list[Comment]: ...
+def create_test_comments(cards: list[Card], *comments: str) -> list[Comment]:
+    return [
+        card.comment(comment, mentions=card.board.users)
+        for card in cards
+        for comment in comments
+    ]
 
 def main():
     test_project_name = 'plankapy Test Project'
@@ -108,12 +113,9 @@ def main():
         'label 2',
         'label 3',
     ]
-    test_fields = [
-        {'group 1': ['f1', 'f2']},
-        {'group 2': ['f1', 'f2']},
-    ]
+    test_fields = ['f1', 'f2']
     test_cards = [f'Card {i}' for i in range(10)]
-    test_attachments = ['https://random-d.uk/api/randomimg']
+    test_attachments = ['res/readme-autocomplete.png']
     test_tasks = [
         {'tl1': ['t1', 't2']},
         {'tl2': ['t1', 't2']},
@@ -132,13 +134,21 @@ def main():
     project = create_test_project(planka, test_project_name)
     users = create_test_users(planka, *test_users)
     boards = create_test_boards(project, *test_boards)
+    for board in boards:
+        board.add_editors(users)
     labels = create_test_labels(boards, *test_labels)
     lists = create_test_lists(boards, *test_lists)
+    fields = create_test_fields_on_boards(boards, *test_fields)
     cards = create_test_cards(lists, *test_cards)
+    for card in cards:
+        card.add_label(choice(card.board.labels))
     attach = create_test_attachments(choices(cards, k=10), *test_attachments)
-    fields = create_test_fields(cards, *test_fields)
     tasks = create_test_tasks(cards, *test_tasks)
-    #comments = create_test_comments(users, cards, *test_comments)
+    for task in tasks:
+        task.assignee = choice(users)
+    comments = create_test_comments(cards, *['THIS IS A COMMENT', 'MENTION EVERYONE'])
 
 if __name__ == '__main__':
+    #planka = Planka('http://localhost:1337')
+    #planka.login(username='demo', password='demo')
     main()
