@@ -292,6 +292,25 @@ class Card(PlankaModel[schemas.Card]):
         """Read all the current User's Notifications for the Card"""
         return [Notification(n, self.session) for n in self.endpoints.readCardNotifications(self.id)['included']['notifications']]
 
+    def comment(self, comment: str, mentions: Sequence[User]|None=None) -> Comment:
+        """Leave a comment as this user and mention any user included in the mentions list
+        
+        Args:
+            text: The text body of the comment
+            mentions: A sequence of Users that will be mentioned after the body
+        
+        Example:
+            ```python
+                >>> card.comment('Need Fix', mentions=card2.users)
+                # Comment from current user On Card:
+                Need Fix
+                @user1
+                @user2
+            ```
+        """
+        comment = '\n'.join([comment, *[f"@{u.name}" for u in mentions or []]])
+        return Comment(self.endpoints.createComment(self.id, text=comment)['item'], self.session)
+
     def move(self, list: List, position: Position = 'top') -> Card:
         """Move the card to a new list (default to top of new list)"""
         self.update(
