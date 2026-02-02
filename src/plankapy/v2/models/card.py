@@ -292,13 +292,25 @@ class Card(PlankaModel[schemas.Card]):
         """Read all the current User's Notifications for the Card"""
         return [Notification(n, self.session) for n in self.endpoints.readCardNotifications(self.id)['included']['notifications']]
 
-    def comment(self, comment: str, mentions: Sequence[User]|None=None) -> Comment:
+    def comment(self, comment: str, *, mentions: Sequence[User]|None=None) -> Comment:
         """Leave a comment as this user and mention any user included in the mentions list
         
         Args:
-            text: The text body of the comment
+            text: The text body of the comment (`@[name|username|email]` will mention)
             mentions: A sequence of Users that will be mentioned after the body
         
+        Note:
+            If a user is explicitly mentioned in the comment, they will be removed from the 
+            suffix mention. e.g. 
+            ```python
+            >>> card.comment(
+            ...     'Fix this @user1, then send to @user2', 
+            ...     mentions=[user1, user2, user3]
+            ... )
+            '''Fix this @user1, then send to @user2
+            @user3'''
+            ```
+            
         Example:
             ```python
                 >>> card.comment('Need Fix', mentions=card2.users)
@@ -308,7 +320,26 @@ class Card(PlankaModel[schemas.Card]):
                 @user2
             ```
         """
-        comment = '\n'.join([comment, *[f"@{u.name}" for u in mentions or []]])
+        # Store inline mentions to prevent additional mention in postfix
+        _mentioned: list[User] = []
+        if '@' in comment:
+            for u in self.board.users:
+                # Replace raw @ mentions with markdown formatted mentions
+                # Allow mentioning by name, username, or email
+                if f'@{u.email}' in comment:
+                    comment = comment.replace(f'@{u.email}', f'@[{u.email}]({u.id})')
+                    _mentioned.append(u)
+                elif f'@{u.name}' in comment:
+                    comment = comment.replace(f'@{u.name}', f'@[{u.name}]({u.id})')
+                    _mentioned.append(u)
+                elif f'@{u.username}' in comment:
+                    comment = comment.replace(f'@{u.username}', f'@[{u.username}]({u.id})')
+                    _mentioned.append(u)
+        
+        # Add additional postfix mentions
+        if mentions:
+            mentions = [m for m in mentions if m not in _mentioned]
+            comment = '\n'.join([comment, *[f"@[{u.name}]({u.id})" for u in mentions or []]])
         return Comment(self.endpoints.createComment(self.id, text=comment)['item'], self.session)
 
     def move(self, list: List, position: Position = 'top') -> Card:
