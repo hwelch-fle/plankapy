@@ -292,6 +292,56 @@ class Card(PlankaModel[schemas.Card]):
         """Read all the current User's Notifications for the Card"""
         return [Notification(n, self.session) for n in self.endpoints.readCardNotifications(self.id)['included']['notifications']]
 
+    def comment(self, comment: str, *, mentions: Sequence[User]|None=None) -> Comment:
+        """Leave a comment as this user and mention any user included in the mentions list
+        
+        Args:
+            text: The text body of the comment (`@[name|username|email]` will mention)
+            mentions: A sequence of Users that will be mentioned after the body
+        
+        Note:
+            If a user is explicitly mentioned in the comment, they will be removed from the 
+            suffix mention. e.g. 
+            ```python
+            >>> card.comment(
+            ...     'Fix this @user1, then send to @user2', 
+            ...     mentions=[user1, user2, user3]
+            ... )
+            '''Fix this @user1, then send to @user2
+            @user3'''
+            ```
+            
+        Example:
+            ```python
+                >>> card.comment('Need Fix', mentions=card2.users)
+                # Comment from current user On Card:
+                Need Fix
+                @user1
+                @user2
+            ```
+        """
+        # Store inline mentions to prevent additional mention in postfix
+        _mentioned: list[User] = []
+        if '@' in comment:
+            for u in self.board.users:
+                # Replace raw @ mentions with markdown formatted mentions
+                # Allow mentioning by name, username, or email
+                if f'@{u.email}' in comment:
+                    comment = comment.replace(f'@{u.email}', f'@[{u.email}]({u.id})')
+                    _mentioned.append(u)
+                elif f'@{u.name}' in comment:
+                    comment = comment.replace(f'@{u.name}', f'@[{u.name}]({u.id})')
+                    _mentioned.append(u)
+                elif f'@{u.username}' in comment:
+                    comment = comment.replace(f'@{u.username}', f'@[{u.username}]({u.id})')
+                    _mentioned.append(u)
+        
+        # Add additional postfix mentions
+        if mentions:
+            mentions = [m for m in mentions if m not in _mentioned]
+            comment = '\n'.join([comment, *[f"@[{u.name}]({u.id})" for u in mentions or []]])
+        return Comment(self.endpoints.createComment(self.id, text=comment)['item'], self.session)
+
     def move(self, list: List, position: Position = 'top') -> Card:
         """Move the card to a new list (default to top of new list)"""
         self.update(
@@ -429,40 +479,41 @@ class Card(PlankaModel[schemas.Card]):
                 for cfv in self.custom_field_values
             }
 
-    def add_card_fields(self, *fields: str, 
+    def create_card_field_group(self, name: str, position: Position='top') -> CustomFieldGroup:
+        """Create a CustomFieldGroup in the Card
+        
+        Args:
+            name: The name of the group
+            position: The position of the new group
+        """
+        return CustomFieldGroup(
+                self.endpoints.createCardCustomFieldGroup(
+                    self.id, 
+                    name=name, 
+                    position=get_position(self.custom_field_groups, position))['item'], 
+                self.session
+            )
+
+    def add_card_fields(self, *fields: str,
                         group: str='Fields', 
                         position: Position='top') -> CustomFieldGroup:
         """Add fields directly to a Card
         
         Args:
-            *fields (str): Varargs of the Fieldnames to add to the Card
-            group (str): An optional FieldGroup name to add the fields to (default: `Fields`)
-            position (Position): The position to add the Card field group at (default: `top`)
+            *fields: Varargs of the Fieldnames to add to the Card
+            group: An optional FieldGroup name to add the fields to (default: `Fields`)
+            position: The position to add the Card field group at (default: `top`)
         
         Returns:
             CustomFieldGroup
         """
-        _existing_cfgs = [cfg for cfg in self.custom_field_groups]
-        position = get_position(_existing_cfgs, position)
-        
-        # Create a new CustomFieldGroup if it doesn't exist
-        if group not in [cfg.name for cfg in _existing_cfgs]:
-            cfg = CustomFieldGroup(
-                self.endpoints.createCardCustomFieldGroup(
-                    self.id, 
-                    name=group, 
-                    position=position)['item'], 
-                self.session
-            )
-        
-        else:
-            cfg = [cfg for cfg in _existing_cfgs if cfg.name == group].pop()
-        
-        _existing_fields = [cf for cf in cfg.custom_fields]
-        for field in fields:
-            if field not in [cf.name for cf in _existing_fields]:
-                cfg.add_field(name=field)
-        
+        # Get an existing group if name matches
+        cfg = (
+            self.custom_field_groups[{'name': group}].dpop() 
+            or self.create_card_field_group(group, position)
+        )
+        # Add any fields that don't already exist in the Group
+        cfg.add_fields(*(set(fields) ^ set(cfg.custom_fields.extract('name'))))
         return cfg
         
     def add_member(self, user: User, 

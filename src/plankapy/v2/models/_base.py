@@ -3,7 +3,9 @@ from __future__ import annotations
 __all__ = ("PlankaModel", )
 
 import json
-from typing import Any
+import copy
+
+from typing import Any, Self, Callable
 from collections.abc import Mapping
 
 TYPE_CHECKING = False
@@ -11,9 +13,20 @@ if TYPE_CHECKING:
     # Models take a Planka session to allow checking User permissions
     from ..interface import Planka
 
+type Diff = dict[str, tuple[Any, Any]]
+type ModelFormatter[M: PlankaModel[Any]] = Callable[[M], str]
+
+DEFAULT_FORMATTER: ModelFormatter[PlankaModel[Any]] = (
+    lambda m: f"{m.__class__.__name__}({getattr(m, 'name', getattr(m, 'id', 'Unknown'))})"
+)
+"""Default Model Formatter: `Model(name/id/'Unknown')`"""
+
 class PlankaModel[Schema: Mapping[str, Any]]:
     """Base Planka object interface"""
     
+    __formatter__: ModelFormatter[Self] = DEFAULT_FORMATTER
+    """Formatter func that allows overriding __str__ behavior for models"""
+
     def __init__(self, schema: Schema, session: Planka) -> None:
         self._schema = schema
         self.session = session
@@ -63,9 +76,48 @@ class PlankaModel[Schema: Mapping[str, Any]]:
             f'Model attributes are read only. '
             'To update use associated property'
         )
+    
+    def copy(self) -> Self:
+        """Create a deepcopy of the model and its associated schema.
+
+        Note:
+            Since the endpoints for both instances of the Model are the same, any 
+            calls to update will restore the state and bring both copies into sync. 
+            copies like this are meant more for comparing changes when running a sync 
+            or update/assignemnt operation.
+        
+        Example:
+        ```python
+            >>> card_copy = card.copy()
+            >>> card.name = 'Updated Name'
+            >>> card_copy.name
+            'Original Name'
+            >>> card.name
+            'Updated Name'
+            >>> # This update may have had side effects
+            >>> print(card_copy.diff(card))
+            {'name': ('Original Name', 'Updated Name'), 'updatedAt': ('...2:00pm', '...2:45pm'), ...}
+        ```
+        """
+        return copy.deepcopy(self)
+
+    def diff(self, other: PlankaModel[Schema]) -> Diff:
+        """Get a schema diff between two model schemas.
+
+        Note:
+            Only matching keys are diffed. Any schema keys that are not in the source schema 
+            will not be checked in the target schema
+        """
+        return {
+            k: (source, delta) 
+            for k, source in self.schema
+            if k in other.schema
+            and (delta := other.schema[k]) 
+            and delta != source
+        }
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({getattr(self, 'name', getattr(self, 'id', 'Unknown'))})"
+        return self.__class__.__formatter__(self)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.schema})'          

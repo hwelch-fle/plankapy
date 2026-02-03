@@ -281,14 +281,14 @@ class Board(PlankaModel[schemas.Board]):
                     name: str,
                     type: Literal['active', 'closed']='active',
                     position: Position = 'top',
-                    color: ListColor|None=None) -> List:
+                    color: ListColor|Literal['random']|None=None) -> List:
         """Create a new List on the Board
         
         Args:
             name: Name/title of the List
             type: Type/status of the List
             position: Position of the List within the Board
-            color: An optional color to set the list to
+            color: An optional color to set the list to (`random` to randomize)
         """
         l = List(
             self.endpoints.createList(
@@ -342,6 +342,30 @@ class Board(PlankaModel[schemas.Board]):
         if label in self.labels:
             label.delete()
     
+    def create_field_group(self, 
+                           name: str|None=None, 
+                           *, 
+                           position: Position= 'top', 
+                           base_group: BaseCustomFieldGroup|None=None) -> CustomFieldGroup:
+        """Create a new CustomFieldGroup on the Board
+        
+        Args:
+            name: The name of the Custom Field Group
+            position: The position of the field group within the board
+            base_group: An optional BaseCustomFieldGroup to use as a template
+        """
+        args: paths.Request_createBoardCustomFieldGroup = {
+            'name': name,
+            'position': get_position(self.custom_field_groups, position)
+        }
+        if base_group:
+            args['baseCustomFieldGroupId'] = base_group.id
+            args['name'] = args['name'] or base_group.name
+        return CustomFieldGroup(
+            self.endpoints.createBoardCustomFieldGroup(self.id, **args)['item'],
+            self.session
+        )
+
     def add_member(self, user: User, 
                    *,
                    role: BoardRole='viewer',
@@ -488,6 +512,7 @@ class Board(PlankaModel[schemas.Board]):
         ]
 
 from .attachment import Attachment
+from .base_custom_field_group import BaseCustomFieldGroup
 from .board_membership import BoardMembership
 from .card import Card
 from .card_label import CardLabel

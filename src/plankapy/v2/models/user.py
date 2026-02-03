@@ -14,7 +14,7 @@ from ..api import schemas, paths, events
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from typing import Any, Unpack
-    from models import *
+    #from models import *
     from ._literals import (
         UserRole, 
         EditorMode, 
@@ -84,9 +84,9 @@ class User(PlankaModel[schemas.User]):
         """Avatar information for the user with generated URLs"""
         return self.schema['avatar']
     @avatar.setter
-    def avatar(self, avatar: Any) -> None:
-        """Set the User's avatar"""
-        raise NotImplementedError('Avatar setting has not been implemented') 
+    def avatar(self, avatar: str | bytes | None) -> None:
+        """Set the User's avatar using a URL, file bytes, or None to unset"""
+        self.update_avatar(avatar=avatar)  
     
     @property
     def gravatar_url(self) -> str | None:
