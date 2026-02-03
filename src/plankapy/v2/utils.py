@@ -7,6 +7,7 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import Any, Protocol, TypedDict
 from .models import *
+from .interface import Planka
 
 __all__ = ('due_in', 'board_to_csv', 'board_to_table', 'snapshot', )
 
