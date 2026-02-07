@@ -9,14 +9,16 @@ from typing import Any, Protocol, TypedDict
 from .models import *
 from .interface import Planka
 
-__all__ = ('due_in', 'board_to_csv', 'board_to_table', 'snapshot', )
+__all__ = ('due_in', 'board_to_csv', 'board_to_table', 'snapshot', 'PlankaSnapshot', )
 
 class HasDueDate(Protocol):
     @property
     def due_date(self) -> datetime | None: ...
     
 def due_in(hours: float=0, days: float=0, weeks: float=0):
-    """Decorated function for use with """
+    """Decorated function for use with a [ModelList](plankapy.v2.models._helpers.ModelList)
+    That allows filtering by date
+    """
     def _inner(m: HasDueDate):
         if not m.due_date:
             return False
@@ -72,26 +74,47 @@ def board_to_csv(board: Board, outdir: str|Path='.', name: str|None=None):
 from .api import schemas
 class PlankaSnapshot(TypedDict):
     projects: list[schemas.Project]
+    """Project Schemas"""
     boards: list[schemas.Board]
+    """Board Schemas"""
     lists: list[schemas.List]
+    """List Schemas"""
     cards: list[schemas.Card]
+    """Card Schemas"""
     card_labels: list[schemas.CardLabel]
+    """Card Label Schemas"""
     card_memberships: list[schemas.CardMembership]
+    """Card Membership Schemas"""
     task_lists: list[schemas.TaskList]
+    """Task List Schemas"""
     tasks: list[schemas.Task]
+    """Task Schemas"""
     base_custom_field_groups: list[schemas.BaseCustomFieldGroup]
+    """Base Custom Field Group schemas"""
     custom_field_groups: list[CustomFieldGroup]
+    """Custom Field Group Schemas"""
     custom_fields: list[schemas.CustomField]
+    """Custom Field Schemas"""
     custom_field_values: list[CustomFieldValue]
+    """Custom Field Value Schemas"""
     comments: list[schemas.Comment]
+    """Comment Schemas"""
     webhooks: list[schemas.Webhook]
+    """Webhook Schemas"""
     users: list[schemas.User]
+    """User Schemas"""
     board_memberships: list[schemas.BoardMembership]
+    """Board Membership Schemas"""
     project_managers: list[schemas.ProjectManager]
+    """Project Manager Schemas"""
     labels: list[schemas.Label]
+    """Label Schemas"""
     notification_services: list[schemas.NotificationService]
+    """Notificaiton Service Schemas"""
     actions: list[schemas.Action]
+    """Action Schemas"""
     config: schemas.Config
+    """Config Schema"""
 
 def _get_schema[M: PlankaModel[Any]](models: list[M]):
     return [m.schema for m in models]
