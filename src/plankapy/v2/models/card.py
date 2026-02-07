@@ -212,7 +212,7 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def description(self) -> str:
         """Detailed description of the Card"""
-        return self.schema['name']
+        return self.schema['description']
     @description.setter
     def description(self, description: str) -> None:
         """Set the Card Description"""

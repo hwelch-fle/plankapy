@@ -135,40 +135,41 @@ nav:
           - Archive: interfaces/Archive.md
 
   - Plankapy v2:
-      - interface:
-          - Planka: v2/interface.md
-      - api:
-          - Paths: v2/api/paths.md
-          - Schemas: v2/api/schemas.md
-          - REST Types: v2/api/rest-typing.md
-          - Errors: v2/api/errors.md
-      - models:
-          - PlankaModel: v2/models/_planka-model.md
-          - Action: v2/models/action.md
-          - Attachment: v2/models/attachment.md
-          - BackgroundImage: v2/models/background-image.md
-          - BaseCustomFieldGroup: v2/models/base-custom-field-group.md
-          - Board: v2/models/board.md
-          - BoardMembership: v2/models/board-membership.md
-          - Card: v2/models/card.md
-          - CardLabel: v2/models/card-label.md
-          - CardMembership: v2/models/card-membership.md
-          - Comment: v2/models/comment.md
-          - Config: v2/models/config.md
-          - CustomField: v2/models/custom-field.md
-          - CustomFieldGroup: v2/models/custom-field-group.md
-          - CustomFieldValue: v2/models/custom-field-value.md
-          - Label: v2/models/label.md
-          - List: v2/models/list.md
-          - Notification: v2/models/notification.md
-          - NotificationService: v2/models/notification-service.md
-          - Project: v2/models/project.md
-          - ProjectManager: v2/models/project-manager.md
-          - Task: v2/models/task.md
-          - TaskList: v2/models/task-list.md
-          - User: v2/models/user.md
-          - Webhook: v2/models/webhook.md
-
+    - interface:
+      - Planka: v2/interface.md
+    - api:
+      - Paths: v2/api/paths.md
+      - Schemas: v2/api/schemas.md
+      - REST Types: v2/api/rest-typing.md
+      - Errors: v2/api/errors.md
+    - models:
+      - PlankaModel: v2/models/_planka-model.md
+      - Action: v2/models/action.md
+      - Attachment: v2/models/attachment.md
+      - BackgroundImage: v2/models/background-image.md
+      - BaseCustomFieldGroup: v2/models/base-custom-field-group.md
+      - Board: v2/models/board.md
+      - BoardMembership: v2/models/board-membership.md
+      - Card: v2/models/card.md
+      - CardLabel: v2/models/card-label.md
+      - CardMembership: v2/models/card-membership.md
+      - Comment: v2/models/comment.md
+      - Config: v2/models/config.md
+      - CustomField: v2/models/custom-field.md
+      - CustomFieldGroup: v2/models/custom-field-group.md
+      - CustomFieldValue: v2/models/custom-field-value.md
+      - Label: v2/models/label.md
+      - List: v2/models/list.md
+      - Notification: v2/models/notification.md
+      - NotificationService: v2/models/notification-service.md
+      - Project: v2/models/project.md
+      - ProjectManager: v2/models/project-manager.md
+      - Task: v2/models/task.md
+      - TaskList: v2/models/task-list.md
+      - User: v2/models/user.md
+      - Webhook: v2/models/webhook.md
+    - utils: v2/utils.md
+        
   - Examples: examples.md
 
 plugins:
