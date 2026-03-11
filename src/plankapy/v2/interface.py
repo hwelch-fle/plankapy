@@ -46,16 +46,18 @@ from __future__ import annotations
 from functools import cached_property
 from collections.abc import Sequence
 from datetime import timezone
+from typing import Unpack
 
 from httpx import Client, HTTPStatusError, URL
 
 from .api import (
     PlankaEndpoints, 
     events,
+    typ,
 )
 from .models import *
 from .models._helpers import model_list
-from .models._literals import Language, TermsType, UserRole, ProjectType
+from .models._literals import Language, UserRole, ProjectType
 
 # Allow Users to set `PLANKA_LANG` environment variable with their language
 # Default to en-US if not set
@@ -229,6 +231,26 @@ class Planka:
     def config(self) -> Config:
         """Get the configuration info for the current Planka server"""
         return Config(self.endpoints.getConfig()['item'], self)
+    
+    @property
+    def smtp_config(self): 
+        """Get the server SMTP config (this also tests the curent config)"""
+        return self.endpoints.testSmtpConfig()
+
+    def update_smtp_config(self, **opts: Unpack[typ.Request_updateConfig]):
+        """Update the server SMTP config (all args are optional and only passed args will be updated)
+        
+        Args:
+            smtpHost: Hostname or IP address of the SMTP server
+            smtpPort: Port number of the SMTP server
+            smtpName: Client hostname used in the EHLO command for SMTP
+            smtpSecure: Whether to use a secure connection for SMTP
+            smtpTlsRejectUnauthorized: Whether to reject unauthorized or self-signed TLS certificates for SMTP connections
+            smtpUser: Username for authenticating with the SMTP server
+            smtpPassword: Password for authenticating with the SMTP server
+            smtpFrom: Default "from" used for outgoing SMTP emails
+        """
+        self.endpoints.updateConfig(**opts)
 
     @property
     @model_list
@@ -372,6 +394,4 @@ class Planka:
             args['accessToken'] = access_token
         return Webhook(self.endpoints.createWebhook(**args)['item'], self)
         
-    def test_smtp(self):
-        """Test the SMTP config and return the current SMTP configuration """
-        return self.endpoints.testSmtpConfig()
+        
