@@ -672,8 +672,8 @@ class PlankaEndpoints:
 
         Args:
             listId (str): ID of the list to get cards from (must be an endless list))
-            before[listChangedAt] (str): Pagination cursor field `listChangedAt` (use together with `before[id]`)) (optional)
-            before[id] (str): Pagination cursor field `id` (use together with `before[listChangedAt]`)) (optional)
+            before_listChangedAt (str): Pagination cursor field `listChangedAt` (use together with `before_id`)) (optional)
+            before_id (str): Pagination cursor field `id` (use together with `before_listChangedAt`)) (optional)
             search (str): Search term to filter cards) (optional)
             userIds (str): Comma-separated user IDs to filter by members or task assignees) (optional)
             labelIds (str): Comma-separated label IDs to filter by labels) (optional)
@@ -688,6 +688,12 @@ class PlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
+        # Monkey patch since brackets cannot be used in varaible names
+        if 'before_listChangedAt' in kwargs:
+            kwargs['before[listChangedAt]'] = kwargs.pop('before_listChangedAt') # type: ignore
+        if 'before_id' in kwargs:
+            kwargs['before[id]'] = kwargs.pop('before_id') # type: ignore
+            
         valid_params = ('before[listChangedAt]', 'before[id]', 'search', 'userIds', 'labelIds')
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get(f"api/lists/{listId}/cards", params=passed_params)

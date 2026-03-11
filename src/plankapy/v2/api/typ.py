@@ -147,12 +147,14 @@ class Request_createCard(TypedDict):
     """Stopwatch data for time tracking"""
 
 class Request_getCards(TypedDict):
-    before: NotRequired[str]
-    """Pagination cursor (JSON object with id and listChangedAt)"""
+    before_listChangedAt: NotRequired[str]
+    """Pagination cursor field `listChangedAt` (use together with `before_id`)"""
+    before_id: NotRequired[str]
+    """Pagination cursor field `id` (use together with `before_listChangedAt`)"""
     search: NotRequired[str]
     """Search term to filter cards"""
     userIds: NotRequired[str]
-    """Comma-separated user IDs to filter by members"""
+    """Comma-separated user IDs to filter by members or task assignees"""
     labelIds: NotRequired[str]
     """Comma-separated label IDs to filter by labels"""
 
