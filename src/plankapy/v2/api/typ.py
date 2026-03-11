@@ -662,7 +662,26 @@ class Response_updateBoard(TypedDict):
 
 class Response_getBootstrap(TypedDict):
     """Bootstrap retrieved successfully"""
-
+    oidc: OIDC_conf
+    "OpenID Connect configuration (null if not configured)"
+    version: str
+    "Current version of the PLANKA application"
+    activeUsersLimit: NotRequired[int]
+    "Maximum number of active users allowed (conditionally added for admins if configured)"
+    customerPanelUrl: NotRequired[str]
+    "URL to the customer management panel (conditionally added for admins if configured)"
+    termsLanguages: NotRequired[str]
+    "List of available language codes for terms localization"
+    
+class OIDC_conf(TypedDict):
+    """OIDC response schema"""
+    authorizationUrl: str
+    "OIDC authorization URL for initiating authentication"
+    endSessionUrl: str | None
+    "OIDC end session URL for logout (null if not supported by provider)"
+    isEnforced: bool
+    "Whether OIDC authentication is enforced (users must use OIDC to login)"
+  
 class Response_createCardLabel(TypedDict):
     """Label added to card successfully"""
     item: CardLabel
