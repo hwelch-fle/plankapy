@@ -372,3 +372,6 @@ class Planka:
             args['accessToken'] = access_token
         return Webhook(self.endpoints.createWebhook(**args)['item'], self)
         
+    def test_smtp(self):
+        """Test the SMTP config and return the current SMTP configuration """
+        return self.endpoints.testSmtpConfig()
