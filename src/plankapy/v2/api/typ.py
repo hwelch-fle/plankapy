@@ -1058,6 +1058,9 @@ class Response_createUserApiKey(TypedDict):
     item: User
     included: Included_createUserApiKey
 
+class Included_createUserApiKey(TypedDict):
+    apiKey: str
+
 class Response_createUser(TypedDict):
     """User created successfully"""
     item: User
@@ -1094,6 +1097,9 @@ class Response_updateUserPassword(TypedDict):
     """Password updated successfully"""
     item: User
     included: Included_updateUserPassword
+
+class Included_updateUserPassword(TypedDict):
+    accessToken: str
 
 class Response_updateUserUsername(TypedDict):
     """Username updated successfully"""
