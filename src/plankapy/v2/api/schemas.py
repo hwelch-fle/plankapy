@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TypedDict, NotRequired, Any, Literal
 
-from .events import WebhookEvent
+from .events import PlankaEvent
 
 __all__ = (
     "Action",
@@ -72,10 +72,10 @@ class BackgroundImage(TypedDict):
     """Unique identifier for the background image"""
     projectId: str
     """ID of the project the background image belongs to"""
-    sizeInBytes: str # Change to `size` after next release
+    size: str
     """File size of the background image in bytes"""
     url: str
-    """URL to access the full-size background image"""
+    """URL to the full-size background image"""
     thumbnailUrls: dict[str, Any]
     """URLs for different thumbnail sizes of the background image"""
     createdAt: str
@@ -214,12 +214,28 @@ class Comment(TypedDict):
     """When the comment was last updated"""
 
 class Config(TypedDict):
-    version: str
-    """Current version of the PLANKA application"""
-    activeUsersLimit: NotRequired[int]
-    """Maximum number of active users allowed (conditionally added for admins if configured)"""
-    oidc: dict[str, Any]
-    """OpenID Connect configuration (null if not configured)"""
+    id: str
+    """Unique identifier for the config (always set to '1')"""
+    smtpHost: NotRequired[str]
+    """Hostname or IP address of the SMTP server"""
+    smtpPort: NotRequired[int]
+    """Port number of the SMTP server"""
+    smtpName: NotRequired[str]
+    """Client hostname used in the EHLO command for SMTP"""
+    smtpSecure: NotRequired[bool]
+    """Whether to use a secure connection for SMTP"""
+    smtpTlsRejectUnauthorized: NotRequired[bool]
+    """Whether to reject unauthorized or self-signed TLS certificates for SMTP connections"""
+    smtpUser: NotRequired[str]
+    """Username for authenticating with the SMTP server"""
+    smtpPassword: NotRequired[str]
+    """Password for authenticating with the SMTP server"""
+    smtpFrom: NotRequired[str]
+    """Default "from" used for outgoing SMTP emails"""
+    createdAt: NotRequired[str]
+    """When the config was created"""
+    updatedAt: NotRequired[str]
+    """When the config was last updated"""
 
 class CustomField(TypedDict):
     id: str
@@ -440,8 +456,10 @@ class User(TypedDict):
     """Contact phone number"""
     organization: str
     """Organization or company name"""
-    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW']]
+    language: NotRequired[Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW']]
     """Preferred language for user interface and notifications (personal field)"""
+    apiKeyPrefix: NotRequired[str]
+    """Prefix of the API key for display purposes (private field)"""
     subscribeToOwnCards: NotRequired[bool]
     """Whether the user subscribes to their own cards (personal field)"""
     subscribeToCardWhenCommenting: NotRequired[bool]
@@ -456,8 +474,6 @@ class User(TypedDict):
     """Default view mode for the home page (personal field)"""
     defaultProjectsOrder: NotRequired[Literal['byDefault', 'alphabetically', 'byCreationTime']]
     """Default sort order for projects display (personal field)"""
-    termsType: Literal['general', 'extended']
-    """Type of terms applicable to the user based on role"""
     isSsoUser: NotRequired[bool]
     """Whether the user is SSO user (private field)"""
     isDeactivated: bool
@@ -470,23 +486,19 @@ class User(TypedDict):
     """When the user was created"""
     updatedAt: str
     """When the user was last updated"""
-    apiKeyPrefix: str | None
-    """The prefix for the user's API key if one is active"""
 
 class Webhook(TypedDict):
     id: str
     """Unique identifier for the webhook"""
-    boardId: str
-    """The board that the webhook is associated with"""
     name: str
     """Name/title of the webhook"""
     url: str
     """URL endpoint for the webhook"""
     accessToken: str
     """Access token for webhook authentication"""
-    events: list[WebhookEvent]
+    events: list[PlankaEvent]
     """List of events that trigger the webhook"""
-    excludedEvents: list[WebhookEvent]
+    excludedEvents: list[PlankaEvent]
     """List of events excluded from the webhook"""
     createdAt: str
     """When the webhook was created"""
