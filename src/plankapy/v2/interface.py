@@ -179,8 +179,7 @@ class Planka:
             terms_lang: If accepting terms, request them in this language
             
         Note:
-            After accepting the terms, please get an API key from the Planka server. If you need to accept extended terms, please 
-            set the `terms` flag to the terms you are accepting. These terms will be printed to `stdout` during the flow.
+            After logging in for the first time, please get an API key from the Planka server.
         """
         # API Key
         if api_key:
