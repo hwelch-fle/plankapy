@@ -216,6 +216,11 @@ class Planka:
         return User(self.endpoints.getUser('me')['item'], self)
 
     @property
+    def bootstrap(self):
+        """Get the application bootstrap"""
+        return self.endpoints.getBootstrap()
+
+    @property
     @model_list
     def notifications(self) -> list[Notification]:
         """Get all notifications for the current User"""
