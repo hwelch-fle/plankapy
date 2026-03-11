@@ -151,28 +151,31 @@ class Planka:
         self.current_role: UserRole | None = None
         self.current_id : str | None = None
     
-    def accept_terms(self, pending_token: str, terms_type: TermsType='general', lang: Language='en-US'):
+    def accept_terms(self, pending_token: str, lang: Language | None = None):
         """If the User has never logged on, or is required to accept new terms, allow them to do so"""
-        terms = self.endpoints.getTerms(type=terms_type, language=lang)['item']
+        if lang:
+            terms = self.endpoints.getTerms(language=lang)['item']
+        else:
+            terms = self.endpoints.getTerms()['item']
         print(terms['content'])
         sig = terms['signature']
         self.endpoints.acceptTerms(pendingToken=pending_token, signature=sig)
     
     def login(self, 
               *, 
-              username: str|None=None, 
-              password: str|None=None, 
-              api_key: str|None=None, 
-              accept_terms: TermsType | None=None,
-              terms_lang: Language='en-US') -> None:
+              username: str | None = None, 
+              password: str | None = None, 
+              api_key: str | None = None, 
+              accept_terms: bool | None = None,
+              terms_lang: Language | None = None) -> None:
         
         """Authenticate with the planka instance
         
         Args:
-            username (str | None): User username/email 
-            password (str | None): User password
-            api_key (str | None): User API Key
-            accept_terms (TermsType | None): If you user has not accepted the terms, run the term acceptance flow
+            username: User username/email 
+            password: User password
+            api_key: User API Key
+            accept_terms: Set to `True` to accept terms on first login
             terms_lang: If accepting terms, request them in this language
             
         Note:
@@ -190,9 +193,9 @@ class Planka:
                 token = self.endpoints.createAccessToken(emailOrUsername=username, password=password, withHttpOnlyToken=True)['item']
                 self.client.headers['Authorization'] = f'Bearer {token}'
             except HTTPStatusError as e:
-                if accept_terms is None:
-                    raise PermissionError(f'Please logon again with `accept_terms` set to the terms you must accept')
-                self.accept_terms(e.response.json()['pendingToken'], terms_type=accept_terms, lang=terms_lang)
+                if not accept_terms:
+                    raise PermissionError(f'Please logon again with `accept_terms` set to `True` to login the first time')
+                self.accept_terms(e.response.json()['pendingToken'], lang=terms_lang)
                 self.login(username=username, password=password)
         
         # Invalid Creds
