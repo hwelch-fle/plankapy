@@ -459,4 +459,5 @@ class User(PlankaModel[schemas.User]):
             return self.endpoints.createUserApiKey(self.id)['included']['apiKey']
     
 from .notification_service import NotificationService
-from . import Card, Board
+from .card import Card
+from .board import Board
