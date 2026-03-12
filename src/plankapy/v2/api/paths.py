@@ -540,7 +540,7 @@ class PlankaEndpoints:
         raise_planka_err(resp)
         return resp.json()
 
-    def getBootstrap(self) -> Bootstrap:
+    def getBootstrap(self) -> Response_getBootstrap:
         """Retrieves the application bootstrap.
         """
         resp = self.client.get("api/bootstrap")

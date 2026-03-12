@@ -659,7 +659,11 @@ class Item_getBoard(Board):
 class Response_updateBoard(TypedDict):
     """Board updated successfully"""
     item: Board
-  
+
+class Response_getBootstrap(TypedDict):
+    """Bootstrap retrieved successfully"""
+    item: Bootstrap
+
 class Response_createCardLabel(TypedDict):
     """Label added to card successfully"""
     item: CardLabel

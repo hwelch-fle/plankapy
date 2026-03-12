@@ -218,7 +218,7 @@ class Planka:
     @property
     def bootstrap(self):
         """Get the application bootstrap"""
-        return Config(self.endpoints.getBootstrap(), self)
+        return Config(self.endpoints.getBootstrap()['item'], self)
 
     @property
     @model_list
