@@ -649,7 +649,7 @@ class Included_getBoard(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Included_getBoard_all(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Item_getBoard(Board):
@@ -659,28 +659,6 @@ class Item_getBoard(Board):
 class Response_updateBoard(TypedDict):
     """Board updated successfully"""
     item: Board
-
-class Response_getBootstrap(TypedDict):
-    """Bootstrap retrieved successfully"""
-    oidc: OIDC_conf
-    "OpenID Connect configuration (null if not configured)"
-    version: str
-    "Current version of the PLANKA application"
-    activeUsersLimit: NotRequired[int]
-    "Maximum number of active users allowed (conditionally added for admins if configured)"
-    customerPanelUrl: NotRequired[str]
-    "URL to the customer management panel (conditionally added for admins if configured)"
-    termsLanguages: NotRequired[str]
-    "List of available language codes for terms localization"
-    
-class OIDC_conf(TypedDict):
-    """OIDC response schema"""
-    authorizationUrl: str
-    "OIDC authorization URL for initiating authentication"
-    endSessionUrl: str | None
-    "OIDC end session URL for logout (null if not supported by provider)"
-    isEnforced: bool
-    "Whether OIDC authentication is enforced (users must use OIDC to login)"
   
 class Response_createCardLabel(TypedDict):
     """Label added to card successfully"""
@@ -719,7 +697,7 @@ class Included_getCards(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Items_getCards(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Response_deleteCard(TypedDict):
@@ -743,7 +721,7 @@ class Included_getCard(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Item_getCard(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Response_updateCard(TypedDict):
@@ -901,7 +879,7 @@ class Included_getList(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Included_getList_all(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Response_updateList(TypedDict):
@@ -1001,7 +979,7 @@ class Included_getProjects(TypedDict):
     notificationServices: list[NotificationService]
 
 class Items_getProjects(Project):
-    isFavorite: bool
+    isFavorite: NotRequired[bool]
     """Whether the project is marked as favorite by the current user"""
 
 class Response_deleteProject(TypedDict):
@@ -1024,7 +1002,7 @@ class Included_getProject(TypedDict):
     notificationServices: list[NotificationService]
 
 class Item_getProject(Project):
-    isFavorite: bool
+    isFavorite: NotRequired[bool]
     """Whether the project is marked as favorite by the current user"""
 
 class Response_updateProject(TypedDict):

@@ -218,7 +218,7 @@ class Planka:
     @property
     def bootstrap(self):
         """Get the application bootstrap"""
-        return self.endpoints.getBootstrap()
+        return Config(self.endpoints.getBootstrap(), self)
 
     @property
     @model_list
@@ -234,13 +234,13 @@ class Planka:
 
     @cached_property
     def config(self) -> Config:
-        """Get the configuration info for the current Planka server"""
-        return Config(self.endpoints.getConfig()['item'], self)
+        """(*deprecated: Use `Planka.bootstrap` instead*) Get the configuration info for the current Planka server"""
+        return self.bootstrap
     
     @property
     def smtp_config(self): 
         """Get the server SMTP config (this also tests the current config)"""
-        return self.endpoints.testSmtpConfig()
+        return self.endpoints.testSmtpConfig()['item']
 
     def update_smtp_config(self, **opts: Unpack[typ.Request_updateConfig]):
         """Update the server SMTP config (all args are optional and only passed args will be updated)

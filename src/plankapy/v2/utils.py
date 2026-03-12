@@ -113,8 +113,12 @@ class PlankaSnapshot(TypedDict):
     """Notificaiton Service Schemas"""
     actions: list[schemas.Action]
     """Action Schemas"""
-    config: schemas.Config
+    config: schemas.Bootstrap
     """Config Schema"""
+    bootstrap: schemas.Bootstrap
+    """New name for Config"""
+    smtp_config: schemas.Config
+    """SMTP Configuration"""
 
 def _get_schema[M: PlankaModel[Any]](models: list[M]):
     return [m.schema for m in models]
@@ -179,7 +183,9 @@ def snapshot(planka: Planka) -> PlankaSnapshot:
         'labels': _get_schema(labels),
         'notification_services': _get_schema(notification_services),
         'actions': _get_schema(actions),
-        'config': config.schema
+        'config': config.schema,
+        'bootstrap': config.schema,
+        'smtp_config': planka.smtp_config
     }
     return snap
 

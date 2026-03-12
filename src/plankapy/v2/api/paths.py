@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import (
-    Literal,
     Unpack,
 )
 from httpx import Client, Response, HTTPStatusError
@@ -541,7 +540,7 @@ class PlankaEndpoints:
         raise_planka_err(resp)
         return resp.json()
 
-    def getBootstrap(self) -> Response_getBootstrap:
+    def getBootstrap(self) -> Bootstrap:
         """Retrieves the application bootstrap.
         """
         resp = self.client.get("api/bootstrap")

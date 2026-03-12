@@ -29,6 +29,7 @@ __all__ = (
     "User",
     "Webhook",
     "Stopwatch",
+    "Bootstrap",
 )
 
 class Action(TypedDict):
@@ -136,6 +137,27 @@ class BoardMembership(TypedDict):
     """When the board membership was created"""
     updatedAt: str
     """When the board membership was last updated"""
+
+class Bootstrap(TypedDict):
+    oidc: OIDC
+    "OpenID Connect configuration (null if not configured)"
+    version: str
+    "Current version of the PLANKA application"
+    activeUsersLimit: NotRequired[int]
+    "Maximum number of active users allowed (conditionally added for admins if configured)"
+    customerPanelUrl: NotRequired[str]
+    "URL to the customer management panel (conditionally added for admins if configured)"
+    termsLanguages: NotRequired[list[str]]
+    "List of available language codes for terms localization"
+    
+class OIDC(TypedDict):
+    """OIDC response schema"""
+    authorizationUrl: str
+    "OIDC authorization URL for initiating authentication"
+    endSessionUrl: str | None
+    "OIDC end session URL for logout (null if not supported by provider)"
+    isEnforced: bool
+    "Whether OIDC authentication is enforced (users must use OIDC to login)"
 
 class Card(TypedDict):
     id: str
