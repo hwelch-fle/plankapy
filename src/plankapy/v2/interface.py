@@ -239,7 +239,7 @@ class Planka:
     
     @property
     def smtp_config(self): 
-        """Get the server SMTP config (this also tests the curent config)"""
+        """Get the server SMTP config (this also tests the current config)"""
         return self.endpoints.testSmtpConfig()
 
     def update_smtp_config(self, **opts: Unpack[typ.Request_updateConfig]):
