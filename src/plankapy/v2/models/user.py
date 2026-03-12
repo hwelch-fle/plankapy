@@ -13,7 +13,7 @@ from ..api import schemas, paths, events
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from typing import Any, Unpack
+    from typing import Any, Unpack, Literal
     #from models import *
     from ._literals import (
         UserRole, 
@@ -190,8 +190,11 @@ class User(PlankaModel[schemas.User]):
     
     @property
     def is_sso_user(self) -> bool:
-        """Whether the user is SSO user (private field)"""
+        """Whether the user is SSO user (private field, can be unlinked by admins)"""
         return self.schema.get('isSsoUser', False)
+    @is_sso_user.setter
+    def is_sso_user(self, is_sso_user: Literal[False]) -> None:
+        self.update(isSsoUser=is_sso_user)
     
     @property
     def is_deactivated(self) -> bool:
