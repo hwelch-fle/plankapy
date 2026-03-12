@@ -174,6 +174,8 @@ class Card(TypedDict):
     """When the card was created"""
     updatedAt: str
     """When the card was last updated"""
+    isSubscribed: NotRequired[bool]
+    """If the current user is subscribed to the card"""
 
 class CardLabel(TypedDict):
     id: str
@@ -386,6 +388,8 @@ class Project(TypedDict):
     """When the project was created"""
     updatedAt: str
     """When the project was last updated"""
+    isFavorite: NotRequired[bool]
+    """If the project is in the current user's favorites"""
 
 class ProjectManager(TypedDict):
     id: str
@@ -490,6 +494,8 @@ class User(TypedDict):
 class Webhook(TypedDict):
     id: str
     """Unique identifier for the webhook"""
+    boardId: NotRequired[str]
+    """ID of the board associated with the webhook"""
     name: str
     """Name/title of the webhook"""
     url: str
