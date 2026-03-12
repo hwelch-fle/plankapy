@@ -1083,7 +1083,7 @@ class PlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        resp = self.client.patch(f"api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}", json=kwargs)
+        resp = self.client.patch(f"api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:{customFieldId}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
 
@@ -1106,7 +1106,7 @@ class PlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        resp = self.client.delete(f"api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}")
+        resp = self.client.delete(f"api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:{customFieldId}")
         raise_planka_err(resp)
         return resp.json()
 
