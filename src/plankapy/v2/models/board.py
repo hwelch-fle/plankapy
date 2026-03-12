@@ -66,7 +66,7 @@ class Board(PlankaModel[schemas.Board]):
     @model_list
     def subscribed_cards(self) -> list[Card]:
         """Get all Cards on the Board that the current User is subscribed to"""
-        return [Card(sc, self.session) for sc in self._included['cards'] if sc['isSubscribed']]
+        return [Card(sc, self.session) for sc in self._included['cards'] if sc.get('isSubscribed', False)]
     
     @property
     @model_list

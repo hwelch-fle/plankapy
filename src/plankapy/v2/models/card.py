@@ -121,7 +121,7 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def subscribed(self) -> bool:
         """If the current user is subscribed to the Card"""
-        return self.endpoints.getCard(self.id)['item']['isSubscribed']
+        return self.endpoints.getCard(self.id)['item'].get('isSubscribed', False)
     @subscribed.setter
     def subscribed(self, subscribed: bool) -> None:
         """Set subscription status on the Card for the current User"""

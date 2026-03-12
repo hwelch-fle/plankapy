@@ -5,8 +5,8 @@ __all__ = ("PlankaModel", )
 import json
 import copy
 
-from typing import Any, Self, Callable
-from collections.abc import Mapping
+from typing import Any, Self
+from collections.abc import Mapping, Callable
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
