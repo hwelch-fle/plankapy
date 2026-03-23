@@ -101,11 +101,11 @@ BackgroundGradient = Literal[
 BackgroundGradients = get_args(BackgroundGradient)
 
 Language = Literal[
-    'ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 
+    'ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 
     'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 
     'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 
     'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 
-    'zh-CN', 'zh-TW',
+    'vi-VN', 'zh-CN', 'zh-TW',
 ]
 Languages: tuple[Language, ...] = get_args(Language)
 

@@ -54,19 +54,19 @@ class Board(PlankaModel[schemas.Board]):
     @model_list
     def trashed_cards(self) -> list[Card]:
         """Get all Cards in the Board trash list"""
-        return [Card(c, self.session) for c in self.endpoints.getCards(self.trash_list.id)['items']]
+        return self.trash_list.cards
     
     @property
     @model_list
     def archived_cards(self) -> list[Card]:
         """Get all Cards in the Board archive list"""
-        return [Card(c, self.session) for c in self.endpoints.getCards(self.archive_list.id)['items']]
+        return self.archive_list.cards
 
     @property
     @model_list
     def subscribed_cards(self) -> list[Card]:
         """Get all Cards on the Board that the current User is subscribed to"""
-        return [Card(sc, self.session) for sc in self._included['cards'] if sc['isSubscribed']]
+        return [Card(sc, self.session) for sc in self._included['cards'] if sc.get('isSubscribed', False)]
     
     @property
     @model_list

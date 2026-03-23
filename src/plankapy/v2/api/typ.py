@@ -14,7 +14,9 @@ class Request_acceptTerms(TypedDict):
     pendingToken: str
     """Pending token received from the authentication flow"""
     signature: str
-    """Terms signature hash based on user role"""
+    """Terms signature hash"""
+    initialLanguage: NotRequired[Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW'] | None]
+    """Preferred language for user interface and notifications (used only if user language is not set)"""
 
 class Request_createAccessToken(TypedDict):
     emailOrUsername: str
@@ -147,12 +149,14 @@ class Request_createCard(TypedDict):
     """Stopwatch data for time tracking"""
 
 class Request_getCards(TypedDict):
-    before: NotRequired[str]
-    """Pagination cursor (JSON object with id and listChangedAt)"""
+    before_listChangedAt: NotRequired[str]
+    """Pagination cursor field `listChangedAt` (use together with `before_id`)"""
+    before_id: NotRequired[str]
+    """Pagination cursor field `id` (use together with `before_listChangedAt`)"""
     search: NotRequired[str]
     """Search term to filter cards"""
     userIds: NotRequired[str]
-    """Comma-separated user IDs to filter by members"""
+    """Comma-separated user IDs to filter by members or task assignees"""
     labelIds: NotRequired[str]
     """Comma-separated label IDs to filter by labels"""
 
@@ -166,7 +170,7 @@ class Request_updateCard(TypedDict):
     type: NotRequired[Literal['project', 'story']]
     """Type of the card"""
     position: NotRequired[int | None]
-    """Position of the card within the list"""
+    """Position of the card within the list (required when moving card to new list)"""
     name: NotRequired[str]
     """Name/title of the card"""
     description: NotRequired[str | None]
@@ -181,9 +185,13 @@ class Request_updateCard(TypedDict):
     """Whether the current user is subscribed to the card"""
 
 class Request_duplicateCard(TypedDict):
-    position: int
+    boardId: NotRequired[str]
+    """ID of the board to duplicate the card to"""
+    listId: NotRequired[str]
+    """ID of the list to duplicate the card to"""
+    position: NotRequired[int | None]
     """Position for the duplicated card within the list"""
-    name: str
+    name: NotRequired[str | None]
     """Name/title for the duplicated card"""
 
 class Request_createComment(TypedDict):
@@ -197,6 +205,24 @@ class Request_getComments(TypedDict):
 class Request_updateComments(TypedDict):
     text: NotRequired[str]
     """Content of the comment"""
+
+class Request_updateConfig(TypedDict):
+    smtpHost: NotRequired[str | None]
+    """Hostname or IP address of the SMTP server"""
+    smtpPort: NotRequired[int | None]
+    """Port number of the SMTP server"""
+    smtpName: NotRequired[str | None]
+    """Client hostname used in the EHLO command for SMTP"""
+    smtpSecure: NotRequired[bool]
+    """Whether to use a secure connection for SMTP"""
+    smtpTlsRejectUnauthorized: NotRequired[bool]
+    """Whether to reject unauthorized or self-signed TLS certificates for SMTP connections"""
+    smtpUser: NotRequired[str | None]
+    """Username for authenticating with the SMTP server"""
+    smtpPassword: NotRequired[str | None]
+    """Password for authenticating with the SMTP server"""
+    smtpFrom: NotRequired[str | None]
+    """Default "from" used for outgoing SMTP emails"""
 
 class Request_createBoardCustomFieldGroup(TypedDict):
     baseCustomFieldGroupId: NotRequired[str]
@@ -321,7 +347,7 @@ class Request_createProjectManager(TypedDict):
     """ID of the user who is assigned as project manager"""
 
 class Request_createProject(TypedDict):
-    type: Literal['shared', 'private']
+    type: Literal['private', 'shared']
     """Type of the project"""
     name: str
     """Name/title of the project"""
@@ -407,8 +433,8 @@ class Request_createUser(TypedDict):
     """Contact phone number"""
     organization: NotRequired[str | None]
     """Organization or company name"""
-    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None]
-    """Preferred language for user interface and notifications"""
+    language: NotRequired[Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW'] | None]
+    """Preferred language for user interface and notifications (if null - will be set automatically on the first login)"""
     subscribeToOwnCards: NotRequired[bool]
     """Whether the user subscribes to their own cards"""
     subscribeToCardWhenCommenting: NotRequired[bool]
@@ -431,8 +457,10 @@ class Request_updateUser(TypedDict):
     """Contact phone number"""
     organization: NotRequired[str | None]
     """Organization or company name"""
-    language: NotRequired[Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None]
+    language: NotRequired[Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW']]
     """Preferred language for user interface and notifications"""
+    apiKey: NotRequired[dict[str, Any] | None]
+    """API key of the user (only null value to remove API key)"""
     subscribeToOwnCards: NotRequired[bool]
     """Whether the user subscribes to their own cards"""
     subscribeToCardWhenCommenting: NotRequired[bool]
@@ -447,6 +475,8 @@ class Request_updateUser(TypedDict):
     """Default view mode for the home page"""
     defaultProjectsOrder: NotRequired[Literal['byDefault', 'alphabetically', 'byCreationTime']]
     """Default sort order for projects display"""
+    isSsoUser: NotRequired[bool]
+    """Whether the user is SSO user (only false value to unlink SSO, for admins)"""
     isDeactivated: NotRequired[bool]
     """Whether the user account is deactivated and cannot log in (for admins)"""
 
@@ -619,7 +649,7 @@ class Included_getBoard(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Included_getBoard_all(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Item_getBoard(Board):
@@ -629,6 +659,10 @@ class Item_getBoard(Board):
 class Response_updateBoard(TypedDict):
     """Board updated successfully"""
     item: Board
+
+class Response_getBootstrap(TypedDict):
+    """Bootstrap retrieved successfully"""
+    item: Bootstrap
 
 class Response_createCardLabel(TypedDict):
     """Label added to card successfully"""
@@ -667,7 +701,7 @@ class Included_getCards(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Items_getCards(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Response_deleteCard(TypedDict):
@@ -691,7 +725,7 @@ class Included_getCard(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Item_getCard(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Response_updateCard(TypedDict):
@@ -743,6 +777,14 @@ class Response_updateComments(TypedDict):
 
 class Response_getConfig(TypedDict):
     """Configuration retrieved successfully"""
+    item: Config
+
+class Response_updateConfig(TypedDict):
+    """Configuration updated successfully"""
+    item: Config
+
+class Response_testSmtpConfig(TypedDict):
+    """Test email sent successfully"""
     item: Config
 
 class Response_createBoardCustomFieldGroup(TypedDict):
@@ -841,7 +883,7 @@ class Included_getList(TypedDict):
     customFieldValues: list[CustomFieldValue]
 
 class Included_getList_all(Card):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
 class Response_updateList(TypedDict):
@@ -941,7 +983,7 @@ class Included_getProjects(TypedDict):
     notificationServices: list[NotificationService]
 
 class Items_getProjects(Project):
-    isFavorite: bool
+    isFavorite: NotRequired[bool]
     """Whether the project is marked as favorite by the current user"""
 
 class Response_deleteProject(TypedDict):
@@ -964,7 +1006,7 @@ class Included_getProject(TypedDict):
     notificationServices: list[NotificationService]
 
 class Item_getProject(Project):
-    isFavorite: bool
+    isFavorite: NotRequired[bool]
     """Whether the project is marked as favorite by the current user"""
 
 class Response_updateProject(TypedDict):
@@ -1008,17 +1050,24 @@ class Response_getTerms(TypedDict):
     item: Item_getTerms
 
 class Item_getTerms(TypedDict):
-    type: Literal['general', 'extended']
-    language: Literal['de-DE', 'en-US']
+    language: str
     content: str
     signature: str
+
+class Response_createUserApiKey(TypedDict):
+    """API key created successfully"""
+    item: User
+    included: Included_createUserApiKey
+
+class Included_createUserApiKey(TypedDict):
+    apiKey: str
 
 class Response_createUser(TypedDict):
     """User created successfully"""
     item: User
 
 class Response_getUsers(TypedDict):
-    """List of users retrieved successfully"""
+    """Users retrieved successfully"""
     items: list[User]
 
 class Response_deleteUser(TypedDict):
@@ -1051,8 +1100,7 @@ class Response_updateUserPassword(TypedDict):
     included: Included_updateUserPassword
 
 class Included_updateUserPassword(TypedDict):
-    accessTokens: list[str]
-    """New acces tokens (when updating own password)"""
+    accessToken: str
 
 class Response_updateUserUsername(TypedDict):
     """Username updated successfully"""
@@ -1063,7 +1111,7 @@ class Response_createWebhook(TypedDict):
     item: Webhook
 
 class Response_getWebhooks(TypedDict):
-    """List of webhooks retrieved successfully"""
+    """Webhooks retrieved successfully"""
     items: list[Webhook]
 
 class Response_deleteWebhook(TypedDict):

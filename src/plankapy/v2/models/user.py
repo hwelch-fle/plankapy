@@ -13,7 +13,7 @@ from ..api import schemas, paths, events
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from typing import Any, Unpack
+    from typing import Any, Unpack, Literal
     #from models import *
     from ._literals import (
         UserRole, 
@@ -184,14 +184,17 @@ class User(PlankaModel[schemas.User]):
         self.update(defaultProjectsOrder=default_projects_order)
     
     @property
-    def terms_type(self) -> TermsType:
+    def terms_type(self) -> TermsType | None:
         """Type of terms applicable to the user based on role"""
-        return self.schema['termsType']
+        return self.schema.get('termsType')
     
     @property
     def is_sso_user(self) -> bool:
-        """Whether the user is SSO user (private field)"""
+        """Whether the user is SSO user (private field, can be unlinked by admins)"""
         return self.schema.get('isSsoUser', False)
+    @is_sso_user.setter
+    def is_sso_user(self, is_sso_user: Literal[False]) -> None:
+        self.update(isSsoUser=is_sso_user)
     
     @property
     def is_deactivated(self) -> bool:
@@ -435,4 +438,26 @@ class User(PlankaModel[schemas.User]):
         if notification_service in self.notification_services:
             notification_service.delete()
     
+    def create_api_key(self, overwrite: bool = False) -> str | None:
+        """Generate an API key for the user (must be admin or logged in user)
+        
+        Args:
+            overwrite: If the user already has an API Key, this will overwrite it with a new one and return the new key
+            
+        Returns:
+            A new API Key for the user (This is only sent once! so make sure to save it somewhere)
+            
+        Raises:
+            PermissionError if the user already has a key and `overwrite` is unset
+        """
+        if self.schema.get('apiKeyPrefix'):
+            if overwrite:
+                self.update(apiKey=None)
+            else:
+                raise PermissionError('User already has an API Key, run again with `overwrite` enabled to create a new one')
+        else:
+            return self.endpoints.createUserApiKey(self.id)['included']['apiKey']
+    
 from .notification_service import NotificationService
+from .card import Card
+from .board import Board

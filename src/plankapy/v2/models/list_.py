@@ -299,12 +299,10 @@ class List(PlankaModel[schemas.List]):
             if isinstance(labels, Label):
                 labels = [labels]
             kwargs['labelIds '] = ','.join(l.id for l in labels)
-        if card_before or changed_before:
-            kwargs['before'] = {}
         if card_before:
-            kwargs['before']['id'] = card_before.id
+            kwargs['before_id'] = card_before.id
         if changed_before:
-            kwargs['before']['listChangedAt'] = dttoiso(changed_before, default_timezone=self.session.timezone)
+            kwargs['before_listChangedAt'] = dttoiso(changed_before, default_timezone=self.session.timezone)
             
         return [
             Card(c, self.session) 

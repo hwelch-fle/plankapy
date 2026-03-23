@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Sequence
+from collections.abc import Sequence
 
 __all__ = ('BaseCustomFieldGroup', )
 

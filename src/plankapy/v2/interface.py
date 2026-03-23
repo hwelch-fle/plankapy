@@ -46,16 +46,18 @@ from __future__ import annotations
 from functools import cached_property
 from collections.abc import Sequence
 from datetime import timezone
+from typing import Unpack
 
 from httpx import Client, HTTPStatusError, URL
 
 from .api import (
     PlankaEndpoints, 
     events,
+    typ,
 )
 from .models import *
 from .models._helpers import model_list
-from .models._literals import Language, TermsType, UserRole, ProjectType
+from .models._literals import Language, UserRole, ProjectType
 
 # Allow Users to set `PLANKA_LANG` environment variable with their language
 # Default to en-US if not set
@@ -151,33 +153,35 @@ class Planka:
         self.current_role: UserRole | None = None
         self.current_id : str | None = None
     
-    def accept_terms(self, pending_token: str, terms_type: TermsType='general', lang: Language='en-US'):
+    def accept_terms(self, pending_token: str, lang: Language | None = None):
         """If the User has never logged on, or is required to accept new terms, allow them to do so"""
-        terms = self.endpoints.getTerms(type=terms_type, language=lang)['item']
+        if lang:
+            terms = self.endpoints.getTerms(language=lang)['item']
+        else:
+            terms = self.endpoints.getTerms()['item']
         print(terms['content'])
         sig = terms['signature']
         self.endpoints.acceptTerms(pendingToken=pending_token, signature=sig)
     
     def login(self, 
               *, 
-              username: str|None=None, 
-              password: str|None=None, 
-              api_key: str|None=None, 
-              accept_terms: TermsType | None=None,
-              terms_lang: Language='en-US') -> None:
+              username: str | None = None, 
+              password: str | None = None, 
+              api_key: str | None = None, 
+              accept_terms: bool | None = None,
+              terms_lang: Language | None = None) -> None:
         
         """Authenticate with the planka instance
         
         Args:
-            username (str | None): User username/email 
-            password (str | None): User password
-            api_key (str | None): User API Key
-            accept_terms (TermsType | None): If you user has not accepted the terms, run the term acceptance flow
+            username: User username/email 
+            password: User password
+            api_key: User API Key
+            accept_terms: Set to `True` to accept terms on first login
             terms_lang: If accepting terms, request them in this language
             
         Note:
-            After accepting the terms, please get an API key from the Planka server. If you need to accept extended terms, please 
-            set the `terms` flag to the terms you are accepting. These terms will be printed to `stdout` during the flow.
+            After logging in for the first time, please get an API key from the Planka server.
         """
         # API Key
         if api_key:
@@ -190,9 +194,9 @@ class Planka:
                 token = self.endpoints.createAccessToken(emailOrUsername=username, password=password, withHttpOnlyToken=True)['item']
                 self.client.headers['Authorization'] = f'Bearer {token}'
             except HTTPStatusError as e:
-                if accept_terms is None:
-                    raise PermissionError(f'Please logon again with `accept_terms` set to the terms you must accept')
-                self.accept_terms(e.response.json()['pendingToken'], terms_type=accept_terms, lang=terms_lang)
+                if not accept_terms:
+                    raise PermissionError(f'Please logon again with `accept_terms` set to `True` to login the first time')
+                self.accept_terms(e.response.json()['pendingToken'], lang=terms_lang)
                 self.login(username=username, password=password)
         
         # Invalid Creds
@@ -212,6 +216,11 @@ class Planka:
         return User(self.endpoints.getUser('me')['item'], self)
 
     @property
+    def bootstrap(self):
+        """Get the application bootstrap"""
+        return Config(self.endpoints.getBootstrap()['item'], self)
+
+    @property
     @model_list
     def notifications(self) -> list[Notification]:
         """Get all notifications for the current User"""
@@ -225,8 +234,28 @@ class Planka:
 
     @cached_property
     def config(self) -> Config:
-        """Get the configuration info for the current Planka server"""
-        return Config(self.endpoints.getConfig()['item'], self)
+        """(*deprecated: Use `Planka.bootstrap` instead*) Get the configuration info for the current Planka server"""
+        return self.bootstrap
+    
+    @property
+    def smtp_config(self): 
+        """Get the server SMTP config (this also tests the current config)"""
+        return self.endpoints.testSmtpConfig()['item']
+
+    def update_smtp_config(self, **opts: Unpack[typ.Request_updateConfig]):
+        """Update the server SMTP config (all args are optional and only passed args will be updated)
+        
+        Args:
+            smtpHost: Hostname or IP address of the SMTP server
+            smtpPort: Port number of the SMTP server
+            smtpName: Client hostname used in the EHLO command for SMTP
+            smtpSecure: Whether to use a secure connection for SMTP
+            smtpTlsRejectUnauthorized: Whether to reject unauthorized or self-signed TLS certificates for SMTP connections
+            smtpUser: Username for authenticating with the SMTP server
+            smtpPassword: Password for authenticating with the SMTP server
+            smtpFrom: Default "from" used for outgoing SMTP emails
+        """
+        self.endpoints.updateConfig(**opts)
 
     @property
     @model_list
@@ -369,4 +398,5 @@ class Planka:
         if access_token:
             args['accessToken'] = access_token
         return Webhook(self.endpoints.createWebhook(**args)['item'], self)
+        
         

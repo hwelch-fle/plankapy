@@ -36,12 +36,12 @@ class Webhook(PlankaModel[schemas.Webhook]):
         return self.schema['accessToken']
     
     @property
-    def events(self) -> list[_events.WebhookEvent]:
+    def events(self) -> list[_events.PlankaEvent]:
         """List of events that trigger the Webhook"""
         return self.schema['events']
     
     @property
-    def excluded_events(self) -> list[_events.WebhookEvent]:
+    def excluded_events(self) -> list[_events.PlankaEvent]:
         """List of events excluded from the Webhook"""
         return self.schema['excludedEvents']
     

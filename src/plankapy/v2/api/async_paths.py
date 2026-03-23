@@ -27,7 +27,8 @@ class AsyncPlankaEndpoints:
 
         Args:
             pendingToken (str): Pending token received from the authentication flow
-            signature (str): Terms signature hash based on user role
+            signature (str): Terms signature hash
+            initialLanguage (Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW'] | None): Preferred language for user interface and notifications (used only if user language is not set)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -514,6 +515,13 @@ class AsyncPlankaEndpoints:
         await raise_planka_err(resp)
         return resp.json()
 
+    async def getBootstrap(self) -> Response_getBootstrap:
+        """Retrieves the application bootstrap.
+        """
+        resp = await self.client.get("api/bootstrap")
+        await raise_planka_err(resp)
+        return resp.json()
+
     async def createCardLabel(self, cardId: str, **kwargs: Unpack[Request_createCardLabel]) -> Response_createCardLabel:
         """Adds a label to a card. Requires board editor permissions.
 
@@ -638,10 +646,11 @@ class AsyncPlankaEndpoints:
 
         Args:
             listId (str): ID of the list to get cards from (must be an endless list))
-            before (str): Pagination cursor (JSON object with id and listChangedAt)) (optional)
+            before[listChangedAt] (str): Pagination cursor field `listChangedAt` (use together with `before[id]`)) (optional)
+            before[id] (str): Pagination cursor field `id` (use together with `before[listChangedAt]`)) (optional)
             search (str): Search term to filter cards) (optional)
-            filterUserIds (str): Comma-separated user IDs to filter by members) (optional)
-            filterLabelIds (str): Comma-separated label IDs to filter by labels) (optional)
+            userIds (str): Comma-separated user IDs to filter by members or task assignees) (optional)
+            labelIds (str): Comma-separated label IDs to filter by labels) (optional)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -653,7 +662,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             NotFound: 404 
         """
-        valid_params = ('before', 'search', 'filterUserIds', 'filterLabelIds')
+        valid_params = ('before[listChangedAt]', 'before[id]', 'search', 'userIds', 'labelIds')
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get(f"api/lists/{listId}/cards", params=passed_params)
         await raise_planka_err(resp)
@@ -709,7 +718,7 @@ class AsyncPlankaEndpoints:
             listId (str): ID of the list to move the card to
             coverAttachmentId (str | None): ID of the attachment used as cover
             type (Literal['project', 'story']): Type of the card
-            position (int | None): Position of the card within the list
+            position (int | None): Position of the card within the list (required when moving card to new list)
             name (str): Name/title of the card
             description (str | None): Detailed description of the card
             dueDate (str | None): Due date for the card
@@ -738,8 +747,10 @@ class AsyncPlankaEndpoints:
 
         Args:
             id (str): ID of the card to duplicate)
-            position (int): Position for the duplicated card within the list
-            name (str): Name/title for the duplicated card
+            boardId (str): ID of the board to duplicate the card to
+            listId (str): ID of the list to duplicate the card to
+            position (int | None): Position for the duplicated card within the list
+            name (str | None): Name/title for the duplicated card
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -751,6 +762,7 @@ class AsyncPlankaEndpoints:
             Unauthorized: 401 
             Forbidden: 403 
             NotFound: 404 
+            UnprocessableEntity: 422 
         """
         resp = await self.client.post(f"api/cards/{id}/duplicate", json=kwargs)
         await raise_planka_err(resp)
@@ -865,9 +877,42 @@ class AsyncPlankaEndpoints:
         return resp.json()
 
     async def getConfig(self) -> Response_getConfig:
-        """Retrieves the application configuration.
+        """Retrieves the application configuration. Requires admin privileges.
         """
         resp = await self.client.get("api/config")
+        await raise_planka_err(resp)
+        return resp.json()
+
+    async def updateConfig(self, **kwargs: Unpack[Request_updateConfig]) -> Response_updateConfig:
+        """Updates the application configuration. Requires admin privileges.
+
+        Args:
+            smtpHost (str | None): Hostname or IP address of the SMTP server
+            smtpPort (int | None): Port number of the SMTP server
+            smtpName (str | None): AsyncClient hostname used in the EHLO command for SMTP
+            smtpSecure (bool): Whether to use a secure connection for SMTP
+            smtpTlsRejectUnauthorized (bool): Whether to reject unauthorized or self-signed TLS certificates for SMTP connections
+            smtpUser (str | None): Username for authenticating with the SMTP server
+            smtpPassword (str | None): Password for authenticating with the SMTP server
+            smtpFrom (str | None): Default "from" used for outgoing SMTP emails
+        """
+        resp = await self.client.patch("api/config", json=kwargs)
+        await raise_planka_err(resp)
+        return resp.json()
+
+    async def testSmtpConfig(self) -> Response_testSmtpConfig:
+        """Sends a test email to verify the SMTP is configured correctly. Only available when SMTP is configured via the UI.
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
+
+        Raises:
+            Unauthorized: 401 
+            Forbidden: 403 
+        """
+        resp = await self.client.post("api/config/test-smtp")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1006,7 +1051,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        resp = await self.client.patch(f"api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}", json=kwargs)
+        resp = await self.client.patch(f"api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:{customFieldId}", json=kwargs)
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1029,7 +1074,7 @@ class AsyncPlankaEndpoints:
             Forbidden: 403 
             NotFound: 404 
         """
-        resp = await self.client.delete(f"api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:${customFieldId}")
+        resp = await self.client.delete(f"api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:{customFieldId}")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1583,7 +1628,7 @@ class AsyncPlankaEndpoints:
         """Creates a project. The current user automatically becomes a project manager.
 
         Args:
-            type (Literal['public', 'private']): Type of the project
+            type (Literal['private', 'shared']): Type of the project
             name (str): Name/title of the project
             description (str | None): Detailed description of the project
 
@@ -1852,12 +1897,11 @@ class AsyncPlankaEndpoints:
         await raise_planka_err(resp)
         return resp.json()
 
-    async def getTerms(self, type: Literal['general', 'extended'], **kwargs: Unpack[Request_getTerms]) -> Response_getTerms:
+    async def getTerms(self, **kwargs: Unpack[Request_getTerms]) -> Response_getTerms:
         """Retrieves terms and conditions in the specified language.
 
         Args:
-            type (Literal['general', 'extended']): Type of terms to retrieve)
-            language (Literal['de-DE', 'en-US']): Language code for terms localization) (optional)
+            language (str): Language code for terms localization) (optional)
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
@@ -1871,7 +1915,27 @@ class AsyncPlankaEndpoints:
         """
         valid_params = ('language',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
-        resp = await self.client.get(f"api/terms/{type}", params=passed_params)
+        resp = await self.client.get("api/terms", params=passed_params)
+        await raise_planka_err(resp)
+        return resp.json()
+
+    async def createUserApiKey(self, id: str) -> Response_createUserApiKey:
+        """Generates a user's API key. The full API key is returned only once and cannot be retrieved again.
+
+        Args:
+            id (str): ID of the user to create API key for)
+
+        Note:
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
+            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            Planka internal status codes and names are included here for disambiguation
+
+        Raises:
+            ValidationError: 400 
+            Unauthorized: 401 
+            NotFound: 404 
+        """
+        resp = await self.client.post(f"api/users/{id}/api-key")
         await raise_planka_err(resp)
         return resp.json()
 
@@ -1886,7 +1950,7 @@ class AsyncPlankaEndpoints:
             username (str | None): Unique username for user identification
             phone (str | None): Contact phone number
             organization (str | None): Organization or company name
-            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None): Preferred language for user interface and notifications
+            language (Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW'] | None): Preferred language for user interface and notifications (if null - will be set automatically on the first login)
             subscribeToOwnCards (bool): Whether the user subscribes to their own cards
             subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
             turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
@@ -1977,7 +2041,8 @@ class AsyncPlankaEndpoints:
             avatar (dict[str, Any] | None): Avatar of the user (only null value to remove avatar)
             phone (str | None): Contact phone number
             organization (str | None): Organization or company name
-            language (Literal['ar-YE', 'bg-BG', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'zh-CN', 'zh-TW'] | None): Preferred language for user interface and notifications
+            language (Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW']): Preferred language for user interface and notifications
+            apiKey (dict[str, Any] | None): API key of the user (only null value to remove API key)
             subscribeToOwnCards (bool): Whether the user subscribes to their own cards
             subscribeToCardWhenCommenting (bool): Whether the user subscribes to cards when commenting
             turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
@@ -1985,6 +2050,7 @@ class AsyncPlankaEndpoints:
             defaultEditorMode (Literal['wysiwyg', 'markup']): Default markdown editor mode
             defaultHomeView (Literal['gridProjects', 'groupedProjects']): Default view mode for the home page
             defaultProjectsOrder (Literal['byDefault', 'alphabetically', 'byCreationTime']): Default sort order for projects display
+            isSsoUser (bool): Whether the user is SSO user (only false value to unlink SSO, for admins)
             isDeactivated (bool): Whether the user account is deactivated and cannot log in (for admins)
 
         Note:

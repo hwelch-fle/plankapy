@@ -81,7 +81,7 @@ class Project(PlankaModel[schemas.Project]):
     @property
     def favorite(self) -> bool:
         """Whether the project is in the current User's favorites"""
-        return self.endpoints.getProject(self.id)['item']['isFavorite']
+        return self.endpoints.getProject(self.id)['item'].get('isFavorite', False)
     @favorite.setter
     def favorite(self, is_favorite: bool) -> None:
         """Set/Unset the Project in the current User's favorites"""

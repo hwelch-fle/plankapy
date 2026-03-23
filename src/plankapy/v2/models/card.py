@@ -121,7 +121,7 @@ class Card(PlankaModel[schemas.Card]):
     @property
     def subscribed(self) -> bool:
         """If the current user is subscribed to the Card"""
-        return self.endpoints.getCard(self.id)['item']['isSubscribed']
+        return self.endpoints.getCard(self.id)['item'].get('isSubscribed', False)
     @subscribed.setter
     def subscribed(self, subscribed: bool) -> None:
         """Set subscription status on the Card for the current User"""
@@ -351,19 +351,25 @@ class Card(PlankaModel[schemas.Card]):
         )
         return self
 
-    def duplicate(self, position: Position = 'top', *, name: str|None=None) -> Card:
+    def duplicate(self, position: Position = 'top', *, name: str | None = None, board: Board | None, lst: List | None) -> Card:
         """Duplicate the card in the current List
         
         Args:
             position (Position): The position to place the new Card in (default: `top`)
             name (str|None): An optional name to give the new Card (default `{name} (copy)`)
+            board: THe Board to duplicate the card to
+            lst: The List to duplicate the card to (if Board is unset, this List's Board will be used)
         """
         position = get_position(self.list.cards, position)
+        lst = lst or self.list
+        board = board or lst.board
         return Card(
             self.endpoints.duplicateCard(
                 self.id, 
                 position=position, 
-                name=name or f'{self.name} (copy)'
+                name=name or f'{self.name} (copy)',
+                boardId=board.id,
+                listId=lst.id,
             )['item'], 
             self.session
         )
