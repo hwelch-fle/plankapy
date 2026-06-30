@@ -3,7 +3,7 @@ A Python API for [Planka](https://github.com/plankanban/planka)
 
 ![PyPI - License](https://img.shields.io/pypi/l/plankapy)
 
-![PyPI - Version](https://img.shields.io/pypi/v/plankapy) ![PyPI - Downloads](https://img.shields.io/pypi/dw/plankapy) ![GitHub last commit](https://img.shields.io/github/last-commit/hwelch-fle/plankapy)
+![PyPI - Version](https://img.shields.io/pypi/v/plankapy) ![GitHub last commit](https://img.shields.io/github/last-commit/hwelch-fle/plankapy)
 
 [![Release](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml/badge.svg)](https://github.com/hwelch-fle/plankapy/actions/workflows/python-publish.yml) [![Docs](https://github.com/hwelch-fle/plankapy/actions/workflows/docs.yml/badge.svg)](https://github.com/hwelch-fle/plankapy/actions/workflows/docs.yml) 
 
