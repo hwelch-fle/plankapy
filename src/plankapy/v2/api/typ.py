@@ -11,7 +11,6 @@ from typing import (
 from . import schemas as sch
 
 
-# Request Typing
 class Request_acceptTerms(TypedDict):
     pendingToken: str
     """Pending token received from the authentication flow"""
@@ -588,7 +587,6 @@ class Request_updateWebhook(TypedDict):
     """Comma-separated list of events excluded from the webhook"""
 
 
-# Response Typing
 class Response_acceptTerms(TypedDict):
     """Terms accepted successfully"""
     item: str
@@ -739,7 +737,7 @@ class Included_getBoard_all(sch.Card):
 
 
 class Item_getBoard(sch.Board):
-    isSubscribed: bool
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the board"""
 
 
