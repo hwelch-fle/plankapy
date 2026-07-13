@@ -33,8 +33,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -55,8 +55,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -72,8 +72,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             Unauthorized: 401
@@ -92,8 +92,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -115,8 +115,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -135,8 +135,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -158,8 +158,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -185,8 +185,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -207,8 +207,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -229,8 +229,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -252,8 +252,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -274,8 +274,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -296,8 +296,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -317,8 +317,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -339,8 +339,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -363,8 +363,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -385,8 +385,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -407,8 +407,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -432,8 +432,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -453,8 +453,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -474,8 +474,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -504,8 +504,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -532,8 +532,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -555,8 +555,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -577,8 +577,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -600,8 +600,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -628,8 +628,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -655,8 +655,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -677,8 +677,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -698,8 +698,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -729,8 +729,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -755,8 +755,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -777,8 +777,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -798,8 +798,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -820,8 +820,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -842,8 +842,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -864,8 +864,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -906,8 +906,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             Unauthorized: 401
@@ -928,8 +928,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -953,8 +953,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -975,8 +975,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -996,8 +996,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1018,8 +1018,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1043,8 +1043,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1066,8 +1066,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1090,8 +1090,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1113,8 +1113,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1134,8 +1134,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1158,8 +1158,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1182,8 +1182,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1203,8 +1203,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1227,8 +1227,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1248,8 +1248,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1272,8 +1272,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1293,8 +1293,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1314,8 +1314,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1339,8 +1339,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1361,8 +1361,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1384,8 +1384,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1408,8 +1408,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1431,8 +1431,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1452,8 +1452,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1474,8 +1474,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1494,8 +1494,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1511,8 +1511,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1527,8 +1527,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1546,8 +1546,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1567,8 +1567,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1588,8 +1588,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1611,8 +1611,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1635,8 +1635,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1651,8 +1651,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1670,8 +1670,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1691,8 +1691,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1719,8 +1719,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1746,8 +1746,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1767,8 +1767,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1788,8 +1788,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1812,8 +1812,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1837,8 +1837,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1859,8 +1859,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1885,8 +1885,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1906,8 +1906,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1928,8 +1928,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1958,8 +1958,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1976,8 +1976,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -1996,8 +1996,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2018,8 +2018,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2056,8 +2056,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2079,8 +2079,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2102,8 +2102,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2126,8 +2126,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2149,8 +2149,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2175,8 +2175,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2192,8 +2192,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2211,8 +2211,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
@@ -2236,8 +2236,8 @@ class AsyncPlankaEndpoints:
 
         Note:
             All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
-            If a matching PlankaError exists, it will be raised (see `api.errors`)
-            Planka internal status codes and names are included here for disambiguation
+             If a matching PlankaError exists, it will be raised (see `api.errors`)
+             Planka internal status codes and names are included here for disambiguation
 
         Raises:
             ValidationError: 400
