@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Unpack
 
 from httpx import HTTPStatusError
@@ -385,7 +386,7 @@ class Card(PlankaModel[schemas.Card]):
             self.move(self.prev_list, position)
         return self
 
-    def add_attachment(self, attachment: str | bytes,
+    def add_attachment(self, attachment: Path | str | bytes,
                        *,
                        cover: bool = False,
                        download_url: bool = False,
@@ -393,10 +394,10 @@ class Card(PlankaModel[schemas.Card]):
         """Add an Attachment to the card
 
         Args:
-            attachment (str | bytes): The URL or raw bytes of the attachment
-            cover (bool): Set the new attachment as the cover of the card
-            download_url (bool): If a link is used, download the file from the link and attach it (default: `False`)
-            name (str | None): The optional name of the attachment (default is `hash() + mimetypes.guess_type(attachment)`)
+            attachment: Path or URL or raw bytes of the attachment
+            cover: Set the new attachment as the cover of the card
+            download_url: If a link is used, download the file from the link and attach it (default: `False`)
+            name: The optional name of the attachment (default is `hash() + mimetypes.guess_type(attachment)`)
 
         Returns:
             Attachment
@@ -417,8 +418,8 @@ class Card(PlankaModel[schemas.Card]):
         # Handle filepath or URL
         mime_type = None
         extension = '.bin'
-        if isinstance(attachment, str):
-
+        if isinstance(attachment, (Path, str)):
+            attachment = str(attachment)
             # Guess URL file type
             if attachment.startswith('http'):
                 mime_type, *_ = mimetypes.guess_type(attachment)

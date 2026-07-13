@@ -37,7 +37,7 @@ class BoardMembership(PlankaModel[schemas.BoardMembership]):
         Raises:
             LookupError: User no longer in the Board
         """
-        if usr := self.board.users[{'userId': self.user.id}].dpop():
+        if usr := self.board.users[{'id': self.schema['userId']}].dpop():
             return usr
         raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
