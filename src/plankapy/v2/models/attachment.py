@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-__all__ = ('Attachment', )
-
+from collections.abc import Iterator
 from datetime import datetime
+from typing import Any, Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
@@ -10,11 +10,7 @@ from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from collections.abc import Iterator
-    from typing import Any, Unpack
-    # from models import *
+__all__ = ('Attachment', )
 
 
 class Attachment(PlankaModel[schemas.Attachment]):
@@ -50,9 +46,8 @@ class Attachment(PlankaModel[schemas.Attachment]):
     @property
     def creator(self) -> User:
         """The User created the Attachment (Raises LookupError if User is not found in Board)"""
-        usrs = [u for u in self.card.board.users if self.schema['creatorUserId'] == u.id]
-        if usrs:
-            return usrs.pop()
+        if usr := self.card.board.users[{'id': self.schema['creatorUserId']}].dpop():
+            return usr
         raise LookupError(f"Cannot find User: {self.schema['creatorUserId']}")
 
     @property
@@ -69,9 +64,7 @@ class Attachment(PlankaModel[schemas.Attachment]):
     def sync(self) -> None:
         """Pull the latest state of the Attachment from the Planka Server"""
         # No endpoint for attachments, need to get it through the associated Card
-        new = [a for a in self.card.attachments if a.id == self.id]
-        if not new:
-            self.schema = new.pop().schema
+        self.schema = self.card.attachments[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateAttachment]) -> None:
         """Update the Attachment with the provided values"""

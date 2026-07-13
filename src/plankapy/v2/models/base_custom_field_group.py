@@ -2,17 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position, model_list
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-    # from models import *
 
 __all__ = ('BaseCustomFieldGroup', )
 

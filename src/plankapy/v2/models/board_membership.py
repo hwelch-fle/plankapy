@@ -1,20 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import dtfromiso
+from ._literals import BoardRole
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-
-    # from models import *
-    from _literals import BoardRole
-
 
 __all__ = ('BoardMembership', )
 

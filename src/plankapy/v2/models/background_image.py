@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-__all__ = ('BackgroundImage', )
-
+from collections.abc import Generator, Iterator
 from datetime import datetime
 
 from ..api import events, schemas
@@ -10,10 +9,7 @@ from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from collections.abc import Generator, Iterator
-    # from models import *
+__all__ = ('BackgroundImage', )
 
 
 class BackgroundImage(PlankaModel[schemas.BackgroundImage]):

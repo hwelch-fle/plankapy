@@ -1,17 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from ..api import events, schemas
 from ._base import PlankaModel
 from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Any
-    # from models import *
 
 __all__ = ('Action', )
 
@@ -44,9 +40,8 @@ class Action(PlankaModel[schemas.Action]):
     @property
     def user(self) -> User:
         """The User who performed the Action (Raise LookupError if User is not found in Board)"""
-        usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
-        if usrs:
-            return usrs.pop()
+        if usr := self.card.board.users[{'id': self.schema['userId']}].dpop():
+            return usr
         raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
     @property

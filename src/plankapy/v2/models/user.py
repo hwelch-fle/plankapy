@@ -1,32 +1,26 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any, Literal, Unpack
 
 from httpx import HTTPStatusError
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import dtfromiso, model_list
+from ._literals import (
+    BoardRole,
+    EditorMode,
+    HomeView,
+    Language,
+    LockableField,
+    NotificationServiceFormat,
+    ProjectOrdering,
+    TermsType,
+    UserRole,
+)
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Any, Literal, Unpack
-
-    # from models import *
-    from ._literals import (
-        BoardRole,
-        EditorMode,
-        HomeView,
-        Language,
-        LockableField,
-        NotificationServiceFormat,
-        ProjectOrdering,
-        TermsType,
-        UserRole,
-    )
-
 
 __all__ = ('User', )
 

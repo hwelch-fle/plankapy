@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Unpack
 
 from ..api import (
     events as _events,
@@ -11,12 +12,6 @@ from ._base import PlankaModel
 from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-    # from models import *
-
 
 __all__ = ('Webhook', )
 
@@ -63,20 +58,16 @@ class Webhook(PlankaModel[schemas.Webhook]):
 
     # Special Methods
     def sync(self):
-        """Sync the Webhook with the Planka server (admin only)"""
+        """Sync the Webhook with the Planka server (admin only, noop otherwise)"""
         if self.current_role == 'admin':
-            self.schema = [
-                Webhook(w, self.session)
-                for w in self.endpoints.getWebhooks()['items']
-                if w['id'] == self.id
-            ].pop().schema
+            self.schema = self.session.webhooks[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateWebhook]):
-        """Update the Webhook (admin only)"""
+        """Update the Webhook (admin only, noop otherwise)"""
         if self.current_role == 'admin':
             self.schema = self.endpoints.updateWebhook(self.id, **kwargs)['item']
 
     def delete(self):
-        """Delete the Webhook (admin only)"""
+        """Delete the Webhook (admin only, noop otherwise)"""
         if self.current_role == 'admin':
             self.endpoints.deleteWebhook(self.id)

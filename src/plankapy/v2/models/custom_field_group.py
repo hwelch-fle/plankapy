@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-__all__ = ('CustomFieldGroup', )
-
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
@@ -10,10 +9,7 @@ from ._helpers import Position, dtfromiso, get_position, model_list
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-    # from models import *
+__all__ = ('CustomFieldGroup', )
 
 
 class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
@@ -50,10 +46,9 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
         return Card(self.endpoints.getCard(self.schema['cardId'])['item'], self.session)
 
     @property
-    def base_custom_field_group(self) -> BaseCustomFieldGroup:
+    def base_custom_field_group(self) -> BaseCustomFieldGroup | None:
         """The BaseCustomFieldGroup used as a template"""
-        bcfgs = [bcfg for bcfg in self.board.project.base_custom_field_groups if bcfg.id == self.schema['baseCustomFieldGroupId']]
-        return bcfgs.pop()
+        return self.board.project.base_custom_field_groups[{'id': self.schema['baseCustomFieldGroupId']}].dpop()
 
     @property
     def position(self) -> int:
@@ -135,9 +130,8 @@ class CustomFieldGroup(PlankaModel[schemas.CustomFieldGroup]):
             CustomField: If the Field aleady exists, that Field is returned
         """
         # Return existing field
-        existing_field = [cf for cf in self.custom_fields if cf.name == name]
-        if existing_field:
-            return existing_field.pop()
+        if existing_field := self.custom_fields[{'name': name}].dpop():
+            return existing_field
 
         return CustomField(
             self.endpoints.createCustomFieldInGroup(

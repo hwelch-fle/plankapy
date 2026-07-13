@@ -1,20 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import dtfromiso
+from ._literals import NotificationServiceFormat
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-
-    # from models import *
-    from ._literals import NotificationServiceFormat
-
 
 __all__ = ('NotificationService', )
 
@@ -69,9 +63,7 @@ class NotificationService(PlankaModel[schemas.NotificationService]):
     # Special Methods
     def sync(self):
         """Sync the NotificationService with the Planka server"""
-        nss = [ns for ns in self.board.project.notification_services if ns == self]
-        if nss:
-            self.schema = nss.pop().schema
+        self.schema = self.board.project.notification_services[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateNotificationService]):
         """Update the NotificationService"""

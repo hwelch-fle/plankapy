@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-__all__ = ('Comment', )
-
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
@@ -10,10 +9,7 @@ from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-    # from models import *
+__all__ = ('Comment', )
 
 
 class Comment(PlankaModel[schemas.Comment]):
@@ -51,9 +47,7 @@ class Comment(PlankaModel[schemas.Comment]):
     # Special Methods
     def sync(self):
         """Sync the Comment with the Planka server"""
-        cm = [cm for cm in self.card.comments if cm == self]
-        if cm:
-            self.schema = cm.pop().schema
+        self.schema = self.card.comments[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateComments]):
         """Update the Comment (must be the comment Creator or an Admin)"""

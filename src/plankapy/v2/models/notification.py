@@ -1,21 +1,16 @@
 from __future__ import annotations
 
-__all__ = ('Notification', )
-
 from datetime import datetime
+from typing import Any, Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import dtfromiso, model_list
+from ._literals import NotificationType
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Any, Unpack
-
-    # from models import *
-    from ._literals import NotificationType
+__all__ = ('Notification', )
 
 
 class Notification(PlankaModel[schemas.Notification]):

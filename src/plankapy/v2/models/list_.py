@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
-from random import choice, shuffle
+from random import shuffle
+from secrets import choice
+from typing import Any, Literal, Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
@@ -13,18 +16,9 @@ from ._helpers import (
     get_position,
     model_list,
 )
-from ._literals import ListColors
+from ._literals import CardType, ListColor, ListColors, UserListType
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
-    from typing import Any, Literal, Unpack
-
-    # from models import *
-    from ._literals import CardType, ListColor, UserListType
-
 
 __all__ = ('List', )
 
@@ -135,7 +129,7 @@ class List(PlankaModel[schemas.List]):
     def color(self, color: ListColor | Literal['random'] | None) -> None:
         """Set the List color"""
         if color == 'random':
-            color = choice(ListColors)  # noqa: S311
+            color = choice(ListColors)
         self.update(color=color)
 
     @property

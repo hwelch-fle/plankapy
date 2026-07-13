@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-__all__ = ('CustomFieldValue', )
-
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
@@ -10,10 +9,7 @@ from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-    # from models import *
+__all__ = ('CustomFieldValue', )
 
 
 class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
@@ -36,8 +32,9 @@ class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     @property
     def custom_field(self) -> CustomField:
         """The CustomField the CustomFieldValue belongs to"""
-        cfs = [cf for cf in self.custom_field_group.custom_fields if cf.id == self.schema['customFieldId']]
-        return cfs.pop()
+        cf = self.custom_field_group.custom_fields[{'id': self.schema['customFieldId']}].dpop()
+        assert cf, 'Custom Field not found (this should be unreachable)'
+        return cf
 
     @property
     def content(self) -> str:
@@ -62,9 +59,7 @@ class CustomFieldValue(PlankaModel[schemas.CustomFieldValue]):
     # Special Methods
     def sync(self):
         """Sync the CustomFieldValue with the Planka server"""
-        cfvs = [cfv for cfv in self.card.custom_field_values if cfv.id == self.id]
-        if cfvs:
-            self.schema = cfvs.pop().schema
+        self.schema = self.card.custom_field_values[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateCustomFieldValue]):
         """Update the CustomFieldValue"""

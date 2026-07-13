@@ -8,12 +8,6 @@ from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    ...
-    # from models import *
-
-
 __all__ = ('ProjectManager', )
 
 
@@ -32,9 +26,8 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
     @property
     def user(self) -> User:
         """The User assigned as ProjectManager (Raises LookupError if the User cannot be found)"""
-        usrs = [u for u in self.project.users if self.schema['userId'] == u.id]
-        if usrs:
-            return usrs.pop()
+        if usr := self.project.users['id': self.schema['userId']].dpop():
+            return usr
         raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
     @property

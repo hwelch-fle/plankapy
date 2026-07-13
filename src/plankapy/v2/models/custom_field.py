@@ -1,18 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-    # from models import *
-
 
 __all__ = ('CustomField', )
 
@@ -25,7 +20,7 @@ class CustomField(PlankaModel[schemas.CustomField]):
     # CustomField props
 
     @property
-    def base_custom_field_group(self) -> BaseCustomFieldGroup:
+    def base_custom_field_group(self) -> BaseCustomFieldGroup | None:
         """The BaseCustomFieldGroup the custom field belongs to"""
         return self.custom_field_group.base_custom_field_group
 

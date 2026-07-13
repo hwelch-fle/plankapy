@@ -2,22 +2,16 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
+from typing import Unpack
 
 from httpx import HTTPStatusError
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position, model_list
+from ._literals import BackgroundGradient, BackgroundType, BoardImportType
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-
-    # from models import *
-    from ._literals import BackgroundGradient, BackgroundType, BoardImportType
-
 
 __all__ = ('Project', )
 
@@ -93,20 +87,16 @@ class Project(PlankaModel[schemas.Project]):
         self.update(isFavorite=is_favorite)
 
     @property
-    def owner(self) -> User | None:
+    def owner(self) -> User:
         """The User who owns the project (Raises LookupError if the User cannot be found)"""
-        usrs = [pm for pm in self.project_managers if self.schema['ownerProjectManagerId'] == pm.id]
-        if usrs:
-            return usrs.pop().user
-        # return User(self.endpoints.getUser(self.schema['ownerProjectManagerId'])['item'], self.session)
+        if pm := self.project_managers[{'id': self.schema['ownerProjectManagerId']}].dpop():
+            return pm.user
+        raise LookupError(f'Could not find Owner {self.schema['ownerProjectManagerId']}')
 
     @property
     def background_image(self) -> BackgroundImage | None:
         """The current BackgroundImage of the Project"""
-        bgis = [bgi for bgi in self.background_images if bgi.id == self.schema['backgroundImageId']]
-        if not bgis:
-            return None
-        return bgis.pop()
+        return self.background_images[{'id': self.schema['backgroundImageId']}].dpop()
 
     @background_image.setter
     def background_image(self, background_image: BackgroundImage | None) -> None:

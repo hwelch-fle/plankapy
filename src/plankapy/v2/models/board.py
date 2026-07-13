@@ -1,23 +1,23 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
-from random import choice
+from secrets import choice
+from typing import Literal, Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, get_position, model_list
-from ._literals import LabelColors
+from ._literals import (
+    BoardRole,
+    BoardView,
+    CardType,
+    LabelColor,
+    LabelColors,
+    ListColor,
+)
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from typing import Literal, Unpack
-
-    # from models import *
-    from ._literals import BoardRole, BoardView, CardType, LabelColor, ListColor
-
 
 __all__ = ('Board', )
 
@@ -187,7 +187,7 @@ class Board(PlankaModel[schemas.Board]):
     @property
     def subscribed(self) -> bool:
         """Whether the current user is subscribed to the Board"""
-        return self.endpoints.getBoard(self.id)['item']['isSubscribed']
+        return self.endpoints.getBoard(self.id)['item'].get('isSubscribed', False)
 
     @property
     def project(self) -> Project:
@@ -339,7 +339,7 @@ class Board(PlankaModel[schemas.Board]):
                 self.id,
                 name=name,
                 position=get_position(self.labels, position),
-                color=color if color != 'random' else choice(LabelColors))['item'],  # noqa: S311
+                color=color if color != 'random' else choice(LabelColors))['item'],
                 self.session
             )
         return lbl
@@ -390,7 +390,7 @@ class Board(PlankaModel[schemas.Board]):
         """
         # Create a new membership
         if user not in self.users:
-            BoardMembership(
+            bm = BoardMembership(
                 self.endpoints.createBoardMembership(
                     self.id,
                     userId=user.id,
@@ -398,9 +398,10 @@ class Board(PlankaModel[schemas.Board]):
                     canComment=can_comment)['item'],
                 self.session
             )
+            return bm
 
-        # Get existing membership and update role different
-        membership = [bm for bm in self.board_memberships if bm.user == user].pop()
+        membership = self.board_memberships[{'userId': user.id}].dpop()
+        assert membership, 'User is not a member of the board (this should be unreachable)'
         if membership.role != role:
             membership.role = role
         if membership.can_comment != can_comment:

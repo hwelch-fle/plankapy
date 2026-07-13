@@ -1,24 +1,19 @@
 from __future__ import annotations
 
-from httpx import HTTPStatusError
-
-__all__ = ('Card', 'Stopwatch', )
-
+from collections.abc import Sequence
 from datetime import datetime, timedelta
+from typing import Any, Unpack
+
+from httpx import HTTPStatusError
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import Position, dtfromiso, dttoiso, get_position, model_list
+from ._literals import BoardRole, CardType
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from typing import Any, Unpack
-
-    # from models import *
-    from ._literals import BoardRole, CardType
+__all__ = ('Card', 'Stopwatch', )
 
 
 class Card(PlankaModel[schemas.Card]):

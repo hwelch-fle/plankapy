@@ -1,18 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Unpack
 
 from ..api import events, schemas, typ
 from ._base import PlankaModel
 from ._helpers import dtfromiso
 
 # Deferred Model imports at bottom of file
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import Unpack
-    # from models import *
-
 
 __all__ = ('Task', )
 
@@ -42,9 +37,8 @@ class Task(PlankaModel[schemas.Task]):
     @property
     def assignee(self) -> User | None:
         """The User assigned to the Task if there is one"""
-        usrs = [u for u in self.card.board.users if self.schema['assigneeUserId'] == u.id]
-        if usrs:
-            return usrs.pop()
+        if usr := self.card.board.users[{'id': self.schema['assigneeUserId']}].dpop():
+            return usr
         raise LookupError(f"Cannot find User: {self.schema['assigneeUserId']}")
 
     @assignee.setter
@@ -99,9 +93,7 @@ class Task(PlankaModel[schemas.Task]):
     # Special Methods
     def sync(self):
         """Sync the Task with the Planka server"""
-        tsks = [tsk for tsk in self.task_list.tasks if tsk == self]
-        if tsks:
-            self.schema = tsks.pop().schema
+        self.schema = self.task_list.tasks[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateTask]):
         """Update the Task"""
