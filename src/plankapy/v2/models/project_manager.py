@@ -26,7 +26,7 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
     @property
     def user(self) -> User:
         """The User assigned as ProjectManager (Raises LookupError if the User cannot be found)"""
-        if usr := self.project.users['id': self.schema['userId']].dpop():
+        if usr := self.project.users[{'id': self.schema['userId']}].dpop():
             return usr
         raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
