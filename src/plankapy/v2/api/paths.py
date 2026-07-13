@@ -14,12 +14,9 @@ def raise_planka_err(resp: Response) -> None:
     try:
         resp.raise_for_status()
     except HTTPStatusError as status_err:
-        try:
-            planka_code = status_err.response.json().get('code')
-            planka_err = ERRORS.get(planka_code, PlankaError)
-            raise planka_err(status_err)
-        except Exception as e:
-            raise status_err from e
+        planka_code = status_err.response.json().get('code')
+        planka_err = ERRORS.get(planka_code, PlankaError)
+        raise planka_err(status_err) from status_err
 
 
 class PlankaEndpoints:
