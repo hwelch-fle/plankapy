@@ -473,10 +473,10 @@ def yield_init() -> Generator[str]:
     version: str = SWG["info"]["version"]
     yield f'"""{SWG["info"]["title"]} ({version}) - Generated on {datetime.now(tz=dt.UTC).strftime("%a %b %d %Y")}"""'
     yield ""
-    yield "from .schemas import *"
-    yield "from .paths import *"
     yield "from .async_paths import *"
     yield "from .errors import *"
+    yield "from .paths import *"
+    yield "from .schemas import *"
     yield ""
     yield f'__version__ = "{version}"'
     yield ""
