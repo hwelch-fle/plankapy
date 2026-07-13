@@ -38,7 +38,7 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Error: 401 Invalid pending token
+            Error: 401 Invalid pending token
             Error: 403 Authentication restriction
         """
         resp = self.client.post("api/access-tokens/accept-terms", json=kwargs)
@@ -60,7 +60,7 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Error: 401 Invalid credentials
+            Error: 401 Invalid credentials
             Error: 403 Authentication restriction
         """
         resp = self.client.post("api/access-tokens", json=kwargs)
@@ -77,7 +77,7 @@ class PlankaEndpoints:
 
         Raises:
             Unauthorized: 401
-         """
+        """
         resp = self.client.delete("api/access-tokens/me")
         raise_planka_err(resp)
         return resp.json()
@@ -121,7 +121,7 @@ class PlankaEndpoints:
         Raises:
             ValidationError: 400
             NotFound: 404
-         """
+        """
         resp = self.client.post("api/access-tokens/revoke-pending-token", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -142,7 +142,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get(f"api/boards/{boardId}/actions", params=passed_params)
@@ -165,7 +165,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get(f"api/cards/{cardId}/actions", params=passed_params)
@@ -229,7 +229,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/attachments/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -251,7 +251,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/attachments/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -299,7 +299,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/background-images/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -321,7 +321,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/projects/{projectId}/base-custom-field-groups", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -342,7 +342,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/base-custom-field-groups/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -364,7 +364,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/base-custom-field-groups/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -389,7 +389,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.post(f"api/boards/{boardId}/board-memberships", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -409,7 +409,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/board-memberships/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -431,7 +431,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/board-memberships/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -456,7 +456,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-             Error: 422 Import file upload error
+            Error: 422 Import file upload error
         """
         if imp_file := kwargs.pop('importFile', None):
             resp = self.client.post(
@@ -483,7 +483,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/boards/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -504,7 +504,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get(f"api/boards/{id}", params=passed_params)
@@ -534,7 +534,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/boards/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -564,7 +564,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.post(f"api/cards/{cardId}/card-labels", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -586,7 +586,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/cards/{cardId}/card-labels/labelId:{labelId}")
         raise_planka_err(resp)
         return resp.json()
@@ -609,7 +609,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.post(f"api/cards/{cardId}/card-memberships", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -631,7 +631,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/cards/{cardId}/card-memberships/userId:{userId}")
         raise_planka_err(resp)
         return resp.json()
@@ -660,7 +660,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.post(f"api/lists/{listId}/cards", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -685,7 +685,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         # Monkey patch since brackets cannot be used in varaible names
         if 'before_listChangedAt' in kwargs:
             kwargs['before[listChangedAt]'] = kwargs.pop('before_listChangedAt')  # type: ignore
@@ -714,7 +714,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/cards/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -734,7 +734,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.get(f"api/cards/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -767,7 +767,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.patch(f"api/cards/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -793,7 +793,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.post(f"api/cards/{id}/duplicate", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -813,7 +813,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/cards/{id}/read-notifications")
         raise_planka_err(resp)
         return resp.json()
@@ -835,7 +835,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/cards/{cardId}/comments", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -856,7 +856,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get(f"api/cards/{cardId}/comments", params=passed_params)
@@ -879,7 +879,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/comments/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -901,7 +901,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/comments/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -940,8 +940,8 @@ class PlankaEndpoints:
 
         Raises:
             Unauthorized: 401
-             Forbidden: 403
-         """
+            Forbidden: 403
+        """
         resp = self.client.post("api/config/test-smtp")
         raise_planka_err(resp)
         return resp.json()
@@ -966,7 +966,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.post(f"api/boards/{boardId}/custom-field-groups", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -991,7 +991,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.post(f"api/cards/{cardId}/custom-field-groups", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1012,7 +1012,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/custom-field-groups/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1032,7 +1032,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.get(f"api/custom-field-groups/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1056,7 +1056,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.patch(f"api/custom-field-groups/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1126,7 +1126,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1150,7 +1150,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/custom-field-groups/{customFieldGroupId}/custom-fields", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1171,7 +1171,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/custom-fields/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1195,7 +1195,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/custom-fields/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1219,7 +1219,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/boards/{boardId}/labels", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1240,7 +1240,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/labels/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1264,7 +1264,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/labels/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1285,7 +1285,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/lists/{id}/clear")
         raise_planka_err(resp)
         return resp.json()
@@ -1309,7 +1309,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/boards/{boardId}/lists", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1330,7 +1330,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/lists/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1350,7 +1350,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.get(f"api/lists/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1376,7 +1376,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/lists/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1398,7 +1398,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/lists/{id}/move-cards", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1422,7 +1422,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.post(f"api/lists/{id}/sort", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1445,7 +1445,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.post(f"api/boards/{boardId}/notification-services", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1468,7 +1468,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.post(f"api/users/{userId}/notification-services", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1488,7 +1488,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/notification-services/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1510,7 +1510,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/notification-services/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1530,7 +1530,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/notification-services/{id}/test")
         raise_planka_err(resp)
         return resp.json()
@@ -1545,8 +1545,8 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
-         """
+            Unauthorized: 401
+        """
         resp = self.client.get("api/notifications")
         raise_planka_err(resp)
         return resp.json()
@@ -1561,8 +1561,8 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
-         """
+            Unauthorized: 401
+        """
         resp = self.client.post("api/notifications/read-all")
         raise_planka_err(resp)
         return resp.json()
@@ -1582,7 +1582,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.get(f"api/notifications/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1603,7 +1603,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/notifications/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1627,7 +1627,7 @@ class PlankaEndpoints:
             NotFound: 404
             Conflict: 409
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.post(f"api/projects/{projectId}/project-managers", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1649,7 +1649,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.delete(f"api/project-managers/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1669,8 +1669,8 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
-         """
+            Unauthorized: 401
+        """
         resp = self.client.post("api/projects", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1685,8 +1685,8 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
-         """
+            Unauthorized: 401
+        """
         resp = self.client.get("api/projects")
         raise_planka_err(resp)
         return resp.json()
@@ -1707,7 +1707,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.delete(f"api/projects/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1727,7 +1727,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.get(f"api/projects/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1758,7 +1758,7 @@ class PlankaEndpoints:
             NotFound: 404
             Conflict: 409
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.patch(f"api/projects/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1783,7 +1783,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/cards/{cardId}/task-lists", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1804,7 +1804,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/task-lists/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1824,7 +1824,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.get(f"api/task-lists/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1849,7 +1849,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/task-lists/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1875,7 +1875,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             UnprocessableEntity: 422
-         """
+        """
         resp = self.client.post(f"api/task-lists/{taskListId}/tasks", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1896,7 +1896,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/tasks/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -1922,7 +1922,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/tasks/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -1942,7 +1942,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         valid_params = ('language',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get("api/terms", params=passed_params)
@@ -1964,7 +1964,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.post(f"api/users/{id}/api-key")
         raise_planka_err(resp)
         return resp.json()
@@ -1992,10 +1992,10 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
-             Forbidden: 403
+            Unauthorized: 401
+            Forbidden: 403
             Conflict: 409
-         """
+        """
         resp = self.client.post("api/users", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -2010,9 +2010,9 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
-             Forbidden: 403
-         """
+            Unauthorized: 401
+            Forbidden: 403
+        """
         resp = self.client.get("api/users")
         raise_planka_err(resp)
         return resp.json()
@@ -2033,7 +2033,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/users/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -2054,7 +2054,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = self.client.get(f"api/users/{id}", params=passed_params)
@@ -2094,7 +2094,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.patch(f"api/users/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -2143,7 +2143,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.patch(f"api/users/{id}/email", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -2166,7 +2166,7 @@ class PlankaEndpoints:
             Unauthorized: 401
             Forbidden: 403
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/users/{id}/password", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -2190,7 +2190,7 @@ class PlankaEndpoints:
             Forbidden: 403
             NotFound: 404
             Conflict: 409
-         """
+        """
         resp = self.client.patch(f"api/users/{id}/username", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -2212,9 +2212,9 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
+            Unauthorized: 401
             Conflict: 409
-         """
+        """
         resp = self.client.post("api/webhooks", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
@@ -2229,8 +2229,8 @@ class PlankaEndpoints:
 
         Raises:
             ValidationError: 400
-             Unauthorized: 401
-         """
+            Unauthorized: 401
+        """
         resp = self.client.get("api/webhooks")
         raise_planka_err(resp)
         return resp.json()
@@ -2250,7 +2250,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.delete(f"api/webhooks/{id}")
         raise_planka_err(resp)
         return resp.json()
@@ -2275,7 +2275,7 @@ class PlankaEndpoints:
             ValidationError: 400
             Unauthorized: 401
             NotFound: 404
-         """
+        """
         resp = self.client.patch(f"api/webhooks/{id}", json=kwargs)
         raise_planka_err(resp)
         return resp.json()
