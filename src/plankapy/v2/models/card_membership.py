@@ -3,16 +3,17 @@ from __future__ import annotations
 __all__ = ('CardMembership', )
 
 from datetime import datetime
+
+from ..api import events, schemas
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, events
 
 # Deferred Model imports at bottom of file
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     ...
-    #from models import *
+    # from models import *
 
 
 class CardMembership(PlankaModel[schemas.CardMembership]):
@@ -21,7 +22,7 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     __events__ = events.CardMembershipEvent
 
     # CardMembership properties
-    
+
     @property
     def card(self) -> Card:
         """The Card the User is a member of"""
@@ -30,9 +31,9 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     @property
     def user(self) -> User:
         """The User who is a member of the Card (Raise LookupError if the User is no longer on the Board)"""
-        _usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
-        if _usrs:
-            return _usrs.pop()
+        usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
+        if usrs:
+            return usrs.pop()
         raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
     @property

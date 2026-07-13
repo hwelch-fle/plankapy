@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import TypedDict, NotRequired, Any, Literal
+
+from typing import Any, Literal, NotRequired, TypedDict
 
 from .events import PlankaEvent
 
@@ -10,6 +11,7 @@ __all__ = (
     "BaseCustomFieldGroup",
     "Board",
     "BoardMembership",
+    "Bootstrap",
     "Card",
     "CardLabel",
     "CardMembership",
@@ -24,13 +26,13 @@ __all__ = (
     "NotificationService",
     "Project",
     "ProjectManager",
+    "Stopwatch",
     "Task",
     "TaskList",
     "User",
     "Webhook",
-    "Stopwatch",
-    "Bootstrap",
 )
+
 
 class Action(TypedDict):
     id: str
@@ -50,6 +52,7 @@ class Action(TypedDict):
     updatedAt: str
     """When the action was last updated"""
 
+
 class Attachment(TypedDict):
     id: str
     """Unique identifier for the attachment"""
@@ -68,6 +71,7 @@ class Attachment(TypedDict):
     updatedAt: str
     """When the attachment was last updated"""
 
+
 class BackgroundImage(TypedDict):
     id: str
     """Unique identifier for the background image"""
@@ -84,6 +88,7 @@ class BackgroundImage(TypedDict):
     updatedAt: str
     """When the background image was last updated"""
 
+
 class BaseCustomFieldGroup(TypedDict):
     id: str
     """Unique identifier for the base custom field group"""
@@ -95,6 +100,7 @@ class BaseCustomFieldGroup(TypedDict):
     """When the base custom field group was created"""
     updatedAt: str
     """When the base custom field group was last updated"""
+
 
 class Board(TypedDict):
     id: str
@@ -120,6 +126,7 @@ class Board(TypedDict):
     updatedAt: str
     """When the board was last updated"""
 
+
 class BoardMembership(TypedDict):
     id: str
     """Unique identifier for the board membership"""
@@ -138,6 +145,7 @@ class BoardMembership(TypedDict):
     updatedAt: str
     """When the board membership was last updated"""
 
+
 class Bootstrap(TypedDict):
     oidc: OIDC
     "OpenID Connect configuration (null if not configured)"
@@ -149,7 +157,8 @@ class Bootstrap(TypedDict):
     "URL to the customer management panel (conditionally added for admins if configured)"
     termsLanguages: NotRequired[list[str]]
     "List of available language codes for terms localization"
-    
+
+
 class OIDC(TypedDict):
     """OIDC response schema"""
     authorizationUrl: str
@@ -158,6 +167,7 @@ class OIDC(TypedDict):
     "OIDC end session URL for logout (null if not supported by provider)"
     isEnforced: bool
     "Whether OIDC authentication is enforced (users must use OIDC to login)"
+
 
 class Card(TypedDict):
     id: str
@@ -199,6 +209,7 @@ class Card(TypedDict):
     isSubscribed: NotRequired[bool]
     """If the current user is subscribed to the card"""
 
+
 class CardLabel(TypedDict):
     id: str
     """Unique identifier for the card-label association"""
@@ -211,6 +222,7 @@ class CardLabel(TypedDict):
     updatedAt: str
     """When the card-label association was last updated"""
 
+
 class CardMembership(TypedDict):
     id: str
     """Unique identifier for the card membership"""
@@ -222,6 +234,7 @@ class CardMembership(TypedDict):
     """When the card membership was created"""
     updatedAt: str
     """When the card membership was last updated"""
+
 
 class Comment(TypedDict):
     id: str
@@ -236,6 +249,7 @@ class Comment(TypedDict):
     """When the comment was created"""
     updatedAt: str
     """When the comment was last updated"""
+
 
 class Config(TypedDict):
     id: str
@@ -261,6 +275,7 @@ class Config(TypedDict):
     updatedAt: NotRequired[str]
     """When the config was last updated"""
 
+
 class CustomField(TypedDict):
     id: str
     """Unique identifier for the custom field"""
@@ -278,6 +293,7 @@ class CustomField(TypedDict):
     """When the custom field was created"""
     updatedAt: str
     """When the custom field was last updated"""
+
 
 class CustomFieldGroup(TypedDict):
     id: str
@@ -297,6 +313,7 @@ class CustomFieldGroup(TypedDict):
     updatedAt: str
     """When the custom field group was last updated"""
 
+
 class CustomFieldValue(TypedDict):
     id: str
     """Unique identifier for the custom field value"""
@@ -313,6 +330,7 @@ class CustomFieldValue(TypedDict):
     updatedAt: str
     """When the custom field value was last updated"""
 
+
 class Label(TypedDict):
     id: str
     """Unique identifier for the label"""
@@ -328,6 +346,7 @@ class Label(TypedDict):
     """When the label was created"""
     updatedAt: str
     """When the label was last updated"""
+
 
 class List(TypedDict):
     id: str
@@ -346,6 +365,7 @@ class List(TypedDict):
     """When the list was created"""
     updatedAt: str
     """When the list was last updated"""
+
 
 class Notification(TypedDict):
     id: str
@@ -373,6 +393,7 @@ class Notification(TypedDict):
     updatedAt: str
     """When the notification was last updated"""
 
+
 class NotificationService(TypedDict):
     id: str
     """Unique identifier for the notification service"""
@@ -388,6 +409,7 @@ class NotificationService(TypedDict):
     """When the notification service was created"""
     updatedAt: str
     """When the notification service was last updated"""
+
 
 class Project(TypedDict):
     id: str
@@ -413,6 +435,7 @@ class Project(TypedDict):
     isFavorite: NotRequired[bool]
     """If the project is in the current user's favorites"""
 
+
 class ProjectManager(TypedDict):
     id: str
     """Unique identifier for the project manager"""
@@ -424,6 +447,7 @@ class ProjectManager(TypedDict):
     """When the project manager was created"""
     updatedAt: str
     """When the project manager was last updated"""
+
 
 class Task(TypedDict):
     id: str
@@ -445,6 +469,7 @@ class Task(TypedDict):
     updatedAt: str
     """When the task was last updated"""
 
+
 class TaskList(TypedDict):
     id: str
     """Unique identifier for the task list"""
@@ -462,6 +487,7 @@ class TaskList(TypedDict):
     """When the task list was created"""
     updatedAt: str
     """When the task list was last updated"""
+
 
 class User(TypedDict):
     id: str
@@ -513,6 +539,7 @@ class User(TypedDict):
     updatedAt: str
     """When the user was last updated"""
 
+
 class Webhook(TypedDict):
     id: str
     """Unique identifier for the webhook"""
@@ -532,6 +559,7 @@ class Webhook(TypedDict):
     """When the webhook was created"""
     updatedAt: str
     """When the webhook was last updated"""
+
 
 class Stopwatch(TypedDict):
     startedAt: str | None

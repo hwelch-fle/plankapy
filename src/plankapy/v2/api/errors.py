@@ -1,17 +1,20 @@
 from __future__ import annotations
+
 from typing import Any
+
 from httpx import HTTPStatusError
 
 __all__ = (
-    "PlankaError",
     "ERRORS",
     "Conflict",
     "Forbidden",
     "NotFound",
+    "PlankaError",
     "Unauthorized",
     "UnprocessableEntity",
     "ValidationError",
 )
+
 
 class PlankaError(HTTPStatusError):
     def __init__(self, parent: HTTPStatusError, *args: Any, **kwargs: Any) -> None:
@@ -22,23 +25,29 @@ class PlankaError(HTTPStatusError):
             self.add_note(problem)
 
 
-class Conflict(PlankaError): ...
-"""Request conflicts with current state of the resource"""
+class Conflict(PlankaError):
+    """Request conflicts with current state of the resource"""
 
-class Forbidden(PlankaError): ...
-"""Access forbidden - insufficient permissions"""
 
-class NotFound(PlankaError): ...
-"""Resource not found"""
+class Forbidden(PlankaError):
+    """Access forbidden - insufficient permissions"""
 
-class Unauthorized(PlankaError): ...
-"""Authentication required or invalid credentials"""
 
-class UnprocessableEntity(PlankaError): ...
-"""Request contains semantic errors or validation failures"""
+class NotFound(PlankaError):
+    """Resource not found"""
 
-class ValidationError(PlankaError): ...
-"""Request validation failed due to missing or invalid parameters"""
+
+class Unauthorized(PlankaError):
+    """Authentication required or invalid credentials"""
+
+
+class UnprocessableEntity(PlankaError):
+    """Request contains semantic errors or validation failures"""
+
+
+class ValidationError(PlankaError):
+    """Request validation failed due to missing or invalid parameters"""
+
 
 ERRORS: dict[str, type[PlankaError]] = {
     'E_CONFLICT': Conflict,

@@ -3,18 +3,19 @@ from __future__ import annotations
 __all__ = ('CardLabel', )
 
 from datetime import datetime
+
+from ..api import events, schemas
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, events
 
 # Deferred Model imports at bottom of file
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     ...
-    #from models import *
+    # from models import *
 
- 
+
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
 

@@ -1,39 +1,35 @@
 from typing import Literal, get_args
 
-__all__ =   (
-    
-    # Literal Types for hinting
-    "BoardView",
-    "CardType",
-    "BoardRole",
-    "LabelColor",
-    "ListColor",
+__all__ = (
     "BackgroundGradient",
-    "Language",
-    "EditorMode",
-    "HomeView",
-    "ProjectOrdering",
-    "ProjectType",
-    "TermsType",
-    "LockableField",
-    "NotificationType",
-    "UserRole",
-    
-    # String Tuples (for in/choice operations)
-    "BoardViews",
-    "CardTypes",
-    "BoardRoles",
-    "LabelColors",
-    "ListColors",
     "BackgroundGradients",
-    "Languages",
+    "BoardRole",
+    "BoardRoles",
+    "BoardView",
+    "BoardViews",
+    "CardType",
+    "CardTypes",
+    "EditorMode",
     "EditorModes",
+    "HomeView",
     "HomeViews",
-    "ProjectOrderings",
-    "ProjectTypes",
-    "TermsTypes",
+    "LabelColor",
+    "LabelColors",
+    "Language",
+    "Languages",
+    "ListColor",
+    "ListColors",
+    "LockableField",
     "LockableFields",
+    "NotificationType",
     "NotificationTypes",
+    "ProjectOrdering",
+    "ProjectOrderings",
+    "ProjectType",
+    "ProjectTypes",
+    "TermsType",
+    "TermsTypes",
+    "UserRole",
     "UserRoles",
 )
 
@@ -42,7 +38,7 @@ BoardViews: tuple[BoardView, ...] = get_args(BoardView)
 
 # Single element literals throw warnings on __args__ access
 BoardImportType = Literal['trello']
-BoardImportTypes: tuple[BoardImportType, ...] = BoardImportType # type: ignore
+BoardImportTypes: tuple[BoardImportType, ...] = BoardImportType  # type: ignore
 
 CardType = Literal['project', 'story']
 CardTypes: tuple[CardType, ...] = get_args(CardType)
@@ -51,22 +47,22 @@ BoardRole = Literal['editor', 'viewer']
 BoardRoles: tuple[BoardRole, ...] = get_args(BoardRole)
 
 LabelColor = Literal[
-    'muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 
-    'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 
-    'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 
-    'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 
-    'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 
-    'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 
-    'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 
-    'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 
-    'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 
+    'muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue',
+    'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad',
+    'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange',
+    'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes',
+    'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss',
+    'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone',
+    'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust',
+    'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red',
+    'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac',
     'red-burgundy', 'pirate-gold',
 ]
 LabelColors: tuple[LabelColor, ...] = get_args(LabelColor)
 
 ListColor = Literal[
-    'berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 
-    'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 
+    'berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip',
+    'light-mud', 'orange-peel', 'bright-moss', 'antique-blue',
     'dark-granite', 'turquoise-sea',
 ]
 ListColors: tuple[ListColor, ...] = get_args(ListColor)
@@ -90,21 +86,21 @@ BackgroundType = Literal['gradient', 'image']
 BackgroundTypes: tuple[BackgroundType, ...] = get_args(BackgroundType)
 
 BackgroundGradient = Literal[
-    'old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh', 
-    'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust', 
-    'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange', 
-    'sour-peel', 'green-ninja', 'algae-green', 'coral-reef', 
-    'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain', 
-    'blue-steel', 'blueish-curve', 'prism-light', 'green-mist', 
+    'old-lime', 'ocean-dive', 'tzepesch-style', 'jungle-mesh',
+    'strawberry-dust', 'purple-rose', 'sun-scream', 'warm-rust',
+    'sky-change', 'green-eyes', 'blue-xchange', 'blood-orange',
+    'sour-peel', 'green-ninja', 'algae-green', 'coral-reef',
+    'steel-grey', 'heat-waves', 'velvet-lounge', 'purple-rain',
+    'blue-steel', 'blueish-curve', 'prism-light', 'green-mist',
     'red-curtain'
 ]
 BackgroundGradients = get_args(BackgroundGradient)
 
 Language = Literal[
-    'ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 
-    'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 
-    'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 
-    'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 
+    'ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US',
+    'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT',
+    'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU',
+    'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ',
     'vi-VN', 'zh-CN', 'zh-TW',
 ]
 Languages: tuple[Language, ...] = get_args(Language)

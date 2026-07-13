@@ -1,28 +1,29 @@
 from __future__ import annotations
-from typing import (
-    Literal,
-    Unpack,
-)
-from httpx import AsyncClient, Response, HTTPStatusError
-from .schemas import *
-from .typ import *
-from .errors import *
+
+from typing import Unpack
+
+from httpx import AsyncClient, HTTPStatusError, Response
+
+from . import typ
+from .errors import ERRORS, PlankaError
 
 __all__ = ("AsyncPlankaEndpoints",)
 
-async def raise_planka_err(resp: Response) -> None:
+
+def raise_planka_err(resp: Response) -> None:
     try:
         resp.raise_for_status()
     except HTTPStatusError as status_err:
         planka_code = status_err.response.json().get('code')
         planka_err = ERRORS.get(planka_code, PlankaError)
-        raise planka_err(status_err)
+        raise planka_err(status_err) from status_err
+
 
 class AsyncPlankaEndpoints:
     def __init__(self, client: AsyncClient) -> None:
         self.client = client
 
-    async def acceptTerms(self, **kwargs: Unpack[Request_acceptTerms]) -> Response_acceptTerms:
+    async def acceptTerms(self, **kwargs: Unpack[typ.Request_acceptTerms]) -> typ.Response_acceptTerms:
         """Accept terms during the authentication flow. Converts the pending token to an access token.
 
         Args:
@@ -31,20 +32,20 @@ class AsyncPlankaEndpoints:
             initialLanguage (Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW'] | None): Preferred language for user interface and notifications (used only if user language is not set)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
+            ValidationError: 400
             Error: 401 Invalid pending token
             Error: 403 Authentication restriction
         """
         resp = await self.client.post("api/access-tokens/accept-terms", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createAccessToken(self, **kwargs: Unpack[Request_createAccessToken]) -> Response_createAccessToken:
+    async def createAccessToken(self, **kwargs: Unpack[typ.Request_createAccessToken]) -> typ.Response_createAccessToken:
         """Authenticates a user using email/username and password. Returns an access token for API authentication.
 
         Args:
@@ -53,35 +54,35 @@ class AsyncPlankaEndpoints:
             withHttpOnlyToken (bool): Whether to include an HTTP-only authentication cookie
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
+            ValidationError: 400
             Error: 401 Invalid credentials
             Error: 403 Authentication restriction
         """
         resp = await self.client.post("api/access-tokens", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteAccessToken(self) -> Response_deleteAccessToken:
+    async def deleteAccessToken(self) -> typ.Response_deleteAccessToken:
         """Logs out the current user by deleting the session and access token. Clears HTTP-only cookies if present.
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            Unauthorized: 401 
+            Unauthorized: 401
         """
         resp = await self.client.delete("api/access-tokens/me")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def exchangeForAccessTokenWithOidc(self, **kwargs: Unpack[Request_exchangeForAccessTokenWithOidc]) -> Response_exchangeForAccessTokenWithOidc:
+    async def exchangeForAccessTokenWithOidc(self, **kwargs: Unpack[typ.Request_exchangeForAccessTokenWithOidc]) -> typ.Response_exchangeForAccessTokenWithOidc:
         """Exchanges an OIDC authorization code for an access token. Creates a user if they do not exist.
 
         Args:
@@ -90,12 +91,12 @@ class AsyncPlankaEndpoints:
             withHttpOnlyToken (bool): Whether to include HTTP-only authentication cookie
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
+            ValidationError: 400
             Error: 401 OIDC authentication error
             Error: 403 Authentication restriction
             Error: 409 Conflict error
@@ -103,29 +104,29 @@ class AsyncPlankaEndpoints:
             Error: 500 OIDC configuration error
         """
         resp = await self.client.post("api/access-tokens/exchange-with-oidc", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def revokePendingToken(self, **kwargs: Unpack[Request_revokePendingToken]) -> Response_revokePendingToken:
+    async def revokePendingToken(self, **kwargs: Unpack[typ.Request_revokePendingToken]) -> typ.Response_revokePendingToken:
         """Revokes a pending authentication token and cancels the authentication flow.
 
         Args:
             pendingToken (str): Pending token to revoke
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            NotFound: 404 
+            ValidationError: 400
+            NotFound: 404
         """
         resp = await self.client.post("api/access-tokens/revoke-pending-token", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getBoardActions(self, boardId: str, **kwargs: Unpack[Request_getBoardActions]) -> Response_getBoardActions:
+    async def getBoardActions(self, boardId: str, **kwargs: Unpack[typ.Request_getBoardActions]) -> typ.Response_getBoardActions:
         """Retrieves a list of actions (activity history) for a specific board, with pagination support.
 
         Args:
@@ -133,22 +134,22 @@ class AsyncPlankaEndpoints:
             beforeId (str): ID to get actions before (for pagination)) (optional)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get(f"api/boards/{boardId}/actions", params=passed_params)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getCardActions(self, cardId: str, **kwargs: Unpack[Request_getCardActions]) -> Response_getCardActions:
+    async def getCardActions(self, cardId: str, **kwargs: Unpack[typ.Request_getCardActions]) -> typ.Response_getCardActions:
         """Retrieves a list of actions (activity history) for a specific card, with pagination support.
 
         Args:
@@ -156,22 +157,22 @@ class AsyncPlankaEndpoints:
             beforeId (str): ID to get actions before (for pagination)) (optional)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get(f"api/cards/{cardId}/actions", params=passed_params)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createAttachment(self, cardId: str, **kwargs: Unpack[Request_createAttachment]) -> Response_createAttachment:
+    async def createAttachment(self, cardId: str, **kwargs: Unpack[typ.Request_createAttachment]) -> typ.Response_createAttachment:
         """Creates an attachment on a card. Requires board editor permissions.
 
         Args:
@@ -183,43 +184,43 @@ class AsyncPlankaEndpoints:
             requestId (str): Request ID for tracking
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
             Error: 422 Upload or validation error
         """
         resp = await self.client.post(f"api/cards/{cardId}/attachments", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteAttachment(self, id: str) -> Response_deleteAttachment:
+    async def deleteAttachment(self, id: str) -> typ.Response_deleteAttachment:
         """Deletes an attachment. Requires board editor permissions.
 
         Args:
             id (str): ID of the attachment to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/attachments/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateAttachment(self, id: str, **kwargs: Unpack[Request_updateAttachment]) -> Response_updateAttachment:
+    async def updateAttachment(self, id: str, **kwargs: Unpack[typ.Request_updateAttachment]) -> typ.Response_updateAttachment:
         """Updates an attachment. Requires board editor permissions.
 
         Args:
@@ -227,21 +228,21 @@ class AsyncPlankaEndpoints:
             name (str): Name/title of the attachment
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/attachments/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createBackgroundImage(self, projectId: str, **kwargs: Unpack[Request_createBackgroundImage]) -> Response_createBackgroundImage:
+    async def createBackgroundImage(self, projectId: str, **kwargs: Unpack[typ.Request_createBackgroundImage]) -> typ.Response_createBackgroundImage:
         """Uploads a background image for a project. Requires project manager permissions.
 
         Args:
@@ -250,43 +251,43 @@ class AsyncPlankaEndpoints:
             requestId (str): Request ID for tracking
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
             Error: 422 File upload error
         """
         resp = await self.client.post(f"api/projects/{projectId}/background-images", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteBackgroundImage(self, id: str) -> Response_deleteBackgroundImage:
+    async def deleteBackgroundImage(self, id: str) -> typ.Response_deleteBackgroundImage:
         """Deletes a background image. Requires project manager permissions.
 
         Args:
             id (str): ID of the background image to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/background-images/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createBaseCustomFieldGroup(self, projectId: str, **kwargs: Unpack[Request_createBaseCustomFieldGroup]) -> Response_createBaseCustomFieldGroup:
+    async def createBaseCustomFieldGroup(self, projectId: str, **kwargs: Unpack[typ.Request_createBaseCustomFieldGroup]) -> typ.Response_createBaseCustomFieldGroup:
         """Creates a base custom field group within a project. Requires project manager permissions.
 
         Args:
@@ -294,42 +295,42 @@ class AsyncPlankaEndpoints:
             name (str): Name/title of the base custom field group
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/projects/{projectId}/base-custom-field-groups", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteBaseCustomFieldGroup(self, id: str) -> Response_deleteBaseCustomFieldGroup:
+    async def deleteBaseCustomFieldGroup(self, id: str) -> typ.Response_deleteBaseCustomFieldGroup:
         """Deletes a base custom field group. Requires project manager permissions.
 
         Args:
             id (str): ID of the base custom field group to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/base-custom-field-groups/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateBaseCustomFieldGroup(self, id: str, **kwargs: Unpack[Request_updateBaseCustomFieldGroup]) -> Response_updateBaseCustomFieldGroup:
+    async def updateBaseCustomFieldGroup(self, id: str, **kwargs: Unpack[typ.Request_updateBaseCustomFieldGroup]) -> typ.Response_updateBaseCustomFieldGroup:
         """Updates a base custom field group. Requires project manager permissions.
 
         Args:
@@ -337,21 +338,21 @@ class AsyncPlankaEndpoints:
             name (str): Name/title of the base custom field group
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/base-custom-field-groups/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createBoardMembership(self, boardId: str, **kwargs: Unpack[Request_createBoardMembership]) -> Response_createBoardMembership:
+    async def createBoardMembership(self, boardId: str, **kwargs: Unpack[typ.Request_createBoardMembership]) -> typ.Response_createBoardMembership:
         """Creates a board membership within a board. Requires project manager permissions.
 
         Args:
@@ -361,42 +362,42 @@ class AsyncPlankaEndpoints:
             canComment (bool | None): Whether the user can comment on cards (applies only to viewers)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.post(f"api/boards/{boardId}/board-memberships", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteBoardMembership(self, id: str) -> Response_deleteBoardMembership:
+    async def deleteBoardMembership(self, id: str) -> typ.Response_deleteBoardMembership:
         """Deletes a board membership. Users can remove their own membership, project managers can remove any membership.
 
         Args:
             id (str): ID of the board membership to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/board-memberships/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateBoardMembership(self, id: str, **kwargs: Unpack[Request_updateBoardMembership]) -> Response_updateBoardMembership:
+    async def updateBoardMembership(self, id: str, **kwargs: Unpack[typ.Request_updateBoardMembership]) -> typ.Response_updateBoardMembership:
         """Updates a board membership. Requires project manager permissions.
 
         Args:
@@ -405,20 +406,20 @@ class AsyncPlankaEndpoints:
             canComment (bool | None): Whether the user can comment on cards (applies only to viewers)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/board-memberships/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createBoard(self, projectId: str, **kwargs: Unpack[Request_createBoard]) -> Response_createBoard:
+    async def createBoard(self, projectId: str, **kwargs: Unpack[typ.Request_createBoard]) -> typ.Response_createBoard:
         """Creates a board within a project. Supports importing from Trello. Requires project manager permissions.
 
         Args:
@@ -430,41 +431,41 @@ class AsyncPlankaEndpoints:
             requestId (str): Request ID for tracking
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
             Error: 422 Import file upload error
         """
         resp = await self.client.post(f"api/projects/{projectId}/boards", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteBoard(self, id: str) -> Response_deleteBoard:
+    async def deleteBoard(self, id: str) -> typ.Response_deleteBoard:
         """Deletes a board and all its contents (lists, cards, etc.). Requires project manager permissions.
 
         Args:
             id (str): ID of the board to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/boards/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getBoard(self, id: str, **kwargs: Unpack[Request_getBoard]) -> Response_getBoard:
+    async def getBoard(self, id: str, **kwargs: Unpack[typ.Request_getBoard]) -> typ.Response_getBoard:
         """Retrieves comprehensive board information, including lists, cards, and other related data.
 
         Args:
@@ -472,22 +473,22 @@ class AsyncPlankaEndpoints:
             subscribe (bool): Whether to subscribe to real-time updates for this board (only for socket connections)) (optional)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get(f"api/boards/{id}", params=passed_params)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateBoard(self, id: str, **kwargs: Unpack[Request_updateBoard]) -> Response_updateBoard:
+    async def updateBoard(self, id: str, **kwargs: Unpack[typ.Request_updateBoard]) -> typ.Response_updateBoard:
         """Updates a board. Project managers can update all fields, board members can only subscribe/unsubscribe.
 
         Args:
@@ -502,27 +503,27 @@ class AsyncPlankaEndpoints:
             isSubscribed (bool): Whether the current user is subscribed to the board
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/boards/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getBootstrap(self) -> Response_getBootstrap:
+    async def getBootstrap(self) -> typ.Response_getBootstrap:
         """Retrieves the application bootstrap.
         """
         resp = await self.client.get("api/bootstrap")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createCardLabel(self, cardId: str, **kwargs: Unpack[Request_createCardLabel]) -> Response_createCardLabel:
+    async def createCardLabel(self, cardId: str, **kwargs: Unpack[typ.Request_createCardLabel]) -> typ.Response_createCardLabel:
         """Adds a label to a card. Requires board editor permissions.
 
         Args:
@@ -530,22 +531,22 @@ class AsyncPlankaEndpoints:
             labelId (str): ID of the label to add to the card
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.post(f"api/cards/{cardId}/card-labels", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteCardLabel(self, cardId: str, labelId: str) -> Response_deleteCardLabel:
+    async def deleteCardLabel(self, cardId: str, labelId: str) -> typ.Response_deleteCardLabel:
         """Removes a label from a card. Requires board editor permissions.
 
         Args:
@@ -553,21 +554,21 @@ class AsyncPlankaEndpoints:
             labelId (str): ID of the label to remove from the card)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/cards/{cardId}/card-labels/labelId:{labelId}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createCardMembership(self, cardId: str, **kwargs: Unpack[Request_createCardMembership]) -> Response_createCardMembership:
+    async def createCardMembership(self, cardId: str, **kwargs: Unpack[typ.Request_createCardMembership]) -> typ.Response_createCardMembership:
         """Adds a user to a card. Requires board editor permissions.
 
         Args:
@@ -575,22 +576,22 @@ class AsyncPlankaEndpoints:
             userId (str): ID of the card to add the user to
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.post(f"api/cards/{cardId}/card-memberships", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteCardMembership(self, cardId: str, userId: str) -> Response_deleteCardMembership:
+    async def deleteCardMembership(self, cardId: str, userId: str) -> typ.Response_deleteCardMembership:
         """Removes a user from a card. Requires board editor permissions.
 
         Args:
@@ -598,21 +599,21 @@ class AsyncPlankaEndpoints:
             userId (str): ID of the user to remove from the card)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/cards/{cardId}/card-memberships/userId:{userId}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createCard(self, listId: str, **kwargs: Unpack[Request_createCard]) -> Response_createCard:
+    async def createCard(self, listId: str, **kwargs: Unpack[typ.Request_createCard]) -> typ.Response_createCard:
         """Creates a card within a list. Requires board editor permissions.
 
         Args:
@@ -626,22 +627,22 @@ class AsyncPlankaEndpoints:
             stopwatch (dict[str, Any] | None): Stopwatch data for time tracking
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/lists/{listId}/cards", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getCards(self, listId: str, **kwargs: Unpack[Request_getCards]) -> Response_getCards:
+    async def getCards(self, listId: str, **kwargs: Unpack[typ.Request_getCards]) -> typ.Response_getCards:
         """Retrieves cards from an endless list with filtering, search, and pagination support.
 
         Args:
@@ -653,63 +654,63 @@ class AsyncPlankaEndpoints:
             labelIds (str): Comma-separated label IDs to filter by labels) (optional)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         valid_params = ('before[listChangedAt]', 'before[id]', 'search', 'userIds', 'labelIds')
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get(f"api/lists/{listId}/cards", params=passed_params)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteCard(self, id: str) -> Response_deleteCard:
+    async def deleteCard(self, id: str) -> typ.Response_deleteCard:
         """Deletes a card and all its contents (tasks, attachments, etc.). Requires board editor permissions.
 
         Args:
             id (str): ID of the card to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/cards/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getCard(self, id: str) -> Response_getCard:
+    async def getCard(self, id: str) -> typ.Response_getCard:
         """Retrieves comprehensive card information, including tasks, attachments, and other related data.
 
         Args:
             id (str): ID of the card to retrieve)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.get(f"api/cards/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateCard(self, id: str, **kwargs: Unpack[Request_updateCard]) -> Response_updateCard:
+    async def updateCard(self, id: str, **kwargs: Unpack[typ.Request_updateCard]) -> typ.Response_updateCard:
         """Updates a card. Board editors can update all fields, viewers can only subscribe/unsubscribe.
 
         Args:
@@ -727,22 +728,22 @@ class AsyncPlankaEndpoints:
             isSubscribed (bool): Whether the current user is subscribed to the card
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.patch(f"api/cards/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def duplicateCard(self, id: str, **kwargs: Unpack[Request_duplicateCard]) -> Response_duplicateCard:
+    async def duplicateCard(self, id: str, **kwargs: Unpack[typ.Request_duplicateCard]) -> typ.Response_duplicateCard:
         """Creates a duplicate of a card with all its contents (tasks, attachments, etc.). Requires board editor permissions.
 
         Args:
@@ -753,42 +754,42 @@ class AsyncPlankaEndpoints:
             name (str | None): Name/title for the duplicated card
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/cards/{id}/duplicate", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def readCardNotifications(self, id: str) -> Response_readCardNotifications:
+    async def readCardNotifications(self, id: str) -> typ.Response_readCardNotifications:
         """Marks all notifications for a specific card as read for the current user. Requires access to the card.
 
         Args:
             id (str): ID of the card to mark notifications as read for)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.post(f"api/cards/{id}/read-notifications")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createComment(self, cardId: str, **kwargs: Unpack[Request_createComment]) -> Response_createComment:
+    async def createComment(self, cardId: str, **kwargs: Unpack[typ.Request_createComment]) -> typ.Response_createComment:
         """Creates a new comment on a card. Requires board editor permissions or comment permissions.
 
         Args:
@@ -796,21 +797,21 @@ class AsyncPlankaEndpoints:
             text (str): Content of the comment
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/cards/{cardId}/comments", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getComments(self, cardId: str, **kwargs: Unpack[Request_getComments]) -> Response_getComments:
+    async def getComments(self, cardId: str, **kwargs: Unpack[typ.Request_getComments]) -> typ.Response_getComments:
         """Retrieves comments for a card with pagination support. Requires access to the card.
 
         Args:
@@ -818,43 +819,43 @@ class AsyncPlankaEndpoints:
             beforeId (str): ID to get comments before (for pagination)) (optional)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         valid_params = ('beforeId',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get(f"api/cards/{cardId}/comments", params=passed_params)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteComment(self, id: str) -> Response_deleteComment:
+    async def deleteComment(self, id: str) -> typ.Response_deleteComment:
         """Deletes a comment. Can be deleted by the comment author (with comment permissions) or project manager.
 
         Args:
             id (str): ID of the comment to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/comments/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateComments(self, id: str, **kwargs: Unpack[Request_updateComments]) -> Response_updateComments:
+    async def updateComments(self, id: str, **kwargs: Unpack[typ.Request_updateComments]) -> typ.Response_updateComments:
         """Updates a comment. Only the author of the comment can update it.
 
         Args:
@@ -862,28 +863,28 @@ class AsyncPlankaEndpoints:
             text (str): Content of the comment
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/comments/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getConfig(self) -> Response_getConfig:
+    async def getConfig(self) -> typ.Response_getConfig:
         """Retrieves the application configuration. Requires admin privileges.
         """
         resp = await self.client.get("api/config")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateConfig(self, **kwargs: Unpack[Request_updateConfig]) -> Response_updateConfig:
+    async def updateConfig(self, **kwargs: Unpack[typ.Request_updateConfig]) -> typ.Response_updateConfig:
         """Updates the application configuration. Requires admin privileges.
 
         Args:
@@ -897,26 +898,26 @@ class AsyncPlankaEndpoints:
             smtpFrom (str | None): Default "from" used for outgoing SMTP emails
         """
         resp = await self.client.patch("api/config", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def testSmtpConfig(self) -> Response_testSmtpConfig:
+    async def testSmtpConfig(self) -> typ.Response_testSmtpConfig:
         """Sends a test email to verify the SMTP is configured correctly. Only available when SMTP is configured via the UI.
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            Unauthorized: 401 
-            Forbidden: 403 
+            Unauthorized: 401
+            Forbidden: 403
         """
         resp = await self.client.post("api/config/test-smtp")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createBoardCustomFieldGroup(self, boardId: str, **kwargs: Unpack[Request_createBoardCustomFieldGroup]) -> Response_createBoardCustomFieldGroup:
+    async def createBoardCustomFieldGroup(self, boardId: str, **kwargs: Unpack[typ.Request_createBoardCustomFieldGroup]) -> typ.Response_createBoardCustomFieldGroup:
         """Creates a custom field group within a board. Either `baseCustomFieldGroupId` or `name` must be provided. Requires board editor permissions.
 
         Args:
@@ -926,22 +927,22 @@ class AsyncPlankaEndpoints:
             name (str | None): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/boards/{boardId}/custom-field-groups", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createCardCustomFieldGroup(self, cardId: str, **kwargs: Unpack[Request_createCardCustomFieldGroup]) -> Response_createCardCustomFieldGroup:
+    async def createCardCustomFieldGroup(self, cardId: str, **kwargs: Unpack[typ.Request_createCardCustomFieldGroup]) -> typ.Response_createCardCustomFieldGroup:
         """Creates a custom field group within a card. Either `baseCustomFieldGroupId` or `name` must be provided. Requires board editor permissions.
 
         Args:
@@ -951,63 +952,63 @@ class AsyncPlankaEndpoints:
             name (str | None): Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/cards/{cardId}/custom-field-groups", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteCustomFieldGroup(self, id: str) -> Response_deleteCustomFieldGroup:
+    async def deleteCustomFieldGroup(self, id: str) -> typ.Response_deleteCustomFieldGroup:
         """Deletes a custom field group. Requires board editor permissions.
 
         Args:
             id (str): ID of the custom field group to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/custom-field-groups/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getCustomFieldGroup(self, id: str) -> Response_getCustomFieldGroup:
+    async def getCustomFieldGroup(self, id: str) -> typ.Response_getCustomFieldGroup:
         """Retrieves comprehensive custom field group information, including fields and values. Requires access to the board/card.
 
         Args:
             id (str): ID of the custom field group to retrieve)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.get(f"api/custom-field-groups/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateCustomFieldGroup(self, id: str, **kwargs: Unpack[Request_updateCustomFieldGroup]) -> Response_updateCustomFieldGroup:
+    async def updateCustomFieldGroup(self, id: str, **kwargs: Unpack[typ.Request_updateCustomFieldGroup]) -> typ.Response_updateCustomFieldGroup:
         """Updates a custom field group. Supports both board-wide and card-specific groups. Requires board editor permissions.
 
         Args:
@@ -1016,22 +1017,22 @@ class AsyncPlankaEndpoints:
             name (str | None): Name/title of the custom field group
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.patch(f"api/custom-field-groups/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str, **kwargs: Unpack[Request_updateCustomFieldValue]) -> Response_updateCustomFieldValue:
+    async def updateCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str, **kwargs: Unpack[typ.Request_updateCustomFieldValue]) -> typ.Response_updateCustomFieldValue:
         """Creates or updates a custom field value for a card. Requires board editor permissions.
 
         Args:
@@ -1041,21 +1042,21 @@ class AsyncPlankaEndpoints:
             content (str): Content/value of the custom field
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/cards/{cardId}/custom-field-values/customFieldGroupId:{customFieldGroupId}:customFieldId:{customFieldId}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str) -> Response_deleteCustomFieldValue:
+    async def deleteCustomFieldValue(self, cardId: str, customFieldGroupId: str, customFieldId: str) -> typ.Response_deleteCustomFieldValue:
         """Deletes a custom field value for a specific card. Requires board editor permissions.
 
         Args:
@@ -1064,21 +1065,21 @@ class AsyncPlankaEndpoints:
             customFieldId (str): ID of the custom field the value belongs to)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/cards/{cardId}/custom-field-value/customFieldGroupId:{customFieldGroupId}:customFieldId:{customFieldId}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createCustomFieldInBaseGroup(self, baseCustomFieldGroupId: str, **kwargs: Unpack[Request_createCustomFieldInBaseGroup]) -> Response_createCustomFieldInBaseGroup:
+    async def createCustomFieldInBaseGroup(self, baseCustomFieldGroupId: str, **kwargs: Unpack[typ.Request_createCustomFieldInBaseGroup]) -> typ.Response_createCustomFieldInBaseGroup:
         """Creates a custom field within a base custom field group. Requires project manager permissions.
 
         Args:
@@ -1088,20 +1089,20 @@ class AsyncPlankaEndpoints:
             showOnFrontOfCard (bool): Whether to show the field on the front of cards
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.post(f"api/base-custom-field-groups/{baseCustomFieldGroupId}/custom-fields", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createCustomFieldInGroup(self, customFieldGroupId: str, **kwargs: Unpack[Request_createCustomFieldInGroup]) -> Response_createCustomFieldInGroup:
+    async def createCustomFieldInGroup(self, customFieldGroupId: str, **kwargs: Unpack[typ.Request_createCustomFieldInGroup]) -> typ.Response_createCustomFieldInGroup:
         """Creates a custom field within a custom field group. Requires board editor permissions.
 
         Args:
@@ -1111,42 +1112,42 @@ class AsyncPlankaEndpoints:
             showOnFrontOfCard (bool): Whether to show the field on the front of cards
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/custom-field-groups/{customFieldGroupId}/custom-fields", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteCustomField(self, id: str) -> Response_deleteCustomField:
+    async def deleteCustomField(self, id: str) -> typ.Response_deleteCustomField:
         """Deletes a custom field. Can delete the in base custom field group (requires project manager permissions) or the custom field group (requires board editor permissions).
 
         Args:
             id (str): ID of the custom field to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/custom-fields/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateCustomField(self, id: str, **kwargs: Unpack[Request_updateCustomField]) -> Response_updateCustomField:
+    async def updateCustomField(self, id: str, **kwargs: Unpack[typ.Request_updateCustomField]) -> typ.Response_updateCustomField:
         """Updates a custom field. Can update in the base custom field group (requires project manager permissions) or the custom field group (requires board editor permissions).
 
         Args:
@@ -1156,21 +1157,21 @@ class AsyncPlankaEndpoints:
             showOnFrontOfCard (bool): Whether to show the field on the front of cards
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/custom-fields/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createLabel(self, boardId: str, **kwargs: Unpack[Request_createLabel]) -> Response_createLabel:
+    async def createLabel(self, boardId: str, **kwargs: Unpack[typ.Request_createLabel]) -> typ.Response_createLabel:
         """Creates a label within a board. Requires board editor permissions.
 
         Args:
@@ -1180,42 +1181,42 @@ class AsyncPlankaEndpoints:
             color (Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']): Color of the label
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/boards/{boardId}/labels", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteLabel(self, id: str) -> Response_deleteLabel:
+    async def deleteLabel(self, id: str) -> typ.Response_deleteLabel:
         """Deletes a label. Requires board editor permissions.
 
         Args:
             id (str): ID of the label to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/labels/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateLabel(self, id: str, **kwargs: Unpack[Request_updateLabel]) -> Response_updateLabel:
+    async def updateLabel(self, id: str, **kwargs: Unpack[typ.Request_updateLabel]) -> typ.Response_updateLabel:
         """Updates a label. Requires board editor permissions.
 
         Args:
@@ -1225,42 +1226,42 @@ class AsyncPlankaEndpoints:
             color (Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']): Color of the label
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/labels/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def clearList(self, id: str) -> Response_clearList:
+    async def clearList(self, id: str) -> typ.Response_clearList:
         """Deletes all cards from a list. Only works with trash-type lists. Requires project manager or board editor permissions.
 
         Args:
             id (str): ID of the list to clear (must be a trash-type list))
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/lists/{id}/clear")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createList(self, boardId: str, **kwargs: Unpack[Request_createList]) -> Response_createList:
+    async def createList(self, boardId: str, **kwargs: Unpack[typ.Request_createList]) -> typ.Response_createList:
         """Creates a list within a board. Requires board editor permissions.
 
         Args:
@@ -1270,62 +1271,62 @@ class AsyncPlankaEndpoints:
             name (str): Name/title of the list
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/boards/{boardId}/lists", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteList(self, id: str) -> Response_deleteList:
+    async def deleteList(self, id: str) -> typ.Response_deleteList:
         """Deletes a list and moves its cards to a trash list. Can only delete finite lists. Requires board editor permissions.
 
         Args:
             id (str): ID of the list to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/lists/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getList(self, id: str) -> Response_getList:
+    async def getList(self, id: str) -> typ.Response_getList:
         """Retrieves comprehensive list information, including cards, attachments, and other related data. Requires access to the board.
 
         Args:
             id (str): ID of the list to retrieve)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.get(f"api/lists/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateList(self, id: str, **kwargs: Unpack[Request_updateList]) -> Response_updateList:
+    async def updateList(self, id: str, **kwargs: Unpack[typ.Request_updateList]) -> typ.Response_updateList:
         """Updates a list. Can move lists between boards. Requires board editor permissions.
 
         Args:
@@ -1337,21 +1338,21 @@ class AsyncPlankaEndpoints:
             color (Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea'] | None): Color for the list
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/lists/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def moveListCards(self, id: str, **kwargs: Unpack[Request_moveListCards]) -> Response_moveListCards:
+    async def moveListCards(self, id: str, **kwargs: Unpack[typ.Request_moveListCards]) -> typ.Response_moveListCards:
         """Moves all cards from a closed list to an archive list. Requires board editor permissions.
 
         Args:
@@ -1359,21 +1360,21 @@ class AsyncPlankaEndpoints:
             listId (str): ID of the target list (must be an archive-type list)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/lists/{id}/move-cards", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def sortList(self, id: str, **kwargs: Unpack[Request_sortList]) -> Response_sortList:
+    async def sortList(self, id: str, **kwargs: Unpack[typ.Request_sortList]) -> typ.Response_sortList:
         """Sorts all cards within a list. Requires board editor permissions.
 
         Args:
@@ -1382,22 +1383,22 @@ class AsyncPlankaEndpoints:
             order (Literal['asc', 'desc']): Sorting order
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/lists/{id}/sort", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createBoardNotificationService(self, boardId: str, **kwargs: Unpack[Request_createBoardNotificationService]) -> Response_createBoardNotificationService:
+    async def createBoardNotificationService(self, boardId: str, **kwargs: Unpack[typ.Request_createBoardNotificationService]) -> typ.Response_createBoardNotificationService:
         """Creates a new notification service for a board. Requires project manager permissions.
 
         Args:
@@ -1406,21 +1407,21 @@ class AsyncPlankaEndpoints:
             format (Literal['text', 'markdown', 'html']): Format for notification messages
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.post(f"api/boards/{boardId}/notification-services", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createUserNotificationService(self, userId: str, **kwargs: Unpack[Request_createUserNotificationService]) -> Response_createUserNotificationService:
+    async def createUserNotificationService(self, userId: str, **kwargs: Unpack[typ.Request_createUserNotificationService]) -> typ.Response_createUserNotificationService:
         """Creates a new notification service for a user. Users can only create services for themselves.
 
         Args:
@@ -1429,41 +1430,41 @@ class AsyncPlankaEndpoints:
             format (Literal['text', 'markdown', 'html']): Format for notification messages
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.post(f"api/users/{userId}/notification-services", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteNotificationService(self, id: str) -> Response_deleteNotificationService:
+    async def deleteNotificationService(self, id: str) -> typ.Response_deleteNotificationService:
         """Deletes a notification service. Users can delete their own services, project managers can delete board services.
 
         Args:
             id (str): ID of the notification service to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/notification-services/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateNotificationService(self, id: str, **kwargs: Unpack[Request_updateNotificationService]) -> Response_updateNotificationService:
+    async def updateNotificationService(self, id: str, **kwargs: Unpack[typ.Request_updateNotificationService]) -> typ.Response_updateNotificationService:
         """Updates a notification service. Users can update their own services, project managers can update board services.
 
         Args:
@@ -1472,92 +1473,92 @@ class AsyncPlankaEndpoints:
             format (Literal['text', 'markdown', 'html']): Format for notification messages
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/notification-services/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def testNotificationService(self, id: str) -> Response_testNotificationService:
+    async def testNotificationService(self, id: str) -> typ.Response_testNotificationService:
         """Sends a test notification to verify the notification service is working. Users can test their own services, project managers can test board services.
 
         Args:
             id (str): ID of the notification service to test)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.post(f"api/notification-services/{id}/test")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getNotifications(self) -> Response_getNotifications:
+    async def getNotifications(self) -> typ.Response_getNotifications:
         """Retrieves all unread notifications for the current user, including creator users.
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
+            ValidationError: 400
+            Unauthorized: 401
         """
         resp = await self.client.get("api/notifications")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def readAllNotifications(self) -> Response_readAllNotifications:
+    async def readAllNotifications(self) -> typ.Response_readAllNotifications:
         """Marks all notifications for the current user as read.
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
+            ValidationError: 400
+            Unauthorized: 401
         """
         resp = await self.client.post("api/notifications/read-all")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getNotification(self, id: str) -> Response_getNotification:
+    async def getNotification(self, id: str) -> typ.Response_getNotification:
         """Retrieves notification, including creator users. Users can only access their own notifications.
 
         Args:
             id (str): ID of the notification to retrieve)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.get(f"api/notifications/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateNotification(self, id: str, **kwargs: Unpack[Request_updateNotification]) -> Response_updateNotification:
+    async def updateNotification(self, id: str, **kwargs: Unpack[typ.Request_updateNotification]) -> typ.Response_updateNotification:
         """Updates a notification. Users can only update their own notifications.
 
         Args:
@@ -1565,20 +1566,20 @@ class AsyncPlankaEndpoints:
             isRead (bool): Whether the notification has been read
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/notifications/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createProjectManager(self, projectId: str, **kwargs: Unpack[Request_createProjectManager]) -> Response_createProjectManager:
+    async def createProjectManager(self, projectId: str, **kwargs: Unpack[typ.Request_createProjectManager]) -> typ.Response_createProjectManager:
         """Creates a project manager within a project. Requires admin privileges for shared projects or existing project manager permissions. The user must be an admin or project owner.
 
         Args:
@@ -1586,45 +1587,45 @@ class AsyncPlankaEndpoints:
             userId (str): ID of the user who is assigned as project manager
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/projects/{projectId}/project-managers", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteProjectManager(self, id: str) -> Response_deleteProjectManager:
+    async def deleteProjectManager(self, id: str) -> typ.Response_deleteProjectManager:
         """Deletes a project manager. Requires admin privileges for shared projects or existing project manager permissions. Cannot remove the last project manager.
 
         Args:
             id (str): ID of the project manager to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.delete(f"api/project-managers/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createProject(self, **kwargs: Unpack[Request_createProject]) -> Response_createProject:
+    async def createProject(self, **kwargs: Unpack[typ.Request_createProject]) -> typ.Response_createProject:
         """Creates a project. The current user automatically becomes a project manager.
 
         Args:
@@ -1633,76 +1634,76 @@ class AsyncPlankaEndpoints:
             description (str | None): Detailed description of the project
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
+            ValidationError: 400
+            Unauthorized: 401
         """
         resp = await self.client.post("api/projects", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getProjects(self) -> Response_getProjects:
+    async def getProjects(self) -> typ.Response_getProjects:
         """Retrieves all projects the current user has access to, including managed projects, membership projects, and shared projects (for admins).
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
+            ValidationError: 400
+            Unauthorized: 401
         """
         resp = await self.client.get("api/projects")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteProject(self, id: str) -> Response_deleteProject:
+    async def deleteProject(self, id: str) -> typ.Response_deleteProject:
         """Deletes a project. The project must not have any boards. Requires project manager permissions.
 
         Args:
             id (str): ID of the project to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.delete(f"api/projects/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getProject(self, id: str) -> Response_getProject:
+    async def getProject(self, id: str) -> typ.Response_getProject:
         """Retrieves comprehensive project information, including boards, board memberships, and other related data.
 
         Args:
             id (str): ID of the project to retrieve)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.get(f"api/projects/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateProject(self, id: str, **kwargs: Unpack[Request_updateProject]) -> Response_updateProject:
+    async def updateProject(self, id: str, **kwargs: Unpack[typ.Request_updateProject]) -> typ.Response_updateProject:
         """Updates a project. Accessible fields depend on user permissions.
 
         Args:
@@ -1717,23 +1718,23 @@ class AsyncPlankaEndpoints:
             isFavorite (bool): Whether the project is marked as favorite by the current user
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
+            UnprocessableEntity: 422
         """
         resp = await self.client.patch(f"api/projects/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createTaskList(self, cardId: str, **kwargs: Unpack[Request_createTaskList]) -> Response_createTaskList:
+    async def createTaskList(self, cardId: str, **kwargs: Unpack[typ.Request_createTaskList]) -> typ.Response_createTaskList:
         """Creates a task list within a card. Requires board editor permissions.
 
         Args:
@@ -1744,62 +1745,62 @@ class AsyncPlankaEndpoints:
             hideCompletedTasks (bool): Whether to hide completed tasks
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.post(f"api/cards/{cardId}/task-lists", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteTaskList(self, id: str) -> Response_deleteTaskList:
+    async def deleteTaskList(self, id: str) -> typ.Response_deleteTaskList:
         """Deletes a task list and all its tasks. Requires board editor permissions.
 
         Args:
             id (str): ID of the task list to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/task-lists/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getTaskList(self, id: str) -> Response_getTaskList:
+    async def getTaskList(self, id: str) -> typ.Response_getTaskList:
         """Retrieves task list information, including tasks. Requires access to the card.
 
         Args:
             id (str): ID of the task list to retrieve)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.get(f"api/task-lists/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateTaskList(self, id: str, **kwargs: Unpack[Request_updateTaskList]) -> Response_updateTaskList:
+    async def updateTaskList(self, id: str, **kwargs: Unpack[typ.Request_updateTaskList]) -> typ.Response_updateTaskList:
         """Updates a task list. Requires board editor permissions.
 
         Args:
@@ -1810,21 +1811,21 @@ class AsyncPlankaEndpoints:
             hideCompletedTasks (bool): Whether to hide completed tasks
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/task-lists/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createTask(self, taskListId: str, **kwargs: Unpack[Request_createTask]) -> Response_createTask:
+    async def createTask(self, taskListId: str, **kwargs: Unpack[typ.Request_createTask]) -> typ.Response_createTask:
         """Creates a task within a task list. Either `linkedCardId` or `name` must be provided. Requires board editor permissions.
 
         Args:
@@ -1835,43 +1836,43 @@ class AsyncPlankaEndpoints:
             isCompleted (bool): Whether the task is completed
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/task-lists/{taskListId}/tasks", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteTask(self, id: str) -> Response_deleteTask:
+    async def deleteTask(self, id: str) -> typ.Response_deleteTask:
         """Deletes a task. Requires board editor permissions.
 
         Args:
             id (str): ID of the task to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/tasks/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateTask(self, id: str, **kwargs: Unpack[Request_updateTask]) -> Response_updateTask:
+    async def updateTask(self, id: str, **kwargs: Unpack[typ.Request_updateTask]) -> typ.Response_updateTask:
         """Updates a task. Linked card tasks have limited update options. Requires board editor permissions.
 
         Args:
@@ -1883,63 +1884,63 @@ class AsyncPlankaEndpoints:
             isCompleted (bool): Whether the task is completed
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/tasks/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getTerms(self, **kwargs: Unpack[Request_getTerms]) -> Response_getTerms:
+    async def getTerms(self, **kwargs: Unpack[typ.Request_getTerms]) -> typ.Response_getTerms:
         """Retrieves terms and conditions in the specified language.
 
         Args:
             language (str): Language code for terms localization) (optional)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         valid_params = ('language',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get("api/terms", params=passed_params)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createUserApiKey(self, id: str) -> Response_createUserApiKey:
+    async def createUserApiKey(self, id: str) -> typ.Response_createUserApiKey:
         """Generates a user's API key. The full API key is returned only once and cannot be retrieved again.
 
         Args:
             id (str): ID of the user to create API key for)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.post(f"api/users/{id}/api-key")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createUser(self, **kwargs: Unpack[Request_createUser]) -> Response_createUser:
+    async def createUser(self, **kwargs: Unpack[typ.Request_createUser]) -> typ.Response_createUser:
         """Creates a user account. Requires admin privileges.
 
         Args:
@@ -1956,59 +1957,59 @@ class AsyncPlankaEndpoints:
             turnOffRecentCardHighlighting (bool): Whether recent card highlighting is disabled
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            Conflict: 409
         """
         resp = await self.client.post("api/users", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getUsers(self) -> Response_getUsers:
+    async def getUsers(self) -> typ.Response_getUsers:
         """Retrieves a list of all users. Requires admin or project owner privileges.
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
         """
         resp = await self.client.get("api/users")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteUser(self, id: str) -> Response_deleteUser:
+    async def deleteUser(self, id: str) -> typ.Response_deleteUser:
         """Deletes a user account. Cannot delete the default admin user. Requires admin privileges.
 
         Args:
             id (str): ID of the user to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/users/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getUser(self, id: str, **kwargs: Unpack[Request_getUser]) -> Response_getUser:
+    async def getUser(self, id: str, **kwargs: Unpack[typ.Request_getUser]) -> typ.Response_getUser:
         """Retrieves a user. Use 'me' as ID to get the current user.
 
         Args:
@@ -2016,22 +2017,22 @@ class AsyncPlankaEndpoints:
             subscribe (bool): Whether to subscribe to real-time updates for this user (only for socket connections)) (optional)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         valid_params = ('subscribe',)
         passed_params = {k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}
         resp = await self.client.get(f"api/users/{id}", params=passed_params)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateUser(self, id: str, **kwargs: Unpack[Request_updateUser]) -> Response_updateUser:
+    async def updateUser(self, id: str, **kwargs: Unpack[typ.Request_updateUser]) -> typ.Response_updateUser:
         """Updates a user. Users can update their own profile, admins can update any user.
 
         Args:
@@ -2054,22 +2055,22 @@ class AsyncPlankaEndpoints:
             isDeactivated (bool): Whether the user account is deactivated and cannot log in (for admins)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.patch(f"api/users/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateUserAvatar(self, id: str, **kwargs: Unpack[Request_updateUserAvatar]) -> Response_updateUserAvatar:
+    async def updateUserAvatar(self, id: str, **kwargs: Unpack[typ.Request_updateUserAvatar]) -> typ.Response_updateUserAvatar:
         """Updates a user's avatar image. Users can update their own avatar, admins can update any user's avatar.
 
         Args:
@@ -2077,21 +2078,21 @@ class AsyncPlankaEndpoints:
             file (str): Avatar image file (must be an image format)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
-            UnprocessableEntity: 422 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
+            UnprocessableEntity: 422
         """
         resp = await self.client.post(f"api/users/{id}/avatar", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateUserEmail(self, id: str, **kwargs: Unpack[Request_updateUserEmail]) -> Response_updateUserEmail:
+    async def updateUserEmail(self, id: str, **kwargs: Unpack[typ.Request_updateUserEmail]) -> typ.Response_updateUserEmail:
         """Updates a user's email address. Users must provide current password when updating their own email. Admins can update any user's email without a password.
 
         Args:
@@ -2100,22 +2101,22 @@ class AsyncPlankaEndpoints:
             currentPassword (str): Current password (required when updating own email)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.patch(f"api/users/{id}/email", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateUserPassword(self, id: str, **kwargs: Unpack[Request_updateUserPassword]) -> Response_updateUserPassword:
+    async def updateUserPassword(self, id: str, **kwargs: Unpack[typ.Request_updateUserPassword]) -> typ.Response_updateUserPassword:
         """Updates a user's password. Users must provide a current password when updating their own password. Admins can update any user's password without the current password. Returns a new access token when updating own password.
 
         Args:
@@ -2124,21 +2125,21 @@ class AsyncPlankaEndpoints:
             currentPassword (str): Current password (required when updating own password)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/users/{id}/password", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateUserUsername(self, id: str, **kwargs: Unpack[Request_updateUserUsername]) -> Response_updateUserUsername:
+    async def updateUserUsername(self, id: str, **kwargs: Unpack[typ.Request_updateUserUsername]) -> typ.Response_updateUserUsername:
         """Updates a user's username. Users must provide a current password when updating their own username (unless they are SSO users with `oidcIgnoreUsername` enabled). Admins can update any user's username without the current password.
 
         Args:
@@ -2147,22 +2148,22 @@ class AsyncPlankaEndpoints:
             currentPassword (str): Current password (required when updating own username)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Forbidden: 403 
-            NotFound: 404 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Forbidden: 403
+            NotFound: 404
+            Conflict: 409
         """
         resp = await self.client.patch(f"api/users/{id}/username", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def createWebhook(self, **kwargs: Unpack[Request_createWebhook]) -> Response_createWebhook:
+    async def createWebhook(self, **kwargs: Unpack[typ.Request_createWebhook]) -> typ.Response_createWebhook:
         """Creates a webhook. Requires admin privileges.
 
         Args:
@@ -2173,56 +2174,56 @@ class AsyncPlankaEndpoints:
             excludedEvents (str | None): Comma-separated list of events excluded from the webhook
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            Conflict: 409 
+            ValidationError: 400
+            Unauthorized: 401
+            Conflict: 409
         """
         resp = await self.client.post("api/webhooks", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def getWebhooks(self) -> Response_getWebhooks:
+    async def getWebhooks(self) -> typ.Response_getWebhooks:
         """Retrieves a list of all configured webhooks. Requires admin privileges.
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
+            ValidationError: 400
+            Unauthorized: 401
         """
         resp = await self.client.get("api/webhooks")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def deleteWebhook(self, id: str) -> Response_deleteWebhook:
+    async def deleteWebhook(self, id: str) -> typ.Response_deleteWebhook:
         """Deletes a webhook. Requires admin privileges.
 
         Args:
             id (str): ID of the webhook to delete)
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.delete(f"api/webhooks/{id}")
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
 
-    async def updateWebhook(self, id: str, **kwargs: Unpack[Request_updateWebhook]) -> Response_updateWebhook:
+    async def updateWebhook(self, id: str, **kwargs: Unpack[typ.Request_updateWebhook]) -> typ.Response_updateWebhook:
         """Updates a webhook. Requires admin privileges.
 
         Args:
@@ -2234,15 +2235,15 @@ class AsyncPlankaEndpoints:
             excludedEvents (str | None): Comma-separated list of events excluded from the webhook
 
         Note:
-            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). 
-            If a matching PlankaError exists, it will be raised (see `api.errors`) 
+            All status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`).
+            If a matching PlankaError exists, it will be raised (see `api.errors`)
             Planka internal status codes and names are included here for disambiguation
 
         Raises:
-            ValidationError: 400 
-            Unauthorized: 401 
-            NotFound: 404 
+            ValidationError: 400
+            Unauthorized: 401
+            NotFound: 404
         """
         resp = await self.client.patch(f"api/webhooks/{id}", json=kwargs)
-        await raise_planka_err(resp)
+        raise_planka_err(resp)
         return resp.json()
