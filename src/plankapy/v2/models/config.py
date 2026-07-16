@@ -1,22 +1,22 @@
 from __future__ import annotations
 
-__all__ = ('Config', )
-
+from ..api import events, schemas
 from ._base import PlankaModel
-from ..api import schemas, events
+
+__all__ = ('Config', )
 
 
 # NOTE: schemas.Config is now used for SMTP Config, App Config is now Bootstrap
 class Config(PlankaModel[schemas.Bootstrap]):
     """Python interface for Planka Config"""
-    
+
     __events__ = events.ConfigEvents
 
     @property
     def version(self) -> str | None:
         """Current version of the PLANKA application"""
         return self.schema.get('version')
-    
+
     @property
     def activeUsersLimit(self) -> int | None:
         """Maximum number of active users allowed (conditionally added for admins if configured)"""

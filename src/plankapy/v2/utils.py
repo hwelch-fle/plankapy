@@ -1,41 +1,50 @@
 """
 Utility functions for dealing with Planka objects
 """
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from itertools import zip_longest
-
 from pathlib import Path
 from typing import Any, Protocol, TypedDict
-from .models import *
-from .interface import Planka
 
-__all__ = ('due_in', 'board_to_csv', 'board_to_table', 'snapshot', 'PlankaSnapshot', )
+from .api import schemas
+from .interface import Planka
+from .models import (
+    Board,
+    CustomFieldGroup,
+    CustomFieldValue,
+    PlankaModel,
+)
+
+__all__ = ('PlankaSnapshot', 'board_to_csv', 'board_to_table', 'due_in', 'snapshot')
+
 
 class HasDueDate(Protocol):
     @property
     def due_date(self) -> datetime | None: ...
-    
-def due_in(hours: float=0, days: float=0, weeks: float=0):
+
+
+def due_in(hours: float = 0, days: float = 0, weeks: float = 0):
     """Decorated function for use with a [ModelList](plankapy.v2.models._helpers.ModelList)
-    That allows filtering by date
+     that allows filtering by date
     """
     def _inner(m: HasDueDate):
         if not m.due_date:
             return False
         by = timedelta(days=days, hours=hours, weeks=weeks)
-        return (m.due_date - by) <= datetime.now(tz=timezone.utc)
+        return (m.due_date - by) <= datetime.now(tz=UTC)
     return _inner
 
+
 def board_to_table(board: Board) -> list[list[str]]:
-    """Get a nested list/table for the board. 
-    Uses `name` attributes of cards and lists
-    
+    """Get a nested list/table for the board.
+     Uses `name` attributes of cards and lists
+
     Args:
         board: The board object to tablify
-    
+
     Returns:
-        A matrix of string lists with the first element being list names 
-        and the remaining elements being card names from left to right    
+        A matrix of string lists with the first element being list names
+         and the remaining elements being card names from left to right.
         ```
         [
             ['list1', 'list2'],
@@ -51,14 +60,15 @@ def board_to_table(board: Board) -> list[list[str]]:
         for lst in board.lists
     ]
     rows = zip_longest(*list_cards, fillvalue='')
-    return [headers]+[list(row) for row in rows]
+    return [headers] + [list(row) for row in rows]
 
-def board_to_csv(board: Board, outdir: str|Path='.', name: str|None=None):
+
+def board_to_csv(board: Board, outdir: str | Path = '.', name: str | None = None):
     """Write the current board state out to a csv file
 
-    Writes out a csv of the board state using `list.name` and `card.name` as 
-    the headers and values respectively. Will match visual state of the board.
-    
+    Writes out a csv of the board state using `list.name` and `card.name` as
+     the headers and values respectively. Will match visual state of the board.
+
     Args:
         board: The board to export
         outdir: A string or Path to the outpud directory (default: `cwd`)
@@ -67,11 +77,9 @@ def board_to_csv(board: Board, outdir: str|Path='.', name: str|None=None):
     outfile = Path(outdir) / f'{name or board.name}.csv'
     rows = board_to_table(board)
     with outfile.open('wt') as csv:
-        csv.writelines(','.join(row)+'\n' for row in rows)
+        csv.writelines(','.join(row) + '\n' for row in rows)
 
 
-# System level snapshot of all schemas
-from .api import schemas
 class PlankaSnapshot(TypedDict):
     projects: list[schemas.Project]
     """Project Schemas"""
@@ -120,21 +128,23 @@ class PlankaSnapshot(TypedDict):
     smtp_config: schemas.Config
     """SMTP Configuration"""
 
+
 def _get_schema[M: PlankaModel[Any]](models: list[M]):
     return [m.schema for m in models]
 
+
 def snapshot(planka: Planka) -> PlankaSnapshot:
     """Create a dictionary snapshot of a Planka object. (MUST BE ADMIN)
-    All associated schemas are dumped into a single dictionary. 
+     All associated schemas are dumped into a single dictionary.
 
     Note:
-        Since this required traversing all objecs in the system, it can be a very long process. 
-        This is best run at a time when not a lot of users are interacting with the board since 
-        a 5 minute snapshot could end up with sync errors if state changes over that time.
+        Since this required traversing all objecs in the system, it can be a very long process.
+         This is best run at a time when not a lot of users are interacting with the board since
+         a 5 minute snapshot could end up with sync errors if state changes over that time.
 
     Returns:
-        A dictonary with all object schemas. Each top level key is a 
-    
+        A dictonary with all object schemas. Each top level key is a snake cased schema name.
+
     Raises:
         PermissionError: If the logged in user is not an admin
     """
@@ -143,7 +153,7 @@ def snapshot(planka: Planka) -> PlankaSnapshot:
     projects = planka.projects
     boards = [b for p in projects for b in p.boards]
     cards = [c for b in boards for c in b.cards]
-    lists = [l for b in boards for l in b.lists]
+    lists = [lst for b in boards for lst in b.lists]
     card_labels = [cl for b in boards for cl in b.card_labels]
     card_memberships = [cm for b in boards for cm in b.card_memberships]
     task_lists = [tl for b in boards for tl in b.task_lists]
@@ -157,7 +167,7 @@ def snapshot(planka: Planka) -> PlankaSnapshot:
     users = planka.users
     board_memberships = [bm for b in boards for bm in b.board_memberships]
     project_managers = [pm for p in projects for pm in p.project_managers]
-    labels = [l for b in boards for l in b.labels]
+    labels = [lbl for b in boards for lbl in b.labels]
     notification_services = [ns for p in projects for ns in p.notification_services]
     actions = [a for c in cards for a in c.actions]
     config = planka.config
@@ -189,4 +199,5 @@ def snapshot(planka: Planka) -> PlankaSnapshot:
     }
     return snap
 
-from .interface import Planka
+
+from .interface import Planka  # noqa: E402

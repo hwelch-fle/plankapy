@@ -1,18 +1,14 @@
 from __future__ import annotations
 
-__all__ = ('CardMembership', )
-
 from datetime import datetime
+
+from ..api import events, schemas
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, events
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    ...
-    #from models import *
+__all__ = ('CardMembership', )
 
 
 class CardMembership(PlankaModel[schemas.CardMembership]):
@@ -21,7 +17,7 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     __events__ = events.CardMembershipEvent
 
     # CardMembership properties
-    
+
     @property
     def card(self) -> Card:
         """The Card the User is a member of"""
@@ -30,9 +26,8 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     @property
     def user(self) -> User:
         """The User who is a member of the Card (Raise LookupError if the User is no longer on the Board)"""
-        _usrs = [u for u in self.card.board.users if self.schema['userId'] == u.id]
-        if _usrs:
-            return _usrs.pop()
+        if usr := self.card.board.users[{'id': self.schema['userId']}].dpop():
+            return usr
         raise LookupError(f"Cannot find User: {self.schema['userId']}")
 
     @property
@@ -44,6 +39,11 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
     def updated_at(self) -> datetime:
         """When the card membership was last updated"""
         return dtfromiso(self.schema['updatedAt'], self.session.timezone)
+
+    # Special Methods
+    def sync(self):
+        """Sync the CardMembership with the Planka server"""
+        self.schema = self.card.board.card_memberships[self].dpop(default=self).schema
 
     def delete(self):
         """Delete the CardMembership"""

@@ -3,10 +3,21 @@ import sys
 sys.path.append('../src')
 sys.path.append('src')
 
-from random import choices, choice
+from random import choice
 
-from plankapy.v2.models import Project, Board, List, Task, Comment, Label, Attachment, Card, CustomField
 from plankapy.v2 import Planka
+from plankapy.v2.models import (
+    Attachment,
+    Board,
+    Card,
+    Comment,
+    CustomField,
+    Label,
+    List,
+    Project,
+    Task,
+)
+
 
 def create_test_project(planka: Planka, name: str = 'plankapy Test Project') -> Project:
     # Delete any existing test projects
@@ -16,14 +27,15 @@ def create_test_project(planka: Planka, name: str = 'plankapy Test Project') -> 
         tp.delete()
     return planka.create_project(name=name, type='shared')
 
-def create_test_users(planka: Planka, *users: str, default_password: str='plankapy999'):
+
+def create_test_users(planka: Planka, *users: str, default_password: str = 'plankapy999'):
     # Delete any existing test users:
     for user in planka.users[{'name': lambda n: n in users}]:
         user.delete()
     return [
         planka.create_user(
-            email=f'{name}@test.com', 
-            name=name, 
+            email=f'{name}@test.com',
+            name=name,
             password=default_password,
             username=name,
             role='boardUser',
@@ -31,11 +43,13 @@ def create_test_users(planka: Planka, *users: str, default_password: str='planka
         for name in users
     ]
 
+
 def create_test_boards(project: Project, *boards: str) -> list[Board]:
     return [
         project.create_board(name=board)
         for board in boards
     ]
+
 
 def create_test_labels(boards: list[Board], *labels: str) -> list[Label]:
     return [
@@ -44,12 +58,14 @@ def create_test_labels(boards: list[Board], *labels: str) -> list[Label]:
         for l in labels
     ]
 
+
 def create_test_lists(boards: list[Board], *lists: str) -> list[List]:
     return [
         b.create_list(name=l, color='random')
         for b in boards
         for l in lists
     ]
+
 
 def create_test_cards(lists: list[List], *cards: str) -> list[Card]:
     return [
@@ -58,12 +74,14 @@ def create_test_cards(lists: list[List], *cards: str) -> list[Card]:
         for c in cards
     ]
 
+
 def create_test_attachments(cards: list[Card], *attachments: str) -> list[Attachment]:
     return [
         c.add_attachment(a, cover=True, download_url=True)
         for c in cards
         for a in attachments
     ]
+
 
 def create_test_fields_on_boards(boards: list[Board], *fields: str) -> list[CustomField]:
     return [
@@ -72,6 +90,7 @@ def create_test_fields_on_boards(boards: list[Board], *fields: str) -> list[Cust
         if (cfg := b.create_field_group('Fields'))
         for f in fields
     ]
+
 
 def create_test_tasks(cards: list[Card], *tasks: dict[str, list[str]]) -> list[Task]:
     return [
@@ -83,6 +102,7 @@ def create_test_tasks(cards: list[Card], *tasks: dict[str, list[str]]) -> list[T
         for v in tl_tasks
     ]
 
+
 def create_test_comments(cards: list[Card], *comments: str) -> list[Comment]:
     return [
         card.comment(comment, mentions=card.board.users)
@@ -90,12 +110,13 @@ def create_test_comments(cards: list[Card], *comments: str) -> list[Comment]:
         for comment in comments
     ]
 
+
 def main():
     test_project_name = 'plankapy Test Project'
     test_users = [
-        'plankapy1', 
-        'plankapy2', 
-        'plankapy3', 
+        'plankapy1',
+        'plankapy2',
+        'plankapy3',
         'plankapy4',
     ]
     test_boards = [
@@ -150,7 +171,8 @@ def main():
         task.assignee = choice(users)
     comments = create_test_comments(cards, *['THIS IS A COMMENT', 'MENTION EVERYONE'])
 
+
 if __name__ == '__main__':
-    #planka = Planka('http://localhost:1337')
-    #planka.login(username='demo', password='demo')
-    main()
+    planka = Planka('https://pro.demo.planka.cloud/')
+    planka.login(username='influencer@demo.com', password='DemoPass123!')
+    #main()

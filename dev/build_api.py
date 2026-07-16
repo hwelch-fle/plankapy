@@ -2,6 +2,7 @@
 a typing module using it
 """
 
+import datetime as dt
 import json
 from collections.abc import Generator
 from datetime import datetime
@@ -9,8 +10,6 @@ from pathlib import Path
 from typing import Any, Required, TypedDict
 
 import httpx
-
-import os
 
 HERE = Path(__file__).parent
 
@@ -20,12 +19,12 @@ SWAGGER_URL = "https://plankanban.github.io/planka/swagger-ui/swagger.json"
 SWAGGER_FILE = HERE / "swagger.json"
 
 INIT_MOD = API / "__init__.py"
-SCHEMA_MOD = API / "schemas.py" # Schema for each planka object
+SCHEMA_MOD = API / "schemas.py"  # Schema for each planka object
 
-PATH_MOD = API / "paths.py" # Endpoints
-ASYNC_PATH_MOD = API / "async_paths.py" # Async Endpoints
-TYP_MOD = API / "typ.py" # Typing for response/request json
-ERRORS_MOD = API / "errors.py" # Error implementations
+PATH_MOD = API / "paths.py"  # Endpoints
+ASYNC_PATH_MOD = API / "async_paths.py"  # Async Endpoints
+TYP_MOD = API / "typ.py"  # Typing for response/request json
+ERRORS_MOD = API / "errors.py"  # Error implementations
 
 TYPES = {
     "string": "str",
@@ -83,36 +82,38 @@ def get_schemas(swg: dict[str, Any]) -> dict[str, Schema]:
 def get_errors(swg: dict[str, Any]) -> dict[str, Response]:
     return swg["components"]["responses"]
 
+
 requests: dict[str, Any] | None = None
 responses: dict[str, Any] | None = None
+
+
 def yield_paths() -> Generator[str]:
     """This is a beautiful function. My god is it a mess I'm sorry"""
-    
+
     yield "from __future__ import annotations"
-    yield "from typing import ("
-    yield "\tLiteral,"
-    yield "\tUnpack,"
-    yield ")"
-    yield "from httpx import Client, Response, HTTPStatusError"
-    yield "from .schemas import *"
-    yield "from .typ import *"
-    yield "from .errors import *"
+    yield ""
+    yield "from typing import Unpack"
+    yield ""
+    yield "from httpx import Client, HTTPStatusError, Response"
+    yield ""
+    yield "from . import typ"
+    yield "from .errors import ERRORS, PlankaError"
     yield ""
     yield '__all__ = ("PlankaEndpoints",)'
-    yield ""
+    yield "\n"
     yield "def raise_planka_err(resp: Response) -> None:"
     yield "\ttry:"
     yield "\t\tresp.raise_for_status()"
     yield "\texcept HTTPStatusError as status_err:"
     yield "\t\tplanka_code = status_err.response.json().get('code')"
     yield "\t\tplanka_err = ERRORS.get(planka_code, PlankaError)"
-    yield "\t\traise planka_err(status_err)"
-    yield ""
+    yield "\t\traise planka_err(status_err) from status_err"
+    yield "\n"
     yield "class PlankaEndpoints:"
     yield "\tdef __init__(self, client: Client) -> None:"
     yield "\t\tself.client = client"
     yield ""
-    
+
     kwarg_reqs: dict[str, list[str]] = {}
     resps: dict[str, list[str]] = {}
     for r, rs in get_paths(SWG).items():
@@ -131,7 +132,7 @@ def yield_paths() -> Generator[str]:
             )
             optional_params = [p for p in params if not p.get('required', False)]
             body = info.get("requestBody")
-                    
+
             # Get item/includes type from here
             # assign a Item[type] or Includes[itemtype, *includetypes] return
             # may need additional response typeshed for includes keys per endpoint
@@ -150,10 +151,10 @@ def yield_paths() -> Generator[str]:
                 r_included = r_props['included']
                 r_i_props = r_included.get('properties')
                 for p_name, prop in r_i_props.items():
-                    if prop["type"] ==  "array":
+                    if prop["type"] == "array":
                         if '$ref' in prop['items']:
                             t = prop['items']['$ref'].split('/')[-1]
-                            resps[f'Included_{oid}'].append(f'{p_name}: list[{t}]')
+                            resps[f'Included_{oid}'].append(f'{p_name}: list[sch.{t}]')
                         elif 'allOf' in prop['items']:
                             base_type = prop['items']['allOf'][0]['$ref'].split('/')[-1]
                             additional_keys = [
@@ -164,14 +165,26 @@ def yield_paths() -> Generator[str]:
                                 for obj in prop['items']['allOf'][1:]
                                 for prop_name, prop in obj['properties'].items()
                             ]
-                            resps[f'Included_{oid}_all({base_type})'] = additional_keys
-                            resps[f'Included_{oid}'].append(f'{p_name}: list[Included_{oid}_all]{' | None' if prop.get('nullable') else ''}\n\t"""{prop["description"]}"""')
+                            resps[f'Included_{oid}_all(sch.{base_type})'] = additional_keys
+                            resps[f'Included_{oid}'].append(
+                                f'{p_name}: list[Included_{oid}_all]'
+                                f'{' | None' if prop.get('nullable') else ''}'
+                                f'\n\t"""{prop["description"]}"""'
+                            )
                         else:
                             if prop['type'] == 'array':
-                                resps[f'Included_{oid}'].append(f'{p_name}: list[{TYPES.get(prop['items']['type'], 'Any')}]{' | None' if prop.get('nullable') else ''}\n\t"""{prop['description']}"""')
+                                resps[f'Included_{oid}'].append(
+                                    f'{p_name}: list[{TYPES.get(prop['items']['type'], 'Any')}]'
+                                    f'{' | None' if prop.get('nullable') else ''}'
+                                    f'\n\t"""{prop['description']}"""'
+                                )
                             else:
-                                resps[f'Included_{oid}'].append(f'{p_name}: list[{TYPES.get(prop['type'], 'Any')}]{' | None' if prop.get('nullable') else ''}\n\t"""{prop['description']}"""')
-                                
+                                resps[f'Included_{oid}'].append(
+                                    f'{p_name}: list[{TYPES.get(prop['type'], 'Any')}]'
+                                    f'{' | None' if prop.get('nullable') else ''}'
+                                    f'\n\t"""{prop['description']}"""'
+                                )
+
             if 'item' in r_props:
                 has_item = True
                 r_item = r_props['item']
@@ -187,11 +200,11 @@ def yield_paths() -> Generator[str]:
                         for obj in r_item['allOf'][1:]
                         for prop_name, prop in obj['properties'].items()
                     ]
-                    resps[f'Item_{oid}({base_type})'] = additional_keys
+                    resps[f'Item_{oid}(sch.{base_type})'] = additional_keys
 
                 elif '$ref' in r_item:
-                    has_item = False # Direct reference
-                    resps[f'Response_{oid}'].append(f"item: {r_item['$ref'].split('/')[-1]}")
+                    has_item = False  # Direct reference
+                    resps[f'Response_{oid}'].append(f"item: sch.{r_item['$ref'].split('/')[-1]}")
 
                 elif 'properties' in r_item:
                     resps[f'Item_{oid}'] = []
@@ -200,16 +213,23 @@ def yield_paths() -> Generator[str]:
                             t = f"Literal{prop['enum']}"
                         else:
                             t = TYPES.get(prop['type'], 'Any')
-                        resps[f'Item_{oid}'].append(f"{p_name}: {t}{' | None' if prop.get('nullable') else ''}")
+                        resps[f'Item_{oid}'].append(
+                            f"{p_name}: {t}"
+                            f"{' | None' if prop.get('nullable') else ''}"
+                        )
                 else:
                     has_item = False
-                    resps[f'Response_{oid}'].append(f'item: {TYPES.get(r_item["type"])}{' | None' if r_item.get('nullable') else ''}\n\t"""{r_item['description']}"""')
-            
+                    resps[f'Response_{oid}'].append(
+                        f'item: {TYPES.get(r_item["type"])}'
+                        f'{' | None' if r_item.get('nullable') else ''}'
+                        f'\n\t"""{r_item['description']}"""'
+                    )
+
             if 'items' in r_props:
                 has_items = True
                 r_items = r_props['items']
                 r_i_props = r_items.get('properties')
-                
+
                 if 'allOf' in r_items['items']:
                     base_type = r_items['items']['allOf'][0]['$ref'].split('/')[-1]
                     additional_keys = [
@@ -220,17 +240,17 @@ def yield_paths() -> Generator[str]:
                         for obj in r_items['items']['allOf'][1:]
                         for prop_name, prop in obj['properties'].items()
                     ]
-                    resps[f'Items_{oid}({base_type})'] = additional_keys
-            
+                    resps[f'Items_{oid}(sch.{base_type})'] = additional_keys
+
                 else:
                     resps[f'Items_{oid}'] = []
-                    #for p_name, prop in r_items.get('properties', {}).items():
+                    # for p_name, prop in r_items.get('properties', {}).items():
                     if r_items['type'] == 'array':
                         if '$ref' in r_items['items']:
                             has_items = False
                             t = r_items['items']['$ref'].split('/')[-1]
-                            resps[f'Response_{oid}'].append(f'items: list[{t}]')
-            
+                            resps[f'Response_{oid}'].append(f'items: list[sch.{t}]')
+
             if has_items or has_item or has_included:
                 if has_item:
                     resps[f'Response_{oid}'].append(f'item: Item_{oid}')
@@ -238,15 +258,15 @@ def yield_paths() -> Generator[str]:
                     resps[f'Response_{oid}'].append(f'items: list[Items_{oid}]')
                 if has_included:
                     resps[f'Response_{oid}'].append(f'included: Included_{oid}')
-            
+
             if not body and not optional_params:
-                yield f"\tdef {oid}({', '.join(header)}) -> Response_{oid}:"
+                yield f"\tdef {oid}({', '.join(header)}) -> typ.Response_{oid}:"
             else:
-                yield f"\tdef {oid}({', '.join(header)}, **kwargs: Unpack[Request_{oid}]) -> Response_{oid}:"
+                yield f"\tdef {oid}({', '.join(header)}, **kwargs: Unpack[typ.Request_{oid}]) -> typ.Response_{oid}:"
             yield f'\t\t"""{info["description"]}'
             if params or body:
                 yield ""
-                yield f"\t\tArgs:"
+                yield "\t\tArgs:"
             if params:
                 for p in params:
                     if "enum" in p["schema"]:
@@ -254,10 +274,10 @@ def yield_paths() -> Generator[str]:
                     else:
                         t = p["schema"]["type"]
                     if p.get('required', False):
-                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}{' | None' if p.get('nullable') else ''}): {p['description']})"
+                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}{' | None' if p.get('nullable') else ''}): {p['description'].strip()})"
                     else:
-                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}{' | None' if p.get('nullable') else ''}): {p['description']}) (optional)"
-                        
+                        yield f"\t\t\t{p['name']} ({TYPES.get(t, t)}{' | None' if p.get('nullable') else ''}): {p['description'].strip()}) (optional)"
+
             if body or optional_params:
                 r_typing = f"Request_{oid}"
                 kwarg_reqs[r_typing] = []
@@ -273,7 +293,7 @@ def yield_paths() -> Generator[str]:
                         schema = body["content"]["application/json"]["schema"]
                     except KeyError:
                         schema = body["content"]["multipart/form-data"]["schema"]
-                    kwarg_required = schema.get('required', []) 
+                    kwarg_required = schema.get('required', [])
                     for name, prop in schema["properties"].items():
                         if "enum" in prop:
                             yield f"\t\t\t{name} (Literal{prop['enum']}{' | None' if prop.get('nullable') else ''}): {prop['description']}"
@@ -288,19 +308,18 @@ def yield_paths() -> Generator[str]:
                                 kwarg_reqs[r_typing].append(f'{name}: {p_type}{' | None' if prop.get('nullable') else ''}\n\t"""{prop['description']}"""')
                             else:
                                 kwarg_reqs[r_typing].append(f'{name}: NotRequired[{p_type}{' | None' if prop.get('nullable') else ''}]\n\t"""{prop['description']}"""')
-            
+
             errors = {code: r for code, r in info['responses'].items() if code != '200'}
             if errors:
                 yield ""
                 yield "\t\tNote:"
-                yield "\t\t\tAll status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`). "
-                yield "\t\t\tIf a matching PlankaError exists, it will be raised (see `api.errors`) "
-                yield "\t\t\tPlanka internal status codes and names are included here for disambiguation"
+                yield "\t\t\tAll status errors are instances of `httpx.HTTPStatusError` at runtime (`response.raise_for_status()`)."
+                yield "\t\t\t If a matching PlankaError exists, it will be raised (see `api.errors`)"
+                yield "\t\t\t Planka internal status codes and names are included here for disambiguation"
                 yield ""
                 yield "\t\tRaises:"
                 for e_code, e in errors.items():
-                    yield f"\t\t\t{e.get('$ref', 'Error').split('/')[-1]}: {int(e_code)} " + e.get('description', '')
-                    
+                    yield "\t\t\t" + (f"{e.get('$ref', 'Error').split('/')[-1]}: {int(e_code)} " + e.get('description', '')).strip()
             yield '\t\t"""'
             if not body and not optional_params:
                 if '{' in r:
@@ -314,8 +333,8 @@ def yield_paths() -> Generator[str]:
                     yield f'\t\tresp = self.client.{typ}("api{r}", json=kwargs)'
             elif optional_params or body:
                 if optional_params:
-                    yield f'\t\tvalid_params = {tuple([p['name'] for p in optional_params])}'
-                    yield f'\t\tpassed_params = ''{k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}'
+                    yield f'\t\tvalid_params = {tuple(p['name'] for p in optional_params)}'
+                    yield '\t\tpassed_params = ''{k: v for k, v in kwargs.items() if k in valid_params if isinstance(v, str | int | float)}'
                 if optional_params and body:
                     if '{' in r:
                         yield f'\t\tresp = self.client.{typ}(f"api{r}", params=passed_params, json=kwargs)'
@@ -331,7 +350,7 @@ def yield_paths() -> Generator[str]:
                         yield f'\t\tresp = self.client.{typ}(f"api{r}", json=kwargs)'
                     else:
                         yield f'\t\tresp = self.client.{typ}("api{r}", json=kwargs)'
-            
+
             yield "\t\traise_planka_err(resp)"
             yield "\t\treturn resp.json()"
             yield ""
@@ -341,67 +360,94 @@ def yield_paths() -> Generator[str]:
     requests = kwarg_reqs
     responses = resps
 
+
 def yield_async_paths() -> Generator[str]:
     for line in yield_paths():
-        if '__init__' not in line:
+        if '__init__' not in line and 'def raise_planka_err' not in line:
             line = line.replace('def ', 'async def ')
         if 'PlankaEndpoints' in line:
             line = line.replace('PlankaEndpoints', 'AsyncPlankaEndpoints')
         line = line.replace(': Client', ': AsyncClient')
         line = line.replace('import Client', 'import AsyncClient')
         line = line.replace('resp = ', 'resp = await ')
-        line = line.replace('raise_planka_err(resp)', 'await raise_planka_err(resp)')
+        # line = line.replace('raise_planka_err(resp)', 'await raise_planka_err(resp)')
         yield line
+
 
 def yield_types() -> Generator[str]:
     yield "from __future__ import annotations"
+    yield ""
     yield "from datetime import datetime"
     yield "from typing import ("
     yield "\tAny,"
     yield "\tLiteral,"
-    yield "\tTypedDict,"
     yield "\tNotRequired,"
-    yield ")"
-    yield "from .schemas import *"
+    yield "\tTypedDict,"
+    yield ")\n"
+    yield "from . import schemas as sch"
     yield ""
     if requests:
         yield ""
-        yield "# Request Typing"
+        # yield "# Request Typing"
         for c_name, attrs in requests.items():
             yield f"class {c_name}(TypedDict):"
             for attr in attrs:
+                if c_name == 'Request_getCards':
+                    attr = attr.replace('before[listChangedAt]', 'before_listChangedAt')
+                    attr = attr.replace('before[id]', 'before_id')
+                if 'file:' in attr.lower():
+                    if c_name != 'Request_createAttachment':
+                        attr = attr.replace('str', 'bytes')
+                    else:
+                        attr = attr.replace('str', 'str | bytes')
+                if 'dueDate:' in attr:
+                    if c_name != 'Request_updateCard':
+                        attr = attr.replace('str', 'str | datetime')
+                        attr = attr.replace(
+                            "Due date for the card",
+                            "Due date for the card (`datetime` only allowed when using `Card.create_card`, otherwise use ISO string)"
+                        )
+                if 'stopwatch:' in attr:
+                    if c_name == 'Request_updateCard':
+                        attr = attr.replace('dict[str, Any]', 'sch.Stopwatch')
                 yield f"\t{attr}"
-            yield ""
-        yield ""
+            yield "\n"
 
     if responses:
-        yield ""
-        yield "# Response Typing"
+        # yield "# Response Typing"
         for r_name, attrs in responses.items():
             if not attrs:
                 continue
             if '(' in r_name:
-                yield f"class {r_name}:"
+                yield f"\nclass {r_name}:"
             else:
-                yield f"class {r_name}(TypedDict):"
-            
+                yield f"\nclass {r_name}(TypedDict):"
+
             for attr in attrs:
+                if 'isFavorite:' in attr:
+                    attr = attr.replace(': bool', ': NotRequired[bool]')
+                if 'isSubscribed:' in attr:
+                    attr = attr.replace(': bool', ': NotRequired[bool]')
                 yield f"\t{attr}"
+
+            # Bootstrap response
+            if r_name == 'Response_getBootstrap':
+                yield "\titem: sch.Bootstrap"
             yield ""
-        yield ""
+        # yield ""
+
 
 def yield_errors() -> Generator[str]:
     yield "from __future__ import annotations"
+    yield ""
     yield "from typing import Any"
+    yield ""
     yield "from httpx import HTTPStatusError"
     yield ""
     yield "__all__ = ("
-    yield '\t"PlankaError",'
-    yield '\t"ERRORS",'
-    for i in get_errors(SWG):
+    for i in ['ERRORS', *sorted([*get_errors(SWG), 'PlankaError'])]:
         yield f'\t"{i}",'
-    yield ")"
-    yield ""
+    yield ")\n\n"
     yield "class PlankaError(HTTPStatusError):"
     yield "    def __init__(self, parent: HTTPStatusError, *args: Any, **kwargs: Any) -> None:"
     yield "        response_json: dict[str, str] = parent.response.json()"
@@ -409,12 +455,12 @@ def yield_errors() -> Generator[str]:
     yield "        super().__init__(message, request=parent.request, response=parent.response)"
     yield "        for problem in response_json.get('problems', []):"
     yield "            self.add_note(problem)"
-    yield ""
     errors: dict[str, str] = {}
     for r, rs in get_errors(SWG).items():
-        yield f"\nclass {r}(PlankaError): ..."
-        yield f'"""{rs["description"]}"""'
+        yield f"\n\nclass {r}(PlankaError):"
+        yield f'    """{rs["description"]}"""'
         errors[rs['content']['application/json']['schema']['properties']['code']['example']] = r
+    yield ""
     yield ""
     yield "ERRORS: dict[str, type[PlankaError]] = {"
     for e_name, e_class in errors.items():
@@ -422,33 +468,36 @@ def yield_errors() -> Generator[str]:
     yield "}"
     yield ""
 
+
 def yield_init() -> Generator[str]:
-    _version: str = SWG["info"]["version"]
-    yield f'"""{SWG["info"]["title"]} ({_version}) - Generated on {datetime.now().strftime("%a %b %d %Y")}"""'
+    version: str = SWG["info"]["version"]
+    yield f'"""{SWG["info"]["title"]} ({version}) - Generated on {datetime.now(tz=dt.UTC).strftime("%a %b %d %Y")}"""'
     yield ""
-    yield "from .schemas import *"
-    yield "from .paths import *"
     yield "from .async_paths import *"
     yield "from .errors import *"
+    yield "from .paths import *"
+    yield "from .schemas import *"
     yield ""
-    yield f'__version__ = "{_version}"'
+    yield f'__version__ = "{version}"'
     yield ""
 
 
 def yield_schema() -> Generator[str]:
     yield "from __future__ import annotations"
-    yield "from typing import TypedDict, NotRequired, Any, Literal"
     yield ""
-    yield "from .events import WebhookEvent"
+    yield "from typing import Any, Literal, NotRequired, TypedDict"
+    yield ""
+    yield "from .events import PlankaEvent"
     yield ""
     yield "__all__ = ("
-    for c in get_schemas(SWG):
+    schms = sorted([*get_schemas(SWG), "Stopwatch"])
+    for c in schms:
         yield f'\t"{c}",'
-    yield '\t"Stopwatch",'
     yield ")"
     for c, prop in get_schemas(SWG).items():
-        yield f"\nclass {c}(TypedDict):"
+        yield f"\n\nclass {c}(TypedDict):"
         for p, ps in prop["properties"].items():
+            p = p.replace('[', '_').replace(']', '')
             t = "Any"
             if "enum" in ps:
                 t = f"Literal{ps['enum']}"
@@ -467,21 +516,24 @@ def yield_schema() -> Generator[str]:
             yield f"    {p}: {t}"
             if "description" in ps:
                 yield f'    """{ps["description"]}"""'
-    yield ""
+    yield "\n"
     yield "class Stopwatch(TypedDict):"
     yield "    startedAt: str | None"
     yield '    """The time that a running stopwatch was started"""'
     yield "    total: int"
     yield '    """The number of seconds that the stopwatch has been running"""'
+    yield '\n'
 
 
-#INIT_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '), yield_init())))
-#SCHEMA_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_schema())))
-PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_paths())))
-ASYNC_PATH_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_async_paths())))
-#ERRORS_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_errors())))
-#TYP_MOD.write_text("\n".join(map(lambda l: l.replace('\t', '    '),yield_types())))
+# Populate paths
+_ = list(yield_paths())
+INIT_MOD.write_text("\n".join(line.replace('\t', '    ') for line in yield_init()))
+# SCHEMA_MOD.write_text("\n".join(line.replace('\t', '    ') for line in yield_schema()))
+# PATH_MOD.write_text("\n".join(line.replace('\t', '    ') for line in yield_paths()))
+# ASYNC_PATH_MOD.write_text("\n".join(line.replace('\t', '    ') for line in yield_async_paths()))
+# ERRORS_MOD.write_text("\n".join(line.replace('\t', '    ') for line in yield_errors()))
+TYP_MOD.write_text("\n".join(line.replace('\t', '    ') for line in yield_types()))
 # Delete the file after it is used
 # this ensures that the api typing module
 # is always up to date
-os.remove(SWAGGER_FILE)
+Path(SWAGGER_FILE).unlink()

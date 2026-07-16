@@ -1,20 +1,16 @@
 from __future__ import annotations
 
-__all__ = ('CardLabel', )
-
 from datetime import datetime
+
+from ..api import events, schemas
 from ._base import PlankaModel
 from ._helpers import dtfromiso
-from ..api import schemas, events
 
 # Deferred Model imports at bottom of file
 
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    ...
-    #from models import *
+__all__ = ('CardLabel', )
 
- 
+
 class CardLabel(PlankaModel[schemas.CardLabel]):
     """Python interface for Planka CardLabels"""
 
@@ -41,6 +37,11 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
     def updated_at(self) -> datetime:
         """When the card-label association was last updated"""
         return dtfromiso(self.schema['updatedAt'], self.session.timezone)
+
+    # Special Methods
+    def sync(self):
+        """Sync the CardLabel with the Planka server"""
+        self.schema = self.card.board.card_labels[self].dpop(default=self).schema
 
     def delete(self):
         """Delete the CardLabel"""

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Literal, NotRequired, TypedDict
+from typing import Literal, TypedDict
+
 from . import schemas
 
 __all__ = (
     "Card",
 )
+
 
 class Card(schemas.Card):
     isDraft: bool
@@ -22,7 +24,7 @@ class Card(schemas.Card):
     sourceLabels: list[str]
     sourceId: str
     coverLinkAttachmentId: str
-    
+
 
 class Recurrence(TypedDict):
     time: str
@@ -49,14 +51,14 @@ class Board(schemas.Board):
 
 class List(schemas.List):
     # Added a `recurring` list type
-    type: Literal['active', 'closed', 'archive', 'trash', 'recurring'] # type: ignore
+    type: Literal['active', 'closed', 'archive', 'trash', 'recurring']  # type: ignore
 
 
 class User(schemas.User):
     hideIdentityFromGuests: bool
 
     # Added `guest?`
-    role: Literal['admin', 'projectOwner', 'boardUser', 'guest'] # type: ignore
+    role: Literal['admin', 'projectOwner', 'boardUser', 'guest']  # type: ignore
     canBeUsedByWorkers: bool
     canBeUsedByGuests: bool
 
@@ -86,7 +88,7 @@ class Comment(schemas.Comment):
     isIdentityHiddenFromGuests: bool | None
     isPinned: bool
 
+
 class TaskList(schemas.TaskList):
     canBeEditedByWorkers: bool
     isVisibleToGuests: bool
-    

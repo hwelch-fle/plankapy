@@ -1,10 +1,12 @@
 # TODO: A Server class that can be bound to a webhook and dispatch functions
 
+import datetime as dt
 from collections.abc import Callable
 from datetime import datetime
 from typing import Any
-from .interface import Planka
+
 from .api.events import PlankaEvent, PlankaEvents
+from .interface import Planka
 
 EventHandler = Callable[[Planka, Any], Any]
 """Type Signature for an Event Handler
@@ -22,50 +24,56 @@ EventHandlerMap = dict[PlankaEvent | tuple[PlankaEvent, ...], list[EventHandler]
 Keys can be a single event or a tuple of events, values are a list of handlers to be called on that event
 """
 
+
 def print_card_deleted(planka: Planka, hook_response: Any):
     print(f'{planka.me.name} says: Card Deleted: {hook_response}')
+
 
 def print_card_created(planka: Planka, hook_response: Any):
     print(f'{planka.me.name} says: Card Created: {hook_response}')
 
+
 def print_card_updated(planka: Planka, hook_response: Any):
     print(f'{planka.me.name} says: Card Updated: {hook_response}')
 
+
 def print_hello_world(planka: Planka, hook_response: Any):
-    print(f'Something happened! Hello World! We\'re doing it again!')
+    print('Something happened! Hello World! We\'re doing it again!')
+
 
 DEFAULT_HANDLERS: EventHandlerMap = {
     'cardCreate': [print_card_created],
     'cardUpdate': [print_card_updated],
     'cardDelete': [print_card_deleted],
     ('cardCreate', 'cardUpdate', 'cardDelete'): [
-        print_hello_world, 
-        print_card_created, 
-        print_card_updated, 
+        print_hello_world,
+        print_card_created,
+        print_card_updated,
         print_card_deleted
     ],
 }
 
+
 class EventDispatcher:
-    """A simple server that creates or binds to an existing webhook and dispatches 
-    automation scripts when pinged
+    """A simple server that creates or binds to an existing webhook and dispatches
+     automation scripts when pinged
     """
 
     __events__ = PlankaEvents
 
     def __init__(self, name: str, url: str,
-                 *, 
-                 planka: Planka, 
-                 handlers: EventHandlerMap=DEFAULT_HANDLERS):
+                 *,
+                 planka: Planka,
+                 handlers: EventHandlerMap = DEFAULT_HANDLERS):
         self.handlers = handlers
         self.url = url
         self.planka = planka
 
     async def run(self):
         """Run the dispatcher (should be in an event loop)"""
-        rcvd_event = str()
-        rcvd_data: dict[str, Any] = dict()
+        rcvd_event = ''
+        rcvd_data = dict[str, Any]()
 
         for event, handlers in self.handlers.items():
             if (isinstance(event, tuple) and rcvd_event in event) or (rcvd_event == event):
-                yield (event, {h.__name__: h(self.planka, rcvd_data) for h in handlers}, datetime.now())
+                yield (event, {h.__name__: h(self.planka, rcvd_data) for h in handlers}, datetime.now(tz=dt.UTC))

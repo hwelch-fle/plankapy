@@ -1,15 +1,16 @@
 from __future__ import annotations
+
 from datetime import datetime
 from typing import (
     Any,
     Literal,
-    TypedDict,
     NotRequired,
+    TypedDict,
 )
-from .schemas import *
+
+from . import schemas as sch
 
 
-# Request Typing
 class Request_acceptTerms(TypedDict):
     pendingToken: str
     """Pending token received from the authentication flow"""
@@ -17,6 +18,7 @@ class Request_acceptTerms(TypedDict):
     """Terms signature hash"""
     initialLanguage: NotRequired[Literal['ar-YE', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'en-US', 'es-ES', 'et-EE', 'fa-IR', 'fi-FI', 'fr-FR', 'hu-HU', 'id-ID', 'it-IT', 'ja-JP', 'ko-KR', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-Cyrl-RS', 'sr-Latn-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'uz-UZ', 'vi-VN', 'zh-CN', 'zh-TW'] | None]
     """Preferred language for user interface and notifications (used only if user language is not set)"""
+
 
 class Request_createAccessToken(TypedDict):
     emailOrUsername: str
@@ -26,6 +28,7 @@ class Request_createAccessToken(TypedDict):
     withHttpOnlyToken: NotRequired[bool]
     """Whether to include an HTTP-only authentication cookie"""
 
+
 class Request_exchangeForAccessTokenWithOidc(TypedDict):
     code: str
     """Authorization code from OIDC provider"""
@@ -34,17 +37,21 @@ class Request_exchangeForAccessTokenWithOidc(TypedDict):
     withHttpOnlyToken: NotRequired[bool]
     """Whether to include HTTP-only authentication cookie"""
 
+
 class Request_revokePendingToken(TypedDict):
     pendingToken: str
     """Pending token to revoke"""
+
 
 class Request_getBoardActions(TypedDict):
     beforeId: NotRequired[str]
     """ID to get actions before (for pagination)"""
 
+
 class Request_getCardActions(TypedDict):
     beforeId: NotRequired[str]
     """ID to get actions before (for pagination)"""
+
 
 class Request_createAttachment(TypedDict):
     type: Literal['file', 'link']
@@ -58,9 +65,11 @@ class Request_createAttachment(TypedDict):
     requestId: NotRequired[str]
     """Request ID for tracking"""
 
+
 class Request_updateAttachment(TypedDict):
     name: NotRequired[str]
     """Name/title of the attachment"""
+
 
 class Request_createBackgroundImage(TypedDict):
     file: bytes
@@ -68,13 +77,16 @@ class Request_createBackgroundImage(TypedDict):
     requestId: NotRequired[str]
     """Request ID for tracking"""
 
+
 class Request_createBaseCustomFieldGroup(TypedDict):
     name: str
     """Name/title of the base custom field group"""
 
+
 class Request_updateBaseCustomFieldGroup(TypedDict):
     name: NotRequired[str]
     """Name/title of the base custom field group"""
+
 
 class Request_createBoardMembership(TypedDict):
     userId: str
@@ -84,11 +96,13 @@ class Request_createBoardMembership(TypedDict):
     canComment: NotRequired[bool | None]
     """Whether the user can comment on cards (applies only to viewers)"""
 
+
 class Request_updateBoardMembership(TypedDict):
     role: NotRequired[Literal['editor', 'viewer']]
     """Role of the user in the board"""
     canComment: NotRequired[bool | None]
     """Whether the user can comment on cards (applies only to viewers)"""
+
 
 class Request_createBoard(TypedDict):
     position: int
@@ -102,9 +116,11 @@ class Request_createBoard(TypedDict):
     requestId: NotRequired[str]
     """Request ID for tracking"""
 
+
 class Request_getBoard(TypedDict):
     subscribe: NotRequired[bool]
     """Whether to subscribe to real-time updates for this board (only for socket connections)"""
+
 
 class Request_updateBoard(TypedDict):
     position: NotRequired[int]
@@ -124,13 +140,16 @@ class Request_updateBoard(TypedDict):
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the board"""
 
+
 class Request_createCardLabel(TypedDict):
     labelId: str
     """ID of the label to add to the card"""
 
+
 class Request_createCardMembership(TypedDict):
     userId: str
     """ID of the card to add the user to"""
+
 
 class Request_createCard(TypedDict):
     type: Literal['project', 'story']
@@ -148,6 +167,7 @@ class Request_createCard(TypedDict):
     stopwatch: NotRequired[dict[str, Any] | None]
     """Stopwatch data for time tracking"""
 
+
 class Request_getCards(TypedDict):
     before_listChangedAt: NotRequired[str]
     """Pagination cursor field `listChangedAt` (use together with `before_id`)"""
@@ -159,6 +179,7 @@ class Request_getCards(TypedDict):
     """Comma-separated user IDs to filter by members or task assignees"""
     labelIds: NotRequired[str]
     """Comma-separated label IDs to filter by labels"""
+
 
 class Request_updateCard(TypedDict):
     boardId: NotRequired[str]
@@ -179,10 +200,11 @@ class Request_updateCard(TypedDict):
     """Due date for the card"""
     isDueCompleted: NotRequired[bool | None]
     """Whether the due date is completed"""
-    stopwatch: NotRequired[Stopwatch | None]
+    stopwatch: NotRequired[sch.Stopwatch | None]
     """Stopwatch data for time tracking"""
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
+
 
 class Request_duplicateCard(TypedDict):
     boardId: NotRequired[str]
@@ -194,17 +216,21 @@ class Request_duplicateCard(TypedDict):
     name: NotRequired[str | None]
     """Name/title for the duplicated card"""
 
+
 class Request_createComment(TypedDict):
     text: str
     """Content of the comment"""
+
 
 class Request_getComments(TypedDict):
     beforeId: NotRequired[str]
     """ID to get comments before (for pagination)"""
 
+
 class Request_updateComments(TypedDict):
     text: NotRequired[str]
     """Content of the comment"""
+
 
 class Request_updateConfig(TypedDict):
     smtpHost: NotRequired[str | None]
@@ -224,6 +250,7 @@ class Request_updateConfig(TypedDict):
     smtpFrom: NotRequired[str | None]
     """Default "from" used for outgoing SMTP emails"""
 
+
 class Request_createBoardCustomFieldGroup(TypedDict):
     baseCustomFieldGroupId: NotRequired[str]
     """ID of the base custom field group used as a template"""
@@ -231,6 +258,7 @@ class Request_createBoardCustomFieldGroup(TypedDict):
     """Position of the custom field group within the board"""
     name: NotRequired[str | None]
     """Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)"""
+
 
 class Request_createCardCustomFieldGroup(TypedDict):
     baseCustomFieldGroupId: NotRequired[str]
@@ -240,15 +268,18 @@ class Request_createCardCustomFieldGroup(TypedDict):
     name: NotRequired[str | None]
     """Name/title of the custom field group (required if `baseCustomFieldGroupId` is not provided)"""
 
+
 class Request_updateCustomFieldGroup(TypedDict):
     position: NotRequired[int]
     """Position of the custom field group within the board/card"""
     name: NotRequired[str | None]
     """Name/title of the custom field group"""
 
+
 class Request_updateCustomFieldValue(TypedDict):
     content: str
     """Content/value of the custom field"""
+
 
 class Request_createCustomFieldInBaseGroup(TypedDict):
     position: int
@@ -258,6 +289,7 @@ class Request_createCustomFieldInBaseGroup(TypedDict):
     showOnFrontOfCard: NotRequired[bool]
     """Whether to show the field on the front of cards"""
 
+
 class Request_createCustomFieldInGroup(TypedDict):
     position: int
     """Position of the custom field within the group"""
@@ -265,6 +297,7 @@ class Request_createCustomFieldInGroup(TypedDict):
     """Name/title of the custom field"""
     showOnFrontOfCard: NotRequired[bool]
     """Whether to show the field on the front of cards"""
+
 
 class Request_updateCustomField(TypedDict):
     position: NotRequired[int]
@@ -274,6 +307,7 @@ class Request_updateCustomField(TypedDict):
     showOnFrontOfCard: NotRequired[bool]
     """Whether to show the field on the front of cards"""
 
+
 class Request_createLabel(TypedDict):
     position: int
     """Position of the label within the board"""
@@ -281,6 +315,7 @@ class Request_createLabel(TypedDict):
     """Name/title of the label"""
     color: Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']
     """Color of the label"""
+
 
 class Request_updateLabel(TypedDict):
     position: NotRequired[int]
@@ -290,6 +325,7 @@ class Request_updateLabel(TypedDict):
     color: NotRequired[Literal['muddy-grey', 'autumn-leafs', 'morning-sky', 'antique-blue', 'egg-yellow', 'desert-sand', 'dark-granite', 'fresh-salad', 'lagoon-blue', 'midnight-blue', 'light-orange', 'pumpkin-orange', 'light-concrete', 'sunny-grass', 'navy-blue', 'lilac-eyes', 'apricot-red', 'orange-peel', 'silver-glint', 'bright-moss', 'deep-ocean', 'summer-sky', 'berry-red', 'light-cocoa', 'grey-stone', 'tank-green', 'coral-green', 'sugar-plum', 'pink-tulip', 'shady-rust', 'wet-rock', 'wet-moss', 'turquoise-sea', 'lavender-fields', 'piggy-red', 'light-mud', 'gun-metal', 'modern-green', 'french-coast', 'sweet-lilac', 'red-burgundy', 'pirate-gold']]
     """Color of the label"""
 
+
 class Request_createList(TypedDict):
     type: Literal['active', 'closed']
     """Type/status of the list"""
@@ -297,6 +333,7 @@ class Request_createList(TypedDict):
     """Position of the list within the board"""
     name: str
     """Name/title of the list"""
+
 
 class Request_updateList(TypedDict):
     boardId: NotRequired[str]
@@ -310,9 +347,11 @@ class Request_updateList(TypedDict):
     color: NotRequired[Literal['berry-red', 'pumpkin-orange', 'lagoon-blue', 'pink-tulip', 'light-mud', 'orange-peel', 'bright-moss', 'antique-blue', 'dark-granite', 'turquoise-sea'] | None]
     """Color for the list"""
 
+
 class Request_moveListCards(TypedDict):
     listId: str
     """ID of the target list (must be an archive-type list)"""
+
 
 class Request_sortList(TypedDict):
     fieldName: Literal['name', 'dueDate', 'createdAt']
@@ -320,11 +359,13 @@ class Request_sortList(TypedDict):
     order: NotRequired[Literal['asc', 'desc']]
     """Sorting order"""
 
+
 class Request_createBoardNotificationService(TypedDict):
     url: str
     """URL endpoint for notifications"""
     format: Literal['text', 'markdown', 'html']
     """Format for notification messages"""
+
 
 class Request_createUserNotificationService(TypedDict):
     url: str
@@ -332,19 +373,23 @@ class Request_createUserNotificationService(TypedDict):
     format: Literal['text', 'markdown', 'html']
     """Format for notification messages"""
 
+
 class Request_updateNotificationService(TypedDict):
     url: NotRequired[str]
     """URL endpoint for notifications"""
     format: NotRequired[Literal['text', 'markdown', 'html']]
     """Format for notification messages"""
 
+
 class Request_updateNotification(TypedDict):
     isRead: NotRequired[bool]
     """Whether the notification has been read"""
 
+
 class Request_createProjectManager(TypedDict):
     userId: str
     """ID of the user who is assigned as project manager"""
+
 
 class Request_createProject(TypedDict):
     type: Literal['private', 'shared']
@@ -353,6 +398,7 @@ class Request_createProject(TypedDict):
     """Name/title of the project"""
     description: NotRequired[str | None]
     """Detailed description of the project"""
+
 
 class Request_updateProject(TypedDict):
     ownerProjectManagerId: NotRequired[str | None]
@@ -372,6 +418,7 @@ class Request_updateProject(TypedDict):
     isFavorite: NotRequired[bool]
     """Whether the project is marked as favorite by the current user"""
 
+
 class Request_createTaskList(TypedDict):
     position: int
     """Position of the task list within the card"""
@@ -381,6 +428,7 @@ class Request_createTaskList(TypedDict):
     """Whether to show the task list on the front of the card"""
     hideCompletedTasks: NotRequired[bool]
     """Whether to hide completed tasks"""
+
 
 class Request_updateTaskList(TypedDict):
     position: NotRequired[int]
@@ -392,6 +440,7 @@ class Request_updateTaskList(TypedDict):
     hideCompletedTasks: NotRequired[bool]
     """Whether to hide completed tasks"""
 
+
 class Request_createTask(TypedDict):
     linkedCardId: NotRequired[str]
     """ID of the card linked to the task"""
@@ -401,6 +450,7 @@ class Request_createTask(TypedDict):
     """Name/title of the task (required if `linkedCardId` is not provided)"""
     isCompleted: NotRequired[bool]
     """Whether the task is completed"""
+
 
 class Request_updateTask(TypedDict):
     taskListId: NotRequired[str]
@@ -414,9 +464,11 @@ class Request_updateTask(TypedDict):
     isCompleted: NotRequired[bool]
     """Whether the task is completed"""
 
+
 class Request_getTerms(TypedDict):
     language: NotRequired[str]
     """Language code for terms localization"""
+
 
 class Request_createUser(TypedDict):
     email: str
@@ -442,9 +494,11 @@ class Request_createUser(TypedDict):
     turnOffRecentCardHighlighting: NotRequired[bool]
     """Whether recent card highlighting is disabled"""
 
+
 class Request_getUser(TypedDict):
     subscribe: NotRequired[bool]
     """Whether to subscribe to real-time updates for this user (only for socket connections)"""
+
 
 class Request_updateUser(TypedDict):
     role: NotRequired[Literal['admin', 'projectOwner', 'boardUser']]
@@ -480,9 +534,11 @@ class Request_updateUser(TypedDict):
     isDeactivated: NotRequired[bool]
     """Whether the user account is deactivated and cannot log in (for admins)"""
 
+
 class Request_updateUserAvatar(TypedDict):
     file: bytes
     """Avatar image file (must be an image format)"""
+
 
 class Request_updateUserEmail(TypedDict):
     email: str
@@ -490,17 +546,20 @@ class Request_updateUserEmail(TypedDict):
     currentPassword: NotRequired[str]
     """Current password (required when updating own email)"""
 
+
 class Request_updateUserPassword(TypedDict):
     password: str
     """Password (must meet password requirements)"""
     currentPassword: NotRequired[str]
     """Current password (required when updating own password)"""
 
+
 class Request_updateUserUsername(TypedDict):
     username: NotRequired[str | None]
     """Unique username for user identification"""
     currentPassword: NotRequired[str]
     """Current password (required when updating own username)"""
+
 
 class Request_createWebhook(TypedDict):
     name: str
@@ -513,6 +572,7 @@ class Request_createWebhook(TypedDict):
     """Comma-separated list of events that trigger the webhook"""
     excludedEvents: NotRequired[str | None]
     """Comma-separated list of events excluded from the webhook"""
+
 
 class Request_updateWebhook(TypedDict):
     name: NotRequired[str]
@@ -527,598 +587,725 @@ class Request_updateWebhook(TypedDict):
     """Comma-separated list of events excluded from the webhook"""
 
 
-
-# Response Typing
 class Response_acceptTerms(TypedDict):
     """Terms accepted successfully"""
     item: str
     """Access token for API authentication"""
+
 
 class Response_createAccessToken(TypedDict):
     """Login successful"""
     item: str
     """Access token for API authentication"""
 
+
 class Response_deleteAccessToken(TypedDict):
     """Logout successful"""
     item: str
     """Revoked access token"""
+
 
 class Response_exchangeForAccessTokenWithOidc(TypedDict):
     """OIDC exchange successful"""
     item: str
     """Access token for API authentication"""
 
+
 class Response_revokePendingToken(TypedDict):
     """Pending token revoked successfully"""
     item: dict[str, Any] | None
     """No data returned"""
 
+
 class Response_getBoardActions(TypedDict):
     """Board actions retrieved successfully"""
-    items: list[Action]
+    items: list[sch.Action]
     included: Included_getBoardActions
 
+
 class Included_getBoardActions(TypedDict):
-    users: list[User]
+    users: list[sch.User]
+
 
 class Response_getCardActions(TypedDict):
     """Card actions retrieved successfully"""
-    items: list[Action]
+    items: list[sch.Action]
     included: Included_getCardActions
 
+
 class Included_getCardActions(TypedDict):
-    users: list[User]
+    users: list[sch.User]
+
 
 class Response_createAttachment(TypedDict):
     """Attachment created successfully"""
-    item: Attachment
+    item: sch.Attachment
+
 
 class Response_deleteAttachment(TypedDict):
     """Attachment deleted successfully"""
-    item: Attachment
+    item: sch.Attachment
+
 
 class Response_updateAttachment(TypedDict):
     """Attachment updated successfully"""
-    item: Attachment
+    item: sch.Attachment
+
 
 class Response_createBackgroundImage(TypedDict):
     """Background image uploaded successfully"""
-    item: BackgroundImage
+    item: sch.BackgroundImage
+
 
 class Response_deleteBackgroundImage(TypedDict):
     """Background image deleted successfully"""
-    item: BackgroundImage
+    item: sch.BackgroundImage
+
 
 class Response_createBaseCustomFieldGroup(TypedDict):
     """Base custom field group created successfully"""
-    item: BaseCustomFieldGroup
+    item: sch.BaseCustomFieldGroup
+
 
 class Response_deleteBaseCustomFieldGroup(TypedDict):
     """Base custom field group deleted successfully"""
-    item: BaseCustomFieldGroup
+    item: sch.BaseCustomFieldGroup
+
 
 class Response_updateBaseCustomFieldGroup(TypedDict):
     """Base custom field group updated successfully"""
-    item: BaseCustomFieldGroup
+    item: sch.BaseCustomFieldGroup
+
 
 class Response_createBoardMembership(TypedDict):
     """Board membership created successfully"""
-    item: BoardMembership
+    item: sch.BoardMembership
+
 
 class Response_deleteBoardMembership(TypedDict):
     """Board membership deleted successfully"""
-    item: BoardMembership
+    item: sch.BoardMembership
+
 
 class Response_updateBoardMembership(TypedDict):
     """Board membership updated successfully"""
-    item: BoardMembership
+    item: sch.BoardMembership
+
 
 class Response_createBoard(TypedDict):
     """Board created successfully"""
-    item: Board
+    item: sch.Board
     included: Included_createBoard
 
+
 class Included_createBoard(TypedDict):
-    boardMemberships: list[BoardMembership]
+    boardMemberships: list[sch.BoardMembership]
+
 
 class Response_deleteBoard(TypedDict):
     """Board deleted successfully"""
-    item: Board
+    item: sch.Board
+
 
 class Response_getBoard(TypedDict):
     """Board details retrieved successfully"""
     item: Item_getBoard
     included: Included_getBoard
 
+
 class Included_getBoard(TypedDict):
-    users: list[User]
-    projects: list[Project]
-    boardMemberships: list[BoardMembership]
-    labels: list[Label]
-    lists: list[List]
+    users: list[sch.User]
+    projects: list[sch.Project]
+    boardMemberships: list[sch.BoardMembership]
+    labels: list[sch.Label]
+    lists: list[sch.List]
     cards: list[Included_getBoard_all]
     """Related cards"""
-    cardMemberships: list[CardMembership]
-    cardLabels: list[CardLabel]
-    taskLists: list[TaskList]
-    tasks: list[Task]
-    attachments: list[Attachment]
-    customFieldGroups: list[CustomFieldGroup]
-    customFields: list[CustomField]
-    customFieldValues: list[CustomFieldValue]
+    cardMemberships: list[sch.CardMembership]
+    cardLabels: list[sch.CardLabel]
+    taskLists: list[sch.TaskList]
+    tasks: list[sch.Task]
+    attachments: list[sch.Attachment]
+    customFieldGroups: list[sch.CustomFieldGroup]
+    customFields: list[sch.CustomField]
+    customFieldValues: list[sch.CustomFieldValue]
 
-class Included_getBoard_all(Card):
+
+class Included_getBoard_all(sch.Card):
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
-class Item_getBoard(Board):
-    isSubscribed: bool
+
+class Item_getBoard(sch.Board):
+    isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the board"""
+
 
 class Response_updateBoard(TypedDict):
     """Board updated successfully"""
-    item: Board
+    item: sch.Board
+
 
 class Response_getBootstrap(TypedDict):
     """Bootstrap retrieved successfully"""
-    item: Bootstrap
+    item: sch.Bootstrap
+
 
 class Response_createCardLabel(TypedDict):
     """Label added to card successfully"""
-    item: CardLabel
+    item: sch.CardLabel
+
 
 class Response_deleteCardLabel(TypedDict):
     """Label removed from card successfully"""
-    item: CardLabel
+    item: sch.CardLabel
+
 
 class Response_createCardMembership(TypedDict):
     """User added to card successfully"""
-    item: CardMembership
+    item: sch.CardMembership
+
 
 class Response_deleteCardMembership(TypedDict):
     """User removed from card successfully"""
-    item: CardMembership
+    item: sch.CardMembership
+
 
 class Response_createCard(TypedDict):
     """Card created successfully"""
-    item: Card
+    item: sch.Card
+
 
 class Response_getCards(TypedDict):
     """Cards retrieved successfully"""
     items: list[Items_getCards]
     included: Included_getCards
 
-class Included_getCards(TypedDict):
-    users: list[User]
-    cardMemberships: list[CardMembership]
-    cardLabels: list[CardLabel]
-    taskLists: list[TaskList]
-    tasks: list[Task]
-    attachments: list[Attachment]
-    customFieldGroups: list[CustomFieldGroup]
-    customFields: list[CustomField]
-    customFieldValues: list[CustomFieldValue]
 
-class Items_getCards(Card):
+class Included_getCards(TypedDict):
+    users: list[sch.User]
+    cardMemberships: list[sch.CardMembership]
+    cardLabels: list[sch.CardLabel]
+    taskLists: list[sch.TaskList]
+    tasks: list[sch.Task]
+    attachments: list[sch.Attachment]
+    customFieldGroups: list[sch.CustomFieldGroup]
+    customFields: list[sch.CustomField]
+    customFieldValues: list[sch.CustomFieldValue]
+
+
+class Items_getCards(sch.Card):
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
+
 class Response_deleteCard(TypedDict):
     """Card deleted successfully"""
-    item: Card
+    item: sch.Card
+
 
 class Response_getCard(TypedDict):
     """Card details retrieved successfully"""
     item: Item_getCard
     included: Included_getCard
 
-class Included_getCard(TypedDict):
-    users: list[User]
-    cardMemberships: list[CardMembership]
-    cardLabels: list[CardLabel]
-    taskLists: list[TaskList]
-    tasks: list[Task]
-    attachments: list[Attachment]
-    customFieldGroups: list[CustomFieldGroup]
-    customFields: list[CustomField]
-    customFieldValues: list[CustomFieldValue]
 
-class Item_getCard(Card):
+class Included_getCard(TypedDict):
+    users: list[sch.User]
+    cardMemberships: list[sch.CardMembership]
+    cardLabels: list[sch.CardLabel]
+    taskLists: list[sch.TaskList]
+    tasks: list[sch.Task]
+    attachments: list[sch.Attachment]
+    customFieldGroups: list[sch.CustomFieldGroup]
+    customFields: list[sch.CustomField]
+    customFieldValues: list[sch.CustomFieldValue]
+
+
+class Item_getCard(sch.Card):
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
+
 
 class Response_updateCard(TypedDict):
     """Card updated successfully"""
-    item: Card
+    item: sch.Card
+
 
 class Response_duplicateCard(TypedDict):
     """Card duplicated successfully"""
-    item: Card
+    item: sch.Card
     included: Included_duplicateCard
 
+
 class Included_duplicateCard(TypedDict):
-    cardMemberships: list[CardMembership]
-    cardLabels: list[CardLabel]
-    taskLists: list[TaskList]
-    tasks: list[Task]
-    attachments: list[Attachment]
-    customFieldGroups: list[CustomFieldGroup]
-    customFields: list[CustomField]
-    customFieldValues: list[CustomFieldValue]
+    cardMemberships: list[sch.CardMembership]
+    cardLabels: list[sch.CardLabel]
+    taskLists: list[sch.TaskList]
+    tasks: list[sch.Task]
+    attachments: list[sch.Attachment]
+    customFieldGroups: list[sch.CustomFieldGroup]
+    customFields: list[sch.CustomField]
+    customFieldValues: list[sch.CustomFieldValue]
+
 
 class Response_readCardNotifications(TypedDict):
     """Notifications marked as read successfully"""
-    item: Card
+    item: sch.Card
     included: Included_readCardNotifications
 
+
 class Included_readCardNotifications(TypedDict):
-    notifications: list[Notification]
+    notifications: list[sch.Notification]
+
 
 class Response_createComment(TypedDict):
     """Comment created successfully"""
-    item: Comment
+    item: sch.Comment
+
 
 class Response_getComments(TypedDict):
     """Comments retrieved successfully"""
-    items: list[Comment]
+    items: list[sch.Comment]
     included: Included_getComments
 
+
 class Included_getComments(TypedDict):
-    users: list[User]
+    users: list[sch.User]
+
 
 class Response_deleteComment(TypedDict):
     """Comment deleted successfully"""
-    item: Comment
+    item: sch.Comment
+
 
 class Response_updateComments(TypedDict):
     """Comment updated successfully"""
-    item: Comment
+    item: sch.Comment
+
 
 class Response_getConfig(TypedDict):
     """Configuration retrieved successfully"""
-    item: Config
+    item: sch.Config
+
 
 class Response_updateConfig(TypedDict):
     """Configuration updated successfully"""
-    item: Config
+    item: sch.Config
+
 
 class Response_testSmtpConfig(TypedDict):
     """Test email sent successfully"""
-    item: Config
+    item: sch.Config
+
 
 class Response_createBoardCustomFieldGroup(TypedDict):
     """Custom field group created successfully"""
-    item: CustomFieldGroup
+    item: sch.CustomFieldGroup
+
 
 class Response_createCardCustomFieldGroup(TypedDict):
     """Custom field group created successfully"""
-    item: CustomFieldGroup
+    item: sch.CustomFieldGroup
+
 
 class Response_deleteCustomFieldGroup(TypedDict):
     """Custom field group deleted successfully"""
-    item: CustomFieldGroup
+    item: sch.CustomFieldGroup
+
 
 class Response_getCustomFieldGroup(TypedDict):
     """Custom field group details retrieved successfully"""
-    item: CustomFieldGroup
+    item: sch.CustomFieldGroup
     included: Included_getCustomFieldGroup
 
+
 class Included_getCustomFieldGroup(TypedDict):
-    customFields: list[CustomField]
-    customFieldValues: list[CustomFieldValue]
+    customFields: list[sch.CustomField]
+    customFieldValues: list[sch.CustomFieldValue]
+
 
 class Response_updateCustomFieldGroup(TypedDict):
     """Custom field group updated successfully"""
-    item: CustomFieldGroup
+    item: sch.CustomFieldGroup
+
 
 class Response_updateCustomFieldValue(TypedDict):
     """Custom field value created or updated successfully"""
-    item: CustomFieldValue
+    item: sch.CustomFieldValue
+
 
 class Response_deleteCustomFieldValue(TypedDict):
     """Custom field value deleted successfully"""
-    item: CustomFieldValue
+    item: sch.CustomFieldValue
+
 
 class Response_createCustomFieldInBaseGroup(TypedDict):
     """Custom field created successfully"""
-    item: CustomField
+    item: sch.CustomField
+
 
 class Response_createCustomFieldInGroup(TypedDict):
     """Custom field created successfully"""
-    item: CustomField
+    item: sch.CustomField
+
 
 class Response_deleteCustomField(TypedDict):
     """Custom field deleted successfully"""
-    item: CustomField
+    item: sch.CustomField
+
 
 class Response_updateCustomField(TypedDict):
     """Custom field updated successfully"""
-    item: CustomField
+    item: sch.CustomField
+
 
 class Response_createLabel(TypedDict):
     """Label created successfully"""
-    item: Label
+    item: sch.Label
+
 
 class Response_deleteLabel(TypedDict):
     """Label deleted successfully"""
-    item: Label
+    item: sch.Label
+
 
 class Response_updateLabel(TypedDict):
     """Label updated successfully"""
-    item: Label
+    item: sch.Label
+
 
 class Response_clearList(TypedDict):
     """List cleared successfully"""
-    item: List
+    item: sch.List
+
 
 class Response_createList(TypedDict):
     """List created successfully"""
-    item: List
+    item: sch.List
+
 
 class Response_deleteList(TypedDict):
     """List deleted successfully"""
-    item: List
+    item: sch.List
     included: Included_deleteList
 
+
 class Included_deleteList(TypedDict):
-    cards: list[Card]
+    cards: list[sch.Card]
+
 
 class Response_getList(TypedDict):
     """List details retrieved successfully"""
-    item: List
+    item: sch.List
     included: Included_getList
 
+
 class Included_getList(TypedDict):
-    users: list[User]
+    users: list[sch.User]
     cards: list[Included_getList_all]
     """Related cards"""
-    cardMemberships: list[CardMembership]
-    cardLabels: list[CardLabel]
-    taskLists: list[TaskList]
-    tasks: list[Task]
-    attachments: list[Attachment]
-    customFieldGroups: list[CustomFieldGroup]
-    customFields: list[CustomField]
-    customFieldValues: list[CustomFieldValue]
+    cardMemberships: list[sch.CardMembership]
+    cardLabels: list[sch.CardLabel]
+    taskLists: list[sch.TaskList]
+    tasks: list[sch.Task]
+    attachments: list[sch.Attachment]
+    customFieldGroups: list[sch.CustomFieldGroup]
+    customFields: list[sch.CustomField]
+    customFieldValues: list[sch.CustomFieldValue]
 
-class Included_getList_all(Card):
+
+class Included_getList_all(sch.Card):
     isSubscribed: NotRequired[bool]
     """Whether the current user is subscribed to the card"""
 
+
 class Response_updateList(TypedDict):
     """List updated successfully"""
-    item: List
+    item: sch.List
+
 
 class Response_moveListCards(TypedDict):
     """Cards moved successfully"""
-    item: List
+    item: sch.List
     included: Included_moveListCards
 
+
 class Included_moveListCards(TypedDict):
-    cards: list[Card]
-    actions: list[Action]
+    cards: list[sch.Card]
+    actions: list[sch.Action]
+
 
 class Response_sortList(TypedDict):
     """List sorted successfully"""
-    item: List
+    item: sch.List
     included: Included_sortList
 
+
 class Included_sortList(TypedDict):
-    cards: list[Card]
+    cards: list[sch.Card]
+
 
 class Response_createBoardNotificationService(TypedDict):
     """Notification service created successfully"""
-    item: NotificationService
+    item: sch.NotificationService
+
 
 class Response_createUserNotificationService(TypedDict):
     """Notification service created successfully"""
-    item: NotificationService
+    item: sch.NotificationService
+
 
 class Response_deleteNotificationService(TypedDict):
     """Notification service deleted successfully"""
-    item: NotificationService
+    item: sch.NotificationService
+
 
 class Response_updateNotificationService(TypedDict):
     """Notification service updated successfully"""
-    item: NotificationService
+    item: sch.NotificationService
+
 
 class Response_testNotificationService(TypedDict):
     """Test notification sent successfully"""
-    item: NotificationService
+    item: sch.NotificationService
+
 
 class Response_getNotifications(TypedDict):
     """Notifications retrieved successfully"""
-    items: list[Notification]
+    items: list[sch.Notification]
     included: Included_getNotifications
 
+
 class Included_getNotifications(TypedDict):
-    users: list[User]
+    users: list[sch.User]
+
 
 class Response_readAllNotifications(TypedDict):
     """Notifications marked as read successfully"""
-    items: list[Notification]
+    items: list[sch.Notification]
+
 
 class Response_getNotification(TypedDict):
     """Notification details retrieved successfully"""
-    item: Notification
+    item: sch.Notification
     included: Included_getNotification
 
+
 class Included_getNotification(TypedDict):
-    users: list[User]
+    users: list[sch.User]
+
 
 class Response_updateNotification(TypedDict):
     """Notification updated successfully"""
-    item: Notification
+    item: sch.Notification
+
 
 class Response_createProjectManager(TypedDict):
     """Project manager created successfully"""
-    item: ProjectManager
+    item: sch.ProjectManager
+
 
 class Response_deleteProjectManager(TypedDict):
     """Project manager deleted successfully"""
-    item: ProjectManager
+    item: sch.ProjectManager
+
 
 class Response_createProject(TypedDict):
     """Project created successfully"""
-    item: Project
+    item: sch.Project
     included: Included_createProject
 
+
 class Included_createProject(TypedDict):
-    projectManagers: list[ProjectManager]
+    projectManagers: list[sch.ProjectManager]
+
 
 class Response_getProjects(TypedDict):
     """Projects retrieved successfully"""
     items: list[Items_getProjects]
     included: Included_getProjects
 
-class Included_getProjects(TypedDict):
-    users: list[User]
-    projectManagers: list[ProjectManager]
-    backgroundImages: list[BackgroundImage]
-    baseCustomFieldGroups: list[BaseCustomFieldGroup]
-    boards: list[Board]
-    boardMemberships: list[BoardMembership]
-    customFields: list[CustomField]
-    notificationServices: list[NotificationService]
 
-class Items_getProjects(Project):
+class Included_getProjects(TypedDict):
+    users: list[sch.User]
+    projectManagers: list[sch.ProjectManager]
+    backgroundImages: list[sch.BackgroundImage]
+    baseCustomFieldGroups: list[sch.BaseCustomFieldGroup]
+    boards: list[sch.Board]
+    boardMemberships: list[sch.BoardMembership]
+    customFields: list[sch.CustomField]
+    notificationServices: list[sch.NotificationService]
+
+
+class Items_getProjects(sch.Project):
     isFavorite: NotRequired[bool]
     """Whether the project is marked as favorite by the current user"""
 
+
 class Response_deleteProject(TypedDict):
     """Project deleted successfully"""
-    item: Project
+    item: sch.Project
+
 
 class Response_getProject(TypedDict):
     """Project details retrieved successfully"""
     item: Item_getProject
     included: Included_getProject
 
-class Included_getProject(TypedDict):
-    users: list[User]
-    projectManagers: list[ProjectManager]
-    backgroundImages: list[BackgroundImage]
-    baseCustomFieldGroups: list[BaseCustomFieldGroup]
-    boards: list[Board]
-    boardMemberships: list[BoardMembership]
-    customFields: list[CustomField]
-    notificationServices: list[NotificationService]
 
-class Item_getProject(Project):
+class Included_getProject(TypedDict):
+    users: list[sch.User]
+    projectManagers: list[sch.ProjectManager]
+    backgroundImages: list[sch.BackgroundImage]
+    baseCustomFieldGroups: list[sch.BaseCustomFieldGroup]
+    boards: list[sch.Board]
+    boardMemberships: list[sch.BoardMembership]
+    customFields: list[sch.CustomField]
+    notificationServices: list[sch.NotificationService]
+
+
+class Item_getProject(sch.Project):
     isFavorite: NotRequired[bool]
     """Whether the project is marked as favorite by the current user"""
 
+
 class Response_updateProject(TypedDict):
     """Project updated successfully"""
-    item: Project
+    item: sch.Project
+
 
 class Response_createTaskList(TypedDict):
     """Task list created successfully"""
-    item: TaskList
+    item: sch.TaskList
+
 
 class Response_deleteTaskList(TypedDict):
     """Task list deleted successfully"""
-    item: TaskList
+    item: sch.TaskList
+
 
 class Response_getTaskList(TypedDict):
     """Task list details retrieved successfully"""
-    item: TaskList
+    item: sch.TaskList
     included: Included_getTaskList
 
+
 class Included_getTaskList(TypedDict):
-    tasks: list[Task]
+    tasks: list[sch.Task]
+
 
 class Response_updateTaskList(TypedDict):
     """Task list updated successfully"""
-    item: TaskList
+    item: sch.TaskList
+
 
 class Response_createTask(TypedDict):
     """Task created successfully"""
-    item: Task
+    item: sch.Task
+
 
 class Response_deleteTask(TypedDict):
     """Task deleted successfully"""
-    item: Task
+    item: sch.Task
+
 
 class Response_updateTask(TypedDict):
     """Task updated successfully"""
-    item: Task
+    item: sch.Task
+
 
 class Response_getTerms(TypedDict):
     """Terms content retrieved successfully"""
     item: Item_getTerms
+
 
 class Item_getTerms(TypedDict):
     language: str
     content: str
     signature: str
 
+
 class Response_createUserApiKey(TypedDict):
     """API key created successfully"""
-    item: User
+    item: sch.User
     included: Included_createUserApiKey
+
 
 class Included_createUserApiKey(TypedDict):
     apiKey: str
 
+
 class Response_createUser(TypedDict):
     """User created successfully"""
-    item: User
+    item: sch.User
+
 
 class Response_getUsers(TypedDict):
     """Users retrieved successfully"""
-    items: list[User]
+    items: list[sch.User]
+
 
 class Response_deleteUser(TypedDict):
     """User deleted successfully"""
-    item: User
+    item: sch.User
+
 
 class Response_getUser(TypedDict):
     """User details retrieved successfully"""
-    item: User
+    item: sch.User
     included: Included_getUser
 
+
 class Included_getUser(TypedDict):
-    notificationServices: list[NotificationService]
+    notificationServices: list[sch.NotificationService]
+
 
 class Response_updateUser(TypedDict):
     """User updated successfully"""
-    item: User
+    item: sch.User
+
 
 class Response_updateUserAvatar(TypedDict):
     """Avatar updated successfully"""
-    item: User
+    item: sch.User
+
 
 class Response_updateUserEmail(TypedDict):
     """Email updated successfully"""
-    item: User
+    item: sch.User
+
 
 class Response_updateUserPassword(TypedDict):
     """Password updated successfully"""
-    item: User
+    item: sch.User
     included: Included_updateUserPassword
+
 
 class Included_updateUserPassword(TypedDict):
     accessToken: str
 
+
 class Response_updateUserUsername(TypedDict):
     """Username updated successfully"""
-    item: User
+    item: sch.User
+
 
 class Response_createWebhook(TypedDict):
     """Webhook created successfully"""
-    item: Webhook
+    item: sch.Webhook
+
 
 class Response_getWebhooks(TypedDict):
     """Webhooks retrieved successfully"""
-    items: list[Webhook]
+    items: list[sch.Webhook]
+
 
 class Response_deleteWebhook(TypedDict):
     """Webhook deleted successfully"""
-    item: Webhook
+    item: sch.Webhook
+
 
 class Response_updateWebhook(TypedDict):
     """Webhook updated successfully"""
-    item: Webhook
-
+    item: sch.Webhook

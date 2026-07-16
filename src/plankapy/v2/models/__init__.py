@@ -1,7 +1,6 @@
 """All Object Models for Plankapy v2.5+ (Planka 2.0.0+)"""
 
-__all__ = (
-    "PlankaModel",
+__all__ = [
     "Action",
     "Attachment",
     "BackgroundImage",
@@ -20,59 +19,63 @@ __all__ = (
     "List",
     "Notification",
     "NotificationService",
+    "PlankaModel",
     "Project",
     "ProjectManager",
+    "Stopwatch",
     "Task",
     "TaskList",
     "User",
     "Webhook",
-    "Stopwatch",
-    
-    # Literal tuples
-    "BoardViews",
-    "CardTypes",
-    "BoardRoles",
-    "LabelColors",
-    "ListColors",
-    "BackgroundGradients",
-    "Languages",
-    "EditorModes",
-    "HomeViews",
-    "ProjectOrderings",
-    "TermsTypes",
-    "LockableFields",
-    "NotificationTypes",
-    "UserRoles",
+]
+
+__all__.extend(
+    [
+        "BackgroundGradients",
+        "BoardRoles",
+        "BoardViews",
+        "CardTypes",
+        "EditorModes",
+        "HomeViews",
+        "LabelColors",
+        "Languages",
+        "ListColors",
+        "LockableFields",
+        "NotificationTypes",
+        "ProjectOrderings",
+        "TermsTypes",
+        "UserRoles",
+    ]
 )
 
 from ._base import PlankaModel
+from ._literals import *
 from .action import Action
 from .attachment import Attachment
 from .background_image import BackgroundImage
 from .base_custom_field_group import BaseCustomFieldGroup
-from .board_membership import BoardMembership
 from .board import Board
+from .board_membership import BoardMembership
+from .card import Card, Stopwatch
 from .card_label import CardLabel
 from .card_membership import CardMembership
-from .card import Card, Stopwatch
 from .comment import Comment
 from .config import Config
+from .custom_field import CustomField
 from .custom_field_group import CustomFieldGroup
 from .custom_field_value import CustomFieldValue
-from .custom_field import CustomField
 from .label import Label
 from .list_ import List
-from .notification_service import NotificationService
 from .notification import Notification
-from .project_manager import ProjectManager
+from .notification_service import NotificationService
 from .project import Project
-from .task_list import TaskList
+from .project_manager import ProjectManager
 from .task import Task
+from .task_list import TaskList
 from .user import User
 from .webhook import Webhook
-from ._literals import *
 
-############################ Model Format #####################################
+# Model Format #####################################
 # 1) add_*: For creating an association between a model and another model     #
 #   - Card.add_label(label: Label): ...                                       #
 #                                                                             #
@@ -89,7 +92,7 @@ from ._literals import *
 #   - board.delete_label(label)                                               #
 #                                                                             #
 # 6) sync, update, delete: If possible allow GET, PATCH, DELETE passthroughs  #
-#   - If sync required more than 2 requests, don't implement it               # 
+#   - If sync required more than 2 requests, don't implement it               #
 #                                                                             #
 # 7) @property: All attributes and includes that require 1 request            #
 #   - board.labels (in board['included'])                                     #
@@ -115,4 +118,3 @@ from ._literals import *
 #   - If your operation is slow, do not cache to prevent de-syncing           #
 #       - Slow is ~1-2s We want to capture accurate board states              #
 ###############################################################################
-
