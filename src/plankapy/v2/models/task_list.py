@@ -64,6 +64,7 @@ class TaskList(PlankaModel[schemas.TaskList]):
     @show_on_front_of_card.setter
     def show_on_front_of_card(self, show_on_front_of_card: bool) -> None:
         """Set whether to show TaskList on the front of the Card"""
+        self.update(showOnFrontOfCard=show_on_front_of_card)
 
     @property
     def hide_completed_tasks(self) -> bool:
