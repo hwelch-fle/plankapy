@@ -32,7 +32,7 @@ class Label(PlankaModel[schemas.Label]):
     @position.setter
     def position(self, position: int) -> None:
         """Set the position of the Label within the Board"""
-        self.update()
+        self.update(position=position)
 
     @property
     def name(self) -> str:
