@@ -49,6 +49,10 @@ class BackgroundImage(PlankaModel[schemas.BackgroundImage]):
         return self.schema['thumbnailUrls']
 
     # Special Methods
+    def sync(self) -> None:
+        """Sync the BackgroundImage with the Planka server"""
+        self.schema = self.project.background_images[self].dpop(default=self).schema
+
     def download(self) -> Iterator[bytes]:
         """Get bytes for the full image.
 

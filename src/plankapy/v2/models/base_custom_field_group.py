@@ -53,9 +53,7 @@ class BaseCustomFieldGroup(PlankaModel[schemas.BaseCustomFieldGroup]):
     # Special Methods
     def sync(self):
         """Sync the BaseCustomFieldGroup with the Planka server."""
-        for bcfg in self.project.base_custom_field_groups:
-            if bcfg == self:
-                self.schema = bcfg.schema
+        self.schema = self.project.base_custom_field_groups[self].dpop(default=self).schema
 
     def update(self, **base_custom_field_group: Unpack[typ.Request_updateBaseCustomFieldGroup]):
         """Update the BaseCustomFieldGroup."""

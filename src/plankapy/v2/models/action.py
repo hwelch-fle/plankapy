@@ -54,6 +54,11 @@ class Action(PlankaModel[schemas.Action]):
         """The type of the Action"""
         return self.schema['type']
 
+    # Special Methods
+    def sync(self) -> None:
+        """Sync the Action with the Planka server"""
+        self.schema = self.card.actions[self].dpop(default=self).schema
+
 
 from .board import Board
 from .card import Card

@@ -40,6 +40,11 @@ class CardMembership(PlankaModel[schemas.CardMembership]):
         """When the card membership was last updated"""
         return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
+    # Special Methods
+    def sync(self):
+        """Sync the CardMembership with the Planka server"""
+        self.schema = self.card.board.card_memberships[self].dpop(default=self).schema
+
     def delete(self):
         """Delete the CardMembership"""
         return self.endpoints.deleteCardMembership(userId=self.user.id, cardId=self.card.id)

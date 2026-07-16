@@ -71,6 +71,7 @@ class CustomField(PlankaModel[schemas.CustomField]):
     # Special Methods
     def sync(self):
         """Sync the CustomField with the Planka server"""
+        self.schema = self.custom_field_group.custom_fields[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateCustomField]):
         """Update the CustomField"""

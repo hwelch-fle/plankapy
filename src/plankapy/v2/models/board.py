@@ -276,7 +276,7 @@ class Board(PlankaModel[schemas.Board]):
 
     # Special Methods
     def sync(self) -> None:
-        """Sync the Board with the Planka Server"""
+        """Sync the Board with the Planka server"""
         self.schema = self.endpoints.getBoard(self.id)['item']
 
     def update(self, **board: Unpack[typ.Request_updateBoard]) -> None:

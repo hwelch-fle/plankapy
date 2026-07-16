@@ -62,8 +62,7 @@ class Attachment(PlankaModel[schemas.Attachment]):
 
     # Special Methods
     def sync(self) -> None:
-        """Pull the latest state of the Attachment from the Planka Server"""
-        # No endpoint for attachments, need to get it through the associated Card
+        """Sync the Attachment with the Planka server"""
         self.schema = self.card.attachments[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateAttachment]) -> None:

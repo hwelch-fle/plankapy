@@ -38,6 +38,11 @@ class CardLabel(PlankaModel[schemas.CardLabel]):
         """When the card-label association was last updated"""
         return dtfromiso(self.schema['updatedAt'], self.session.timezone)
 
+    # Special Methods
+    def sync(self):
+        """Sync the CardLabel with the Planka server"""
+        self.schema = self.card.board.card_labels[self].dpop(default=self).schema
+
     def delete(self):
         """Delete the CardLabel"""
         return self.endpoints.deleteCardLabel(cardId=self.schema['cardId'], labelId=self.schema['labelId'])

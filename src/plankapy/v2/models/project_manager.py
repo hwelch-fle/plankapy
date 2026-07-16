@@ -43,7 +43,7 @@ class ProjectManager(PlankaModel[schemas.ProjectManager]):
     # Special Methods
     def sync(self):
         """Sync the ProjectManager with the Planka server"""
-        self.schema = self.project.project_managers[{'id': self.id}].dpop(default=self).schema
+        self.schema = self.project.project_managers[self].dpop(default=self).schema
 
     def delete(self):
         self.endpoints.deleteProjectManager(self.id)

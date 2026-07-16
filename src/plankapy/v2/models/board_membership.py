@@ -77,8 +77,7 @@ class BoardMembership(PlankaModel[schemas.BoardMembership]):
     # Special Methods
     def sync(self):
         """Sync the BoardMembership with the Planka server"""
-        if bms := self.board.board_memberships[{'id': self.id}].dpop(default=self):
-            self.schema = bms.schema
+        self.schema = self.board.board_memberships[self].dpop(default=self).schema
 
     def update(self, **kwargs: Unpack[typ.Request_updateBoardMembership]) -> None:
         """Update the BoardMembership"""

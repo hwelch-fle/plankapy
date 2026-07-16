@@ -846,6 +846,7 @@ class Stopwatch:
         self.card.update(stopwatch=current)
 
     def sync(self):
+        """Sync the Stopwatch (alias for `self.card.sync()`)"""
         self.card.sync()
 
     def __repr__(self) -> str:

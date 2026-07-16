@@ -171,6 +171,7 @@ class Project(PlankaModel[schemas.Project]):
 
     # Special Methods
     def sync(self):
+        """Sync the Project with the Planka server"""
         self.schema = self.endpoints.getProject(self.id)['item']
 
     def update(self, **project: Unpack[typ.Request_updateProject]) -> None:
